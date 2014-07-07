@@ -1,0 +1,6 @@
+rootProject.name = 'openpush-project'
+
+include ':openpush'
+include ':openpush-sample'
+
+project(':openpush').projectDir = new File(settingsDir, "openpush-library")

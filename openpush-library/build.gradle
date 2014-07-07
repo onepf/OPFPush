@@ -1,0 +1,59 @@
+group = "org.onepf.openpush"
+version = "1.00-SNAPSHOT"
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+    }
+}
+
+apply plugin: 'android-library'
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:+'
+    provided 'com.google.android.gms:play-services:3.1.+'
+    compile files('libs/push.jar')
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 19
+        versionCode version.replace('.', '').replace('-SNAPSHOT', '') as int
+        versionName version
+    }
+}
+
+artifacts {
+    archives (file('build/bundles/release/classes.jar')) {
+        name "$project.name"
+        type 'jar'
+        extension 'jar'
+    }
+}
+
+uploadArchives {
+    repositories {
+        if (project.properties.containsKey('teamcity')) {
+            mavenDeployer {
+
+            }
+        }
+    }
+}.doFirst {
+    // remove all aar artifacts
+    configurations.archives.artifacts.removeAll {
+        it.file.name.contains("aar")
+    }
+}
