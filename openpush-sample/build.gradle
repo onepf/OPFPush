@@ -41,8 +41,3 @@ android {
     }
 
 }
-//
-//uploadBeta {
-//    linkApplicationName = "openpush"
-//    artifactName = "openpush"
-//}
