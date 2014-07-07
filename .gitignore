@@ -1,0 +1,13 @@
+build/
+.gradle/
+
+#idea files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+#Mac files
+.DS_Store
+
+local.properties
