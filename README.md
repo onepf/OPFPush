@@ -16,7 +16,7 @@ Steps to integrate
     OpenPushProviderConfig config = new OpenPushProviderConfig(this, new PushListener());
     ````
     
-    The following methods of the listener need to be overriden
+    The following methods of the listener need to be overridden
     ````java
     
     public void onMessage(Context context, Bundle extras, String providerName) {
