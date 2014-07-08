@@ -34,14 +34,20 @@ public class OpenPushProviderConfig {
     final Context appContext;
     final List<PushProvider> selectedProviders = new ArrayList<PushProvider>();
 
+    /**
+     * Base constructor for the configuration
+     * @param context context of any type
+     * @param listener listener for push provider actions
+     */
     public OpenPushProviderConfig(Context context, PushListener listener) {
         appContext = context.getApplicationContext();
         pushListener = listener;
     }
 
     /**
-     *
-     * @param provider
+     * Adds the provider to the configuration.
+     * If the provider is already contained, it will be added.
+     * @param provider provider to add
      */
     public void addProvider(PushProvider provider) {
         if (!alreadyAdded(selectedProviders, provider)) {
@@ -53,6 +59,12 @@ public class OpenPushProviderConfig {
         }
     }
 
+    /**
+     * Internal method to check whether a provider is already added.
+     * @param selectedProviders  set of the added providers
+     * @param providerToAdd provider to check
+     * @return is the provider already added
+     */
     private boolean alreadyAdded(List<PushProvider> selectedProviders, PushProvider providerToAdd) {
         // Ignoring same provider, even if it has different senderIDs for some reason
         for (PushProvider provider: selectedProviders) {

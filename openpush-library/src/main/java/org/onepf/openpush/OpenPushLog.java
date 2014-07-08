@@ -25,24 +25,39 @@ import android.os.Bundle;
  */
 public class OpenPushLog {
 
-    private static boolean mEnabled = true;
+    private static boolean enabled = true;
 
+    /**
+     * Enables the logging.
+     */
     public static void enable() {
-        mEnabled = true;
+        enabled = true;
     }
 
+    /**
+     * Disables the logging.
+     */
     public static void disable() {
-        mEnabled = false;
+        enabled = false;
     }
 
+    /**
+     * Is the logging enabled?
+     */
     public static boolean isEnabled() {
-        return mEnabled;
+        return enabled;
     }
 
+    /**
+     * Returns the detailed description of the intent.
+     */
     public static String intentToString(Intent intent) {
         return "Action: " + intent.getAction() + ", extras: " + bundleToString(intent.getExtras());
     }
 
+    /**
+     * Returnts the detailed bundle description.
+     */
     public static String bundleToString(Bundle bundle) {
         if (bundle != null) {
             // Implicitly calls unparcel

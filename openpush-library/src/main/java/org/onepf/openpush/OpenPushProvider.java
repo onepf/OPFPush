@@ -34,13 +34,13 @@ public class OpenPushProvider implements PushProvider {
     private static final String PREFERENCES = OpenPushProvider.class.getPackage().getName() + ".preferences";
     private static final String KEY_PROVIDER_NAME = OpenPushProvider.class.getPackage().getName() + ".provider";
 
-    private boolean mIsInitialized = false;
+    private boolean mIsInitialized;
 
     private InternalPushListener mInternalListener;
 
-    private Context mContext;
+    private Context context;
 
-    private PushProvider mCurrentProvider;
+    private PushProvider currentProvider;
 
     //region Singleton implementation
     private static class SingletonHolder {
@@ -84,12 +84,12 @@ public class OpenPushProvider implements PushProvider {
 
             mInternalListener.setExternalListener(config.pushListener);
 
-            mContext = config.appContext;
+            context = config.appContext;
 
             List<PushProvider> mProviders = config.selectedProviders;
-            mCurrentProvider = loadStoredProvider(mContext, mProviders);
-            if (mCurrentProvider == null || !mCurrentProvider.available()) {
-                mCurrentProvider = chooseProvider(mProviders);
+            currentProvider = loadStoredProvider(context, mProviders);
+            if (currentProvider == null || !currentProvider.available()) {
+                currentProvider = chooseProvider(mProviders);
             }
 
             mIsInitialized = true;
@@ -147,18 +147,18 @@ public class OpenPushProvider implements PushProvider {
     //region PushProvider implementation
     @Override
     public boolean available() {
-        return mCurrentProvider != null;
+        return currentProvider != null;
     }
 
     @Override
     public boolean isRegistered() {
-        return available() && mCurrentProvider.isRegistered();
+        return available() && currentProvider.isRegistered();
     }
 
     @Override
     public String getRegistrationId() {
         if (available()) {
-            return mCurrentProvider.getRegistrationId();
+            return currentProvider.getRegistrationId();
         } else {
             return null;
         }
@@ -167,21 +167,21 @@ public class OpenPushProvider implements PushProvider {
     @Override
     public void register() {
         if (available()) {
-            mCurrentProvider.register();
+            currentProvider.register();
         }
     }
 
     @Override
     public void unregister() {
         if (available()) {
-            mCurrentProvider.unregister();
+            currentProvider.unregister();
         }
     }
 
     @Override
     public String getName() {
         if (available()) {
-            return mCurrentProvider.getName();
+            return currentProvider.getName();
         }
 
         return null;
@@ -228,7 +228,7 @@ public class OpenPushProvider implements PushProvider {
         }
 
         private boolean isFromCurrentProvider(String providerName) {
-            return mExternalListener != null && mCurrentProvider.getName().equals(providerName);
+            return mExternalListener != null && currentProvider.getName().equals(providerName);
         }
     }
 

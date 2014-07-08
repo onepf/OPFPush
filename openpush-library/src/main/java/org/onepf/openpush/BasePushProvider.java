@@ -34,6 +34,11 @@ public abstract class BasePushProvider implements PushProvider {
         return isImplementationClassPresent(provider);
     }
 
+    /**
+     * Checks whether the required class is presented.
+     * @param className class to check
+     * @return is the class available
+     */
     private static boolean isImplementationClassPresent(String className) {
         try {
             Class.forName(className);
@@ -44,6 +49,11 @@ public abstract class BasePushProvider implements PushProvider {
         }
     }
 
+    /**
+     * Process the error depending on the current mode.
+     * @param errorMessage message to process
+     * @param cause cause to process
+     */
     private static void processError(String errorMessage, Throwable cause) {
         if (OpenPushStrictMode.isEnabled()) {
             if (cause != null) {

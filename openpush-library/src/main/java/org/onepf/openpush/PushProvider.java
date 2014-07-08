@@ -23,36 +23,32 @@ package org.onepf.openpush;
 public interface PushProvider {
 
     /**
-     *
+     * Initiate registration for the current application.
      */
     void register();
 
     /**
-     *
+     * Unregister the application.
      */
     void unregister();
 
     /**
-     *
-     * @return
+     * Checks whether the provider is available
      */
     boolean available();
 
     /**
-     *
-     * @return
+     * Checks whether the application was successfully registered on the service.
      */
     boolean isRegistered();
 
     /**
-     *
-     * @return
+     * Gets the registration id.
      */
     String getRegistrationId();
 
     /**
-     *
-     * @return
+     * Returns the name of the provider.
      */
     String getName();
 

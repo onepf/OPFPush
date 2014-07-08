@@ -13,38 +13,22 @@
  *       See the License for the specific language governing permissions and
  *       limitations under the License.
  ******************************************************************************/
-package org.onepf.openpush;
+
+package org.onepf.openpush.nokia;
+
+import android.content.Context;
+
+import com.nokia.push.PushBroadcastReceiver;
 
 /**
- * <p>Strict mode enables some exceptions in case of incorrect workflow.<p/>
- * Enabled by default to avoid common integration mistakes.
- *
- * @author Anton Rutkevich
- * @since 14.05.14
+ * @author Anastasia Karimova
+ * @since 08.07.2014
  */
-public class OpenPushStrictMode {
+public final class NokiaPushBroadcastReceiver extends PushBroadcastReceiver {
 
-    private static boolean enabled = true;
-
-    /**
-     * Enables strict mode.
-     */
-    public static void enable() {
-        enabled = true;
+    @Override
+    protected String getPushIntentServiceClassName(Context context) {
+//        return super.getPushIntentServiceClassName(context);
+        return NokiaPushIntentService.class.getCanonicalName();
     }
-
-    /**
-     * Disables strict mode.
-     */
-    public static void disable() {
-        enabled = false;
-    }
-
-    /**
-     * Returns whether strict mode is enabled.
-     */
-    public static boolean isEnabled() {
-        return enabled;
-    }
-
 }

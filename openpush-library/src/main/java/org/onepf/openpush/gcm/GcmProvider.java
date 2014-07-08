@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2014 One Platform Foundation
+ *
+ *       Licensed under the Apache License, Version 2.0 (the "License");
+ *       you may not use this file except in compliance with the License.
+ *       You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *       Unless required by applicable law or agreed to in writing, software
+ *       distributed under the License is distributed on an "AS IS" BASIS,
+ *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *       See the License for the specific language governing permissions and
+ *       limitations under the License.
+ ******************************************************************************/
+
 package org.onepf.openpush.gcm;
 
 import android.app.Activity;
@@ -18,6 +34,10 @@ import org.onepf.openpush.OpenPushLog;
 
 import java.io.IOException;
 
+/*
+ * @author Anton Rutkevich, Alexey Vitenko
+ * @since 14.05.14
+ */
 public class GcmProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
@@ -38,8 +58,8 @@ public class GcmProvider extends BasePushProvider {
 
     private Context mApplicationContext;
 
-    private String mRegistrationId;
-    private String mSenderID;
+    private String registrationId;
+    private String senderId;
 
     /**
      *
@@ -51,14 +71,14 @@ public class GcmProvider extends BasePushProvider {
         super(IMPLEMENTATION_CLASS_NAME);
 
         mApplicationContext = context.getApplicationContext();
-        mSenderID = senderID;
+        senderId = senderID;
         loadLocalRegistrationId();
     }
 
     public void register() {
         loadLocalRegistrationId();
         if (!isRegistered()) {
-            registerInBackground(mSenderID);
+            registerInBackground(senderId);
         }
     }
 
@@ -74,9 +94,9 @@ public class GcmProvider extends BasePushProvider {
     }
 
     private void setRegistrationId(String registrationId) {
-        this.mRegistrationId = registrationId;
+        this.registrationId = registrationId;
 
-        storeRegistrationId(mApplicationContext, this.mRegistrationId);
+        storeRegistrationId(mApplicationContext, this.registrationId);
     }
 
     private void removeRegistrationId() {
@@ -85,7 +105,7 @@ public class GcmProvider extends BasePushProvider {
 
     @Override
     public String getRegistrationId() {
-        return mRegistrationId;
+        return registrationId;
     }
 
     @Override
@@ -95,7 +115,7 @@ public class GcmProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        return !TextUtils.isEmpty(mRegistrationId);
+        return !TextUtils.isEmpty(registrationId);
     }
 
     @Override
@@ -130,12 +150,12 @@ public class GcmProvider extends BasePushProvider {
      */
     private void loadLocalRegistrationId() {
         final SharedPreferences prefs = getGcmPreferences(mApplicationContext);
-        mRegistrationId = prefs.getString(PROPERTY_REG_ID, EMPTY_STRING);
-        if (mRegistrationId.length() == 0) {
+        registrationId = prefs.getString(PROPERTY_REG_ID, EMPTY_STRING);
+        if (registrationId.length() == 0) {
             if (OpenPushLog.isEnabled()) {
                 Log.i(TAG, "Registration not found.");
             }
-            mRegistrationId = EMPTY_STRING;
+            registrationId = EMPTY_STRING;
         }
 
         // Check if app was updated; if so, it must clear the registration ID
@@ -147,7 +167,7 @@ public class GcmProvider extends BasePushProvider {
             if (OpenPushLog.isEnabled()) {
                 Log.i(TAG, "App version changed.");
             }
-            mRegistrationId = EMPTY_STRING;
+            registrationId = EMPTY_STRING;
         }
     }
 

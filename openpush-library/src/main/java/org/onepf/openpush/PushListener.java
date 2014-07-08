@@ -26,37 +26,41 @@ import android.os.Bundle;
 public abstract class PushListener {
 
     /**
+     * Method invoked on an incoming message from the provider.
      *
-     * @param context
-     * @param extras
-     * @param providerName
+     * @param context      current context
+     * @param extras       message
+     * @param providerName name of the current provider
      */
     public void onMessage(Context context, Bundle extras, String providerName) {
     }
 
     /**
+     * Method invoked on an error from the provider.
      *
-     * @param context
-     * @param message
-     * @param providerName
+     * @param context      current context
+     * @param message      error message
+     * @param providerName name of the current provider
      */
     public void onError(Context context, String message, String providerName) {
     }
 
     /**
+     * Method invoked on the registration event
      *
-     * @param context
-     * @param token
-     * @param providerName
+     * @param context      current context
+     * @param token        current token
+     * @param providerName name of the current provider
      */
     public void onRegistered(Context context, String token, String providerName) {
     }
 
     /**
+     * Method invoked on the unregistration event.
      *
-     * @param context
-     * @param token
-     * @param providerName
+     * @param context      current context
+     * @param token        current token
+     * @param providerName name of the current provider
      */
     public void onUnregistered(Context context, String token, String providerName) {
     }
