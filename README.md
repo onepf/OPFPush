@@ -82,7 +82,7 @@ Steps to integrate
     </application>
     ````
 
-4. Gradle instrustions:    
+4. Gradle    
     ````gradle
     repositories {
        mavenCentral()
