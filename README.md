@@ -49,13 +49,16 @@ Steps to integrate
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!--Google -->
-    <uses-permission android:name="your.package.name.permission.C2D_MESSAGE" />
+    <uses-permission android:name="(your_application_package).permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-   <permission android:name="your.package.name.permission.C2D_MESSAGE"
+    <permission android:name="(your_application_package).permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="your.package.name.permission.C2D_MESSAGE" />
+    <uses-permission android:name="(your_application_package).permission.C2D_MESSAGE" />
+    <!--Nokia-->
+    <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE" />
 
     <application ...>
+    <!--Google -->
         <receiver
             android:name="org.onepf.openpush.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -64,9 +67,18 @@ Steps to integrate
                 <category android:name="org.onepf.openpush.sample" />
             </intent-filter>
         </receiver>
-
         <service android:name="org.onepf.openpush.gcm.GcmIntentService"
             android:exported="false"/>
+    <!--Nokia-->
+        <receiver android:name="org.onepf.openpush.nokia.NokiaPushBroadcastReceiver"
+            android:permission="com.nokia.pushnotifications.permission.SEND">
+            <intent-filter>
+                <action android:name="com.nokia.pushnotifications.intent.RECEIVE" />
+                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION" />
+                <category android:name="(your_application_package)" />
+            </intent-filter>
+        </receiver>
+        <service android:name="org.onepf.openpush.nokia.NokiaPushIntentService"/>
     </application>
     ````
    
