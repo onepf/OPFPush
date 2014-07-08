@@ -81,4 +81,13 @@ Steps to integrate
         <service android:name="org.onepf.openpush.nokia.NokiaPushIntentService"/>
     </application>
     ````
+
+4. Gradle instrustions:    
+    ````gradle
+    repositories {
+       mavenCentral()
+    }
+    //...
+    compile "com.google.android.gms:play-services:3.1.+"
+    ````
    
