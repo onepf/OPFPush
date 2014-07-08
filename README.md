@@ -1,6 +1,7 @@
 OpenPush
 ========
 The project is under development.
+Releases will be announced later.
 
 Steps to integrate
 ------------------
