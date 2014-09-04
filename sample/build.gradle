@@ -16,7 +16,7 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:20.+'
-    compile project(':gcm_push_provider')
-    compile project(':nokia_push_provider')
-    compile project(':openpush')
+    compile project(':providers:gcm')
+    compile project(':providers:nokia')
+    compile project(':library')
 }

@@ -13,6 +13,6 @@ android {
     }
 }
 dependencies {
-    compile project(':openpush')
+    compile project(':library')
     compile 'com.google.android.gms:play-services:5.0.89'
 }

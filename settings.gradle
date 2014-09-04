@@ -1,3 +1,1 @@
-include ':openpush', ':nokia_push_provider', ':openpush-sample', ':gcm_push_provider'
-
-project(':openpush').projectDir = file("openpush-library")
+include ':library', ':sample', ':providers:gcm', ':providers:nokia'
