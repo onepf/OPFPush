@@ -131,7 +131,8 @@ public class GcmProvider extends BasePushProvider {
     private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext);
         if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode) && !hasGooglePlay(mApplicationContext)) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)
+                    && !hasGooglePlay(mApplicationContext)) {
                 return false;
             }
         }

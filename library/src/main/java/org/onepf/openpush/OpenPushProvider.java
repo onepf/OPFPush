@@ -28,7 +28,6 @@ import java.util.List;
  * @since 14.05.14
  */
 public class OpenPushProvider implements PushProvider {
-
     private static final String TAG = OpenPushProvider.class.getSimpleName();
 
     private static final String PREFERENCES = OpenPushProvider.class.getPackage().getName() + ".preferences";
@@ -67,7 +66,7 @@ public class OpenPushProvider implements PushProvider {
      *
      * @param config
      */
-    public synchronized void init(OpenPushProviderConfig config) {
+    public synchronized void init(Options config) {
         initInternal(config);
     }
 
@@ -75,18 +74,18 @@ public class OpenPushProvider implements PushProvider {
         return mInternalListener;
     }
 
-    private synchronized void initInternal(OpenPushProviderConfig config) {
+    private synchronized void initInternal(Options config) {
         if (!mIsInitialized) {
 
             if (OpenPushLog.isEnabled()) {
                 Log.i(TAG, "Initializing...");
             }
 
-            mInternalListener.setExternalListener(config.pushListener);
+//            mInternalListener.setExternalListener(config.pushListener);
+//
+//            context = config.appContext;
 
-            context = config.appContext;
-
-            List<PushProvider> mProviders = config.selectedProviders;
+            List<PushProvider> mProviders = config.getProviders();
             currentProvider = loadStoredProvider(context, mProviders);
             if (currentProvider == null || !currentProvider.available()) {
                 currentProvider = chooseProvider(mProviders);
@@ -121,7 +120,7 @@ public class OpenPushProvider implements PushProvider {
 
         if (storedProviderName != null) {
             for (PushProvider provider : mProviders) {
-                if (provider.getName().equals(storedProviderName)) {
+                if (storedProviderName.equals(provider.getName())) {
                     if (OpenPushLog.isEnabled()) {
                         Log.i(TAG, "Selected provider: " + provider.getName());
                     }
@@ -139,9 +138,9 @@ public class OpenPushProvider implements PushProvider {
     }
 
     private void storeCurrentProvider(Context context, String providerName) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit();
-        editor.putString(KEY_PROVIDER_NAME, providerName);
-        editor.commit();
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+                .putString(KEY_PROVIDER_NAME, providerName)
+                .apply();
     }
 
     //region PushProvider implementation

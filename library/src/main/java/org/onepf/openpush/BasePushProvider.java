@@ -23,7 +23,6 @@ import android.util.Log;
  * @since 19.05.14
  */
 public abstract class BasePushProvider implements PushProvider {
-
     private static final String TAG = "OpenPush";
 
     public BasePushProvider(String implementationDependencyClass) {
