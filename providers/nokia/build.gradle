@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
@@ -12,6 +13,7 @@ android {
         applicationId 'org.onepf.openpush.nokia'
     }
 }
+
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':library')

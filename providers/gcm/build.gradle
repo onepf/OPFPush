@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
@@ -12,7 +13,9 @@ android {
         applicationId 'org.onepf.openpush.gcm'
     }
 }
+
 dependencies {
     compile project(':library')
     compile 'com.google.android.gms:play-services:5.0.89'
+    compile 'com.android.support:support-v4:20.0.0'
 }
