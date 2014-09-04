@@ -9,8 +9,6 @@ android {
         targetSdkVersion project.targetSdkVersion
         versionCode 2
         versionName "2.0"
-
-        applicationId 'org.onepf.openpush.nokia'
     }
 }
 

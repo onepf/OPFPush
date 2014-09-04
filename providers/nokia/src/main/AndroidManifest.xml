@@ -2,6 +2,12 @@
     package="org.onepf.openpush.nokia"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE" />
+
     <application/>
 
 </manifest>
