@@ -1,5 +1,4 @@
-apply plugin: 'com.android.application'
-
+apply plugin: 'com.android.library'
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
@@ -10,13 +9,10 @@ android {
         versionCode 2
         versionName "2.0"
 
-        applicationId 'org.onepf.openpush.sample'
+        applicationId 'org.onepf.openpush.gcm'
     }
 }
-
 dependencies {
-    compile 'com.android.support:appcompat-v7:20.+'
-    compile project(':gcm_push_provider')
-    compile project(':nokia_push_provider')
     compile project(':openpush')
+    compile 'com.google.android.gms:play-services:5.0.89'
 }

@@ -72,7 +72,6 @@ public class OpenPushProviderConfig {
                 return true;
             }
         }
-
         return false;
     }
 

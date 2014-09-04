@@ -1,0 +1,7 @@
+<manifest
+    package="org.onepf.openpush.nokia"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application/>
+
+</manifest>

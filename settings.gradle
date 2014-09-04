@@ -1,6 +1,3 @@
-rootProject.name = 'openpush-project'
+include ':openpush', ':nokia_push_provider', ':openpush-sample', ':gcm_push_provider'
 
-include ':openpush'
-include ':openpush-sample'
-
-project(':openpush').projectDir = new File(settingsDir, "openpush-library")
+project(':openpush').projectDir = file("openpush-library")
