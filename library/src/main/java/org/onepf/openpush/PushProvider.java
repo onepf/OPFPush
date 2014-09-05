@@ -16,6 +16,10 @@
 
 package org.onepf.openpush;
 
+import android.support.annotation.NonNull;
+
+import org.onepf.openpush.exception.RegistrationException;
+
 /**
  * @author Anton Rutkevich, Alexey Vitenko
  * @since 14.05.14
@@ -25,17 +29,17 @@ public interface PushProvider {
     /**
      * Initiate registration for the current application.
      */
-    void register();
+    void register() throws RegistrationException;
 
     /**
      * Unregister the application.
      */
-    void unregister();
+    void unregister() throws RegistrationException;
 
     /**
      * Checks whether the provider is available
      */
-    boolean available();
+    boolean isAvailable();
 
     /**
      * Checks whether the application was successfully registered on the service.
@@ -50,6 +54,14 @@ public interface PushProvider {
     /**
      * Returns the name of the provider.
      */
+    @NonNull
     String getName();
 
+    /**
+     * Get package of application that contains needed API of this provider.
+     *
+     * @return Host application package.
+     */
+    @NonNull
+    String getHostAppPackage();
 }

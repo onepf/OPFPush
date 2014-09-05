@@ -24,7 +24,8 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import org.onepf.openpush.OpenPushLog;
+
+import org.onepf.openpush.util.LogUtils;
 import org.onepf.openpush.PushListener;
 
 /**
@@ -77,7 +78,7 @@ public class SimplePushListener extends PushListener {
     private void sendIntentToApplication(Context context, String providerName, Intent intent) {
         intent.putExtra(ONEPF_EXTRA_PROVIDER, providerName);
 
-        Log.d(TAG, "Sending intent to app: \n" + OpenPushLog.intentToString(intent));
+        Log.d(TAG, "Sending intent to app: \n" + LogUtils.intentToString(intent));
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
@@ -90,7 +91,7 @@ public class SimplePushListener extends PushListener {
         activityIntent.putExtra(ONEPF_EXTRA_PROVIDER, providerName);
         activityIntent.putExtra(ONEPF_EXTRA_MESSAGE, data);
 
-        Log.d(TAG, "Sending pending intent: \n" + OpenPushLog.intentToString(activityIntent));
+        Log.d(TAG, "Sending pending intent: \n" + LogUtils.intentToString(activityIntent));
 
         PendingIntent contentIntent
                 = PendingIntent.getActivity(context, NOTIFICATION_ID, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);

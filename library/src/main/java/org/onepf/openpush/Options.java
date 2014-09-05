@@ -16,31 +16,21 @@
 
 package org.onepf.openpush;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Anton Rutkevich, Alexey Vitenko
- * @since 14.05.14
+ * @author Kirill Rozov
+ * @since 04.09.2014
  */
 public class Options {
-    private final Context appContext;
     private final List<PushProvider> mProviders;
 
-    /**
-     * Base constructor for the configuration
-     *
-     * @param context context of any type
-     */
-    private Options(Context context, List<PushProvider> providers) {
-        appContext = context.getApplicationContext();
+    private Options(List<PushProvider> providers) {
         mProviders = Collections.unmodifiableList(providers);
-
     }
 
     /**
@@ -53,38 +43,26 @@ public class Options {
         return mProviders;
     }
 
-    @NonNull
-    public Context getContext() {
-        return appContext;
-    }
-
     /**
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
     public static class Builder {
-        private final Context mContext;
+        private static final int PROVIDERS_CAPACITY = 4;
         private List<PushProvider> mProviders;
-
-        public Builder(@NonNull Context context) {
-            mContext = context.getApplicationContext();
-        }
 
         /**
          * Add the provider to the options.
          *
          * @param provider Provider to add.
-         * @throws java.lang.IllegalArgumentException If try to add already added provider or null provider.
+         * @throws java.lang.IllegalArgumentException If try to add already added provider.
          */
-        public void addProvider(PushProvider provider) {
-            if (provider == null) {
-                throw new IllegalArgumentException("Add null provider impossible.");
-            }
-
+        public void addProvider(@NonNull PushProvider provider) {
             if (mProviders != null && mProviders.contains(provider)) {
-                throw new IllegalArgumentException(String.format("Provider '%s' already added", provider));
+                throw new IllegalArgumentException(
+                        String.format("Provider '%s' already added", provider));
             } else {
                 if (mProviders == null) {
-                    mProviders = new ArrayList<PushProvider>(4);
+                    mProviders = new ArrayList<PushProvider>(PROVIDERS_CAPACITY);
                 }
                 mProviders.add(provider);
             }
@@ -100,8 +78,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-
-            return new Options(mContext, mProviders);
+            return new Options(mProviders);
         }
     }
 }

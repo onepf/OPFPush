@@ -14,49 +14,26 @@
  *       limitations under the License.
  ******************************************************************************/
 
-package org.onepf.openpush;
+package org.onepf.openpush.util;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 /**
- * @author Anton Rutkevich
- * @since 14.05.14
+ * @author Kirill Rozov
+ * @since 04.09.2014
  */
-public class OpenPushLog {
-
-    private static boolean enabled = true;
+public class LogUtils {
 
     /**
-     * Enables the logging.
-     */
-    public static void enable() {
-        enabled = true;
-    }
-
-    /**
-     * Disables the logging.
-     */
-    public static void disable() {
-        enabled = false;
-    }
-
-    /**
-     * Is the logging enabled?
-     */
-    public static boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Returns the detailed description of the intent.
+     * Return the detailed description of the intent.
      */
     public static String intentToString(Intent intent) {
         return "Action: " + intent.getAction() + ", extras: " + bundleToString(intent.getExtras());
     }
 
     /**
-     * Returnts the detailed bundle description.
+     * Return the detailed bundle description.
      */
     public static String bundleToString(Bundle bundle) {
         if (bundle != null) {
@@ -64,7 +41,6 @@ public class OpenPushLog {
             bundle.isEmpty();
             return bundle.toString();
         }
-
         return null;
     }
 }

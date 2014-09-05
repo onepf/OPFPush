@@ -17,7 +17,8 @@
 package org.onepf.openpush.sample;
 
 import android.app.Application;
-import org.onepf.openpush.OpenPushLog;
+
+import org.onepf.openpush.util.LogUtils;
 import org.onepf.openpush.OpenPushProvider;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.OpenPushStrictMode;
@@ -36,10 +37,10 @@ public class PushSampleApplication extends Application {
     }
 
     private void initOpenPushLibrary() {
-        OpenPushLog.enable();
+        LogUtils.enable();
         OpenPushStrictMode.enable();
 
-        Options.Builder builder = new Options.Builder(this);
+        Options.Builder builder = new Options.Builder();
         builder.addProvider(new GcmProvider(this, "76325631570"));
         OpenPushProvider.getInstance().init(builder.build());
     }

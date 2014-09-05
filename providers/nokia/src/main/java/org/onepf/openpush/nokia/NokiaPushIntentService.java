@@ -18,11 +18,11 @@ package org.onepf.openpush.nokia;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.nokia.push.PushBaseIntentService;
 
-import org.onepf.openpush.OpenPushProviderHelper;
-import org.onepf.openpush.PushListener;
+import org.onepf.openpush.OpenPushHelper;
 
 /**
  * @author Anastasia Karimova
@@ -30,36 +30,35 @@ import org.onepf.openpush.PushListener;
  */
 public class NokiaPushIntentService extends PushBaseIntentService {
 
-    private PushListener pushListener;
-
     public NokiaPushIntentService() {
         super("Nokia Push Client"); //Passed name will use as Thread name;
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        pushListener = OpenPushProviderHelper.getInternalPushListener();
-    }
-
-    @Override
     protected void onMessage(Context context, Intent intent) {
-        pushListener.onMessage(context, intent.getExtras(), NokiaPushProvider.NAME);
+        Bundle extras = new Bundle();
+        extras.putAll(intent.getExtras());
+        OpenPushHelper.sendMessage(context, NokiaPushProvider.NAME, extras);
     }
 
     @Override
     protected void onError(Context context, String errorMessage) {
-        pushListener.onError(context, errorMessage, NokiaPushProvider.NAME);
+        Bundle extras = new Bundle();
+        extras.putString(OpenPushHelper.EXTRA_MESSAGE, errorMessage);
+        OpenPushHelper.sendError(context, NokiaPushProvider.NAME, extras);
     }
 
     @Override
     protected void onRegistered(Context context, String registrationToken) {
-        pushListener.onRegistered(context, registrationToken, NokiaPushProvider.NAME);
+        Bundle extras = new Bundle();
+        extras.putString(OpenPushHelper.EXTRA_TOKEN, registrationToken);
+        OpenPushHelper.sendRegistered(context, NokiaPushProvider.NAME, extras);
     }
 
     @Override
     protected void onUnregistered(Context context, String oldRegistrationToken) {
-        pushListener.onUnregistered(context, oldRegistrationToken, NokiaPushProvider.NAME);
+        Bundle extras = new Bundle();
+        extras.putString(OpenPushHelper.EXTRA_TOKEN, oldRegistrationToken);
+        OpenPushHelper.sendUnregistered(context, NokiaPushProvider.NAME, extras);
     }
-
 }

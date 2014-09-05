@@ -1,50 +1,29 @@
-/*
- * Copyright 2013 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.onepf.openpush.gcm;
 
-import android.app.Activity;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
-import org.onepf.openpush.OpenPushLog;
+import android.os.Bundle;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-/**
- * This {@code WakefulBroadcastReceiver} takes care of creating and managing a
- * partial wake lock for your app. It passes off the work of processing the GCM
- * message to an {@code IntentService}, while ensuring that the device does not
- * go back to sleep in the transition. The {@code IntentService} calls
- * {@code GcmBroadcastReceiver.completeWakefulIntent()} when it is ready to
- * release the wake lock.
- */
-public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
+import org.onepf.openpush.OpenPushHelper;
 
-    private static final String TAG = GcmBroadcastReceiver.class.getSimpleName();
+public class GcmBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ComponentName comp = new ComponentName(context.getPackageName(), GcmIntentService.class.getName());
-
-        if (OpenPushLog.isEnabled()) {
-            Log.i(TAG, "Received broadcast. " + OpenPushLog.intentToString(intent));
+        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+        Bundle intentExtras = intent.getExtras();
+        if (intentExtras != null) {
+            final String messageType = gcm.getMessageType(intent);
+            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                OpenPushHelper.sendMessage(context, GcmProvider.NAME, new Bundle(intentExtras));
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+                //TODO Notify about message send error.
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
+                //TODO Notify about message delete.
+            }
         }
-
-        startWakefulService(context, (intent.setComponent(comp)));
-        setResultCode(Activity.RESULT_OK);
     }
 }

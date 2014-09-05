@@ -17,32 +17,31 @@
 package org.onepf.openpush.nokia;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.openpush.BasePushProvider;
+import org.onepf.openpush.exception.RegistrationException;
 
 
 public class NokiaPushProvider extends BasePushProvider {
 
     public static final String NAME = "com.nokia.push.provider"; //todo check the name
-
+    private static final String NOKIA_STORE_PACKAGE = "com.nokia.store";
     private static final String IMPLEMENTATION_CLASS_NAME = "com.nokia.push.PushRegistrar";
 
-    private final Context contextId;
     private final String senderId;
 
-    public NokiaPushProvider(Context context, String senderID) {
-        super(IMPLEMENTATION_CLASS_NAME);
-
-        contextId = context.getApplicationContext();
+    public NokiaPushProvider(@NonNull Context context, @NonNull String senderID) {
+        super(context, IMPLEMENTATION_CLASS_NAME);
         senderId = senderID;
     }
 
     @Override
-    public boolean available() {
+    public boolean isAvailable() {
         try {
-            PushRegistrar.checkDevice(contextId);
+            PushRegistrar.checkDevice(getContext());
             return true;
         } catch (UnsupportedOperationException exception) {
             return false;
@@ -51,28 +50,41 @@ public class NokiaPushProvider extends BasePushProvider {
 
     @Override
     public String getRegistrationId() {
-        return PushRegistrar.getRegistrationId(contextId);
+        return PushRegistrar.getRegistrationId(getContext());
     }
 
     @Override
     public boolean isRegistered() {
-        return PushRegistrar.isRegistered(contextId);
+        return PushRegistrar.isRegistered(getContext());
     }
 
     @Override
-    public void register() {
-        if (!isRegistered()) {
-            PushRegistrar.register(contextId, senderId);
+    public void register() throws RegistrationException{
+        if (isRegistered()) {
+            throw new RegistrationException("Nokia Push already registered.");
+        } else {
+            PushRegistrar.register(getContext(), senderId);
         }
     }
 
     @Override
-    public void unregister() {
-        PushRegistrar.unregister(contextId);
+    public void unregister() throws RegistrationException{
+        if (isRegistered()) {
+            PushRegistrar.unregister(getContext());
+        } else {
+            throw new RegistrationException("Nokia Push must be registered before unregister.");
+        }
     }
 
+    @NonNull
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @NonNull
+    @Override
+    public String getHostAppPackage() {
+        return NOKIA_STORE_PACKAGE;
     }
 }

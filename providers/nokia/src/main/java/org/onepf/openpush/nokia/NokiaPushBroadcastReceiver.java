@@ -21,14 +21,15 @@ import android.content.Context;
 import com.nokia.push.PushBroadcastReceiver;
 
 /**
- * @author Anastasia Karimova
- * @since 08.07.2014
+ * @author Kirill Rozov
+ * @since 05.09.2014
  */
 public final class NokiaPushBroadcastReceiver extends PushBroadcastReceiver {
 
+    private static final String SERVICE_CLASS_NAME = NokiaPushIntentService.class.getCanonicalName();
+
     @Override
     protected String getPushIntentServiceClassName(Context context) {
-//        return super.getPushIntentServiceClassName(context);
-        return NokiaPushIntentService.class.getCanonicalName();
+        return SERVICE_CLASS_NAME;
     }
 }

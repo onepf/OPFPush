@@ -15,5 +15,4 @@ android {
 dependencies {
     compile project(':library')
     provided 'com.google.android.gms:play-services:5.0.89'
-    compile 'com.android.support:support-v4:20.0.0'
 }

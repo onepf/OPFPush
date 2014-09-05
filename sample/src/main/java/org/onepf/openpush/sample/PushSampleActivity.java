@@ -30,7 +30,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.onepf.openpush.OpenPushLog;
+
+import org.onepf.openpush.util.LogUtils;
 import org.onepf.openpush.OpenPushProvider;
 
 /**
@@ -182,8 +183,8 @@ public class PushSampleActivity extends ActionBarActivity {
             tvLabelMessage.setVisibility(View.VISIBLE);
             tvMessage.setVisibility(View.VISIBLE);
 
-            tvMessage.setText(OpenPushLog.bundleToString(extras));
-            Log.i(TAG, "Message received in app: " + OpenPushLog.bundleToString(extras));
+            tvMessage.setText(LogUtils.bundleToString(extras));
+            Log.i(TAG, "Message received in app: " + LogUtils.bundleToString(extras));
         }
     }
 
@@ -192,7 +193,7 @@ public class PushSampleActivity extends ActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.i(TAG, "Push received in app: " + OpenPushLog.intentToString(intent));
+            Log.i(TAG, "Push received in app: " + LogUtils.intentToString(intent));
 
             String action = intent.getAction();
 

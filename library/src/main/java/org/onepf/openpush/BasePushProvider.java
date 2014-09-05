@@ -16,54 +16,44 @@
 
 package org.onepf.openpush;
 
-import android.util.Log;
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import org.onepf.openpush.exception.OpenPushException;
 
 /**
  * @author Anton Rutkevich
  * @since 19.05.14
  */
 public abstract class BasePushProvider implements PushProvider {
-    private static final String TAG = "OpenPush";
 
-    public BasePushProvider(String implementationDependencyClass) {
-        checkDependencies(implementationDependencyClass);
+    private final Context mContext;
+
+    public BasePushProvider(@NonNull Context context, @NonNull String implementationDependencyClass) {
+        checkImplementationClassPresent(implementationDependencyClass);
+        mContext = context.getApplicationContext();
     }
 
-    private static boolean checkDependencies(String provider) {
-        return isImplementationClassPresent(provider);
+    protected Context getContext() {
+        return mContext;
     }
 
     /**
      * Checks whether the required class is presented.
+     *
      * @param className class to check
-     * @return is the class available
      */
-    private static boolean isImplementationClassPresent(String className) {
+    private static void checkImplementationClassPresent(String className) {
         try {
             Class.forName(className);
-            return true;
         } catch (ClassNotFoundException e) {
-            processError("Class is not in classpath: " + className, e);
-            return false;
+            throw new OpenPushException(String.format("Class '%s' not present." +
+                    "Check you dependencies.", className));
         }
     }
 
-    /**
-     * Process the error depending on the current mode.
-     * @param errorMessage message to process
-     * @param cause cause to process
-     */
-    private static void processError(String errorMessage, Throwable cause) {
-        if (OpenPushStrictMode.isEnabled()) {
-            if (cause != null) {
-                throw new OpenPushException(errorMessage, cause);
-            } else {
-                throw new OpenPushException(errorMessage);
-            }
-        }
-        if (OpenPushLog.isEnabled()) {
-            Log.w(TAG, errorMessage);
-        }
+    @Override
+    public String toString() {
+        return getName();
     }
-
 }

@@ -16,203 +16,52 @@
 
 package org.onepf.openpush.gcm;
 
-import android.app.Activity;
-import android.app.Dialog;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.OpenPushLog;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.exception.RegistrationException;
+import org.onepf.openpush.exception.OpenPushException;
 
 import java.io.IOException;
 
-/*
- * @author Anton Rutkevich, Alexey Vitenko
- * @since 14.05.14
- */
 public class GcmProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
-
-    private static final String IMPLEMENTATION_CLASS_NAME = "com.google.android.gms.gcm.GoogleCloudMessaging";
-
-    private static final String TAG = GcmProvider.class.getSimpleName();
+    private static final String GOOGLE_PLAY_PACKAGE = "com.android.vending";
+    private static final String IMPLEMENTATION_CLASS_NAME
+            = "com.google.android.gms.gcm.GoogleCloudMessaging";
 
     private static final String GCM_PREFERENCES_NAME = "GCM_PREFS";
-    private static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String PREF_REGISTRATION_ID = "registration_id";
+    private static final String PREF_APP_VERSION = "appVersion";
 
-    private static final String EMPTY_STRING = "";
+    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+    private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
 
+    private String mRegistrationId;
+    private String mSenderId;
 
-    private static final String BACKOFF_MS = "backoff_ms";
-
-    private Context mApplicationContext;
-
-    private String registrationId;
-    private String senderId;
-
-    /**
-     *
-     * @param context
-     * @param senderID
-     * @hide
-     */
-    public GcmProvider(Context context, String senderID) {
-        super(IMPLEMENTATION_CLASS_NAME);
-
-        mApplicationContext = context.getApplicationContext();
-        senderId = senderID;
+    public GcmProvider(@NonNull Context context, @NonNull String senderID) {
+        super(context, IMPLEMENTATION_CLASS_NAME);
+        mSenderId = senderID;
         loadLocalRegistrationId();
     }
 
-    public void register() {
-        loadLocalRegistrationId();
-        if (!isRegistered()) {
-            registerInBackground(senderId);
-        }
-    }
-
-    public void unregister() {
-        if (isRegistered()) {
-            unregisterInBackground();
-        }
-    }
-
-    public Dialog getRecoverGooglePlayServicesDialog(Activity context, int errorCode) {
-        return GooglePlayServicesUtil.getErrorDialog(errorCode, context,
-                                              PLAY_SERVICES_RESOLUTION_REQUEST);
-    }
-
-    private void setRegistrationId(String registrationId) {
-        this.registrationId = registrationId;
-
-        storeRegistrationId(mApplicationContext, this.registrationId);
-    }
-
-    private void removeRegistrationId() {
-        setRegistrationId(null);
-    }
-
-    @Override
-    public String getRegistrationId() {
-        return registrationId;
-    }
-
-    @Override
-    public boolean available() {
-        return checkPlayServices();
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return !TextUtils.isEmpty(registrationId);
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mApplicationContext);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)
-                    && !hasGooglePlay(mApplicationContext)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean hasGooglePlay(Context context) {
-        return getAppVersion(context, GooglePlayServicesUtil.GOOGLE_PLAY_STORE_PACKAGE) > 0;
-    }
-
-    /**
-     * Loads the current registration ID for application on GCM service, if there is one.
-     * <p>
-     * If result is empty, the app needs to register.
-     *
-     */
-    private void loadLocalRegistrationId() {
-        final SharedPreferences prefs = getGcmPreferences(mApplicationContext);
-        registrationId = prefs.getString(PROPERTY_REG_ID, EMPTY_STRING);
-        if (registrationId.length() == 0) {
-            if (OpenPushLog.isEnabled()) {
-                Log.i(TAG, "Registration not found.");
-            }
-            registrationId = EMPTY_STRING;
-        }
-
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(mApplicationContext, mApplicationContext.getPackageName());
-        if (registeredVersion != currentVersion) {
-            if (OpenPushLog.isEnabled()) {
-                Log.i(TAG, "App version changed.");
-            }
-            registrationId = EMPTY_STRING;
-        }
-    }
-
-    /**
-     * Stores the registration ID and the app versionCode in the application's
-     * {@code SharedPreferences}.
-     *
-     * @param context application's context.
-     * @param regId registration ID
-     */
-    private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGcmPreferences(context);
-        int appVersion = getAppVersion(context, context.getPackageName());
-        if (OpenPushLog.isEnabled()) {
-            Log.i(TAG, "Saving registrationId on app version " + appVersion);
-        }
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
-    }
-
-    /**
-     * Registers the application with GCM servers asynchronously.
-     * <p>
-     * Stores the registration ID and the app versionCode in the application's
-     * shared preferences.
-     */
-    private void registerInBackground(final String senderId) {
-        new GcmRegistrationTask(this, senderId).execute();
-    }
-
-    private void unregisterInBackground() {
-        new GcmUnregistrationTask(this).execute();
-    }
-
-    private void notifyWorkflowListeners(String eventType, String message) {
-        Intent intent = new Intent(eventType);
-        intent.setClass(mApplicationContext, GcmIntentService.class);
-        intent.putExtra(GcmIntentService.EXTRA_MESSAGE, message);
-        mApplicationContext.startService(intent);
-    }
-
-    private static int getAppVersion(Context context, String appPackage) {
+    private static int getAppVersion(@NonNull Context context, @NonNull String appPackage) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(appPackage, 0);
             return packageInfo.versionCode;
@@ -221,145 +70,132 @@ public class GcmProvider extends BasePushProvider {
         } catch (NullPointerException npe) {
             // a very rare case that we cannot process correctly
         }
-
-        return -1;
+        return Integer.MIN_VALUE;
     }
 
-
-    /**
-     * Resets the backoff counter.
-     * <p/>
-     * This method should be called after a GCM call succeeds.
-     *
-     * @param context application's context.
-     */
-    static void resetBackoff(Context context, int defaultValue) {
-        if (OpenPushLog.isEnabled()) {
-            Log.d(TAG, "resetting backoff for " + context.getPackageName());
-        }
-        setBackoff(context, defaultValue);
-    }
-
-    /**
-     * Gets the current backoff counter.
-     *
-     * @param context application's context.
-     * @return current backoff counter, in milliseconds.
-     */
-    static int getBackoff(Context context, int defaultValue) {
-        final SharedPreferences prefs = getGcmPreferences(context);
-        return prefs.getInt(BACKOFF_MS, defaultValue);
-    }
-
-    /**
-     * Sets the backoff counter.
-     * <p/>
-     * This method should be called after a GCM call fails, passing an
-     * exponential value.
-     *
-     * @param context application's context.
-     * @param backoff new backoff counter, in milliseconds.
-     */
-    static void setBackoff(Context context, int backoff) {
-        final SharedPreferences prefs = getGcmPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(BACKOFF_MS, backoff);
-        editor.commit();
-    }
-
-    static SharedPreferences getGcmPreferences(Context context) {
+    static SharedPreferences getGcmPreferences(@NonNull Context context) {
         return context.getSharedPreferences(GCM_PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
-    private static class GcmRegistrationTask extends GcmTask {
-
-        private String mSenderId;
-
-        private GcmRegistrationTask(GcmProvider provider, String senderId) {
-            super(provider);
-            mSenderId = senderId;
+    public void register() throws RegistrationException {
+        if (isRegistered()) {
+            throw new OpenPushException("Provider already registered.");
         }
 
-        String performGcmInteraction() throws IOException {
-            GcmProvider provider = getProvider();
-            String registrationId = null;
-            if (provider != null) {
-                registrationId = GoogleCloudMessaging.getInstance(provider.mApplicationContext).register(mSenderId);
-                provider.setRegistrationId(registrationId);
-            }
-
-            return registrationId;
+        loadLocalRegistrationId();
+        try {
+            String registrationId = GoogleCloudMessaging.getInstance(getContext()).register(mSenderId);
+            setRegistrationId(registrationId);
+        } catch (IOException e) {
+            throw new RegistrationException("Error register GCM.", e);
         }
 
-        void notifyListenersOnSuccess(String result) {
-            GcmProvider provider = getProvider();
-            if (provider != null) {
-                provider.notifyWorkflowListeners(GcmIntentService.ACTION_REGISTRATION, result);
-            }
-        }
+        Bundle extras = new Bundle();
+        extras.putString(OpenPushHelper.EXTRA_REGISTRATION_ID, mRegistrationId);
+        OpenPushHelper.sendRegistered(getContext(), GcmProvider.NAME, extras);
     }
 
-    private static class GcmUnregistrationTask extends GcmTask {
-
-        private GcmUnregistrationTask(GcmProvider provider) {
-            super(provider);
-        }
-
-        String performGcmInteraction() throws IOException {
-            GcmProvider provider = getProvider();
-            String id = null;
-            if (provider != null) {
-                GoogleCloudMessaging.getInstance(provider.mApplicationContext).unregister();
-                id = provider.getRegistrationId();
-                provider.removeRegistrationId();
-            }
-
-            return id;
-        }
-
-        void notifyListenersOnSuccess(String result) {
-            GcmProvider provider = getProvider();
-            if (provider != null) {
-                provider.notifyWorkflowListeners(GcmIntentService.ACTION_UNREGISTRATION, result);
-            }
-        }
-    }
-
-    private abstract static class GcmTask extends AsyncTask<Void, Void, Void> {
-
-        private GcmProvider mProvider;
-
-        private GcmTask(GcmProvider provider) {
-            mProvider = provider;
-        }
-
-        GcmProvider getProvider() {
-            return mProvider;
-        }
-
-        abstract void notifyListenersOnSuccess(String result);
-
-        abstract String performGcmInteraction() throws IOException;
-
-        @Override
-        protected Void doInBackground(Void... params) {
+    public void unregister() throws RegistrationException {
+        if (isRegistered()) {
             try {
-                String result = performGcmInteraction();
-                notifyListenersOnSuccess(result);
-            } catch (IOException ex) {
-                notifyListenersOnError(ex);
+                GoogleCloudMessaging.getInstance(getContext()).unregister();
+                getRegistrationId();
+                removeRegistrationId();
+            } catch (IOException e) {
+                throw new RegistrationException("Error unregister GCM.", e);
             }
 
-            return null;
+            Bundle extras = new Bundle();
+            extras.putString(OpenPushHelper.EXTRA_REGISTRATION_ID, mRegistrationId);
+            OpenPushHelper.sendUnregistered(getContext(), GcmProvider.NAME, extras);
+        } else {
+            throw new OpenPushException("Provider must be registered before unregister.");
+        }
+    }
+
+    private void removeRegistrationId() {
+        setRegistrationId(null);
+    }
+
+    @Override
+    public String getRegistrationId() {
+        return mRegistrationId;
+    }
+
+    private void setRegistrationId(String registrationId) {
+        mRegistrationId = registrationId;
+        storeRegistrationId(getContext(), this.mRegistrationId);
+    }
+
+    @Override
+    public boolean isAvailable() {
+        if (isPlayServicesAvailable()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                    || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
+                return true;
+            } else {
+                // On device with version of Android lower than "4.0.4"
+                // we need to ensure that user has at least one google account.
+                Account[] googleAccounts = AccountManager.get(getContext())
+                        .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+                return googleAccounts.length != 0;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isRegistered() {
+        return !TextUtils.isEmpty(mRegistrationId);
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    private boolean isPlayServicesAvailable() {
+        return GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())
+                == ConnectionResult.SUCCESS;
+    }
+
+    private void loadLocalRegistrationId() {
+        Context context = getContext();
+        final SharedPreferences prefs = getGcmPreferences(context);
+        if (prefs.contains(PREF_REGISTRATION_ID)) {
+            mRegistrationId = prefs.getString(PREF_REGISTRATION_ID, null);
         }
 
-        private void notifyListenersOnError(IOException ex) {
-            GcmProvider provider = getProvider();
-            if (provider != null) {
-                String errorMessage = "Class: " + ex.getClass() + " Error :" + ex.getMessage();
-                //todo check for ex.getMessage().equals("SERVICE_NOT_AVAILABLE" ???
-                provider.notifyWorkflowListeners(GcmIntentService.ACTION_ERROR_SERVICE_NOT_AVAILABLE, errorMessage);
+        if (prefs.contains(PREF_APP_VERSION)) {
+            int registeredVersion = prefs.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
+            int currentVersion = getAppVersion(context, context.getPackageName());
+            if (registeredVersion != currentVersion) {
+                mRegistrationId = "";
             }
+        } else {
+            mRegistrationId = "";
         }
+    }
+
+    /**
+     * Stores the registration ID and the app versionCode in the application's
+     * {@code SharedPreferences}.
+     *
+     * @param context        application's context.
+     * @param registrationId registration ID
+     */
+    private void storeRegistrationId(@NonNull Context context, @NonNull String registrationId) {
+        getGcmPreferences(context).edit()
+                .putString(PREF_REGISTRATION_ID, registrationId)
+                .putInt(PREF_APP_VERSION, getAppVersion(context, context.getPackageName()))
+                .apply();
+    }
+
+    @NonNull
+    @Override
+    public String getHostAppPackage() {
+        return GOOGLE_PLAY_PACKAGE;
     }
 }
