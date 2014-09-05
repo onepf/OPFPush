@@ -16,8 +16,7 @@
 
 package org.onepf.openpush;
 
-import android.support.annotation.NonNull;
-
+import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.exception.RegistrationException;
 
 /**
@@ -25,11 +24,10 @@ import org.onepf.openpush.exception.RegistrationException;
  * @since 14.05.14
  */
 public interface PushProvider {
-
     /**
      * Initiate registration for the current application.
      */
-    void register() throws RegistrationException;
+    void register();
 
     /**
      * Unregister the application.
@@ -54,7 +52,7 @@ public interface PushProvider {
     /**
      * Returns the name of the provider.
      */
-    @NonNull
+    @NotNull
     String getName();
 
     /**
@@ -62,6 +60,6 @@ public interface PushProvider {
      *
      * @return Host application package.
      */
-    @NonNull
+    @NotNull
     String getHostAppPackage();
 }

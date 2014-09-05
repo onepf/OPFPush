@@ -30,9 +30,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.onepf.openpush.util.LogUtils;
-import org.onepf.openpush.OpenPushProvider;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -76,11 +74,11 @@ public class PushSampleActivity extends ActionBarActivity {
         super.onResume();
         registerPushReceiver();
 
-        if (OpenPushProvider.getInstance().isRegistered()) {
-            switchToRegisteredState();
-        } else {
-            switchToUnregisteredState();
-        }
+//        if (OpenPushHelper.getInstance().isRegistered()) {
+//            switchToRegisteredState();
+//        } else {
+//            switchToUnregisteredState();
+//        }
     }
 
     @Override
@@ -104,7 +102,7 @@ public class PushSampleActivity extends ActionBarActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OpenPushProvider.getInstance().register();
+//                OpenPushProvider.getInstance().register();
             }
         });
 
@@ -112,7 +110,7 @@ public class PushSampleActivity extends ActionBarActivity {
         btnUnregister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OpenPushProvider.getInstance().unregister();
+//                OpenPushProvider.getInstance().unregister();
             }
         });
 
@@ -136,10 +134,10 @@ public class PushSampleActivity extends ActionBarActivity {
 
     private void registerPushReceiver() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(SimplePushListener.ONEPF_ACTION_REGISTERED);
-        filter.addAction(SimplePushListener.ONEPF_ACTION_UNREGISTERED);
-        filter.addAction(SimplePushListener.ONEPF_ACTION_MESSAGE);
-        filter.addAction(SimplePushListener.ONEPF_ACTION_ERROR);
+//        filter.addAction(SimplePushListener.ONEPF_ACTION_REGISTERED);
+//        filter.addAction(SimplePushListener.ONEPF_ACTION_UNREGISTERED);
+//        filter.addAction(SimplePushListener.ONEPF_ACTION_MESSAGE);
+//        filter.addAction(SimplePushListener.ONEPF_ACTION_ERROR);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mPushReceiver, filter);
     }
@@ -150,11 +148,11 @@ public class PushSampleActivity extends ActionBarActivity {
 
     private void switchToRegisteredState() {
         tvRegistrationId.setVisibility(View.VISIBLE);
-        tvRegistrationId.setText(OpenPushProvider.getInstance().getRegistrationId());
+//        tvRegistrationId.setText(OpenPushProvider.getInstance().getRegistrationId());
 
         tvLabelRegistrationId.setVisibility(View.VISIBLE);
 
-        tvProviderName.setText(OpenPushProvider.getInstance().getName());
+//        tvProviderName.setText(OpenPushProvider.getInstance().getName());
 
         btnRegister.setVisibility(View.INVISIBLE);
         btnUnregister.setVisibility(View.VISIBLE);
@@ -197,15 +195,15 @@ public class PushSampleActivity extends ActionBarActivity {
 
             String action = intent.getAction();
 
-            if (SimplePushListener.ONEPF_ACTION_REGISTERED.equals(action)) {
-                onRegistered();
-            } else if (SimplePushListener.ONEPF_ACTION_UNREGISTERED.equals(action)) {
-                onUnregistered();
-            } else if (SimplePushListener.ONEPF_ACTION_ERROR.equals(action)) {
-                onMessage(intent);
-            } else if (SimplePushListener.ONEPF_ACTION_MESSAGE.equals(action)) {
-                onMessage(intent);
-            }
+//            if (SimplePushListener.ONEPF_ACTION_REGISTERED.equals(action)) {
+//                onRegistered();
+//            } else if (SimplePushListener.ONEPF_ACTION_UNREGISTERED.equals(action)) {
+//                onUnregistered();
+//            } else if (SimplePushListener.ONEPF_ACTION_ERROR.equals(action)) {
+//                onMessage(intent);
+//            } else if (SimplePushListener.ONEPF_ACTION_MESSAGE.equals(action)) {
+//                onMessage(intent);
+//            }
         }
 
         private void onRegistered() {
@@ -227,11 +225,11 @@ public class PushSampleActivity extends ActionBarActivity {
         }
 
         private void onMessage(Intent intent) {
-            final Bundle message = intent.getBundleExtra(SimplePushListener.ONEPF_EXTRA_MESSAGE);
+//            final Bundle message = intent.getBundleExtra(SimplePushListener.ONEPF_EXTRA_MESSAGE);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    onMessageObtained(message);
+//                    onMessageObtained(message);
                 }
             });
         }

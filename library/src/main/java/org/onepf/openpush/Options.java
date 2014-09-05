@@ -16,7 +16,8 @@
 
 package org.onepf.openpush;
 
-import android.support.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.onepf.openpush.retrypolice.RetryPolice;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +29,12 @@ import java.util.List;
  */
 public class Options {
     private final List<PushProvider> mProviders;
+    private final RetryPolice mRetryPolice;
 
-    private Options(List<PushProvider> providers) {
+    private Options(List<PushProvider> providers
+            , RetryPolice retryPolice) {
         mProviders = Collections.unmodifiableList(providers);
+        mRetryPolice = retryPolice;
     }
 
     /**
@@ -38,34 +42,44 @@ public class Options {
      *
      * @return List of all available push providers.
      */
-    @NonNull
+    @NotNull
     public List<PushProvider> getProviders() {
         return mProviders;
+    }
+
+    public RetryPolice getRetryPolice() {
+        return mRetryPolice;
     }
 
     /**
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
     public static class Builder {
-        private static final int PROVIDERS_CAPACITY = 4;
         private List<PushProvider> mProviders;
+        private RetryPolice mRetryPolice;
 
         /**
          * Add the provider to the options.
          *
          * @param provider Provider to add.
+         * @return Current instance of builder.
          * @throws java.lang.IllegalArgumentException If try to add already added provider.
          */
-        public void addProvider(@NonNull PushProvider provider) {
+        public Builder addProvider(@NotNull PushProvider provider) {
             if (mProviders != null && mProviders.contains(provider)) {
                 throw new IllegalArgumentException(
                         String.format("Provider '%s' already added", provider));
             } else {
                 if (mProviders == null) {
-                    mProviders = new ArrayList<PushProvider>(PROVIDERS_CAPACITY);
+                    mProviders = new ArrayList<PushProvider>(4);
                 }
                 mProviders.add(provider);
             }
+            return this;
+        }
+
+        public void setRetryPolice(@NotNull RetryPolice retryPolice) {
+            mRetryPolice = retryPolice;
         }
 
         /**
@@ -78,7 +92,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders);
+            return new Options(mProviders, mRetryPolice);
         }
     }
 }

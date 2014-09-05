@@ -17,24 +17,23 @@
 package org.onepf.openpush.nokia;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.nokia.push.PushRegistrar;
 
+import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
+import org.onepf.openpush.exception.OpenPushException;
 import org.onepf.openpush.exception.RegistrationException;
 
 
 public class NokiaPushProvider extends BasePushProvider {
 
     public static final String NAME = "com.nokia.push.provider"; //todo check the name
-    private static final String NOKIA_STORE_PACKAGE = "com.nokia.store";
-    private static final String IMPLEMENTATION_CLASS_NAME = "com.nokia.push.PushRegistrar";
 
     private final String senderId;
 
-    public NokiaPushProvider(@NonNull Context context, @NonNull String senderID) {
-        super(context, IMPLEMENTATION_CLASS_NAME);
+    public NokiaPushProvider(@NotNull Context context, @NotNull String senderID) {
+        super(context, "com.nokia.push.PushRegistrar");
         senderId = senderID;
     }
 
@@ -42,6 +41,7 @@ public class NokiaPushProvider extends BasePushProvider {
     public boolean isAvailable() {
         try {
             PushRegistrar.checkDevice(getContext());
+            PushRegistrar.checkManifest(getContext());
             return true;
         } catch (UnsupportedOperationException exception) {
             return false;
@@ -59,16 +59,16 @@ public class NokiaPushProvider extends BasePushProvider {
     }
 
     @Override
-    public void register() throws RegistrationException{
+    public void register() {
         if (isRegistered()) {
-            throw new RegistrationException("Nokia Push already registered.");
+            throw new OpenPushException("Nokia Push already registered.");
         } else {
             PushRegistrar.register(getContext(), senderId);
         }
     }
 
     @Override
-    public void unregister() throws RegistrationException{
+    public void unregister() throws RegistrationException {
         if (isRegistered()) {
             PushRegistrar.unregister(getContext());
         } else {
@@ -76,15 +76,15 @@ public class NokiaPushProvider extends BasePushProvider {
         }
     }
 
-    @NonNull
+    @NotNull
     @Override
     public String getName() {
         return NAME;
     }
 
-    @NonNull
+    @NotNull
     @Override
     public String getHostAppPackage() {
-        return NOKIA_STORE_PACKAGE;
+        return "com.nokia.store";
     }
 }

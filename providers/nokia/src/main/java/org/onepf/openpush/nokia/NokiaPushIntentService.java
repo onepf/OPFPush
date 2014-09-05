@@ -21,8 +21,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.nokia.push.PushBaseIntentService;
+import com.nokia.push.PushConstants;
 
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.ProviderRegistrationResult;
 
 /**
  * @author Anastasia Karimova
@@ -34,31 +38,96 @@ public class NokiaPushIntentService extends PushBaseIntentService {
         super("Nokia Push Client"); //Passed name will use as Thread name;
     }
 
+    /**
+     * Called when a Push Notification message has been received.
+     *
+     * @param appContext Application's context.
+     * @param intent     Intent containing the message payload as extras.
+     */
     @Override
-    protected void onMessage(Context context, Intent intent) {
-        Bundle extras = new Bundle();
-        extras.putAll(intent.getExtras());
-        OpenPushHelper.sendMessage(context, NokiaPushProvider.NAME, extras);
+    protected void onMessage(@NotNull Context appContext, Intent intent) {
+        OpenPushHelper.sendMessage(appContext, NokiaPushProvider.NAME,
+                new Bundle(intent.getExtras()));
     }
 
+    /**
+     * Called on registration or unregistration error.
+     *
+     * @param appContext   Application's context.
+     * @param errorMessage Error id returned by the Push Notifications service.
+     */
     @Override
-    protected void onError(Context context, String errorMessage) {
-        Bundle extras = new Bundle();
-        extras.putString(OpenPushHelper.EXTRA_MESSAGE, errorMessage);
-        OpenPushHelper.sendError(context, NokiaPushProvider.NAME, extras);
+    protected void onError(@NotNull Context appContext, String errorMessage) {
     }
 
+    /**
+     * Called when the Push Notifications server tells pending messages
+     * have been deleted because the device was idle.
+     *
+     * @param appContext Application's context.
+     * @param total      Total number of collapsed messages.
+     */
     @Override
-    protected void onRegistered(Context context, String registrationToken) {
-        Bundle extras = new Bundle();
-        extras.putString(OpenPushHelper.EXTRA_TOKEN, registrationToken);
-        OpenPushHelper.sendRegistered(context, NokiaPushProvider.NAME, extras);
+    protected void onDeletedMessages(@NotNull Context appContext, int total) {
+        Bundle extras = new Bundle(1);
+        extras.putInt(OpenPushHelper.EXTRA_MESSAGES_COUNT, total);
+        OpenPushHelper.sendMessageDeleted(appContext, NokiaPushProvider.NAME, extras);
     }
 
+    /**
+     * Called on a registration error that could be retried.
+     * By default, it does nothing and returns true,
+     * but could be overridden to change that behavior and/or display the error.
+     *
+     * @param appContext Application's context.
+     * @param errorId    Error id returned by the Push Notifications service.
+     * @return If true, failed operation will be retried (using exponential backoff).
+     */
     @Override
-    protected void onUnregistered(Context context, String oldRegistrationToken) {
-        Bundle extras = new Bundle();
-        extras.putString(OpenPushHelper.EXTRA_TOKEN, oldRegistrationToken);
-        OpenPushHelper.sendUnregistered(context, NokiaPushProvider.NAME, extras);
+    protected boolean onRecoverableError(@NotNull Context appContext,
+                                         @NotNull
+                                         @MagicConstant(stringValues = {
+                                                 PushConstants.ERROR_INVALID_PARAMETERS,
+                                                 PushConstants.ERROR_INVALID_SENDER,
+                                                 PushConstants.ERROR_SERVICE_NOT_AVAILABLE
+                                         })
+                                         String errorId) {
+        int error;
+        if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
+            error = ProviderRegistrationResult.ERROR_INVALID_PARAMETERS;
+        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            error = ProviderRegistrationResult.ERROR_INVALID_PARAMETERS;
+        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            error = ProviderRegistrationResult.ERROR_SERVICE_NOT_AVAILABLE;
+        } else {
+            error = ProviderRegistrationResult.ERROR_UNKNOWN;
+        }
+        OpenPushHelper.notifyRegistrationEnd(
+                new ProviderRegistrationResult(NokiaPushProvider.NAME, error));
+        return false;
+    }
+
+    /**
+     * Called after a device has been registered.
+     *
+     * @param appContext        Application's context.
+     * @param registrationToken The registration id returned by the Push Notifications service.
+     */
+    @Override
+    protected void onRegistered(@NotNull Context appContext,
+                                @NotNull String registrationToken) {
+        OpenPushHelper.notifyRegistrationEnd(
+                new ProviderRegistrationResult(NokiaPushProvider.NAME, registrationToken));
+    }
+
+    /**
+     * Called after a device has been unregistered.
+     *
+     * @param appContext           Application's context.
+     * @param oldRegistrationToken the registration id that was previously registered.
+     */
+    @Override
+    protected void onUnregistered(@NotNull Context appContext,
+                                  @NotNull String oldRegistrationToken) {
     }
 }

@@ -18,11 +18,9 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
         if (intentExtras != null) {
             final String messageType = gcm.getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                OpenPushHelper.sendMessage(context, GcmProvider.NAME, new Bundle(intentExtras));
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                //TODO Notify about message send error.
+                OpenPushHelper.sendMessage(context, GoogleCloudMessagingProvider.NAME, new Bundle(intentExtras));
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                //TODO Notify about message delete.
+                OpenPushHelper.sendMessageDeleted(context, GoogleCloudMessagingProvider.NAME, new Bundle(intentExtras));
             }
         }
     }

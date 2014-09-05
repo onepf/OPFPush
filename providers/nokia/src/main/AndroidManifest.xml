@@ -4,10 +4,25 @@
 
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
-    <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE" />
+        android:protectionLevel="signature"/>
 
-    <application/>
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE"/>
+
+    <application>
+        <receiver
+            android:name=".NokiaPushBroadcastReceiver"
+            android:permission="com.nokia.pushnotifications.permission.SEND">
+            <intent-filter>
+                <!-- Receives the actual messages. -->
+                <action android:name="com.nokia.pushnotifications.intent.RECEIVE"/>
+                <!-- Receives the registration id. -->
+                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".NokiaPushIntentService"/>
+
+    </application>
 
 </manifest>
