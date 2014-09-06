@@ -1,0 +1,47 @@
+<manifest
+    package="org.onepf.openpush.adm"
+    xmlns:amazon="http://schemas.amazon.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This permission ensures that no other application can intercept your
+    ADM messages. -->
+    <permission
+        android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>
+
+    <!-- This permission allows your app access to receive push notifications
+    from ADM. -->
+    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
+
+    <!-- ADM uses WAKE_LOCK to keep the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <application>
+
+        <!-- You must explicitly enable ADM and declare whether your app cannot work without
+           ADM (android:required="true") or can work without ADM (android:required="false").
+           If you specify android:required="false", your app must degrade gracefully if ADM
+           is unavailable. -->
+        <amazon:enable-feature
+            android:name="com.amazon.device.messaging"
+            android:required="true"/>
+
+        <service
+            android:name=".ADMService"
+            android:exported="false"/>
+
+        <receiver
+            android:name=".ADMBroadcastReceiver"
+            android:permission="com.amazon.device.messaging.permission.SEND">
+
+            <!-- To interact with ADM, your app must listen for the following intents. -->
+            <intent-filter>
+                <action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>
+                <action android:name="com.amazon.device.messaging.intent.RECEIVE"/>
+
+                <!-- Replace the name in the category tag with your app's package name. -->
+                <category android:name="${applicationId}"/>
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

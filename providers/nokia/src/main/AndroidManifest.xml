@@ -21,7 +21,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".NokiaPushIntentService"/>
+        <service android:name=".NokiaPushService"/>
 
     </application>
 

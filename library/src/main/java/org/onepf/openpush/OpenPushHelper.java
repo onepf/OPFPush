@@ -26,37 +26,18 @@ import android.os.Looper;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.exception.OpenPushException;
 
 public class OpenPushHelper {
 
-    public static final String ACTION_REGISTERED =
-            "org.onepf.openpush.gcm.ACTION.registered";
-    public static final String ACTION_UNREGISTERED =
-            "org.onepf.openpush.ACTION.gcm.unregistered";
-    public static final String ACTION_MESSAGE =
-            "org.onepf.openpush.gcm.ACTION.message";
-    public static final String ACTION_MESSAGE_DELETED =
-            "org.onepf.openpush.gcm.ACTION.message_deleted";
-    public static final String ACTION_HOST_APP_REMOVED
-            = "org.onepf.openpush.gcm.ACTION.host_app_removed";
+    private static final String PREFERENCES = "org.onepf.openpush.prefs";
+    private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
 
-    public static final String EXTRA_PROVIDER_NAME
-            = "org.onepf.openpush.EXTRA.provider_name";
-    public static final String EXTRA_REGISTRATION_ID
-            = "org.onepf.openpush.EXTRA.registration_id";
-    public static final String EXTRA_MESSAGES_COUNT
-            = "org.onepf.openpush.EXTRA.messages_count";
-    public static final String EXTRA_HOST_APP_PACKAGE
-            = "org.onepf.openpush.EXTRA.messages_count";
+    public static final int INIT_NOT_STARTED = 0;
+    public static final int INIT_IN_PROGRESS = 1;
+    public static final int INIT_SUCCESS = 2;
+    public static final int INIT_ERROR = 3;
 
-    private static final String PREFERENCES = "org.onepf.openpush.preferences";
-    private static final String KEY_PROVIDER_NAME = "org.onepf.openpush.provider";
-
-    private static final int INIT_NOT_STARTED = 0;
-    private static final int INIT_IN_PROGRESS = 1;
-    private static final int INIT_SUCCESS = 2;
-    private static final int INIT_ERROR = 3;
+    private static Handler sHandler = new Handler(Looper.getMainLooper());
 
     private int mInitStatus = INIT_NOT_STARTED;
     private Options mOptions;
@@ -65,30 +46,34 @@ public class OpenPushHelper {
 
     private int mRetryNumber = 0;
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    private static OpenPushHelper sInstance;
 
     public static void sendMessage(@NotNull Context context,
                                    @NotNull String providerName,
                                    @Nullable Bundle extras) {
-        sendBroadcast(context, ACTION_MESSAGE, providerName, extras);
+        sendBroadcast(context, OpenPushConstants.ACTION_MESSAGE, providerName, extras);
     }
 
     public static void sendMessageDeleted(@NotNull Context context,
                                           @NotNull String providerName,
                                           @Nullable Bundle extras) {
-        sendBroadcast(context, ACTION_MESSAGE_DELETED, providerName, extras);
+        sendBroadcast(context, OpenPushConstants.ACTION_MESSAGE_DELETED, providerName, extras);
     }
 
     public static void sendRegistered(@NotNull Context context,
                                       @NotNull String providerName,
-                                      @Nullable Bundle extras) {
-        sendBroadcast(context, ACTION_REGISTERED, providerName, extras);
+                                      @Nullable String registrationId) {
+        Bundle extras = new Bundle(1);
+        extras.putString(OpenPushConstants.EXTRA_REGISTRATION_ID, registrationId);
+        sendBroadcast(context, OpenPushConstants.ACTION_REGISTERED, providerName, extras);
     }
 
     public static void sendUnregistered(@NotNull Context context,
                                         @NotNull String providerName,
-                                        @Nullable Bundle extras) {
-        sendBroadcast(context, ACTION_UNREGISTERED, providerName, extras);
+                                        @Nullable String registrationId) {
+        Bundle extras = new Bundle(1);
+        extras.putString(OpenPushConstants.EXTRA_REGISTRATION_ID, registrationId);
+        sendBroadcast(context, OpenPushConstants.ACTION_UNREGISTERED, providerName, extras);
     }
 
     private static void sendBroadcast(@NotNull Context context,
@@ -99,31 +84,32 @@ public class OpenPushHelper {
         if (extras != null) {
             newIntent.putExtras(extras);
         }
-        newIntent.putExtra(EXTRA_PROVIDER_NAME, providerName);
+        newIntent.putExtra(OpenPushConstants.EXTRA_PROVIDER_NAME, providerName);
         context.sendBroadcast(newIntent);
     }
 
     public static void notifyRegistrationEnd(@NotNull final ProviderRegistrationResult r) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                OpenPushHelper instance = OpenPushHelper.getInstance();
-                if (instance.mInitStatus == INIT_IN_PROGRESS) {
-                    instance.onRegistrationResult(r);
-                } else {
-                    throw new UnsupportedOperationException("Can't post registration result when int");
-                }
-            }
-        });
+        if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
+            sInstance.onRegistrationResult(r);
+        } else {
+            throw new UnsupportedOperationException(
+                    "Can't post registration result when init isn't running.");
+        }
     }
 
-    public static OpenPushHelper getInstance() {
-        return InstanceHolder.INSTANCE;
+    public static OpenPushHelper getInstance(@NotNull Context context) {
+        if (sInstance == null) {
+            sInstance = new OpenPushHelper(context);
+        }
+        return sInstance;
+    }
+
+    private OpenPushHelper(@NotNull Context context) {
+        mAppContext = context.getApplicationContext();
     }
 
     public synchronized void init(@NotNull Context context, @NotNull Options options) {
-        if (mInitStatus == INIT_NOT_STARTED
-                || mInitStatus == INIT_ERROR) {
+        if (mInitStatus == INIT_NOT_STARTED || mInitStatus == INIT_ERROR) {
             mInitStatus = INIT_IN_PROGRESS;
             mOptions = options;
             mAppContext = context.getApplicationContext();
@@ -136,7 +122,7 @@ public class OpenPushHelper {
             }
 
             if (provider != null) {
-                new ProviderRegistrationTask().execute(provider);
+                provider.register();
             }
         } else {
             throw new IllegalStateException("Attempt to initialize OpenPushProvider twice!");
@@ -144,10 +130,10 @@ public class OpenPushHelper {
     }
 
     @Nullable
-    private PushProvider getNextCandidate(@Nullable PushProvider lastCandidate) {
+    private PushProvider getNextCandidate(@Nullable PushProvider lastProvider) {
         int i = 0;
-        if (lastCandidate != null) {
-            int lastCandidateIndex = mOptions.getProviders().indexOf(lastCandidate);
+        if (lastProvider != null) {
+            int lastCandidateIndex = mOptions.getProviders().indexOf(lastProvider);
             if (lastCandidateIndex != -1) {
                 i = lastCandidateIndex + 1;
             }
@@ -162,25 +148,21 @@ public class OpenPushHelper {
     }
 
     private void onRegistrationResult(@NotNull final ProviderRegistrationResult e) {
-        if (e.getErrorCode() == ProviderRegistrationResult.NO_ERROR) {
+        if (e.getErrorCode() == OpenPushConstants.NO_ERROR) {
             mRetryNumber = 0;
             mCurrentProvider = getProviderByName(e.getProviderName());
-            if (mCurrentProvider != null) {
-                Bundle extras = new Bundle(1);
-                extras.putString(EXTRA_REGISTRATION_ID, e.getRegistrationId());
-                sendRegistered(mAppContext, mCurrentProvider.getName(), extras);
-            }
+            saveProvider(mCurrentProvider);
         } else {
             final PushProvider lastProvider = getProviderByName(e.getProviderName());
             if (mOptions.getRetryPolice() != null
                     && mRetryNumber < mOptions.getRetryPolice().tryCount()) {
-                HANDLER.postDelayed(new RetryRegistrationRunnable(lastProvider),
+                sHandler.postDelayed(new RetryRegistrationRunnable(lastProvider),
                         mOptions.getRetryPolice().getDelay(mRetryNumber));
                 mRetryNumber++;
             } else {
                 PushProvider provider = getNextCandidate(lastProvider);
                 if (provider != null) {
-                    new ProviderRegistrationTask().execute(provider);
+                    provider.register();
                 } else {
                     mInitStatus = INIT_ERROR;
                     //TODO Notify that can't register anyone of providers.
@@ -202,7 +184,7 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider getLastProvider() {
         SharedPreferences prefs = mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        final String storedProviderName = prefs.getString(KEY_PROVIDER_NAME, null);
+        final String storedProviderName = prefs.getString(KEY_LAST_PROVIDER_NAME, null);
 
         if (storedProviderName != null) {
             for (PushProvider provider : mOptions.getProviders()) {
@@ -214,33 +196,27 @@ public class OpenPushHelper {
         return null;
     }
 
+    private void saveProvider(PushProvider provider) {
+        mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+                .putString(KEY_LAST_PROVIDER_NAME, provider.getName())
+                .apply();
+    }
+
     @MagicConstant(intValues = {INIT_ERROR, INIT_IN_PROGRESS, INIT_NOT_STARTED, INIT_SUCCESS})
     public int getInitStatus() {
         return mInitStatus;
     }
 
-    public PushProvider getCurrentProvider() {
-        if (mInitStatus != INIT_SUCCESS) {
-            throw new OpenPushException("Before get current provider call init().");
-        }
-        return mCurrentProvider;
-    }
-
-    private static final class InstanceHolder {
-        final static OpenPushHelper INSTANCE = new OpenPushHelper();
-    }
-
     private static class RetryRegistrationRunnable implements Runnable {
-        @NotNull
-        private final PushProvider mLastProvider;
+        private final PushProvider mProvider;
 
-        public RetryRegistrationRunnable(@NotNull PushProvider lastProvider) {
-            mLastProvider = lastProvider;
+        public RetryRegistrationRunnable(@NotNull PushProvider provider) {
+            mProvider = provider;
         }
 
         @Override
         public void run() {
-            new ProviderRegistrationTask().execute(mLastProvider);
+            mProvider.register();
         }
     }
 }

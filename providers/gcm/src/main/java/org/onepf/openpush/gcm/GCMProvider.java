@@ -19,9 +19,11 @@ package org.onepf.openpush.gcm;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -32,19 +34,16 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.ProviderRegistrationResult;
-import org.onepf.openpush.exception.RegistrationException;
-import org.onepf.openpush.exception.OpenPushException;
+import org.onepf.openpush.OpenPushException;
 
 import java.io.IOException;
 
-public class GoogleCloudMessagingProvider extends BasePushProvider {
+public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
 
     private static final String GCM_PREFERENCES_NAME = "GCM_PREFS";
-    private static final String PREF_REGISTRATION_ID = "registration_id";
+    private static final String PREF_REGISTRATION_ID_FORMAT = "sender_%s.registration_id";
     private static final String PREF_APP_VERSION = "appVersion";
 
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
@@ -52,14 +51,16 @@ public class GoogleCloudMessagingProvider extends BasePushProvider {
 
     private String mRegistrationId;
     private final String mSenderId;
+    private final String mPrefRegistrationId;
 
-    public GoogleCloudMessagingProvider(@NotNull Context context, @NotNull String senderID) {
+    public GCMProvider(@NotNull Context context, @NotNull String senderID) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
         mSenderId = senderID;
+        mPrefRegistrationId = String.format(PREF_REGISTRATION_ID_FORMAT, mSenderId);
 
         final SharedPreferences prefs = getPreferences();
-        if (prefs.contains(PREF_REGISTRATION_ID)) {
-            mRegistrationId = prefs.getString(PREF_REGISTRATION_ID, null);
+        if (prefs.contains(mPrefRegistrationId)) {
+            mRegistrationId = prefs.getString(mPrefRegistrationId, null);
         }
     }
 
@@ -90,32 +91,55 @@ public class GoogleCloudMessagingProvider extends BasePushProvider {
             throw new OpenPushException("Provider already registered.");
         }
 
-        try {
-            mRegistrationId = GoogleCloudMessaging.getInstance(getContext()).register(mSenderId);
-            saveRegistrationId(this.mRegistrationId);
-            OpenPushHelper.notifyRegistrationEnd(
-                    new ProviderRegistrationResult(GoogleCloudMessagingProvider.NAME, mRegistrationId)
-            );
-        } catch (IOException e) {
-            ProviderRegistrationResult result;
-            if (e.getMessage().equals(GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE)) {
-                result = new ProviderRegistrationResult(NAME,
-                        ProviderRegistrationResult.ERROR_SERVICE_NOT_AVAILABLE);
-            } else {
-                result = new ProviderRegistrationResult(NAME, ProviderRegistrationResult.ERROR_UNKNOWN);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String mRegistrationId = GoogleCloudMessaging.getInstance(getContext())
+                            .register(mSenderId);
+                    saveRegistrationId(mRegistrationId);
+                    if (mRegistrationId != null) {
+                        Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+                        intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationId);
+                        getContext().sendBroadcast(intent);
+                    } else {
+                        Intent intent = new Intent(GCMConstants.ACTION_ERROR);
+                        intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                                GCMConstants.ERROR_AUTHEFICATION_FAILED);
+                        getContext().sendBroadcast(intent);
+                    }
+                } catch (IOException e) {
+                    Intent intent = new Intent(GCMConstants.ACTION_ERROR);
+                    if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
+                        intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                                GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                    }
+                    getContext().sendBroadcast(intent);
+                }
+                return null;
             }
-            OpenPushHelper.notifyRegistrationEnd(result);
-        }
+        }.execute();
     }
 
-    public void unregister() throws RegistrationException {
+    public void unregister() {
         if (isRegistered()) {
-            try {
-                GoogleCloudMessaging.getInstance(getContext()).unregister();
-                mRegistrationId = null;
-            } catch (IOException e) {
-                throw new RegistrationException("Error unregister Google Cloud Messaging.", e);
-            }
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        GoogleCloudMessaging.getInstance(getContext()).unregister();
+                        String oldRegistrationToken = mRegistrationId;
+                        mRegistrationId = null;
+
+                        Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+                        intent.putExtra(GCMConstants.EXTRA_TOKEN, oldRegistrationToken);
+                        getContext().sendBroadcast(intent);
+                    } catch (IOException e) {
+                        //TODO Send error.
+                    }
+                    return null;
+                }
+            }.execute();
         } else {
             throw new OpenPushException("Provider must be registered before unregister.");
         }
@@ -128,16 +152,22 @@ public class GoogleCloudMessagingProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext()) == ConnectionResult.SUCCESS) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                    || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
-                return true;
+        if (super.isAvailable()) {
+            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())
+                    == ConnectionResult.SUCCESS) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                        || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
+                    return true;
+                } else {
+                    // On device with version of Android less than "4.0.4"
+                    // we need to ensure that user has at least one google account.
+                    Account[] googleAccounts = AccountManager.get(getContext())
+                            .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+                    return googleAccounts.length != 0;
+                }
             } else {
-                // On device with version of Android less than "4.0.4"
-                // we need to ensure that user has at least one google account.
-                Account[] googleAccounts = AccountManager.get(getContext())
-                        .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
-                return googleAccounts.length != 0;
+                return false;
             }
         } else {
             return false;
@@ -175,9 +205,9 @@ public class GoogleCloudMessagingProvider extends BasePushProvider {
     private void saveRegistrationId(@Nullable String registrationId) {
         SharedPreferences.Editor editor = getPreferences().edit();
         if (TextUtils.isEmpty(registrationId)) {
-            editor.remove(PREF_REGISTRATION_ID);
+            editor.remove(mPrefRegistrationId);
         } else {
-            editor.putString(PREF_REGISTRATION_ID, registrationId);
+            editor.putString(mPrefRegistrationId, registrationId);
         }
 
         editor.putInt(PREF_APP_VERSION, getAppVersion());

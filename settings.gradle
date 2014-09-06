@@ -1,1 +1,1 @@
-include ':library', ':sample', ':providers:gcm', ':providers:nokia'
+include ':library', ':sample', ':providers:gcm', ':providers:nokia',':providers:adm'

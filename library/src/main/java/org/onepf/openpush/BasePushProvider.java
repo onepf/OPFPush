@@ -19,7 +19,6 @@ package org.onepf.openpush;
 import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.exception.OpenPushException;
 
 /**
  * @author Kirill Rozov
@@ -28,19 +27,25 @@ import org.onepf.openpush.exception.OpenPushException;
 public abstract class BasePushProvider implements PushProvider {
 
     private final Context mContext;
+    private final String mImplementationDependencyClass;
 
     public BasePushProvider(@NotNull Context context, @NotNull String implementationDependencyClass) {
-        try {
-            Class.forName(implementationDependencyClass);
-        } catch (ClassNotFoundException e) {
-            throw new OpenPushException(String.format("Class '%s' not present." +
-                    "Check you dependencies.", implementationDependencyClass), e);
-        }
         mContext = context.getApplicationContext();
+        mImplementationDependencyClass = implementationDependencyClass;
     }
 
     protected Context getContext() {
         return mContext;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        try {
+            Class.forName(mImplementationDependencyClass);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     @Override

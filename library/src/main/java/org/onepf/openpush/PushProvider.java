@@ -17,7 +17,6 @@
 package org.onepf.openpush;
 
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.exception.RegistrationException;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -32,7 +31,7 @@ public interface PushProvider {
     /**
      * Unregister the application.
      */
-    void unregister() throws RegistrationException;
+    void unregister();
 
     /**
      * Checks whether the provider is available
@@ -56,7 +55,8 @@ public interface PushProvider {
     String getName();
 
     /**
-     * Get package of application that contains needed API of this provider.
+     * Get package of application that contains API for this provider.
+     * Usually, this is store application.
      *
      * @return Host application package.
      */

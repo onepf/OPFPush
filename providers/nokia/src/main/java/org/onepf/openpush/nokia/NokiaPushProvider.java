@@ -22,8 +22,7 @@ import com.nokia.push.PushRegistrar;
 
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.exception.OpenPushException;
-import org.onepf.openpush.exception.RegistrationException;
+import org.onepf.openpush.OpenPushException;
 
 
 public class NokiaPushProvider extends BasePushProvider {
@@ -39,11 +38,15 @@ public class NokiaPushProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        try {
-            PushRegistrar.checkDevice(getContext());
-            PushRegistrar.checkManifest(getContext());
-            return true;
-        } catch (UnsupportedOperationException exception) {
+        if (super.isAvailable()) {
+            try {
+                PushRegistrar.checkDevice(getContext());
+                PushRegistrar.checkManifest(getContext());
+                return true;
+            } catch (UnsupportedOperationException exception) {
+                return false;
+            }
+        } else {
             return false;
         }
     }
@@ -68,11 +71,11 @@ public class NokiaPushProvider extends BasePushProvider {
     }
 
     @Override
-    public void unregister() throws RegistrationException {
+    public void unregister() {
         if (isRegistered()) {
             PushRegistrar.unregister(getContext());
         } else {
-            throw new RegistrationException("Nokia Push must be registered before unregister.");
+            throw new OpenPushException("Nokia Push must be registered before unregister.");
         }
     }
 

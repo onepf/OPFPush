@@ -1,4 +1,4 @@
-package org.onepf.openpush.exception;
+package org.onepf.openpush;
 
 /**
  * Created by krozov on 05.09.14.

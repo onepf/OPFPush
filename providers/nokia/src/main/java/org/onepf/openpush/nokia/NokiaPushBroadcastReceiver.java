@@ -26,7 +26,7 @@ import com.nokia.push.PushBroadcastReceiver;
  */
 public final class NokiaPushBroadcastReceiver extends PushBroadcastReceiver {
 
-    private static final String SERVICE_CLASS_NAME = NokiaPushIntentService.class.getCanonicalName();
+    private static final String SERVICE_CLASS_NAME = NokiaPushService.class.getCanonicalName();
 
     /**
      * Gets the class name of the intent service that will handle Push Notification messages.

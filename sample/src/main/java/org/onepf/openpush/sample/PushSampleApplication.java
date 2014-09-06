@@ -18,14 +18,17 @@ package org.onepf.openpush.sample;
 
 import android.app.Application;
 
+import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
-import org.onepf.openpush.gcm.GoogleCloudMessagingProvider;
+import org.onepf.openpush.gcm.GCMProvider;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
  * @since 14.05.14
  */
 public class PushSampleApplication extends Application {
+
+    private static final String GCM_SENDER_ID = "76325631570";
 
     @Override
     public void onCreate() {
@@ -34,8 +37,12 @@ public class PushSampleApplication extends Application {
     }
 
     private void initOpenPushLibrary() {
-        Options.Builder builder = new Options.Builder();
-        builder.addProvider(new GoogleCloudMessagingProvider(this, "76325631570"));
-//        OpenPushProvider.getInstance().init(builder.build());
+        final int initStatus = OpenPushHelper.getInstance(this).getInitStatus();
+        if (initStatus == OpenPushHelper.INIT_NOT_STARTED
+                || initStatus == OpenPushHelper.INIT_ERROR) {
+            Options.Builder builder = new Options.Builder();
+            builder.addProvider(new GCMProvider(this, GCM_SENDER_ID));
+            OpenPushHelper.getInstance(this).init(this, builder.build());
+        }
     }
 }
