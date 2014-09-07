@@ -27,7 +27,7 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.ProviderRegistrationResult;
+import org.onepf.openpush.RegistrationResult;
 
 /**
  * @author Kirill Rozov
@@ -59,7 +59,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false));
+                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false));
     }
 
     /**
@@ -95,7 +95,7 @@ public class NokiaPushService extends PushBaseIntentService {
                                          })
                                          String errorId) {
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
+                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
         return false;
     }
 
@@ -127,7 +127,7 @@ public class NokiaPushService extends PushBaseIntentService {
     protected void onRegistered(@NotNull Context appContext,
                                 @NotNull String registrationToken) {
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(NokiaPushProvider.NAME, registrationToken));
+                new RegistrationResult(NokiaPushProvider.NAME, registrationToken));
     }
 
     /**

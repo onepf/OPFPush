@@ -50,7 +50,7 @@ public class OpenPushHelper {
     private static OpenPushHelper sInstance;
     private static OpenPushListener sListener;
 
-    public static void notifyRegistrationEnd(@NotNull final ProviderRegistrationResult r) {
+    public static void notifyRegistrationEnd(@NotNull final RegistrationResult r) {
         if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
             sInstance.onRegistrationResult(r);
         } else {
@@ -142,7 +142,7 @@ public class OpenPushHelper {
         return null;
     }
 
-    private void onRegistrationResult(@NotNull final ProviderRegistrationResult result) {
+    private void onRegistrationResult(@NotNull final RegistrationResult result) {
         final PushProvider provider = getProviderByName(result.getProviderName());
         Assert.assertNotNull(provider);
 

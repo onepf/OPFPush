@@ -25,7 +25,7 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.ProviderRegistrationResult;
+import org.onepf.openpush.RegistrationResult;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -81,13 +81,13 @@ public class GCMService extends IntentService {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(GCMProvider.NAME, error)
+                new RegistrationResult(GCMProvider.NAME, error)
         );
     }
 
     private void onRegistered(String registrationToken) {
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(GCMProvider.NAME, registrationToken)
+                new RegistrationResult(GCMProvider.NAME, registrationToken)
         );
     }
 
