@@ -29,6 +29,8 @@ import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * @author Kirill Rozov
  * @since 05.09.2014
@@ -58,8 +60,8 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
-        OpenPushHelper.notifyRegistrationEnd(
-                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false));
+        EventBus.getDefault()
+                .post(new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false));
     }
 
     /**
@@ -94,8 +96,8 @@ public class NokiaPushService extends PushBaseIntentService {
                                                  PushConstants.ERROR_SERVICE_NOT_AVAILABLE
                                          })
                                          String errorId) {
-        OpenPushHelper.notifyRegistrationEnd(
-                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
+        EventBus.getDefault()
+                .post(new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
         return false;
     }
 
@@ -126,8 +128,8 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onRegistered(@NotNull Context appContext,
                                 @NotNull String registrationToken) {
-        OpenPushHelper.notifyRegistrationEnd(
-                new RegistrationResult(NokiaPushProvider.NAME, registrationToken));
+        EventBus.getDefault()
+                .post(new RegistrationResult(NokiaPushProvider.NAME, registrationToken));
     }
 
     /**

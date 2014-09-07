@@ -9,7 +9,9 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.ProviderRegistrationResult;
+import org.onepf.openpush.RegistrationResult;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -75,9 +77,8 @@ public class ADMService extends ADMMessageHandlerBase {
         } else {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
-        OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(ADMProvider.NAME, error)
-        );
+        EventBus.getDefault()
+                .post(new RegistrationResult(ADMProvider.NAME, error));
     }
 
     /**
@@ -94,9 +95,8 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistered(@NotNull String registrationId) {
         //TODO Send registration id.
 
-        OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(ADMProvider.NAME, registrationId)
-        );
+        EventBus.getDefault()
+                .post(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 
     /**

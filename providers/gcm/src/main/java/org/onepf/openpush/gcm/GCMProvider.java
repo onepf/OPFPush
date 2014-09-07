@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -43,28 +44,28 @@ public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
 
-    private static final String GCM_PREFERENCES_NAME = "GCM_PREFS";
-    private static final String PREF_REGISTRATION_ID_FORMAT = "sender_%s.registration_id";
-    private static final String PREF_APP_VERSION = "appVersion";
+    private static final String PREF_NAME_FORMAT = "gcm_prefs_%s";
+    private static final String PREF_REGISTRATION_TOKEN = "registration_token";
+    private static final String PREF_APP_VERSION = "app_version";
+    private static final String PREF_ANDROID_ID = "android_id";
 
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
 
     private String mRegistrationToken;
     private final String mSenderId;
-    private final String mPrefKeyRegistrationToken;
 
-    private final SharedPreferences mPrefs;
+    private final SharedPreferences mPreferences;
 
     public GCMProvider(@NotNull Context context, @NotNull String senderID) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
         Assert.assertNotNull(senderID);
         mSenderId = senderID;
-        mPrefKeyRegistrationToken = String.format(PREF_REGISTRATION_ID_FORMAT, mSenderId);
 
-        mPrefs = context.getSharedPreferences(GCM_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        if (mPrefs.contains(mPrefKeyRegistrationToken)) {
-            mRegistrationToken = mPrefs.getString(mPrefKeyRegistrationToken, null);
+        mPreferences = context.getSharedPreferences(
+                String.format(PREF_NAME_FORMAT, senderID), Context.MODE_PRIVATE);
+        if (mPreferences.contains(PREF_REGISTRATION_TOKEN)) {
+            mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
         }
     }
 
@@ -118,8 +119,8 @@ public class GCMProvider extends BasePushProvider {
         if (TextUtils.isEmpty(mRegistrationToken)) {
             return false;
         } else {
-            if (mPrefs.contains(PREF_APP_VERSION)) {
-                int registeredVersion = mPrefs.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
+            if (mPreferences.contains(PREF_APP_VERSION)) {
+                int registeredVersion = mPreferences.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
                 int currentVersion = PackageUtils.getAppVersion(getContext());
                 return registeredVersion > 0 && registeredVersion == currentVersion;
             } else {
@@ -143,7 +144,7 @@ public class GCMProvider extends BasePushProvider {
     @Override
     public String toString() {
         return String.format("%s (senderId: '%s', appVersion: %d)", NAME, mSenderId,
-                mPrefs.getInt(PREF_APP_VERSION, -1));
+                mPreferences.getInt(PREF_APP_VERSION, -1));
     }
 
     private class UnregisterTask extends AsyncTask<Void, Void, Boolean> {
@@ -169,9 +170,9 @@ public class GCMProvider extends BasePushProvider {
         protected void onPostExecute(Boolean success) {
             if (success) {
                 mRegistrationToken = null;
-                mPrefs.edit()
+                mPreferences.edit()
                         .remove(PREF_APP_VERSION)
-                        .remove(mPrefKeyRegistrationToken)
+                        .remove(PREF_REGISTRATION_TOKEN)
                         .apply();
 
                 Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
@@ -188,9 +189,10 @@ public class GCMProvider extends BasePushProvider {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mPrefs.edit()
+            mPreferences.edit()
+                    .remove(PREF_ANDROID_ID)
                     .remove(PREF_APP_VERSION)
-                    .remove(mPrefKeyRegistrationToken)
+                    .remove(PREF_REGISTRATION_TOKEN)
                     .apply();
         }
 
@@ -213,8 +215,9 @@ public class GCMProvider extends BasePushProvider {
         protected void onPostExecute(String registrationId) {
             mRegistrationToken = registrationId;
             if (mRegistrationToken != null) {
-                mPrefs.edit()
-                        .putString(mPrefKeyRegistrationToken, registrationId)
+                mPreferences.edit()
+                        .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
+                        .putString(PREF_REGISTRATION_TOKEN, registrationId)
                         .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
                         .apply();
 

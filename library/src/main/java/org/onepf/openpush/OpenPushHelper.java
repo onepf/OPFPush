@@ -27,6 +27,8 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import de.greenrobot.event.EventBus;
+
 public class OpenPushHelper {
 
     private static final String PREFERENCES = "org.onepf.openpush.prefs";
@@ -50,20 +52,7 @@ public class OpenPushHelper {
     private static OpenPushHelper sInstance;
     private static OpenPushListener sListener;
 
-    public static void notifyRegistrationEnd(@NotNull final RegistrationResult r) {
-        if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
-            sInstance.onRegistrationResult(r);
-        } else {
-            throw new UnsupportedOperationException(
-                    "Can't post registration result when register isn't running.");
-        }
-    }
-
-    public static OpenPushListener getListener() {
-        return sListener;
-    }
-
-    public static OpenPushHelper getInstance(@NotNull Context context) {
+    public static OpenPushHelper getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new OpenPushHelper(context);
         }
@@ -80,6 +69,10 @@ public class OpenPushHelper {
                 && mInitStatus == INIT_SUCCESS) {
             mCurrentProvider = provider;
         }
+    }
+
+    public static OpenPushListener getListener() {
+        return sListener;
     }
 
     public void setListener(OpenPushListener l) {
@@ -102,18 +95,30 @@ public class OpenPushHelper {
 
             PushProvider provider = getNextCandidate(null);
             if (provider != null) {
+                EventBus.getDefault().register(this);
                 provider.register();
             } else {
                 sListener.onNoAvailableProvider();
+                mInitStatus = INIT_ERROR;
             }
         } else {
             throw new IllegalStateException("Attempt to register twice!");
         }
     }
 
+    public void onEventMainThread(RegistrationResult r) {
+        if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
+            sInstance.onRegistrationResult(r);
+        } else {
+            throw new UnsupportedOperationException(
+                    "Can't post registration result when register isn't running.");
+        }
+    }
+
     public void unregister() {
         if (mInitStatus == INIT_SUCCESS) {
             mCurrentProvider.unregister();
+            EventBus.getDefault().unregister(this);
             mCurrentProvider = null;
             mInitStatus = INIT_NOT_STARTED;
             saveProvider(null);
