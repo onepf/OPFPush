@@ -43,8 +43,6 @@ import java.io.IOException;
 public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
-
-    private static final String PREF_NAME_FORMAT = "gcm_prefs_%s";
     private static final String PREF_REGISTRATION_TOKEN = "registration_token";
     private static final String PREF_APP_VERSION = "app_version";
     private static final String PREF_ANDROID_ID = "android_id";
@@ -63,7 +61,9 @@ public class GCMProvider extends BasePushProvider {
         mSenderId = senderID;
 
         mPreferences = context.getSharedPreferences(
-                String.format(PREF_NAME_FORMAT, senderID), Context.MODE_PRIVATE);
+                String.format("gcm_prefs_%s", senderID),
+                Context.MODE_PRIVATE
+        );
         if (mPreferences.contains(PREF_REGISTRATION_TOKEN)) {
             mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
         }

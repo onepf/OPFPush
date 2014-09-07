@@ -31,7 +31,6 @@ import de.greenrobot.event.EventBus;
 
 public class OpenPushHelper {
 
-    private static final String PREFERENCES = "org.onepf.openpush.prefs";
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_INIT_STATUS = "init_status";
 
@@ -44,31 +43,34 @@ public class OpenPushHelper {
 
     private int mInitStatus;
     private Options mOptions;
-    private Context mAppContext;
+    private final Context mAppContext;
     private PushProvider mCurrentProvider;
-
+    private final String mId;
     private int mRetryNumber = 0;
 
-    private static OpenPushHelper sInstance;
     private static OpenPushListener sListener;
 
-    public static OpenPushHelper getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new OpenPushHelper(context);
-        }
-        return sInstance;
-    }
+    private final SharedPreferences mPreferences;
 
-    private OpenPushHelper(@NotNull Context context) {
+    public OpenPushHelper(@NotNull Context context, @NotNull String id) {
         mAppContext = context.getApplicationContext();
+        mId = id;
         sListener = new BroadcastOpenPushListener(mAppContext);
-        mInitStatus = getSavedInitStatus();
+        mPreferences = context.getSharedPreferences(
+                String.format("org.onepf.openpush.prefs_%s", id),
+                Context.MODE_PRIVATE
+        );
+        mInitStatus = mPreferences.getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
 
         PushProvider provider = getLastProvider();
         if (provider != null && provider.isAvailable()
                 && mInitStatus == INIT_SUCCESS) {
             mCurrentProvider = provider;
         }
+    }
+
+    public String getId() {
+        return mId;
     }
 
     public static OpenPushListener getListener() {
@@ -81,11 +83,6 @@ public class OpenPushHelper {
         } else {
             sListener = l;
         }
-    }
-
-    private int getSavedInitStatus() {
-        return mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-                .getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
     }
 
     public synchronized void register(@NotNull Options options) {
@@ -106,15 +103,6 @@ public class OpenPushHelper {
         }
     }
 
-    public void onEventMainThread(RegistrationResult r) {
-        if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
-            sInstance.onRegistrationResult(r);
-        } else {
-            throw new UnsupportedOperationException(
-                    "Can't post registration result when register isn't running.");
-        }
-    }
-
     public void unregister() {
         if (mInitStatus == INIT_SUCCESS) {
             mCurrentProvider.unregister();
@@ -122,8 +110,7 @@ public class OpenPushHelper {
             mCurrentProvider = null;
             mInitStatus = INIT_NOT_STARTED;
             saveProvider(null);
-            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-                    .edit().remove(KEY_INIT_STATUS).apply();
+            mPreferences.edit().remove(KEY_INIT_STATUS).apply();
         } else {
             throw new IllegalStateException("Attempt to unregister not initialised!");
         }
@@ -153,8 +140,7 @@ public class OpenPushHelper {
 
         if (result.isSuccess()) {
             mInitStatus = INIT_SUCCESS;
-            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-                    .edit().putInt(KEY_INIT_STATUS, INIT_SUCCESS).apply();
+            mPreferences.edit().putInt(KEY_INIT_STATUS, INIT_SUCCESS).apply();
             mRetryNumber = 0;
             mCurrentProvider = provider;
             saveProvider(mCurrentProvider);
@@ -202,8 +188,7 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
-        SharedPreferences prefs = mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        final String storedProviderName = prefs.getString(KEY_LAST_PROVIDER_NAME, null);
+        final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
         if (storedProviderName != null) {
             for (PushProvider provider : mOptions.getProviders()) {
                 if (storedProviderName.equals(provider.getName())) {
@@ -216,11 +201,11 @@ public class OpenPushHelper {
 
     private void saveProvider(@Nullable PushProvider provider) {
         if (provider == null) {
-            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+            mPreferences.edit()
                     .remove(KEY_LAST_PROVIDER_NAME)
                     .apply();
         } else {
-            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+            mPreferences.edit()
                     .putString(KEY_LAST_PROVIDER_NAME, provider.getName())
                     .apply();
         }

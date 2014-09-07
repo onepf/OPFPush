@@ -66,7 +66,7 @@ public class PushSampleActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+        mOpenPushHelper = new OpenPushHelper(PushSampleActivity.this, "sample");
         setContentView(R.layout.activity_main);
         initViews();
     }
