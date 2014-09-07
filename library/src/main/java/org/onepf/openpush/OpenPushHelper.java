@@ -155,10 +155,10 @@ public class OpenPushHelper {
             saveProvider(mCurrentProvider);
             sListener.onRegistered(result.getProviderName(), result.getRegistrationId());
         } else {
-            if (result.isRecoverableError() && mOptions.getRetryPolice() != null
-                    && mRetryNumber < mOptions.getRetryPolice().tryCount()) {
+            if (result.isRecoverableError() && mOptions.getBackoff() != null
+                    && mRetryNumber < mOptions.getBackoff().tryCount()) {
                 sHandler.postDelayed(new RetryRegistrationRunnable(provider),
-                        mOptions.getRetryPolice().getDelay(mRetryNumber));
+                        mOptions.getBackoff().getDelay(mRetryNumber));
                 mRetryNumber++;
             } else {
                 sListener.onRegistrationError(provider.getName(), result.getErrorCode());

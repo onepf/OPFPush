@@ -1,9 +1,9 @@
-package org.onepf.openpush.retrypolice;
+package org.onepf.openpush;
 
 /**
  * Created by krozov on 05.09.14.
  */
-public interface RetryPolice {
+public interface Backoff {
     /**
      * Maximum number of try to register push provider.
      * Zero value means that will be no retry.

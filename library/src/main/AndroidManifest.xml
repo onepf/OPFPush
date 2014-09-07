@@ -1,6 +1,19 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.onepf.openpush">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    package="org.onepf.openpush"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <application>
+        <receiver
+            android:name=".BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+    </application>
 
 </manifest>

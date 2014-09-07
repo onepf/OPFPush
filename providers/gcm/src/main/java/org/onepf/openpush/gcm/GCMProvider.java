@@ -21,8 +21,6 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
@@ -37,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
+import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
 
@@ -67,22 +66,6 @@ public class GCMProvider extends BasePushProvider {
         if (mPrefs.contains(mPrefKeyRegistrationToken)) {
             mRegistrationToken = mPrefs.getString(mPrefKeyRegistrationToken, null);
         }
-    }
-
-    /**
-     * Get version code of current application.
-     *
-     * @return If find app - return it's version code, else {@link java.lang.Integer#MIN_VALUE}.
-     */
-    private int getAppVersion() {
-        try {
-            PackageInfo packageInfo = getContext().getPackageManager()
-                    .getPackageInfo(getContext().getPackageName(), 0);
-            return packageInfo == null ? Integer.MIN_VALUE : packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-        }
-        return Integer.MIN_VALUE;
     }
 
     public void register() {
@@ -137,7 +120,7 @@ public class GCMProvider extends BasePushProvider {
         } else {
             if (mPrefs.contains(PREF_APP_VERSION)) {
                 int registeredVersion = mPrefs.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
-                int currentVersion = getAppVersion();
+                int currentVersion = PackageUtils.getAppVersion(getContext());
                 return registeredVersion > 0 && registeredVersion == currentVersion;
             } else {
                 return false;
@@ -232,7 +215,7 @@ public class GCMProvider extends BasePushProvider {
             if (mRegistrationToken != null) {
                 mPrefs.edit()
                         .putString(mPrefKeyRegistrationToken, registrationId)
-                        .putInt(PREF_APP_VERSION, getAppVersion())
+                        .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
                         .apply();
 
                 Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);

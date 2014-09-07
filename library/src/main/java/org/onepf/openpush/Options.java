@@ -17,7 +17,6 @@
 package org.onepf.openpush;
 
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.retrypolice.RetryPolice;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,12 +28,12 @@ import java.util.List;
  */
 public class Options {
     private final List<PushProvider> mProviders;
-    private final RetryPolice mRetryPolice;
+    private final Backoff mBackoff;
 
     private Options(List<PushProvider> providers
-            , RetryPolice retryPolice) {
+            , Backoff backoff) {
         mProviders = Collections.unmodifiableList(providers);
-        mRetryPolice = retryPolice;
+        mBackoff = backoff;
     }
 
     /**
@@ -47,8 +46,8 @@ public class Options {
         return mProviders;
     }
 
-    public RetryPolice getRetryPolice() {
-        return mRetryPolice;
+    public Backoff getBackoff() {
+        return mBackoff;
     }
 
     /**
@@ -56,7 +55,7 @@ public class Options {
      */
     public static class Builder {
         private List<PushProvider> mProviders;
-        private RetryPolice mRetryPolice;
+        private Backoff mBackoff;
 
         /**
          * Add the provider to the options.
@@ -78,8 +77,8 @@ public class Options {
             return this;
         }
 
-        public void setRetryPolice(@NotNull RetryPolice retryPolice) {
-            mRetryPolice = retryPolice;
+        public void setBackoff(@NotNull Backoff backoff) {
+            mBackoff = backoff;
         }
 
         /**
@@ -92,7 +91,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders, mRetryPolice);
+            return new Options(mProviders, mBackoff);
         }
     }
 }
