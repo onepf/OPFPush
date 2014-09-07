@@ -26,6 +26,7 @@ import org.onepf.openpush.ProviderRegistrationResult;
  * Created by Kirill Rozov on 06.09.14.
  */
 public class ADMService extends ADMMessageHandlerBase {
+
     public ADMService() {
         super("ADMService");
     }
@@ -41,7 +42,8 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NotNull Intent intent) {
-        OpenPushHelper.sendMessage(this, ADMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getListener()
+                .onMessage(ADMProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -90,10 +92,11 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistered(@NotNull String registrationId) {
+        //TODO Send registration id.
+
         OpenPushHelper.notifyRegistrationEnd(
                 new ProviderRegistrationResult(ADMProvider.NAME, registrationId)
         );
-        OpenPushHelper.sendRegistered(this, ADMProvider.NAME, registrationId);
     }
 
     /**
@@ -110,6 +113,6 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@NotNull String registrationId) {
-        OpenPushHelper.sendUnregistered(this, ADMProvider.NAME, registrationId);
+        OpenPushHelper.getListener().onUnregistered(ADMProvider.NAME, registrationId);
     }
 }

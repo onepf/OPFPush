@@ -5,6 +5,7 @@ import android.content.Context;
 import com.amazon.device.messaging.ADM;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
 
@@ -51,6 +52,7 @@ public class ADMProvider extends BasePushProvider {
     }
 
     @Override
+    @Nullable
     public String getRegistrationId() {
         return mAdm.getRegistrationId();
     }

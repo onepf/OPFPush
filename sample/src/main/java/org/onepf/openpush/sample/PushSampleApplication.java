@@ -42,7 +42,7 @@ public class PushSampleApplication extends Application {
                 || initStatus == OpenPushHelper.INIT_ERROR) {
             Options.Builder builder = new Options.Builder();
             builder.addProvider(new GCMProvider(this, GCM_SENDER_ID));
-            OpenPushHelper.getInstance(this).init(this, builder.build());
+            OpenPushHelper.getInstance(this).init(builder.build());
         }
     }
 }

@@ -17,6 +17,7 @@
 package org.onepf.openpush;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -46,6 +47,7 @@ public interface PushProvider {
     /**
      * Gets the registration id.
      */
+    @Nullable
     String getRegistrationId();
 
     /**

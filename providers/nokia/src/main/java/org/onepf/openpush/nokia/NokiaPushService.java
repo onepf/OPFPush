@@ -30,8 +30,8 @@ import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.ProviderRegistrationResult;
 
 /**
- * @author Anastasia Karimova
- * @since 08.07.2014
+ * @author Kirill Rozov
+ * @since 05.09.2014
  */
 public class NokiaPushService extends PushBaseIntentService {
 
@@ -47,17 +47,19 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onMessage(@NotNull Context appContext, Intent intent) {
-        OpenPushHelper.sendMessage(this, NokiaPushProvider.NAME, intent.getExtras());
+        OpenPushHelper.getListener().onMessage(NokiaPushProvider.NAME, intent.getExtras());
     }
 
     /**
      * Called on registration or unregistration error.
      *
-     * @param appContext   Application's context.
-     * @param errorMessage Error id returned by the Push Notifications service.
+     * @param appContext Application's context.
+     * @param errorId    Error id returned by the Push Notifications service.
      */
     @Override
-    protected void onError(@NotNull Context appContext, String errorMessage) {
+    protected void onError(@NotNull Context appContext, String errorId) {
+        OpenPushHelper.notifyRegistrationEnd(
+                new ProviderRegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false));
     }
 
     /**
@@ -71,7 +73,7 @@ public class NokiaPushService extends PushBaseIntentService {
     protected void onDeletedMessages(@NotNull Context appContext, int total) {
         Bundle extras = new Bundle(1);
         extras.putInt(OpenPushConstants.EXTRA_MESSAGES_COUNT, total);
-        OpenPushHelper.sendMessageDeleted(this, NokiaPushProvider.NAME, extras);
+        OpenPushHelper.getListener().onDeletedMessages(NokiaPushProvider.NAME, extras);
     }
 
     /**
@@ -92,19 +94,27 @@ public class NokiaPushService extends PushBaseIntentService {
                                                  PushConstants.ERROR_SERVICE_NOT_AVAILABLE
                                          })
                                          String errorId) {
-        int error;
-        if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            error = OpenPushConstants.ERROR_INVALID_PARAMETERS;
-        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = OpenPushConstants.ERROR_INVALID_PARAMETERS;
-        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
-        } else {
-            error = OpenPushConstants.ERROR_UNKNOWN;
-        }
         OpenPushHelper.notifyRegistrationEnd(
-                new ProviderRegistrationResult(NokiaPushProvider.NAME, error));
+                new ProviderRegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
         return false;
+    }
+
+    @MagicConstant(intValues = {
+            OpenPushConstants.ERROR_INVALID_PARAMETERS,
+            OpenPushConstants.ERROR_INVALID_PARAMETERS,
+            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+            OpenPushConstants.ERROR_UNKNOWN
+    })
+    private static int convertError(String errorId) {
+        if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
+            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            return OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
+        } else {
+            return OpenPushConstants.ERROR_UNKNOWN;
+        }
     }
 
     /**
@@ -118,7 +128,6 @@ public class NokiaPushService extends PushBaseIntentService {
                                 @NotNull String registrationToken) {
         OpenPushHelper.notifyRegistrationEnd(
                 new ProviderRegistrationResult(NokiaPushProvider.NAME, registrationToken));
-        OpenPushHelper.sendRegistered(this, NokiaPushProvider.NAME, registrationToken);
     }
 
     /**
@@ -130,6 +139,6 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onUnregistered(@NotNull Context appContext,
                                   @NotNull String oldRegistrationToken) {
-        OpenPushHelper.sendUnregistered(this, NokiaPushProvider.NAME, oldRegistrationToken);
+        OpenPushHelper.getListener().onUnregistered(NokiaPushProvider.NAME, oldRegistrationToken);
     }
 }

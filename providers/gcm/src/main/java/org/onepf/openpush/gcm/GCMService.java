@@ -60,11 +60,11 @@ public class GCMService extends IntentService {
     }
 
     protected void onDeletedMessages(Intent intent) {
-        OpenPushHelper.sendMessageDeleted(this, GCMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getListener().onDeletedMessages(GCMProvider.NAME, intent.getExtras());
     }
 
     private void onMessage(Intent intent) {
-        OpenPushHelper.sendMessage(this, GCMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getListener().onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
     private void onError(@NotNull
@@ -89,11 +89,10 @@ public class GCMService extends IntentService {
         OpenPushHelper.notifyRegistrationEnd(
                 new ProviderRegistrationResult(GCMProvider.NAME, registrationToken)
         );
-        OpenPushHelper.sendRegistered(this, GCMProvider.NAME, registrationToken);
     }
 
     private void onUnregistered(String oldRegistrationToken) {
-        OpenPushHelper.sendUnregistered(this, GCMProvider.NAME, oldRegistrationToken);
+        OpenPushHelper.getListener().onUnregistered(GCMProvider.NAME, oldRegistrationToken);
     }
 
 }
