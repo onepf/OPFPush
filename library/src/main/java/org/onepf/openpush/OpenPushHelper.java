@@ -55,7 +55,7 @@ public class OpenPushHelper {
             sInstance.onRegistrationResult(r);
         } else {
             throw new UnsupportedOperationException(
-                    "Can't post registration result when init isn't running.");
+                    "Can't post registration result when register isn't running.");
         }
     }
 
@@ -72,7 +72,7 @@ public class OpenPushHelper {
 
     private OpenPushHelper(@NotNull Context context) {
         mAppContext = context.getApplicationContext();
-        sListener = new OpenPushListener(mAppContext);
+        sListener = new BroadcastOpenPushListener(mAppContext);
         mInitStatus = getSavedInitStatus();
 
         PushProvider provider = getLastProvider();
@@ -82,19 +82,20 @@ public class OpenPushHelper {
         }
     }
 
+    public void setListener(OpenPushListener l) {
+        if (l == null) {
+            sListener = new BroadcastOpenPushListener(mAppContext);
+        } else {
+            sListener = l;
+        }
+    }
+
     private int getSavedInitStatus() {
         return mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
                 .getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
     }
 
-    private void saveInitStatus(int initStatus) {
-        mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-                .edit()
-                .putInt(KEY_INIT_STATUS, initStatus)
-                .apply();
-    }
-
-    public synchronized void init(@NotNull Options options) {
+    public synchronized void register(@NotNull Options options) {
         if (mInitStatus == INIT_NOT_STARTED || mInitStatus == INIT_ERROR) {
             mInitStatus = INIT_IN_PROGRESS;
             mOptions = options;
@@ -102,9 +103,24 @@ public class OpenPushHelper {
             PushProvider provider = getNextCandidate(null);
             if (provider != null) {
                 provider.register();
+            } else {
+                sListener.onNoAvailableProvider();
             }
         } else {
-            throw new IllegalStateException("Attempt to initialize OpenPushProvider twice!");
+            throw new IllegalStateException("Attempt to register twice!");
+        }
+    }
+
+    public void unregister() {
+        if (mInitStatus == INIT_SUCCESS) {
+            mCurrentProvider.unregister();
+            mCurrentProvider = null;
+            mInitStatus = INIT_NOT_STARTED;
+            saveProvider(null);
+            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+                    .edit().remove(KEY_INIT_STATUS).apply();
+        } else {
+            throw new IllegalStateException("Attempt to unregister not initialised!");
         }
     }
 
@@ -132,7 +148,8 @@ public class OpenPushHelper {
 
         if (result.isSuccess()) {
             mInitStatus = INIT_SUCCESS;
-            saveInitStatus(INIT_SUCCESS);
+            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+                    .edit().putInt(KEY_INIT_STATUS, INIT_SUCCESS).apply();
             mRetryNumber = 0;
             mCurrentProvider = provider;
             saveProvider(mCurrentProvider);
@@ -159,6 +176,16 @@ public class OpenPushHelper {
     }
 
     @Nullable
+    public String getCurrentProviderName() {
+        return mCurrentProvider == null ? null : mCurrentProvider.getName();
+    }
+
+    @Nullable
+    public String getCurrentProviderRegistrationId() {
+        return mCurrentProvider == null ? null : mCurrentProvider.getRegistrationId();
+    }
+
+    @Nullable
     private PushProvider getProviderByName(@NotNull String providerName) {
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
@@ -172,7 +199,6 @@ public class OpenPushHelper {
     private PushProvider getLastProvider() {
         SharedPreferences prefs = mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         final String storedProviderName = prefs.getString(KEY_LAST_PROVIDER_NAME, null);
-
         if (storedProviderName != null) {
             for (PushProvider provider : mOptions.getProviders()) {
                 if (storedProviderName.equals(provider.getName())) {
@@ -183,10 +209,16 @@ public class OpenPushHelper {
         return null;
     }
 
-    private void saveProvider(PushProvider provider) {
-        mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
-                .putString(KEY_LAST_PROVIDER_NAME, provider.getName())
-                .apply();
+    private void saveProvider(@Nullable PushProvider provider) {
+        if (provider == null) {
+            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+                    .remove(KEY_LAST_PROVIDER_NAME)
+                    .apply();
+        } else {
+            mAppContext.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+                    .putString(KEY_LAST_PROVIDER_NAME, provider.getName())
+                    .apply();
+        }
     }
 
     @MagicConstant(intValues = {INIT_ERROR, INIT_IN_PROGRESS, INIT_NOT_STARTED, INIT_SUCCESS})

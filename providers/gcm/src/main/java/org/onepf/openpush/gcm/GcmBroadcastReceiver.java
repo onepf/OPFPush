@@ -25,9 +25,12 @@ public class GCMBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent serviceIntent = new Intent(context, GCMService.class);
+        serviceIntent.setAction(intent.getAction());
         serviceIntent.putExtras(intent);
         startWakefulService(context, serviceIntent);
-        setResultCode(Activity.RESULT_OK);
+        if (isOrderedBroadcast()) {
+            setResultCode(Activity.RESULT_OK);
+        }
     }
 
     /**

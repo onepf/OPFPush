@@ -11,12 +11,14 @@ public final class ProviderRegistrationResult {
     private final String mProviderName;
     private final String mRegistrationId;
     private final int mErrorCode;
+    private final boolean mRecoverableError;
 
     public ProviderRegistrationResult(@NotNull String providerName,
                                       @NotNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = OpenPushConstants.NO_ERROR;
+        mRecoverableError = true;
     }
 
     public ProviderRegistrationResult(@NotNull String providerName,
@@ -27,9 +29,26 @@ public final class ProviderRegistrationResult {
                                               OpenPushConstants.ERROR_UNKNOWN,
                                               OpenPushConstants.ERROR_AUTHEFICATION_FAILED
                                       }) int errorCode) {
+        this(providerName, errorCode, true);
+    }
+
+    public ProviderRegistrationResult(@NotNull String providerName,
+                                      @MagicConstant(intValues = {
+                                              OpenPushConstants.ERROR_INVALID_PARAMETERS,
+                                              OpenPushConstants.ERROR_INVALID_SENDER,
+                                              OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+                                              OpenPushConstants.ERROR_UNKNOWN,
+                                              OpenPushConstants.ERROR_AUTHEFICATION_FAILED
+                                      }) int errorCode,
+                                      boolean recoverableError) {
         mProviderName = providerName;
         mRegistrationId = null;
         mErrorCode = errorCode;
+        mRecoverableError = recoverableError;
+    }
+
+    public boolean isRecoverableError() {
+        return mRecoverableError;
     }
 
     public String getRegistrationId() {
@@ -39,6 +58,10 @@ public final class ProviderRegistrationResult {
     @NotNull
     public String getProviderName() {
         return mProviderName;
+    }
+
+    public boolean isSuccess() {
+        return mErrorCode == OpenPushConstants.NO_ERROR;
     }
 
     @MagicConstant(intValues = {

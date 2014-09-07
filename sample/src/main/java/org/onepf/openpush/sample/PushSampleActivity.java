@@ -18,11 +18,8 @@ package org.onepf.openpush.sample;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.ClipboardManager;
 import android.util.Log;
@@ -30,7 +27,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.onepf.openpush.util.LogUtils;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.OpenPushBaseReceiver;
+import org.onepf.openpush.OpenPushConstants;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.Options;
+import org.onepf.openpush.gcm.GCMProvider;
+import org.onepf.openpush.nokia.NokiaPushProvider;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -38,7 +43,8 @@ import org.onepf.openpush.util.LogUtils;
  */
 public class PushSampleActivity extends ActionBarActivity {
 
-    private static final String TAG = PushSampleActivity.class.getSimpleName();
+    private static final String TAG = "PushSampleActivity";
+    public static final String GCM_SENDER_ID = "76325631570";
 
     private TextView tvLabelRegistrationId;
 
@@ -54,37 +60,44 @@ public class PushSampleActivity extends ActionBarActivity {
     private Button btnUnregister;
     private Button btnCopyToClipboard;
 
-    private BroadcastReceiver mPushReceiver = new SampleBroadcastReceiver();
+    private BroadcastReceiver mOpenPushReceiver;
+    private OpenPushHelper mOpenPushHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
         setContentView(R.layout.activity_main);
         initViews();
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        mPushReceiver.onReceive(this, intent);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        registerPushReceiver();
-
-//        if (OpenPushHelper.getInstance().isRegistered()) {
-//            switchToRegisteredState();
-//        } else {
-//            switchToUnregisteredState();
-//        }
+        if (mOpenPushReceiver == null) {
+            registerReceiver();
+        }
     }
 
     @Override
     protected void onPause() {
-        unregisterPushReceiver();
         super.onPause();
+        if (mOpenPushReceiver != null) {
+            unregisterReceiver(mOpenPushReceiver);
+        }
+    }
+
+    private void registerReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(OpenPushConstants.ACTION_REGISTERED);
+        filter.addAction(OpenPushConstants.ACTION_UNREGISTERED);
+        filter.addAction(OpenPushConstants.ACTION_MESSAGE);
+        filter.addAction(OpenPushConstants.ACTION_REGISTRATION_ERROR);
+        filter.addAction(OpenPushConstants.ACTION_NO_AVAILABLE_PROVIDER);
+        filter.addAction(OpenPushConstants.ACTION_DELETED_MESSAGES);
+        filter.addAction(OpenPushConstants.ACTION_HOST_APP_REMOVED);
+        mOpenPushReceiver = new OpenPushEventReceiver();
+        registerReceiver(mOpenPushReceiver, filter);
     }
 
     private void initViews() {
@@ -102,7 +115,12 @@ public class PushSampleActivity extends ActionBarActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                OpenPushProvider.getInstance().register();
+                if (mOpenPushHelper.getInitStatus()
+                        == OpenPushHelper.INIT_NOT_STARTED) {
+                    Options.Builder builder = new Options.Builder();
+                    builder.addProvider(new NokiaPushProvider(PushSampleActivity.this, GCM_SENDER_ID));
+                    mOpenPushHelper.register(builder.build());
+                }
             }
         });
 
@@ -110,7 +128,7 @@ public class PushSampleActivity extends ActionBarActivity {
         btnUnregister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                OpenPushProvider.getInstance().unregister();
+                mOpenPushHelper.unregister();
             }
         });
 
@@ -119,8 +137,8 @@ public class PushSampleActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(PushSampleActivity.this,
-                               PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
-                               Toast.LENGTH_LONG)
+                        PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
+                        Toast.LENGTH_LONG)
                         .show();
 
                 ClipboardManager clipboard
@@ -132,27 +150,13 @@ public class PushSampleActivity extends ActionBarActivity {
         });
     }
 
-    private void registerPushReceiver() {
-        IntentFilter filter = new IntentFilter();
-//        filter.addAction(SimplePushListener.ONEPF_ACTION_REGISTERED);
-//        filter.addAction(SimplePushListener.ONEPF_ACTION_UNREGISTERED);
-//        filter.addAction(SimplePushListener.ONEPF_ACTION_MESSAGE);
-//        filter.addAction(SimplePushListener.ONEPF_ACTION_ERROR);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(mPushReceiver, filter);
-    }
-
-    private void unregisterPushReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mPushReceiver);
-    }
-
-    private void switchToRegisteredState() {
+    private void switchToRegisteredState(String providerName, String registrationId) {
         tvRegistrationId.setVisibility(View.VISIBLE);
-//        tvRegistrationId.setText(OpenPushProvider.getInstance().getRegistrationId());
+        tvRegistrationId.setText(providerName);
 
         tvLabelRegistrationId.setVisibility(View.VISIBLE);
 
-//        tvProviderName.setText(OpenPushProvider.getInstance().getName());
+        tvProviderName.setText(registrationId);
 
         btnRegister.setVisibility(View.INVISIBLE);
         btnUnregister.setVisibility(View.VISIBLE);
@@ -162,8 +166,10 @@ public class PushSampleActivity extends ActionBarActivity {
     }
 
     private void switchToUnregisteredState() {
+        mOpenPushReceiver = null;
+
         tvRegistrationId.setVisibility(View.GONE);
-        tvRegistrationId.setText("");
+        tvRegistrationId.setText(null);
 
         tvLabelRegistrationId.setVisibility(View.GONE);
 
@@ -176,62 +182,19 @@ public class PushSampleActivity extends ActionBarActivity {
         tvRegistrationStatus.setText(getString(R.string.not_registered));
     }
 
-    private void onMessageObtained(Bundle extras) {
-        if (extras != null && !extras.isEmpty()) {
-            tvLabelMessage.setVisibility(View.VISIBLE);
-            tvMessage.setVisibility(View.VISIBLE);
+    public class OpenPushEventReceiver extends OpenPushBaseReceiver {
 
-            tvMessage.setText(LogUtils.bundleToString(extras));
-            Log.i(TAG, "Message received in app: " + LogUtils.bundleToString(extras));
+        public OpenPushEventReceiver() {
         }
-    }
-
-    private class SampleBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.i(TAG, "Push received in app: " + LogUtils.intentToString(intent));
-
-            String action = intent.getAction();
-
-//            if (SimplePushListener.ONEPF_ACTION_REGISTERED.equals(action)) {
-//                onRegistered();
-//            } else if (SimplePushListener.ONEPF_ACTION_UNREGISTERED.equals(action)) {
-//                onUnregistered();
-//            } else if (SimplePushListener.ONEPF_ACTION_ERROR.equals(action)) {
-//                onMessage(intent);
-//            } else if (SimplePushListener.ONEPF_ACTION_MESSAGE.equals(action)) {
-//                onMessage(intent);
-//            }
+        public void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
+            switchToRegisteredState(providerName, registrationId);
         }
 
-        private void onRegistered() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    switchToRegisteredState();
-                }
-            });
-        }
-
-        private void onUnregistered() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    switchToUnregisteredState();
-                }
-            });
-        }
-
-        private void onMessage(Intent intent) {
-//            final Bundle message = intent.getBundleExtra(SimplePushListener.ONEPF_EXTRA_MESSAGE);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    onMessageObtained(message);
-                }
-            });
+        @Override
+        public void onUnregistered(@NotNull String providerName, @Nullable String registrationId) {
+            switchToUnregisteredState();
         }
     }
 }

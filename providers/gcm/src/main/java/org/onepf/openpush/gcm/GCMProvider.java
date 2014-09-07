@@ -31,6 +31,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import junit.framework.Assert;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
@@ -53,14 +55,17 @@ public class GCMProvider extends BasePushProvider {
     private final String mSenderId;
     private final String mPrefKeyRegistrationToken;
 
+    private final SharedPreferences mPrefs;
+
     public GCMProvider(@NotNull Context context, @NotNull String senderID) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
+        Assert.assertNotNull(senderID);
         mSenderId = senderID;
         mPrefKeyRegistrationToken = String.format(PREF_REGISTRATION_ID_FORMAT, mSenderId);
 
-        final SharedPreferences prefs = getPreferences();
-        if (prefs.contains(mPrefKeyRegistrationToken)) {
-            mRegistrationToken = prefs.getString(mPrefKeyRegistrationToken, null);
+        mPrefs = context.getSharedPreferences(GCM_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (mPrefs.contains(mPrefKeyRegistrationToken)) {
+            mRegistrationToken = mPrefs.getString(mPrefKeyRegistrationToken, null);
         }
     }
 
@@ -73,17 +78,11 @@ public class GCMProvider extends BasePushProvider {
         try {
             PackageInfo packageInfo = getContext().getPackageManager()
                     .getPackageInfo(getContext().getPackageName(), 0);
-            return packageInfo.versionCode;
+            return packageInfo == null ? Integer.MIN_VALUE : packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             // should never happen
-        } catch (NullPointerException npe) {
-            // a very rare case that we cannot process correctly
         }
         return Integer.MIN_VALUE;
-    }
-
-    private SharedPreferences getPreferences() {
-        return getContext().getSharedPreferences(GCM_PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
     public void register() {
@@ -95,7 +94,7 @@ public class GCMProvider extends BasePushProvider {
 
     public void unregister() {
         if (isRegistered()) {
-            new UnregisterTask(mRegistrationToken).execute();
+            new UnregisterTask().execute();
         } else {
             throw new OpenPushException("Provider must be registered before unregister.");
         }
@@ -136,9 +135,8 @@ public class GCMProvider extends BasePushProvider {
         if (TextUtils.isEmpty(mRegistrationToken)) {
             return false;
         } else {
-            SharedPreferences prefs = getPreferences();
-            if (prefs.contains(PREF_APP_VERSION)) {
-                int registeredVersion = prefs.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
+            if (mPrefs.contains(PREF_APP_VERSION)) {
+                int registeredVersion = mPrefs.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
                 int currentVersion = getAppVersion();
                 return registeredVersion > 0 && registeredVersion == currentVersion;
             } else {
@@ -153,33 +151,25 @@ public class GCMProvider extends BasePushProvider {
         return NAME;
     }
 
-    private void saveRegistrationId() {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        if (TextUtils.isEmpty(mRegistrationToken)) {
-            editor.remove(mPrefKeyRegistrationToken);
-        } else {
-            editor.putString(mPrefKeyRegistrationToken, mRegistrationToken);
-        }
-        editor.apply();
-    }
-
-    private void saveAppVersion(int version) {
-        SharedPreferences.Editor editor = getPreferences().edit();
-        editor.putInt(PREF_APP_VERSION, version);
-        editor.apply();
-    }
-
     @NotNull
     @Override
     public String getHostAppPackage() {
         return "com.android.vending";
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s (senderId: '%s', appVersion: %d)", NAME, mSenderId,
+                mPrefs.getInt(PREF_APP_VERSION, -1));
+    }
+
     private class UnregisterTask extends AsyncTask<Void, Void, Boolean> {
         private String mOldRegistrationToken;
 
-        private UnregisterTask(@NotNull String oldRegistrationToken) {
-            mOldRegistrationToken = oldRegistrationToken;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mOldRegistrationToken = mRegistrationToken;
         }
 
         @Override
@@ -196,7 +186,11 @@ public class GCMProvider extends BasePushProvider {
         protected void onPostExecute(Boolean success) {
             if (success) {
                 mRegistrationToken = null;
-                saveRegistrationId();
+                mPrefs.edit()
+                        .remove(PREF_APP_VERSION)
+                        .remove(mPrefKeyRegistrationToken)
+                        .apply();
+
                 Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
                 intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
                 getContext().sendBroadcast(intent);
@@ -207,13 +201,20 @@ public class GCMProvider extends BasePushProvider {
     }
 
     private class RegisterTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPrefs.edit()
+                    .remove(PREF_APP_VERSION)
+                    .remove(mPrefKeyRegistrationToken)
+                    .apply();
+        }
+
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String registrationId =
-                        GoogleCloudMessaging.getInstance(getContext()).register(mSenderId);
-                saveRegistrationId();
-                return registrationId;
+                return GoogleCloudMessaging.getInstance(getContext()).register(mSenderId);
             } catch (IOException e) {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
@@ -229,15 +230,17 @@ public class GCMProvider extends BasePushProvider {
         protected void onPostExecute(String registrationId) {
             mRegistrationToken = registrationId;
             if (mRegistrationToken != null) {
-                saveAppVersion(getAppVersion());
+                mPrefs.edit()
+                        .putString(mPrefKeyRegistrationToken, registrationId)
+                        .putInt(PREF_APP_VERSION, getAppVersion())
+                        .apply();
 
                 Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
                 intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
                 getContext().sendBroadcast(intent);
             } else {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
-                intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                        GCMConstants.ERROR_AUTHEFICATION_FAILED);
+                intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_AUTHEFICATION_FAILED);
                 getContext().sendBroadcast(intent);
             }
         }

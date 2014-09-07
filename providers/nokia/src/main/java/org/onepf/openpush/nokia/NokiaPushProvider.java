@@ -20,6 +20,8 @@ import android.content.Context;
 
 import com.nokia.push.PushRegistrar;
 
+import junit.framework.Assert;
+
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
@@ -33,6 +35,7 @@ public class NokiaPushProvider extends BasePushProvider {
 
     public NokiaPushProvider(@NotNull Context context, @NotNull String senderID) {
         super(context, "com.nokia.push.PushRegistrar");
+        Assert.assertNotNull(senderID);
         senderId = senderID;
     }
 
