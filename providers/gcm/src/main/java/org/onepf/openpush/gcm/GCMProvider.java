@@ -39,6 +39,7 @@ import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -51,19 +52,15 @@ public class GCMProvider extends BasePushProvider {
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
 
     private String mRegistrationToken;
-    private final String mSenderId;
+    private final String[] mSenderIDs;
 
     private final SharedPreferences mPreferences;
 
-    public GCMProvider(@NotNull Context context, @NotNull String senderID) {
+    public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
-        Assert.assertNotNull(senderID);
-        mSenderId = senderID;
-
-        mPreferences = context.getSharedPreferences(
-                String.format("gcm_prefs_%s", senderID),
-                Context.MODE_PRIVATE
-        );
+        Assert.assertNotNull(senderIDs);
+        mSenderIDs = senderIDs;
+        mPreferences = context.getSharedPreferences("gcm_prefs", Context.MODE_PRIVATE);
         if (mPreferences.contains(PREF_REGISTRATION_TOKEN)) {
             mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
         }
@@ -143,7 +140,7 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public String toString() {
-        return String.format("%s (senderId: '%s', appVersion: %d)", NAME, mSenderId,
+        return String.format("%s (senderId: '%s', appVersion: %d)", NAME, Arrays.toString(mSenderIDs),
                 mPreferences.getInt(PREF_APP_VERSION, -1));
     }
 
@@ -199,7 +196,7 @@ public class GCMProvider extends BasePushProvider {
         @Override
         protected String doInBackground(Void... params) {
             try {
-                return GoogleCloudMessaging.getInstance(getContext()).register(mSenderId);
+                return GoogleCloudMessaging.getInstance(getContext()).register(mSenderIDs);
             } catch (IOException e) {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {

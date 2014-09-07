@@ -49,7 +49,6 @@ robolectric {
 
 dependencies {
     compile 'com.intellij:annotations:12.0'
-    compile 'de.greenrobot:eventbus:2.2.1'
 
     androidTestCompile 'org.robolectric:robolectric:2.3'
     androidTestCompile 'junit:junit:4.11'

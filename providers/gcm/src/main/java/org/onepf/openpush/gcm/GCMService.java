@@ -27,8 +27,6 @@ import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
  * {@code GcmBroadcastReceiver} (a {@code WakefulBroadcastReceiver}) holds a
@@ -83,13 +81,11 @@ public class GCMService extends IntentService {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
 
-        EventBus.getDefault()
-                .post(new RegistrationResult(GCMProvider.NAME, error));
+        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
     }
 
     private void onRegistered(String registrationToken) {
-        EventBus.getDefault()
-                .post(new RegistrationResult(GCMProvider.NAME, registrationToken));
+        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(GCMProvider.NAME, registrationToken));
     }
 
     private void onUnregistered(String oldRegistrationToken) {

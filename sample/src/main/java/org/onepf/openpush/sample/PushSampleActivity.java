@@ -34,7 +34,6 @@ import org.onepf.openpush.OpenPushBaseReceiver;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
-import org.onepf.openpush.gcm.GCMProvider;
 import org.onepf.openpush.nokia.NokiaPushProvider;
 
 /**
@@ -66,7 +65,7 @@ public class PushSampleActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOpenPushHelper = new OpenPushHelper(PushSampleActivity.this, "sample");
+        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
         setContentView(R.layout.activity_main);
         initViews();
     }

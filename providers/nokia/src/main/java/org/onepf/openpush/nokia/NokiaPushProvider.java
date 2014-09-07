@@ -20,8 +20,6 @@ import android.content.Context;
 
 import com.nokia.push.PushRegistrar;
 
-import junit.framework.Assert;
-
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
@@ -31,12 +29,11 @@ public class NokiaPushProvider extends BasePushProvider {
 
     public static final String NAME = "com.nokia.push.provider"; //todo check the name
 
-    private final String senderId;
+    private final String[] mSendersId;
 
-    public NokiaPushProvider(@NotNull Context context, @NotNull String senderID) {
+    public NokiaPushProvider(@NotNull Context context, @NotNull String... sendersID) {
         super(context, "com.nokia.push.PushRegistrar");
-        Assert.assertNotNull(senderID);
-        senderId = senderID;
+        mSendersId = sendersID;
     }
 
     @Override
@@ -69,7 +66,7 @@ public class NokiaPushProvider extends BasePushProvider {
         if (isRegistered()) {
             throw new OpenPushException("Nokia Push already registered.");
         } else {
-            PushRegistrar.register(getContext(), senderId);
+            PushRegistrar.register(getContext(), mSendersId);
         }
     }
 

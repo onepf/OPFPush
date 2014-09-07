@@ -11,8 +11,6 @@ import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * This class allows your app to receive messages sent via ADM.
  * <p/>
@@ -77,8 +75,7 @@ public class ADMService extends ADMMessageHandlerBase {
         } else {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
-        EventBus.getDefault()
-                .post(new RegistrationResult(ADMProvider.NAME, error));
+        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(ADMProvider.NAME, error));
     }
 
     /**
@@ -95,8 +92,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistered(@NotNull String registrationId) {
         //TODO Send registration id.
 
-        EventBus.getDefault()
-                .post(new RegistrationResult(ADMProvider.NAME, registrationId));
+        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 
     /**

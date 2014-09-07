@@ -27,8 +27,6 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import de.greenrobot.event.EventBus;
-
 public class OpenPushHelper {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
@@ -45,21 +43,40 @@ public class OpenPushHelper {
     private Options mOptions;
     private final Context mAppContext;
     private PushProvider mCurrentProvider;
-    private final String mId;
     private int mRetryNumber = 0;
 
     private static OpenPushListener sListener;
 
     private final SharedPreferences mPreferences;
 
-    public OpenPushHelper(@NotNull Context context, @NotNull String id) {
+    private static OpenPushHelper sInstance;
+
+
+    public static void notifyRegistrationEnd(@NotNull final RegistrationResult r) {
+        if (sInstance != null && sInstance.mInitStatus == INIT_IN_PROGRESS) {
+            sInstance.onRegistrationEnd(r);
+        } else {
+            throw new UnsupportedOperationException(
+                    "Can't post registration result when register isn't running.");
+        }
+    }
+
+
+    public static OpenPushHelper getInstance(@NotNull Context context) {
+        if (sInstance == null) {
+            synchronized (OpenPushHelper.class) {
+                if (sInstance == null) {
+                    sInstance = new OpenPushHelper(context);
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    private OpenPushHelper(@NotNull Context context) {
         mAppContext = context.getApplicationContext();
-        mId = id;
         sListener = new BroadcastOpenPushListener(mAppContext);
-        mPreferences = context.getSharedPreferences(
-                String.format("org.onepf.openpush.prefs_%s", id),
-                Context.MODE_PRIVATE
-        );
+        mPreferences = context.getSharedPreferences("org.onepf.openpush.prefs", Context.MODE_PRIVATE);
         mInitStatus = mPreferences.getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
 
         PushProvider provider = getLastProvider();
@@ -67,10 +84,6 @@ public class OpenPushHelper {
                 && mInitStatus == INIT_SUCCESS) {
             mCurrentProvider = provider;
         }
-    }
-
-    public String getId() {
-        return mId;
     }
 
     public static OpenPushListener getListener() {
@@ -92,7 +105,6 @@ public class OpenPushHelper {
 
             PushProvider provider = getNextCandidate(null);
             if (provider != null) {
-                EventBus.getDefault().register(this);
                 provider.register();
             } else {
                 sListener.onNoAvailableProvider();
@@ -106,7 +118,6 @@ public class OpenPushHelper {
     public void unregister() {
         if (mInitStatus == INIT_SUCCESS) {
             mCurrentProvider.unregister();
-            EventBus.getDefault().unregister(this);
             mCurrentProvider = null;
             mInitStatus = INIT_NOT_STARTED;
             saveProvider(null);
@@ -134,7 +145,7 @@ public class OpenPushHelper {
         return null;
     }
 
-    private void onRegistrationResult(@NotNull final RegistrationResult result) {
+    private void onRegistrationEnd(@NotNull RegistrationResult result) {
         final PushProvider provider = getProviderByName(result.getProviderName());
         Assert.assertNotNull(provider);
 
