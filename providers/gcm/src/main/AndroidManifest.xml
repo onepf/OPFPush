@@ -32,6 +32,11 @@
                 <action android:name="org.onepf.openpush.gcm.error"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <service android:name=".GCMService"/>
     </application>

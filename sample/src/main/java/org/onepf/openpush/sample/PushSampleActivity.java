@@ -85,7 +85,7 @@ public class PushSampleActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getInitStatus() == OpenPushHelper.INIT_SUCCESS) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_WORK) {
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
         }
@@ -112,7 +112,7 @@ public class PushSampleActivity extends ActionBarActivity {
         filter.addAction(OpenPushConstants.ACTION_REGISTERED);
         filter.addAction(OpenPushConstants.ACTION_UNREGISTERED);
         filter.addAction(OpenPushConstants.ACTION_MESSAGE);
-        filter.addAction(OpenPushConstants.ACTION_REGISTRATION_ERROR);
+        filter.addAction(OpenPushConstants.ACTION_ERROR);
         filter.addAction(OpenPushConstants.ACTION_NO_AVAILABLE_PROVIDER);
         filter.addAction(OpenPushConstants.ACTION_DELETED_MESSAGES);
         filter.addAction(OpenPushConstants.ACTION_HOST_APP_REMOVED);
@@ -122,10 +122,10 @@ public class PushSampleActivity extends ActionBarActivity {
 
     @OnClick(R.id.btn_register)
     void onRegisterClick() {
-        if (mOpenPushHelper.getInitStatus() == OpenPushHelper.INIT_SUCCESS) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_WORK) {
             mOpenPushHelper.unregister();
-        } else if (mOpenPushHelper.getInitStatus()
-                == OpenPushHelper.INIT_NOT_STARTED) {
+        } else if (mOpenPushHelper.getState()
+                == OpenPushHelper.STATE_NONE) {
             mOpenPushHelper.register();
         }
     }

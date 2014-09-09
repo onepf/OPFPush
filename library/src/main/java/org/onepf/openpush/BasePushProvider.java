@@ -63,7 +63,7 @@ public abstract class BasePushProvider implements PushProvider {
         }
 
         BasePushProvider that = (BasePushProvider) o;
-        return !getName().equals(that.getName());
+        return getName().equals(that.getName());
     }
 
     @Override
@@ -76,6 +76,6 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
-    public void onHostAppRemoved() {
+    public void onAppStateChanged() {
     }
 }

@@ -15,7 +15,7 @@ public interface OpenPushConstants {
     String ACTION_UNREGISTERED = "org.onepf.openpush.unregistered";
     String ACTION_MESSAGE = "org.onepf.openpush.message";
     String ACTION_DELETED_MESSAGES = "org.onepf.openpush.message_deleted";
-    String ACTION_REGISTRATION_ERROR = "org.onepf.openpush.registration_error";
+    String ACTION_ERROR = "org.onepf.openpush.error";
     String ACTION_NO_AVAILABLE_PROVIDER = "org.onepf.openpush.no_available_provider";
     String ACTION_HOST_APP_REMOVED = "org.onepf.openpush.host_app_removed";
 
@@ -23,6 +23,5 @@ public interface OpenPushConstants {
     String EXTRA_REGISTRATION_ID = "org.onepf.openpush.registration_id";
     String EXTRA_ERROR_ID = "org.onepf.openpush.error_id";
     String EXTRA_MESSAGES_COUNT = "org.onepf.openpush.messages_count";
-    String EXTRA_MESSAGE = "org.onepf.openpush.message";
     String EXTRA_HOST_APP_PACKAGE = "org.onepf.openpush.host_app_package";
 }

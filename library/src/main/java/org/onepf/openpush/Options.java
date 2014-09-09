@@ -17,10 +17,14 @@
 package org.onepf.openpush;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Kirill Rozov
@@ -30,9 +34,8 @@ public class Options {
     private final List<PushProvider> mProviders;
     private final Backoff mBackoff;
 
-    private Options(List<PushProvider> providers
-            , Backoff backoff) {
-        mProviders = Collections.unmodifiableList(providers);
+    private Options(@NotNull Collection<PushProvider> providers, @Nullable Backoff backoff) {
+        mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mBackoff = backoff;
     }
 
@@ -46,6 +49,7 @@ public class Options {
         return mProviders;
     }
 
+    @Nullable
     public Backoff getBackoff() {
         return mBackoff;
     }
@@ -54,7 +58,7 @@ public class Options {
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
     public static class Builder {
-        private List<PushProvider> mProviders;
+        private Set<PushProvider> mProviders;
         private Backoff mBackoff;
 
         /**
@@ -65,20 +69,20 @@ public class Options {
          * @throws java.lang.IllegalArgumentException If try to add already added provider.
          */
         public Builder addProvider(@NotNull PushProvider provider) {
-            if (mProviders != null && mProviders.contains(provider)) {
+            if (mProviders == null) {
+                mProviders = new HashSet<PushProvider>(4);
+            }
+
+            if (mProviders.add(provider)) {
                 throw new IllegalArgumentException(
                         String.format("Provider '%s' already added", provider));
-            } else {
-                if (mProviders == null) {
-                    mProviders = new ArrayList<PushProvider>(4);
-                }
-                mProviders.add(provider);
             }
             return this;
         }
 
-        public void setBackoff(@NotNull Backoff backoff) {
+        public Builder setBackoff(@Nullable Backoff backoff) {
             mBackoff = backoff;
+            return this;
         }
 
         /**
@@ -87,6 +91,7 @@ public class Options {
          * @return New options object.
          * @throws java.lang.IllegalArgumentException If no one provider added.
          */
+        @NotNull
         public Options build() {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");

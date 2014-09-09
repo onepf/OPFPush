@@ -110,6 +110,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@NotNull String registrationId) {
-        OpenPushHelper.getInstance(this).onUnregistered(ADMProvider.NAME, registrationId);
+        OpenPushHelper.getInstance(this)
+                .onUnregistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 }

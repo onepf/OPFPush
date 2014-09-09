@@ -93,7 +93,7 @@ public class GCMService extends IntentService {
 
     private void onUnregistered(String oldRegistrationToken) {
         OpenPushHelper.getInstance(this)
-                .onUnregistered(GCMProvider.NAME, oldRegistrationToken);
+                .onUnregistrationEnd(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
     }
 
 }

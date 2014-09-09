@@ -2,6 +2,7 @@ package org.onepf.openpush;
 
 import android.os.Bundle;
 
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,11 +17,20 @@ public interface OpenPushListener {
 
     void onRegistered(@NotNull String providerName, @Nullable String registrationId);
 
-    void onRegistrationError(@NotNull String providerName, int errorId);
+    void onError(@NotNull String providerName,
+                 @MagicConstant(intValues = {
+                         OpenPushConstants.ERROR_INVALID_PARAMETERS,
+                         OpenPushConstants.ERROR_INVALID_SENDER,
+                         OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+                         OpenPushConstants.ERROR_UNKNOWN,
+                         OpenPushConstants.NO_ERROR,
+                         OpenPushConstants.ERROR_AUTHEFICATION_FAILED
+                 })
+                 int errorId);
 
     void onNoAvailableProvider();
 
     void onUnregistered(@NotNull String providerName, @Nullable String registrationId);
 
-    void onHostAppRemoved(@NotNull String providerName);
+    void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage);
 }

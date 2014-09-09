@@ -142,6 +142,6 @@ public class NokiaPushService extends PushBaseIntentService {
     protected void onUnregistered(@NotNull Context appContext,
                                   @NotNull String oldRegistrationToken) {
         OpenPushHelper.getInstance(this)
-                .onUnregistered(NokiaPushProvider.NAME, oldRegistrationToken);
+                .onUnregistrationEnd(new RegistrationResult(NokiaPushProvider.NAME, oldRegistrationToken));
     }
 }

@@ -29,7 +29,7 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
             } else if (OpenPushConstants.ACTION_UNREGISTERED.equals(action)) {
                 onUnregistered(providerName,
                         intent.getStringExtra(OpenPushConstants.EXTRA_REGISTRATION_ID));
-            } else if (OpenPushConstants.ACTION_REGISTRATION_ERROR.equals(action)) {
+            } else if (OpenPushConstants.ACTION_ERROR.equals(action)) {
                 onRegistrationError(providerName,
                         intent.getIntExtra(OpenPushConstants.EXTRA_ERROR_ID, -1));
             } else if (OpenPushConstants.ACTION_DELETED_MESSAGES.equals(action)) {

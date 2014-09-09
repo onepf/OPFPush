@@ -37,10 +37,10 @@ public class BroadcastOpenPushListener implements OpenPushListener {
     }
 
     @Override
-    public void onRegistrationError(@NotNull String providerName, int errorId) {
+    public void onError(@NotNull String providerName, int errorId) {
         Bundle extras = new Bundle(1);
         extras.putInt(OpenPushConstants.EXTRA_ERROR_ID, errorId);
-        sendBroadcast(OpenPushConstants.ACTION_REGISTRATION_ERROR, providerName, extras);
+        sendBroadcast(OpenPushConstants.ACTION_ERROR, providerName, extras);
     }
 
     @Override
@@ -69,6 +69,9 @@ public class BroadcastOpenPushListener implements OpenPushListener {
     }
 
     @Override
-    public void onHostAppRemoved(@NotNull String providerName) {
+    public void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage) {
+        Bundle extras = new Bundle(1);
+        extras.putString(OpenPushConstants.EXTRA_HOST_APP_PACKAGE, hostAppPackage);
+        sendBroadcast(OpenPushConstants.ACTION_HOST_APP_REMOVED, providerName, extras);
     }
 }

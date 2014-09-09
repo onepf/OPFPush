@@ -71,7 +71,11 @@ public interface PushProvider {
     void close();
 
     /**
-     * Callback method, that called when host app removed.
+     * Callback method, that called when application state change, like update to new version,
+     * or system state changed, like update firmware to a newer version and Android ID changed.
+     *
+     * When this method call you registration is invalid and you need reset all data associated with
+     * previous registration data.
      */
-    void onHostAppRemoved();
+    void onAppStateChanged();
 }

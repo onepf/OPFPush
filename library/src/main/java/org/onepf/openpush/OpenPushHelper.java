@@ -41,10 +41,11 @@ public class OpenPushHelper {
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_INIT_STATUS = "init_status";
 
-    public static final int INIT_NOT_STARTED = 0;
-    public static final int INIT_IN_PROGRESS = 1;
-    public static final int INIT_SUCCESS = 2;
-    public static final int INIT_ERROR = 3;
+    public static final int STATE_NONE = 0;
+    public static final int STATE_REGISTRATION_RUNNING = 1;
+    public static final int STATE_WORK = 2;
+    public static final int STATE_ERROR = 3;
+    public static final int STATE_UNREGISTRATION_RUNNING = 4;
 
     private static final Handler sHandler = new Handler(Looper.getMainLooper());
 
@@ -69,8 +70,9 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider mCurrentProvider;
 
-    private int mInitStatus;
+    private int mState;
     private int mRetryNumber = 0;
+    private RetryRegistrationRunnable mRegistrationRunnable;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
         if (sInstance == null) {
@@ -86,7 +88,7 @@ public class OpenPushHelper {
     private OpenPushHelper(@NotNull Context context) {
         mAppContext = context.getApplicationContext();
         mPreferences =
-                mAppContext.getSharedPreferences("org.onepf.openpush.prefs", Context.MODE_PRIVATE);
+                mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
     }
 
     public void init(@NotNull Options options) {
@@ -95,14 +97,13 @@ public class OpenPushHelper {
         PushProvider provider = getLastProvider();
         if (provider != null && provider.isAvailable()) {
             mCurrentProvider = provider;
-            mInitStatus = mPreferences.getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
+            mState = mPreferences.getInt(KEY_INIT_STATUS, STATE_NONE);
         } else {
-            mInitStatus = INIT_NOT_STARTED;
+            mState = STATE_NONE;
         }
 
-        if (mCurrentProvider != null && !mCurrentProvider.isRegistered()) {
-            mInitStatus = INIT_IN_PROGRESS;
-            mCurrentProvider.register();
+        if (mCurrentProvider != null && mState != STATE_WORK) {
+            register(mCurrentProvider);
         }
     }
 
@@ -115,22 +116,27 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mInitStatus == INIT_NOT_STARTED || mInitStatus == INIT_ERROR) {
-            mInitStatus = INIT_IN_PROGRESS;
+        if (mState == STATE_NONE || mState == STATE_ERROR) {
+            mState = STATE_REGISTRATION_RUNNING;
 
             PushProvider provider = getNextCandidate(null);
-            if (provider != null
-                    && provider.isAvailable()
-                    && !provider.isRegistered()) {
-                provider.register();
-            } else {
+            if (provider == null || !register(provider)) {
                 if (mListener != null) {
                     mListener.onNoAvailableProvider();
                 }
-                mInitStatus = INIT_ERROR;
+                mState = STATE_NONE;
             }
         } else {
             throw new IllegalStateException("Attempt to register twice!");
+        }
+    }
+
+    private boolean register(@NotNull PushProvider provider) {
+        if (provider.isAvailable() && !provider.isRegistered()) {
+            provider.register();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -139,15 +145,10 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mCurrentProvider != null && mInitStatus == INIT_SUCCESS) {
-            if (mPackageReceiver != null) {
-                mAppContext.unregisterReceiver(mPackageReceiver);
-            }
+        if (mCurrentProvider != null && mState == STATE_WORK) {
+            mState = STATE_UNREGISTRATION_RUNNING;
+            unregisterPackageChangeReceiver();
             mCurrentProvider.unregister();
-            mCurrentProvider = null;
-            mInitStatus = INIT_NOT_STARTED;
-            saveProvider(null);
-            mPreferences.edit().remove(KEY_INIT_STATUS).apply();
         } else {
             throw new IllegalStateException("Attempt to unregister not initialised!");
         }
@@ -179,17 +180,32 @@ public class OpenPushHelper {
         try {
             // System apps can't be removed, that's why no sense listen package remove event.
             if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
-                IntentFilter packageRemovedIntentFilter
+                IntentFilter packageRemovedFilter
                         = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-                packageRemovedIntentFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-                packageRemovedIntentFilter.addDataPath(
+                packageRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+                packageRemovedFilter.addDataPath(
                         provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
+
                 mPackageReceiver = new PackageChangeReceiver(provider);
-                mAppContext.registerReceiver(mPackageReceiver, packageRemovedIntentFilter);
+                mAppContext.registerReceiver(mPackageReceiver, packageRemovedFilter);
+
+                IntentFilter packageReplaceFilter =
+                        new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
+                packageReplaceFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+                packageReplaceFilter.addDataPath(
+                        mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
+                mAppContext.registerReceiver(mPackageReceiver, packageReplaceFilter);
             }
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, String.format("Can not find package '%s'.",
                     provider.getHostAppPackage()), e);
+        }
+    }
+
+    private void unregisterPackageChangeReceiver() {
+        if (mPackageReceiver != null) {
+            mAppContext.unregisterReceiver(mPackageReceiver);
+            mPackageReceiver = null;
         }
     }
 
@@ -246,20 +262,20 @@ public class OpenPushHelper {
         }
     }
 
-    @MagicConstant(intValues = {INIT_ERROR, INIT_IN_PROGRESS, INIT_NOT_STARTED, INIT_SUCCESS})
-    public int getInitStatus() {
-        return mInitStatus;
+    @MagicConstant(intValues = {
+            STATE_ERROR,
+            STATE_REGISTRATION_RUNNING,
+            STATE_NONE,
+            STATE_WORK,
+            STATE_UNREGISTRATION_RUNNING
+    })
+    public int getState() {
+        return mState;
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
-        }
-    }
-
-    public void onUnregistered(@NotNull String providerName, @Nullable String registrationId) {
-        if (mListener != null) {
-            mListener.onUnregistered(providerName, registrationId);
         }
     }
 
@@ -269,33 +285,71 @@ public class OpenPushHelper {
         }
     }
 
+    public void onProviderNeedUpdate(@NotNull String providerName) {
+        if (mCurrentProvider != null && providerName.equals(mCurrentProvider.getName())) {
+            reset();
+            mCurrentProvider.onAppStateChanged();
+            register(mCurrentProvider);
+        }
+    }
+
+    private void reset() {
+        mPreferences.edit().clear().apply();
+        mState = STATE_NONE;
+        mRetryNumber = 0;
+        if (mRegistrationRunnable != null) {
+            sHandler.removeCallbacks(mRegistrationRunnable);
+            mRegistrationRunnable = null;
+        }
+    }
+
     void onHostAppRemoved(@NotNull PushProvider provider) {
-        if (mCurrentProvider != null
-                && mCurrentProvider.equals(provider)) {
+        if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
+            reset();
+            mCurrentProvider = null;
             if (mListener != null) {
-                mListener.onHostAppRemoved(provider.getName());
+                mListener.onHostAppRemoved(provider.getName(), provider.getHostAppPackage());
             }
-            mInitStatus = INIT_NOT_STARTED;
-            register();
+            register(); //Restart registration
+        }
+    }
+
+    public void onUnregistrationEnd(@NotNull RegistrationResult result) {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+        if (mState != STATE_UNREGISTRATION_RUNNING) {
+            return;
+        }
+
+        if (result.isSuccess()) {
+            reset();
+            mCurrentProvider = null;
+            if (mListener != null) {
+                mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
+            }
+        } else if (mListener != null) {
+            mState = STATE_ERROR;
+            final PushProvider provider = getProviderByName(result.getProviderName());
+            Assert.assertNotNull(provider);
+            mListener.onError(provider.getName(), result.getErrorCode());
         }
     }
 
     public void onRegistrationEnd(@NotNull RegistrationResult result) {
-        if (mInitStatus != INIT_IN_PROGRESS) {
-            return;
-        }
-
         if (mOptions == null) {
             throw new UnsupportedOperationException("Before register provider call init().");
+        }
+        if (mState != STATE_REGISTRATION_RUNNING) {
+            return;
         }
 
         final PushProvider provider = getProviderByName(result.getProviderName());
         Assert.assertNotNull(provider);
-
         if (result.isSuccess()) {
-            mInitStatus = INIT_SUCCESS;
+            mState = STATE_WORK;
             mCurrentProvider = provider;
-            mPreferences.edit().putInt(KEY_INIT_STATUS, INIT_SUCCESS).apply();
+            mPreferences.edit().putInt(KEY_INIT_STATUS, STATE_WORK).apply();
             mRetryNumber = 0;
             saveProvider(mCurrentProvider);
             if (mListener != null) {
@@ -306,12 +360,15 @@ public class OpenPushHelper {
         } else {
             if (result.isRecoverableError() && mOptions.getBackoff() != null
                     && mRetryNumber < mOptions.getBackoff().tryCount()) {
-                sHandler.postDelayed(new RetryRegistrationRunnable(provider),
+                if (mRegistrationRunnable == null) {
+                    mRegistrationRunnable = new RetryRegistrationRunnable(provider);
+                }
+                sHandler.postDelayed(mRegistrationRunnable,
                         mOptions.getBackoff().getDelay(mRetryNumber));
                 mRetryNumber++;
             } else {
                 if (mListener != null) {
-                    mListener.onRegistrationError(provider.getName(), result.getErrorCode());
+                    mListener.onError(provider.getName(), result.getErrorCode());
                 }
 
                 mRetryNumber = 0;
@@ -319,7 +376,7 @@ public class OpenPushHelper {
                 if (nextProvider != null) {
                     nextProvider.register();
                 } else {
-                    mInitStatus = INIT_ERROR;
+                    mState = STATE_ERROR;
                     mListener.onNoAvailableProvider();
                 }
             }

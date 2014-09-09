@@ -22,9 +22,12 @@ public class PackageChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NotNull Context context, Intent intent) {
-        if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())
+        final String action = intent.getAction();
+        if (Intent.ACTION_PACKAGE_REMOVED.equals(action)
                 && mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
             OpenPushHelper.getInstance(context).onHostAppRemoved(mProvider);
+        } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
+            OpenPushHelper.getInstance(context).onProviderNeedUpdate(mProvider.getName());
         }
     }
 

@@ -30,8 +30,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import junit.framework.Assert;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
@@ -47,10 +45,11 @@ public class GCMProvider extends BasePushProvider {
 
     private static final String PREF_REGISTRATION_TOKEN = "registration_token";
     private static final String PREF_APP_VERSION = "app_version";
-    private static final String PREF_ANDROID_ID = "android_id";
+    static final String PREF_ANDROID_ID = "android_id";
 
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
+    static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
 
     private String mRegistrationToken;
     private final String[] mSenderIDs;
@@ -59,13 +58,10 @@ public class GCMProvider extends BasePushProvider {
 
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
-        Assert.assertNotNull(senderIDs);
         mSenderIDs = senderIDs;
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
-        mPreferences = context.getSharedPreferences("gcm_prefs", Context.MODE_PRIVATE);
-        if (mPreferences.contains(PREF_REGISTRATION_TOKEN)) {
-            mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
-        }
+        mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
     }
 
     public void register() {
@@ -152,16 +148,13 @@ public class GCMProvider extends BasePushProvider {
     }
 
     @Override
-    public void onHostAppRemoved() {
+    public void onAppStateChanged() {
         reset();
     }
 
     private void reset() {
         mRegistrationToken = null;
-        mPreferences.edit()
-                .remove(PREF_APP_VERSION)
-                .remove(PREF_REGISTRATION_TOKEN)
-                .apply();
+        mPreferences.edit().clear().apply();
     }
 
     private class UnregisterTask extends AsyncTask<Void, Void, Boolean> {
@@ -201,12 +194,7 @@ public class GCMProvider extends BasePushProvider {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            mPreferences.edit()
-                    .remove(PREF_ANDROID_ID)
-                    .remove(PREF_APP_VERSION)
-                    .remove(PREF_REGISTRATION_TOKEN)
-                    .apply();
+            reset();
         }
 
         @Override
