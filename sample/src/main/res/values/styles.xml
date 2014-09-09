@@ -2,6 +2,7 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
         <!-- Customize your theme here. -->
     </style>
 

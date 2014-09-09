@@ -16,15 +16,14 @@
 
 package org.onepf.openpush.sample;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,6 +40,7 @@ import org.onepf.openpush.gcm.GCMProvider;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -48,26 +48,23 @@ import butterknife.OnClick;
  */
 public class PushSampleActivity extends ActionBarActivity {
 
-    private static final String TAG = "PushSampleActivity";
     public static final String GCM_SENDER_ID = "76325631570";
 
-    @InjectView(R.id.label_registration_id)
-    TextView tvLabelRegistrationId;
+    @InjectView(R.id.registration_id)
+    TextView mRegistrationIdView;
 
-    @InjectView(R.id.tv_registration_id)
-    TextView tvRegistrationId;
+    @InjectView(R.id.registration_status)
+    TextView mRegistrationStatusView;
 
-    @InjectView(R.id.tv_registration_status)
-    TextView tvRegistrationStatus;
+    @InjectView(R.id.push_provider_name)
+    TextView mProviderNameView;
 
-    @InjectView(R.id.tv_push_provider)
-    TextView tvProviderName;
+    @InjectView(R.id.register_switch)
+    Button mRegisterSwitchView;
 
-    @InjectView(R.id.btn_register)
-    Button btnRegister;
-
+    @Optional
     @InjectView(R.id.btn_copy_to_clipboard)
-    Button btnCopyToClipboard;
+    Button mCopyToClipboardView;
 
     private BroadcastReceiver mOpenPushReceiver;
     private static OpenPushHelper mOpenPushHelper;
@@ -77,26 +74,32 @@ public class PushSampleActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         if (mOpenPushHelper == null) {
             mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+            mOpenPushHelper.setListener(new BroadcastListener(this));
             Options.Builder builder = new Options.Builder();
             builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
             mOpenPushHelper.init(builder.build());
-            mOpenPushHelper.setListener(new BroadcastListener(this));
         }
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
         if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
+            if (mOpenPushReceiver == null) {
+                mOpenPushReceiver = new OpenPushEventReceiver();
+            }
+            registerReceiver(this, mOpenPushReceiver);
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
+        } else {
+            switchToUnregisteredState();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mOpenPushReceiver == null) {
-            registerReceiver();
+        if (mOpenPushReceiver != null) {
+            registerReceiver(this, mOpenPushReceiver);
         }
     }
 
@@ -108,7 +111,7 @@ public class PushSampleActivity extends ActionBarActivity {
         }
     }
 
-    private void registerReceiver() {
+    private static void registerReceiver(Context context, BroadcastReceiver receiver) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastListener.ACTION_REGISTERED);
         filter.addAction(BroadcastListener.ACTION_UNREGISTERED);
@@ -117,20 +120,24 @@ public class PushSampleActivity extends ActionBarActivity {
         filter.addAction(BroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
         filter.addAction(BroadcastListener.ACTION_DELETED_MESSAGES);
         filter.addAction(BroadcastListener.ACTION_HOST_APP_REMOVED);
-        mOpenPushReceiver = new OpenPushEventReceiver();
-        registerReceiver(mOpenPushReceiver, filter);
+        context.registerReceiver(receiver, filter);
     }
 
-    @OnClick(R.id.btn_register)
+    @OnClick(R.id.register_switch)
     void onRegisterClick() {
         if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
             mOpenPushHelper.unregister();
         } else if (mOpenPushHelper.getState()
                 == OpenPushHelper.STATE_NONE) {
+            if (mOpenPushReceiver == null) {
+                mOpenPushReceiver = new OpenPushEventReceiver();
+            }
+            registerReceiver(this, mOpenPushReceiver);
             mOpenPushHelper.register();
         }
     }
 
+    @Optional
     @OnClick(R.id.btn_copy_to_clipboard)
     void setBtnCopyToClipboard() {
         Toast.makeText(PushSampleActivity.this,
@@ -140,40 +147,30 @@ public class PushSampleActivity extends ActionBarActivity {
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(
-                ClipData.newPlainText("Push registration token", tvRegistrationId.getText())
+                ClipData.newPlainText("Push registration token", mRegistrationIdView.getText())
         );
-
-        Log.i(TAG, "Registration id: " + tvRegistrationId.getText());
     }
 
     private void switchToRegisteredState(String providerName, String registrationId) {
-        tvRegistrationId.setVisibility(View.VISIBLE);
-        tvRegistrationId.setText(registrationId);
-
-        tvLabelRegistrationId.setVisibility(View.VISIBLE);
-
-        tvProviderName.setText(providerName);
-
-        btnRegister.setText(R.string.btn_unregister);
-
-        btnCopyToClipboard.setVisibility(View.VISIBLE);
-        tvRegistrationStatus.setText(getString(R.string.registered));
+        mRegistrationIdView.setText(Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, providerName)));
+        mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.unregister)));
+        mRegistrationStatusView.setText(Html.fromHtml(getString(R.string.registered_status)));
+        mCopyToClipboardView.setVisibility(View.VISIBLE);
     }
 
     private void switchToUnregisteredState() {
         mOpenPushReceiver = null;
+        mRegistrationIdView.setText(null);
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
+        mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.register)));
+        mRegistrationStatusView.setText(Html.fromHtml(getString(R.string.unregistered_status)));
+        mCopyToClipboardView.setVisibility(View.GONE);
 
-        tvRegistrationId.setVisibility(View.GONE);
-        tvRegistrationId.setText(null);
-
-        tvLabelRegistrationId.setVisibility(View.GONE);
-
-        tvProviderName.setText("None");
-
-        btnRegister.setText(R.string.btn_register);
-
-        btnCopyToClipboard.setVisibility(View.GONE);
-        tvRegistrationStatus.setText(getString(R.string.not_registered));
+        if (mOpenPushReceiver != null) {
+            unregisterReceiver(mOpenPushReceiver);
+            mOpenPushReceiver = null;
+        }
     }
 
     public class OpenPushEventReceiver extends OpenPushBaseReceiver {
