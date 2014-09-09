@@ -51,6 +51,7 @@ public final class RegistrationResult {
         return mRecoverableError;
     }
 
+    @NotNull
     public String getRegistrationId() {
         return mRegistrationId;
     }

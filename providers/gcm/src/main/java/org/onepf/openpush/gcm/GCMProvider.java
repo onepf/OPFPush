@@ -44,6 +44,7 @@ import java.util.Arrays;
 public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "com.google.android.gms.gcm.provider";
+
     private static final String PREF_REGISTRATION_TOKEN = "registration_token";
     private static final String PREF_APP_VERSION = "app_version";
     private static final String PREF_ANDROID_ID = "android_id";
@@ -53,13 +54,14 @@ public class GCMProvider extends BasePushProvider {
 
     private String mRegistrationToken;
     private final String[] mSenderIDs;
-
     private final SharedPreferences mPreferences;
+    private final GoogleCloudMessaging mGoogleCloudMessaging;
 
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
         super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
         Assert.assertNotNull(senderIDs);
         mSenderIDs = senderIDs;
+        mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences("gcm_prefs", Context.MODE_PRIVATE);
         if (mPreferences.contains(PREF_REGISTRATION_TOKEN)) {
             mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
@@ -98,7 +100,7 @@ public class GCMProvider extends BasePushProvider {
                     return true;
                 } else {
                     // On device with version of Android less than "4.0.4"
-                    // we need to ensure that user has at least one google account.
+                    // we need to ensure that the user has at least one google account.
                     Account[] googleAccounts = AccountManager.get(getContext())
                             .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
                     return googleAccounts.length != 0;
@@ -139,6 +141,11 @@ public class GCMProvider extends BasePushProvider {
     }
 
     @Override
+    public void close() {
+        mGoogleCloudMessaging.close();
+    }
+
+    @Override
     public String toString() {
         return String.format("%s (senderId: '%s', appVersion: %d)", NAME, Arrays.toString(mSenderIDs),
                 mPreferences.getInt(PREF_APP_VERSION, -1));
@@ -156,7 +163,7 @@ public class GCMProvider extends BasePushProvider {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                GoogleCloudMessaging.getInstance(getContext()).unregister();
+                mGoogleCloudMessaging.unregister();
                 return true;
             } catch (IOException e) {
                 return false;
@@ -196,7 +203,7 @@ public class GCMProvider extends BasePushProvider {
         @Override
         protected String doInBackground(Void... params) {
             try {
-                return GoogleCloudMessaging.getInstance(getContext()).register(mSenderIDs);
+                return mGoogleCloudMessaging.register(mSenderIDs);
             } catch (IOException e) {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {

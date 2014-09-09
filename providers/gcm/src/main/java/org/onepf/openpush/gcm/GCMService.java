@@ -25,6 +25,7 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.OpenPushListener;
 import org.onepf.openpush.RegistrationResult;
 
 /**
@@ -60,11 +61,11 @@ public class GCMService extends IntentService {
     }
 
     protected void onDeletedMessages(Intent intent) {
-        OpenPushHelper.getListener().onDeletedMessages(GCMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getInstance(this).onDeletedMessages(GCMProvider.NAME, intent.getExtras());
     }
 
     private void onMessage(Intent intent) {
-        OpenPushHelper.getListener().onMessage(GCMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getInstance(this).onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
     private void onError(@NotNull
@@ -81,15 +82,18 @@ public class GCMService extends IntentService {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
 
-        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+        OpenPushHelper.getInstance(this)
+                .onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
     }
 
     private void onRegistered(String registrationToken) {
-        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(GCMProvider.NAME, registrationToken));
+        OpenPushHelper.getInstance(this)
+                .onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, registrationToken));
     }
 
     private void onUnregistered(String oldRegistrationToken) {
-        OpenPushHelper.getListener().onUnregistered(GCMProvider.NAME, oldRegistrationToken);
+        OpenPushHelper.getInstance(this)
+                .onUnregistered(GCMProvider.NAME, oldRegistrationToken);
     }
 
 }

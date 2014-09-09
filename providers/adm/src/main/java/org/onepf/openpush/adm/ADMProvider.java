@@ -12,7 +12,7 @@ import org.onepf.openpush.OpenPushException;
 /**
  * Created by krozov on 06.09.14.
  */
-public class ADMProvider extends BasePushProvider {
+public abstract class ADMProvider extends BasePushProvider {
 
     public static final String NAME = "Amazon Device Messaging";
 

@@ -9,6 +9,7 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.OpenPushListener;
 import org.onepf.openpush.RegistrationResult;
 
 /**
@@ -42,8 +43,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NotNull Intent intent) {
-        OpenPushHelper.getListener()
-                .onMessage(ADMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getInstance(this).onMessage(ADMProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -75,7 +75,8 @@ public class ADMService extends ADMMessageHandlerBase {
         } else {
             error = OpenPushConstants.ERROR_UNKNOWN;
         }
-        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(ADMProvider.NAME, error));
+        OpenPushHelper.getInstance(this).onRegistrationEnd(
+                new RegistrationResult(ADMProvider.NAME, error));
     }
 
     /**
@@ -91,8 +92,8 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NotNull String registrationId) {
         //TODO Send registration id.
-
-        OpenPushHelper.notifyRegistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
+        OpenPushHelper.getInstance(this)
+                .onRegistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 
     /**
@@ -109,6 +110,6 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@NotNull String registrationId) {
-        OpenPushHelper.getListener().onUnregistered(ADMProvider.NAME, registrationId);
+        OpenPushHelper.getInstance(this).onUnregistered(ADMProvider.NAME, registrationId);
     }
 }

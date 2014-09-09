@@ -64,4 +64,6 @@ public interface PushProvider {
      */
     @NotNull
     String getHostAppPackage();
+
+    void close();
 }

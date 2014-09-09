@@ -52,4 +52,8 @@ public abstract class BasePushProvider implements PushProvider {
     public String toString() {
         return getName();
     }
+
+    @Override
+    public void close() {
+    }
 }

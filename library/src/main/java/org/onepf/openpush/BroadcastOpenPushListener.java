@@ -67,4 +67,8 @@ public class BroadcastOpenPushListener implements OpenPushListener {
         }
         mContext.sendBroadcast(newIntent);
     }
+
+    @Override
+    public void onHostAppRemoved(@NotNull String providerName) {
+    }
 }

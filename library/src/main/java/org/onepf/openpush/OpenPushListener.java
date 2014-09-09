@@ -21,4 +21,6 @@ public interface OpenPushListener {
     void onNoAvailableProvider();
 
     void onUnregistered(@NotNull String providerName, @Nullable String registrationId);
+
+    void onHostAppRemoved(@NotNull String providerName);
 }

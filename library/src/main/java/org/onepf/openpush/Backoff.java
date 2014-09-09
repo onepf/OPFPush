@@ -13,7 +13,7 @@ public interface Backoff {
     /**
      * Get delay before next attempt to register push provider.
      *
-     * @param tryNumber Number of try. Always positive value, than no greater that {@link #tryCount()}.
+     * @param tryNumber Number of try. Always positive value, than no greater that {@code tryCount()}.
      * @return Period in milliseconds to wait before next try ro register.
      */
     long getDelay(int tryNumber);

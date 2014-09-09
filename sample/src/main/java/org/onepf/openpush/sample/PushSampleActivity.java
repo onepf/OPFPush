@@ -34,6 +34,7 @@ import org.onepf.openpush.OpenPushBaseReceiver;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
+import org.onepf.openpush.gcm.GCMProvider;
 import org.onepf.openpush.nokia.NokiaPushProvider;
 
 /**
@@ -117,7 +118,7 @@ public class PushSampleActivity extends ActionBarActivity {
                 if (mOpenPushHelper.getInitStatus()
                         == OpenPushHelper.INIT_NOT_STARTED) {
                     Options.Builder builder = new Options.Builder();
-                    builder.addProvider(new NokiaPushProvider(PushSampleActivity.this, GCM_SENDER_ID));
+                    builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
                     mOpenPushHelper.register(builder.build());
                 }
             }
