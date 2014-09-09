@@ -30,12 +30,16 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.BroadcastOpenPushListener;
 import org.onepf.openpush.OpenPushBaseReceiver;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
-import org.onepf.openpush.nokia.NokiaPushProvider;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -46,29 +50,45 @@ public class PushSampleActivity extends ActionBarActivity {
     private static final String TAG = "PushSampleActivity";
     public static final String GCM_SENDER_ID = "76325631570";
 
-    private TextView tvLabelRegistrationId;
+    @InjectView(R.id.label_registration_id)
+    TextView tvLabelRegistrationId;
 
-    private TextView tvRegistrationId;
-    private TextView tvRegistrationStatus;
+    @InjectView(R.id.tv_registration_id)
+    TextView tvRegistrationId;
 
-    private TextView tvLabelMessage;
-    private TextView tvMessage;
+    @InjectView(R.id.tv_registration_status)
+    TextView tvRegistrationStatus;
 
-    private TextView tvProviderName;
+    @InjectView(R.id.tv_push_provider)
+    TextView tvProviderName;
 
-    private Button btnRegister;
-    private Button btnUnregister;
-    private Button btnCopyToClipboard;
+    @InjectView(R.id.btn_register)
+    Button btnRegister;
+
+    @InjectView(R.id.btn_copy_to_clipboard)
+    Button btnCopyToClipboard;
 
     private BroadcastReceiver mOpenPushReceiver;
-    private OpenPushHelper mOpenPushHelper;
+    private static OpenPushHelper mOpenPushHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+        if (mOpenPushHelper == null) {
+            mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+            Options.Builder builder = new Options.Builder();
+            builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
+            mOpenPushHelper.init(builder.build());
+            mOpenPushHelper.setListener(new BroadcastOpenPushListener(this));
+        }
+
         setContentView(R.layout.activity_main);
-        initViews();
+        ButterKnife.inject(this);
+
+        if (mOpenPushHelper.getInitStatus() == OpenPushHelper.INIT_SUCCESS) {
+            switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
+                    mOpenPushHelper.getCurrentProviderRegistrationId());
+        }
     }
 
     @Override
@@ -100,54 +120,28 @@ public class PushSampleActivity extends ActionBarActivity {
         registerReceiver(mOpenPushReceiver, filter);
     }
 
-    private void initViews() {
-        tvLabelRegistrationId = (TextView) findViewById(R.id.label_registration_id);
+    @OnClick(R.id.btn_register)
+    void onRegisterClick() {
+        if (mOpenPushHelper.getInitStatus() == OpenPushHelper.INIT_SUCCESS) {
+            mOpenPushHelper.unregister();
+        } else if (mOpenPushHelper.getInitStatus()
+                == OpenPushHelper.INIT_NOT_STARTED) {
+            mOpenPushHelper.register();
+        }
+    }
 
-        tvRegistrationId = (TextView) findViewById(R.id.tv_registration_id);
-        tvRegistrationStatus = (TextView) findViewById(R.id.tv_registration_status);
+    @OnClick(R.id.btn_copy_to_clipboard)
+    void setBtnCopyToClipboard() {
+        Toast.makeText(PushSampleActivity.this,
+                PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
+                Toast.LENGTH_LONG)
+                .show();
 
-        tvLabelMessage = (TextView) findViewById(R.id.label_message);
-        tvMessage = (TextView) findViewById(R.id.tv_message_content);
+        ClipboardManager clipboard
+                = (ClipboardManager) getSystemService(Activity.CLIPBOARD_SERVICE);
+        clipboard.setText(tvRegistrationId.getText());
 
-        tvProviderName = (TextView) findViewById(R.id.tv_push_provider);
-
-        btnRegister = (Button) findViewById(R.id.btn_register);
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOpenPushHelper.getInitStatus()
-                        == OpenPushHelper.INIT_NOT_STARTED) {
-                    Options.Builder builder = new Options.Builder();
-                    builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
-                    mOpenPushHelper.register(builder.build());
-                }
-            }
-        });
-
-        btnUnregister = (Button) findViewById(R.id.btn_unregister);
-        btnUnregister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOpenPushHelper.unregister();
-            }
-        });
-
-        btnCopyToClipboard = (Button) findViewById(R.id.btn_copy_to_clipboard);
-        btnCopyToClipboard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(PushSampleActivity.this,
-                        PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
-                        Toast.LENGTH_LONG)
-                        .show();
-
-                ClipboardManager clipboard
-                        = (ClipboardManager) getSystemService(Activity.CLIPBOARD_SERVICE);
-                clipboard.setText(tvRegistrationId.getText());
-
-                Log.i(TAG, "Registration id: " + tvRegistrationId.getText());
-            }
-        });
+        Log.i(TAG, "Registration id: " + tvRegistrationId.getText());
     }
 
     private void switchToRegisteredState(String providerName, String registrationId) {
@@ -158,8 +152,7 @@ public class PushSampleActivity extends ActionBarActivity {
 
         tvProviderName.setText(registrationId);
 
-        btnRegister.setVisibility(View.INVISIBLE);
-        btnUnregister.setVisibility(View.VISIBLE);
+        btnRegister.setText(R.string.btn_unregister);
 
         btnCopyToClipboard.setVisibility(View.VISIBLE);
         tvRegistrationStatus.setText(getString(R.string.registered));
@@ -175,8 +168,7 @@ public class PushSampleActivity extends ActionBarActivity {
 
         tvProviderName.setText("None");
 
-        btnRegister.setVisibility(View.VISIBLE);
-        btnUnregister.setVisibility(View.INVISIBLE);
+        btnRegister.setText(R.string.btn_register);
 
         btnCopyToClipboard.setVisibility(View.GONE);
         tvRegistrationStatus.setText(getString(R.string.not_registered));

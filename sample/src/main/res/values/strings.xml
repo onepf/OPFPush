@@ -7,7 +7,7 @@
     <string name="btn_copy_to_clipboard">Copy to clipboard</string>
     <string name="registration_status">Registration status: </string>
     <string name="push_provider">Provider: </string>
-    <string name="btn_gcm_unregister">Unregister</string>
+    <string name="btn_unregister">Unregister</string>
     <string name="toast_registration_id_copied">Registration id copied</string>
     <string name="registered">Registered</string>
     <string name="not_registered">Not registered</string>

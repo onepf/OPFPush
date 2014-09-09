@@ -54,6 +54,24 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BasePushProvider that = (BasePushProvider) o;
+        return !getName().equals(that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
     public void close() {
     }
 }

@@ -14,8 +14,8 @@ public class BroadcastOpenPushListener implements OpenPushListener {
 
     private final Context mContext;
 
-    BroadcastOpenPushListener(@NotNull Context context) {
-        mContext = context;
+    public BroadcastOpenPushListener(@NotNull Context context) {
+        mContext = context.getApplicationContext();
     }
 
     @Override

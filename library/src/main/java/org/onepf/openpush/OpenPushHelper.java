@@ -20,10 +20,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PatternMatcher;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -33,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
 public class OpenPushHelper {
+
+    private static final String TAG = "OpenPushHelper";
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_INIT_STATUS = "init_status";
@@ -44,20 +48,29 @@ public class OpenPushHelper {
 
     private static final Handler sHandler = new Handler(Looper.getMainLooper());
 
-    private int mInitStatus;
-    private Options mOptions;
-    private PushProvider mCurrentProvider;
-    private int mRetryNumber = 0;
-
     @Nullable
     private OpenPushListener mListener;
-    private final SharedPreferences mPreferences;
-    private static OpenPushHelper sInstance;
 
     @NotNull
     private final Context mAppContext;
 
+    @NotNull
+    private final SharedPreferences mPreferences;
+
+    @Nullable
+    private static OpenPushHelper sInstance;
+
+    @Nullable
     private PackageChangeReceiver mPackageReceiver;
+
+    @Nullable
+    private Options mOptions;
+
+    @Nullable
+    private PushProvider mCurrentProvider;
+
+    private int mInitStatus;
+    private int mRetryNumber = 0;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
         if (sInstance == null) {
@@ -70,27 +83,26 @@ public class OpenPushHelper {
         return sInstance;
     }
 
-    void onHostAppRemoved(@NotNull PushProvider provider) {
-        if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
-            if (mListener != null) {
-                mListener.onHostAppRemoved(provider.getName());
-            }
-            mCurrentProvider.unregister();
-        }
-    }
-
     private OpenPushHelper(@NotNull Context context) {
         mAppContext = context.getApplicationContext();
-        if (mListener != null) {
-            mListener = new BroadcastOpenPushListener(context);
-        }
-        mPreferences = context.getSharedPreferences("org.onepf.openpush.prefs", Context.MODE_PRIVATE);
-        mInitStatus = mPreferences.getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
+        mPreferences =
+                mAppContext.getSharedPreferences("org.onepf.openpush.prefs", Context.MODE_PRIVATE);
+    }
+
+    public void init(@NotNull Options options) {
+        mOptions = options;
 
         PushProvider provider = getLastProvider();
-        if (provider != null && provider.isAvailable()
-                && mInitStatus == INIT_SUCCESS) {
+        if (provider != null && provider.isAvailable()) {
             mCurrentProvider = provider;
+            mInitStatus = mPreferences.getInt(KEY_INIT_STATUS, INIT_NOT_STARTED);
+        } else {
+            mInitStatus = INIT_NOT_STARTED;
+        }
+
+        if (mCurrentProvider != null && !mCurrentProvider.isRegistered()) {
+            mInitStatus = INIT_IN_PROGRESS;
+            mCurrentProvider.register();
         }
     }
 
@@ -98,13 +110,16 @@ public class OpenPushHelper {
         mListener = l;
     }
 
-    public synchronized void register(@NotNull Options options) {
+    public synchronized void register() {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
         if (mInitStatus == INIT_NOT_STARTED || mInitStatus == INIT_ERROR) {
             mInitStatus = INIT_IN_PROGRESS;
-            mOptions = options;
 
             PushProvider provider = getNextCandidate(null);
-            if (provider != null) {
+            if (provider != null && !provider.isRegistered()) {
                 provider.register();
             } else {
                 if (mListener != null) {
@@ -118,7 +133,11 @@ public class OpenPushHelper {
     }
 
     public void unregister() {
-        if (mInitStatus == INIT_SUCCESS) {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
+        if (mCurrentProvider != null && mInitStatus == INIT_SUCCESS) {
             if (mPackageReceiver != null) {
                 mAppContext.unregisterReceiver(mPackageReceiver);
             }
@@ -134,6 +153,10 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getNextCandidate(@Nullable PushProvider lastProvider) {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
         int i = 0;
         if (lastProvider != null) {
             int lastCandidateIndex = mOptions.getProviders().indexOf(lastProvider);
@@ -151,12 +174,20 @@ public class OpenPushHelper {
     }
 
     private void registerPackageChangeReceiver(@NotNull PushProvider provider) {
-        IntentFilter packageRemovedIntentFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-        packageRemovedIntentFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-        packageRemovedIntentFilter.addDataPath(
-                provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
-        mPackageReceiver = new PackageChangeReceiver(provider);
-        mAppContext.registerReceiver(mPackageReceiver, packageRemovedIntentFilter);
+        try {
+            if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
+                IntentFilter packageRemovedIntentFilter
+                        = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+                packageRemovedIntentFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+                packageRemovedIntentFilter.addDataPath(
+                        provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
+                mPackageReceiver = new PackageChangeReceiver(provider);
+                mAppContext.registerReceiver(mPackageReceiver, packageRemovedIntentFilter);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, String.format("Can not find package '%s'.",
+                    provider.getHostAppPackage()), e);
+        }
     }
 
     @Nullable
@@ -171,6 +202,10 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getProviderByName(@NotNull String providerName) {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
@@ -181,6 +216,10 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
         final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
         if (storedProviderName != null) {
             for (PushProvider provider : mOptions.getProviders()) {
@@ -227,9 +266,22 @@ public class OpenPushHelper {
         }
     }
 
+    void onHostAppRemoved(@NotNull PushProvider provider) {
+        if (mCurrentProvider != null
+                && mCurrentProvider.equals(provider)) {
+            if (mListener != null) {
+                mListener.onHostAppRemoved(provider.getName());
+            }
+        }
+    }
+
     public void onRegistrationEnd(@NotNull RegistrationResult result) {
         if (mInitStatus != INIT_IN_PROGRESS) {
             return;
+        }
+
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
         }
 
         final PushProvider provider = getProviderByName(result.getProviderName());

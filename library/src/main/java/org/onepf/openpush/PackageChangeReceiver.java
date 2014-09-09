@@ -22,13 +22,13 @@ public class PackageChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NotNull Context context, Intent intent) {
-        if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
-            OpenPushHelper openPushHelper = OpenPushHelper.getInstance(context);
-            String removedAppPackage = intent.getDataString()
-                    .replace(PackageUtils.PACKAGE_DATA_SCHEME + ':', "");
-            if (mProvider.getHostAppPackage().equals(removedAppPackage)
-                    && openPushHelper.getInitStatus() == OpenPushHelper.INIT_SUCCESS)
-                openPushHelper.onHostAppRemoved(mProvider);
+        if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())
+                && mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
+            OpenPushHelper.getInstance(context).onHostAppRemoved(mProvider);
         }
+    }
+
+    private static String getAppPackage(Intent intent) {
+        return intent.getDataString().replace(PackageUtils.PACKAGE_DATA_SCHEME + ':', "");
     }
 }
