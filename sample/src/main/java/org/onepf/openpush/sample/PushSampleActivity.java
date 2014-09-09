@@ -18,10 +18,12 @@ package org.onepf.openpush.sample;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -136,20 +138,21 @@ public class PushSampleActivity extends ActionBarActivity {
                 Toast.LENGTH_LONG)
                 .show();
 
-        ClipboardManager clipboard
-                = (ClipboardManager) getSystemService(Activity.CLIPBOARD_SERVICE);
-        clipboard.setText(tvRegistrationId.getText());
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(
+                ClipData.newPlainText("Push registration token", tvRegistrationId.getText())
+        );
 
         Log.i(TAG, "Registration id: " + tvRegistrationId.getText());
     }
 
     private void switchToRegisteredState(String providerName, String registrationId) {
         tvRegistrationId.setVisibility(View.VISIBLE);
-        tvRegistrationId.setText(providerName);
+        tvRegistrationId.setText(registrationId);
 
         tvLabelRegistrationId.setVisibility(View.VISIBLE);
 
-        tvProviderName.setText(registrationId);
+        tvProviderName.setText(providerName);
 
         btnRegister.setText(R.string.btn_unregister);
 
