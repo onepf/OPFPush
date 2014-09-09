@@ -325,7 +325,10 @@ public class OpenPushHelper {
 
         if (result.isSuccess()) {
             reset();
-            mCurrentProvider = null;
+            if (mCurrentProvider != null) {
+                mCurrentProvider.close();
+                mCurrentProvider = null;
+            }
             if (mListener != null) {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }

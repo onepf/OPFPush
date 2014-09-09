@@ -26,6 +26,7 @@ import com.nokia.push.PushConstants;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BroadcastListener;
+import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
 
@@ -58,9 +59,19 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
-        OpenPushHelper.getInstance(this).onRegistrationEnd(
-                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
-        );
+        switch (OpenPushHelper.getInstance(this).getState()) {
+            case OpenPushHelper.STATE_REGISTRATION_RUNNING:
+                OpenPushHelper.getInstance(this).onRegistrationEnd(
+                        new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
+                );
+                break;
+
+            case OpenPushHelper.STATE_UNREGISTRATION_RUNNING:
+                OpenPushHelper.getInstance(this).onUnregistrationEnd(
+                        new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
+                );
+                break;
+        }
     }
 
     /**
@@ -102,20 +113,20 @@ public class NokiaPushService extends PushBaseIntentService {
     }
 
     @MagicConstant(intValues = {
-            BroadcastListener.ERROR_INVALID_PARAMETERS,
-            BroadcastListener.ERROR_INVALID_PARAMETERS,
-            BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
-            BroadcastListener.ERROR_UNKNOWN
+            OpenPushConstants.ERROR_INVALID_PARAMETERS,
+            OpenPushConstants.ERROR_INVALID_PARAMETERS,
+            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+            OpenPushConstants.ERROR_UNKNOWN
     })
     private static int convertError(String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return BroadcastListener.ERROR_INVALID_PARAMETERS;
+            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return BroadcastListener.ERROR_INVALID_PARAMETERS;
+            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE;
+            return OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
         } else {
-            return BroadcastListener.ERROR_UNKNOWN;
+            return OpenPushConstants.ERROR_UNKNOWN;
         }
     }
 

@@ -19,12 +19,12 @@ public interface OpenPushListener {
 
     void onError(@NotNull String providerName,
                  @MagicConstant(intValues = {
-                         BroadcastListener.ERROR_INVALID_PARAMETERS,
-                         BroadcastListener.ERROR_INVALID_SENDER,
-                         BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
-                         BroadcastListener.ERROR_UNKNOWN,
-                         BroadcastListener.NO_ERROR,
-                         BroadcastListener.ERROR_AUTHEFICATION_FAILED
+                         OpenPushConstants.ERROR_INVALID_PARAMETERS,
+                         OpenPushConstants.ERROR_INVALID_SENDER,
+                         OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+                         OpenPushConstants.ERROR_UNKNOWN,
+                         OpenPushConstants.NO_ERROR,
+                         OpenPushConstants.ERROR_AUTHEFICATION_FAILED
                  })
                  int errorId);
 

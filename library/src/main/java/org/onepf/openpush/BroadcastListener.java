@@ -26,13 +26,6 @@ public class BroadcastListener implements OpenPushListener {
     public static final String EXTRA_MESSAGES_COUNT = "org.onepf.openpush.messages_count";
     public static final String EXTRA_HOST_APP_PACKAGE = "org.onepf.openpush.host_app_package";
 
-    public static final int NO_ERROR = -1;
-    public static final int ERROR_SERVICE_NOT_AVAILABLE = 1;
-    public static final int ERROR_INVALID_PARAMETERS = 2;
-    public static final int ERROR_INVALID_SENDER = 3;
-    public static final int ERROR_UNKNOWN = 4;
-    public static final int ERROR_AUTHEFICATION_FAILED = 5;
-
     private final Context mAppContext;
 
     public BroadcastListener(@NotNull Context context) {
