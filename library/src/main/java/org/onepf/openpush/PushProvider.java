@@ -65,5 +65,13 @@ public interface PushProvider {
     @NotNull
     String getHostAppPackage();
 
+    /**
+     * Must be called when your application is done using PushProvider, to release internal resources.
+     */
     void close();
+
+    /**
+     * Callback method, that called when host app removed.
+     */
+    void onHostAppRemoved();
 }

@@ -119,7 +119,9 @@ public class OpenPushHelper {
             mInitStatus = INIT_IN_PROGRESS;
 
             PushProvider provider = getNextCandidate(null);
-            if (provider != null && !provider.isRegistered()) {
+            if (provider != null
+                    && provider.isAvailable()
+                    && !provider.isRegistered()) {
                 provider.register();
             } else {
                 if (mListener != null) {
@@ -175,6 +177,7 @@ public class OpenPushHelper {
 
     private void registerPackageChangeReceiver(@NotNull PushProvider provider) {
         try {
+            // System apps can't be removed, that's why no sense listen package remove event.
             if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
                 IntentFilter packageRemovedIntentFilter
                         = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
@@ -272,6 +275,8 @@ public class OpenPushHelper {
             if (mListener != null) {
                 mListener.onHostAppRemoved(provider.getName());
             }
+            mInitStatus = INIT_NOT_STARTED;
+            register();
         }
     }
 

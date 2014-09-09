@@ -74,4 +74,8 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public void close() {
     }
+
+    @Override
+    public void onHostAppRemoved() {
+    }
 }

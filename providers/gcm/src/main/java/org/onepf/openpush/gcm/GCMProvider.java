@@ -151,6 +151,19 @@ public class GCMProvider extends BasePushProvider {
                 mPreferences.getInt(PREF_APP_VERSION, -1));
     }
 
+    @Override
+    public void onHostAppRemoved() {
+        reset();
+    }
+
+    private void reset() {
+        mRegistrationToken = null;
+        mPreferences.edit()
+                .remove(PREF_APP_VERSION)
+                .remove(PREF_REGISTRATION_TOKEN)
+                .apply();
+    }
+
     private class UnregisterTask extends AsyncTask<Void, Void, Boolean> {
         private String mOldRegistrationToken;
 
@@ -173,11 +186,7 @@ public class GCMProvider extends BasePushProvider {
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                mRegistrationToken = null;
-                mPreferences.edit()
-                        .remove(PREF_APP_VERSION)
-                        .remove(PREF_REGISTRATION_TOKEN)
-                        .apply();
+                reset();
 
                 Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
                 intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
