@@ -30,9 +30,8 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.BroadcastOpenPushListener;
+import org.onepf.openpush.BroadcastListener;
 import org.onepf.openpush.OpenPushBaseReceiver;
-import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
@@ -79,13 +78,13 @@ public class PushSampleActivity extends ActionBarActivity {
             Options.Builder builder = new Options.Builder();
             builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
             mOpenPushHelper.init(builder.build());
-            mOpenPushHelper.setListener(new BroadcastOpenPushListener(this));
+            mOpenPushHelper.setListener(new BroadcastListener(this));
         }
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_WORK) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
         }
@@ -109,20 +108,20 @@ public class PushSampleActivity extends ActionBarActivity {
 
     private void registerReceiver() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(OpenPushConstants.ACTION_REGISTERED);
-        filter.addAction(OpenPushConstants.ACTION_UNREGISTERED);
-        filter.addAction(OpenPushConstants.ACTION_MESSAGE);
-        filter.addAction(OpenPushConstants.ACTION_ERROR);
-        filter.addAction(OpenPushConstants.ACTION_NO_AVAILABLE_PROVIDER);
-        filter.addAction(OpenPushConstants.ACTION_DELETED_MESSAGES);
-        filter.addAction(OpenPushConstants.ACTION_HOST_APP_REMOVED);
+        filter.addAction(BroadcastListener.ACTION_REGISTERED);
+        filter.addAction(BroadcastListener.ACTION_UNREGISTERED);
+        filter.addAction(BroadcastListener.ACTION_MESSAGE);
+        filter.addAction(BroadcastListener.ACTION_ERROR);
+        filter.addAction(BroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
+        filter.addAction(BroadcastListener.ACTION_DELETED_MESSAGES);
+        filter.addAction(BroadcastListener.ACTION_HOST_APP_REMOVED);
         mOpenPushReceiver = new OpenPushEventReceiver();
         registerReceiver(mOpenPushReceiver, filter);
     }
 
     @OnClick(R.id.btn_register)
     void onRegisterClick() {
-        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_WORK) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
             mOpenPushHelper.unregister();
         } else if (mOpenPushHelper.getState()
                 == OpenPushHelper.STATE_NONE) {

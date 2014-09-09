@@ -25,7 +25,7 @@ import com.nokia.push.PushConstants;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.OpenPushConstants;
+import org.onepf.openpush.BroadcastListener;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
 
@@ -73,7 +73,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onDeletedMessages(@NotNull Context appContext, int total) {
         Bundle extras = new Bundle(1);
-        extras.putInt(OpenPushConstants.EXTRA_MESSAGES_COUNT, total);
+        extras.putInt(BroadcastListener.EXTRA_MESSAGES_COUNT, total);
         OpenPushHelper.getInstance(this).onDeletedMessages(NokiaPushProvider.NAME, extras);
     }
 
@@ -102,20 +102,20 @@ public class NokiaPushService extends PushBaseIntentService {
     }
 
     @MagicConstant(intValues = {
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-            OpenPushConstants.ERROR_UNKNOWN
+            BroadcastListener.ERROR_INVALID_PARAMETERS,
+            BroadcastListener.ERROR_INVALID_PARAMETERS,
+            BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
+            BroadcastListener.ERROR_UNKNOWN
     })
     private static int convertError(String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+            return BroadcastListener.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+            return BroadcastListener.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
+            return BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE;
         } else {
-            return OpenPushConstants.ERROR_UNKNOWN;
+            return BroadcastListener.ERROR_UNKNOWN;
         }
     }
 
