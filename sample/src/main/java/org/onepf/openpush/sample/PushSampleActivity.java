@@ -24,6 +24,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -37,6 +38,10 @@ import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -48,7 +53,9 @@ import butterknife.Optional;
  */
 public class PushSampleActivity extends ActionBarActivity {
 
+    private static final String WEB_SERVER_URL = "http://localhost:8080";
     public static final String GCM_SENDER_ID = "76325631570";
+    private static final String TAG = "PushSampleActivity";
 
     @InjectView(R.id.registration_id)
     TextView mRegistrationIdView;
@@ -76,7 +83,7 @@ public class PushSampleActivity extends ActionBarActivity {
             mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
             mOpenPushHelper.setListener(new BroadcastListener(this));
             Options.Builder builder = new Options.Builder();
-            builder.addProvider(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
+            builder.addProviders(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
             mOpenPushHelper.init(builder.build());
         }
 
@@ -180,11 +187,43 @@ public class PushSampleActivity extends ActionBarActivity {
 
         @Override
         public void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
+            Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
+                    , providerName, registrationId));
             switchToRegisteredState(providerName, registrationId);
+
+            // You start the registration process by calling startRegister() in your Main
+            // Activity. When the registration ID is ready, ADM calls onRegistered() on
+            // your app. Transmit the passed-in registration ID to your server, so your
+            // server can send messages to this app instance. onRegistered() is also
+            // called if your registration ID is rotated or changed for any reason; your
+            // app should pass the new registration ID to your server if this occurs.
+            // Your server needs to be able to handle a registration ID up to 1536 characters
+            // in length.
+
+            // The following is an example of sending the registration ID to your
+            // server via a header key/value pair over HTTP.
+            sendRegistrationDataToServer(providerName, registrationId);
+        }
+
+        private void sendRegistrationDataToServer(String providerName, String registrationId) {
+            try {
+                URL url = new URL(WEB_SERVER_URL);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setDoInput(true);
+                con.setUseCaches(false);
+                con.setRequestMethod("POST");
+                con.setRequestProperty("RegistrationId", registrationId);
+                con.setRequestProperty("ProviderName", providerName);
+                con.getResponseCode();
+            } catch (IOException e) {
+                Log.e(TAG, "Can't send registration data to server.", e);
+            }
         }
 
         @Override
-        public void onUnregistered(@NotNull String providerName, @Nullable String registrationId) {
+        public void onUnregistered(@NotNull String providerName, @Nullable String oldRegistrationId) {
+            Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
+                    , providerName, oldRegistrationId));
             switchToUnregisteredState();
         }
     }

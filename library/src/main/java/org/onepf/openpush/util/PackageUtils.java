@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by krozov on 07.09.14.
  */
-public class PackageUtils {
+public final class PackageUtils {
     public static final String PACKAGE_DATA_SCHEME = "package";
 
     /**
@@ -34,5 +34,8 @@ public class PackageUtils {
         ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
         return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
                 (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+    }
+
+    private PackageUtils() {
     }
 }

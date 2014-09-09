@@ -70,9 +70,11 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider mCurrentProvider;
 
+    @Nullable
+    private RetryRegistrationRunnable mRegistrationRunnable;
+
     private int mState;
     private int mRetryNumber = 0;
-    private RetryRegistrationRunnable mRegistrationRunnable;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
         if (sInstance == null) {

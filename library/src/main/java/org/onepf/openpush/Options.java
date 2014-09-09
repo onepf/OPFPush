@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,10 +32,14 @@ import java.util.Set;
  * @since 04.09.2014
  */
 public class Options {
+    @NotNull
     private final List<PushProvider> mProviders;
+
+    @Nullable
     private final Backoff mBackoff;
 
-    private Options(@NotNull Collection<PushProvider> providers, @Nullable Backoff backoff) {
+    private Options(@NotNull Collection<? extends PushProvider> providers,
+                    @Nullable Backoff backoff) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mBackoff = backoff;
     }
@@ -58,28 +63,46 @@ public class Options {
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
     public static class Builder {
+        @Nullable
         private Set<PushProvider> mProviders;
+
+        @Nullable
         private Backoff mBackoff;
 
         /**
-         * Add the provider to the options.
+         * Add the providers to the options.
          *
-         * @param provider Provider to add.
+         * @param providers Providers to add.
          * @return Current instance of builder.
-         * @throws java.lang.IllegalArgumentException If try to add already added provider.
+         * @throws java.lang.IllegalArgumentException If try to add already added providers.
          */
-        public Builder addProvider(@NotNull PushProvider provider) {
+        @NotNull
+        public Builder addProviders(@NotNull PushProvider... providers) {
             if (mProviders == null) {
-                mProviders = new HashSet<PushProvider>(4);
+                mProviders = new HashSet<PushProvider>(3);
             }
 
-            if (!mProviders.add(provider)) {
+            if (!Collections.addAll(mProviders, providers)) {
                 throw new IllegalArgumentException(
-                        String.format("Provider '%s' already added", provider));
+                        String.format("Provider '%s' already added", Arrays.toString(providers)));
             }
             return this;
         }
 
+        @NotNull
+        public Builder addProvider(@NotNull Collection<? extends PushProvider> providers) {
+            if (mProviders == null) {
+                mProviders = new HashSet<PushProvider>(4);
+            }
+
+            if (!mProviders.addAll(providers)) {
+                throw new IllegalArgumentException(
+                        String.format("Provider '%s' already added", providers));
+            }
+            return this;
+        }
+
+        @NotNull
         public Builder setBackoff(@Nullable Backoff backoff) {
             mBackoff = backoff;
             return this;

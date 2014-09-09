@@ -22,8 +22,8 @@ public class OptionsTest {
         public void testTwiceAddProvider() {
             Options.Builder builder = new Options.Builder();
             PushProvider provider = new StubPushProvider();
-            builder.addProvider(provider);
-            builder.addProvider(provider);
+            builder.addProviders(provider);
+            builder.addProviders(provider);
         }
 
         @Test(expected = IllegalArgumentException.class)
@@ -34,7 +34,7 @@ public class OptionsTest {
         @Test
         public void testBuilder() {
             Options.Builder builder = new Options.Builder();
-            builder.addProvider(new StubPushProvider());
+            builder.addProviders(new StubPushProvider());
             builder.setBackoff(new ExponentialBackoff());
 
             Options options = builder.build();

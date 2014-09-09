@@ -21,7 +21,7 @@ public class PackageChangeReceiver extends BroadcastReceiver {
     }
 
     @Override
-    public void onReceive(@NotNull Context context, Intent intent) {
+    public void onReceive(@NotNull Context context, @NotNull Intent intent) {
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)
                 && mProvider.getHostAppPackage().equals(getAppPackage(intent))) {

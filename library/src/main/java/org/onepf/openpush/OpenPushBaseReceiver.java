@@ -30,7 +30,7 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
                 onUnregistered(providerName,
                         intent.getStringExtra(BroadcastListener.EXTRA_REGISTRATION_ID));
             } else if (BroadcastListener.ACTION_ERROR.equals(action)) {
-                onRegistrationError(providerName,
+                onError(providerName,
                         intent.getIntExtra(BroadcastListener.EXTRA_ERROR_ID, -1));
             } else if (BroadcastListener.ACTION_DELETED_MESSAGES.equals(action)) {
                 Bundle extras = new Bundle(intent.getExtras());
@@ -49,12 +49,12 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
     protected void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
     }
 
-    protected void onRegistrationError(@NotNull String providerName, int errorId) {
+    protected void onError(@NotNull String providerName, int errorId) {
     }
 
     protected void onNoAvailableProvider() {
     }
 
-    protected void onUnregistered(@NotNull String providerName, @Nullable String registrationId) {
+    protected void onUnregistered(@NotNull String providerName, @Nullable String oldRegistrationId) {
     }
 }

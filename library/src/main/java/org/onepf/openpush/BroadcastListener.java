@@ -26,6 +26,7 @@ public class BroadcastListener implements OpenPushListener {
     public static final String EXTRA_MESSAGES_COUNT = "org.onepf.openpush.messages_count";
     public static final String EXTRA_HOST_APP_PACKAGE = "org.onepf.openpush.host_app_package";
 
+    @NotNull
     private final Context mAppContext;
 
     public BroadcastListener(@NotNull Context context) {

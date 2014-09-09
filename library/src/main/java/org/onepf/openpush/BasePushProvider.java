@@ -26,14 +26,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class BasePushProvider implements PushProvider {
 
+    @NotNull
     private final Context mContext;
+
+    @NotNull
     private final String mImplementationDependencyClass;
 
-    public BasePushProvider(@NotNull Context context, @NotNull String implementationDependencyClass) {
+    public BasePushProvider(@NotNull Context context, @NotNull String implementationClass) {
         mContext = context.getApplicationContext();
-        mImplementationDependencyClass = implementationDependencyClass;
+        mImplementationDependencyClass = implementationClass;
     }
 
+    @NotNull
     protected Context getContext() {
         return mContext;
     }

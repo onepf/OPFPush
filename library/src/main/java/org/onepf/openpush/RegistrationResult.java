@@ -2,19 +2,23 @@ package org.onepf.openpush;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by krozov on 05.09.14.
  */
 public final class RegistrationResult {
 
+    @NotNull
     private final String mProviderName;
+
+    @Nullable
     private final String mRegistrationId;
+
     private final int mErrorCode;
     private final boolean mRecoverableError;
 
-    public RegistrationResult(@NotNull String providerName,
-                              @NotNull String registrationId) {
+    public RegistrationResult(@NotNull String providerName, @NotNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = OpenPushConstants.NO_ERROR;
@@ -51,7 +55,7 @@ public final class RegistrationResult {
         return mRecoverableError;
     }
 
-    @NotNull
+    @Nullable
     public String getRegistrationId() {
         return mRegistrationId;
     }
