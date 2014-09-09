@@ -73,7 +73,7 @@ public class Options {
                 mProviders = new HashSet<PushProvider>(4);
             }
 
-            if (mProviders.add(provider)) {
+            if (!mProviders.add(provider)) {
                 throw new IllegalArgumentException(
                         String.format("Provider '%s' already added", provider));
             }

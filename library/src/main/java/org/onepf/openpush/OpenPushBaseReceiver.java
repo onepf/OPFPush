@@ -16,25 +16,25 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
-        if (OpenPushConstants.ACTION_MESSAGE.equals(action)) {
-            onMessage(intent.getStringExtra(OpenPushConstants.EXTRA_PROVIDER_NAME),
+        if (BroadcastListener.ACTION_MESSAGE.equals(action)) {
+            onMessage(intent.getStringExtra(BroadcastListener.EXTRA_PROVIDER_NAME),
                     intent.getExtras());
-        } else if (OpenPushConstants.ACTION_NO_AVAILABLE_PROVIDER.equals(action)) {
+        } else if (BroadcastListener.ACTION_NO_AVAILABLE_PROVIDER.equals(action)) {
             onNoAvailableProvider();
         } else {
-            final String providerName = intent.getStringExtra(OpenPushConstants.EXTRA_PROVIDER_NAME);
-            if (OpenPushConstants.ACTION_REGISTERED.equals(action)) {
+            final String providerName = intent.getStringExtra(BroadcastListener.EXTRA_PROVIDER_NAME);
+            if (BroadcastListener.ACTION_REGISTERED.equals(action)) {
                 onRegistered(providerName,
-                        intent.getStringExtra(OpenPushConstants.EXTRA_REGISTRATION_ID));
-            } else if (OpenPushConstants.ACTION_UNREGISTERED.equals(action)) {
+                        intent.getStringExtra(BroadcastListener.EXTRA_REGISTRATION_ID));
+            } else if (BroadcastListener.ACTION_UNREGISTERED.equals(action)) {
                 onUnregistered(providerName,
-                        intent.getStringExtra(OpenPushConstants.EXTRA_REGISTRATION_ID));
-            } else if (OpenPushConstants.ACTION_ERROR.equals(action)) {
+                        intent.getStringExtra(BroadcastListener.EXTRA_REGISTRATION_ID));
+            } else if (BroadcastListener.ACTION_ERROR.equals(action)) {
                 onRegistrationError(providerName,
-                        intent.getIntExtra(OpenPushConstants.EXTRA_ERROR_ID, -1));
-            } else if (OpenPushConstants.ACTION_DELETED_MESSAGES.equals(action)) {
+                        intent.getIntExtra(BroadcastListener.EXTRA_ERROR_ID, -1));
+            } else if (BroadcastListener.ACTION_DELETED_MESSAGES.equals(action)) {
                 Bundle extras = new Bundle(intent.getExtras());
-                extras.remove(OpenPushConstants.EXTRA_PROVIDER_NAME);
+                extras.remove(BroadcastListener.EXTRA_PROVIDER_NAME);
                 onDeletedMessages(providerName, extras);
             }
         }

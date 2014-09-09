@@ -39,11 +39,11 @@ public class OpenPushHelper {
     private static final String TAG = "OpenPushHelper";
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
-    private static final String KEY_INIT_STATUS = "init_status";
+    private static final String KEY_STATE = "state";
 
     public static final int STATE_NONE = 0;
     public static final int STATE_REGISTRATION_RUNNING = 1;
-    public static final int STATE_WORK = 2;
+    public static final int STATE_RUNNING = 2;
     public static final int STATE_ERROR = 3;
     public static final int STATE_UNREGISTRATION_RUNNING = 4;
 
@@ -97,12 +97,12 @@ public class OpenPushHelper {
         PushProvider provider = getLastProvider();
         if (provider != null && provider.isAvailable()) {
             mCurrentProvider = provider;
-            mState = mPreferences.getInt(KEY_INIT_STATUS, STATE_NONE);
+            mState = mPreferences.getInt(KEY_STATE, STATE_NONE);
         } else {
             mState = STATE_NONE;
         }
 
-        if (mCurrentProvider != null && mState != STATE_WORK) {
+        if (mCurrentProvider != null && mState != STATE_RUNNING) {
             register(mCurrentProvider);
         }
     }
@@ -145,7 +145,7 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mCurrentProvider != null && mState == STATE_WORK) {
+        if (mCurrentProvider != null && mState == STATE_RUNNING) {
             mState = STATE_UNREGISTRATION_RUNNING;
             unregisterPackageChangeReceiver();
             mCurrentProvider.unregister();
@@ -239,13 +239,14 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
-        if (storedProviderName != null) {
+        if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
+            final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
             for (PushProvider provider : mOptions.getProviders()) {
                 if (storedProviderName.equals(provider.getName())) {
                     return provider;
                 }
             }
+            mPreferences.edit().remove(KEY_LAST_PROVIDER_NAME).apply();
         }
         return null;
     }
@@ -266,7 +267,7 @@ public class OpenPushHelper {
             STATE_ERROR,
             STATE_REGISTRATION_RUNNING,
             STATE_NONE,
-            STATE_WORK,
+            STATE_RUNNING,
             STATE_UNREGISTRATION_RUNNING
     })
     public int getState() {
@@ -347,9 +348,9 @@ public class OpenPushHelper {
         final PushProvider provider = getProviderByName(result.getProviderName());
         Assert.assertNotNull(provider);
         if (result.isSuccess()) {
-            mState = STATE_WORK;
+            mState = STATE_RUNNING;
             mCurrentProvider = provider;
-            mPreferences.edit().putInt(KEY_INIT_STATUS, STATE_WORK).apply();
+            mPreferences.edit().putInt(KEY_STATE, STATE_RUNNING).apply();
             mRetryNumber = 0;
             saveProvider(mCurrentProvider);
             if (mListener != null) {

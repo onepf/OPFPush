@@ -17,28 +17,28 @@ public final class RegistrationResult {
                               @NotNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
-        mErrorCode = OpenPushConstants.NO_ERROR;
+        mErrorCode = BroadcastListener.NO_ERROR;
         mRecoverableError = true;
     }
 
     public RegistrationResult(@NotNull String providerName,
                               @MagicConstant(intValues = {
-                                      OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                      OpenPushConstants.ERROR_INVALID_SENDER,
-                                      OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                      OpenPushConstants.ERROR_UNKNOWN,
-                                      OpenPushConstants.ERROR_AUTHEFICATION_FAILED
+                                      BroadcastListener.ERROR_INVALID_PARAMETERS,
+                                      BroadcastListener.ERROR_INVALID_SENDER,
+                                      BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
+                                      BroadcastListener.ERROR_UNKNOWN,
+                                      BroadcastListener.ERROR_AUTHEFICATION_FAILED
                               }) int errorCode) {
         this(providerName, errorCode, true);
     }
 
     public RegistrationResult(@NotNull String providerName,
                               @MagicConstant(intValues = {
-                                      OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                      OpenPushConstants.ERROR_INVALID_SENDER,
-                                      OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                      OpenPushConstants.ERROR_UNKNOWN,
-                                      OpenPushConstants.ERROR_AUTHEFICATION_FAILED
+                                      BroadcastListener.ERROR_INVALID_PARAMETERS,
+                                      BroadcastListener.ERROR_INVALID_SENDER,
+                                      BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
+                                      BroadcastListener.ERROR_UNKNOWN,
+                                      BroadcastListener.ERROR_AUTHEFICATION_FAILED
                               }) int errorCode,
                               boolean recoverableError) {
         mProviderName = providerName;
@@ -62,16 +62,16 @@ public final class RegistrationResult {
     }
 
     public boolean isSuccess() {
-        return mErrorCode == OpenPushConstants.NO_ERROR;
+        return mErrorCode == BroadcastListener.NO_ERROR;
     }
 
     @MagicConstant(intValues = {
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_INVALID_SENDER,
-            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-            OpenPushConstants.ERROR_UNKNOWN,
-            OpenPushConstants.NO_ERROR,
-            OpenPushConstants.ERROR_AUTHEFICATION_FAILED
+            BroadcastListener.ERROR_INVALID_PARAMETERS,
+            BroadcastListener.ERROR_INVALID_SENDER,
+            BroadcastListener.ERROR_SERVICE_NOT_AVAILABLE,
+            BroadcastListener.ERROR_UNKNOWN,
+            BroadcastListener.NO_ERROR,
+            BroadcastListener.ERROR_AUTHEFICATION_FAILED
     })
     public int getErrorCode() {
         return mErrorCode;
