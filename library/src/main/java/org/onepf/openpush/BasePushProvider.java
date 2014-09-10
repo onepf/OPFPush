@@ -19,7 +19,7 @@ package org.onepf.openpush;
 import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.util.PackageUtils;
 
 /**
  * @author Kirill Rozov
@@ -28,29 +28,24 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BasePushProvider implements PushProvider {
 
     @NotNull
-    private final Context mContext;
+    private final Context mAppContext;
 
-    @NotNull
-    private final String mImplementationClass;
-
-    public BasePushProvider(@NotNull Context context, @NotNull String implementationClass) {
-        mContext = context.getApplicationContext();
-        mImplementationClass = implementationClass;
+    protected BasePushProvider(@NotNull Context context) {
+        if (!checkManifest()) {
+            throw new OpenPushException("Your manifest doesn't contains all required" +
+                    " data. Check your app manifest.");
+        }
+        mAppContext = context.getApplicationContext();
     }
 
     @NotNull
     protected Context getContext() {
-        return mContext;
+        return mAppContext;
     }
 
     @Override
     public boolean isAvailable() {
-        try {
-            Class.forName(mImplementationClass);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+        return PackageUtils.isInstalled(mAppContext, getHostAppPackage());
     }
 
     @NotNull

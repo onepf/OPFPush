@@ -90,7 +90,7 @@ public class Options {
         }
 
         @NotNull
-        public Builder addProvider(@NotNull Collection<? extends PushProvider> providers) {
+        public Builder addProviders(@NotNull Collection<? extends PushProvider> providers) {
             if (mProviders == null) {
                 mProviders = new HashSet<PushProvider>(4);
             }

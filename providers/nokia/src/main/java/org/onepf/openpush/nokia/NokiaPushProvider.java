@@ -23,6 +23,7 @@ import com.nokia.push.PushRegistrar;
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
+import org.onepf.openpush.util.PackageUtils;
 
 
 public class NokiaPushProvider extends BasePushProvider {
@@ -32,7 +33,7 @@ public class NokiaPushProvider extends BasePushProvider {
     private final String[] mSendersId;
 
     public NokiaPushProvider(@NotNull Context context, @NotNull String... sendersID) {
-        super(context, "com.nokia.push.PushRegistrar");
+        super(context);
         mSendersId = sendersID;
     }
 
@@ -41,12 +42,21 @@ public class NokiaPushProvider extends BasePushProvider {
         if (super.isAvailable()) {
             try {
                 PushRegistrar.checkDevice(getContext());
-                PushRegistrar.checkManifest(getContext());
                 return true;
             } catch (UnsupportedOperationException exception) {
                 return false;
             }
         } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean checkManifest() {
+        try {
+            PushRegistrar.checkManifest(getContext());
+            return PackageUtils.checkPermission(getContext(), android.Manifest.permission.INTERNET);
+        } catch (UnsupportedOperationException exception) {
             return false;
         }
     }

@@ -46,7 +46,6 @@ public class OpenPushHelper {
     private static final String TAG = "OpenPushHelper";
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
-    private static final String KEY_STATE = "state";
 
     /**
      * Push isn't running.
@@ -64,9 +63,9 @@ public class OpenPushHelper {
     public static final int STATE_RUNNING = 2;
 
     /**
-     * Error occur while register on unregister provider.
+     * All providers are unavailable or they registration failed.
      */
-    public static final int STATE_ERROR = 3;
+    public static final int STATE_NO_AVAILABLE_PROVIDERS = 3;
 
     /**
      * Helper is unregistering current provider.
@@ -125,7 +124,7 @@ public class OpenPushHelper {
         PushProvider provider = getLastProvider();
         if (provider != null && provider.isAvailable()) {
             mCurrentProvider = provider;
-            mState = mPreferences.getInt(KEY_STATE, STATE_NONE);
+            mState = STATE_RUNNING;
         } else {
             mState = STATE_NONE;
         }
@@ -144,7 +143,7 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mState == STATE_NONE || mState == STATE_ERROR) {
+        if (mState == STATE_NONE || mState == STATE_NO_AVAILABLE_PROVIDERS) {
             mState = STATE_REGISTRATION_RUNNING;
 
             PushProvider provider = getNextCandidate(null);
@@ -291,7 +290,7 @@ public class OpenPushHelper {
     }
 
     @MagicConstant(intValues = {
-            STATE_ERROR,
+            STATE_NO_AVAILABLE_PROVIDERS,
             STATE_REGISTRATION_RUNNING,
             STATE_NONE,
             STATE_RUNNING,
@@ -307,9 +306,9 @@ public class OpenPushHelper {
         }
     }
 
-    public void onDeletedMessages(@NotNull String providerName, @Nullable Bundle extras) {
+    public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
         if (mListener != null) {
-            mListener.onDeletedMessages(providerName, extras);
+            mListener.onDeletedMessages(providerName, messagesCount);
         }
     }
 
@@ -360,10 +359,11 @@ public class OpenPushHelper {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
-            mState = STATE_ERROR;
+            mState = STATE_RUNNING;
             final PushProvider provider = getProviderByName(result.getProviderName());
-            Assert.assertNotNull(provider);
-            mListener.onError(provider.getName(), result.getErrorCode());
+            if (provider != null) {
+                mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
+            }
         }
     }
 
@@ -380,7 +380,6 @@ public class OpenPushHelper {
         if (result.isSuccess()) {
             mState = STATE_RUNNING;
             mCurrentProvider = provider;
-            mPreferences.edit().putInt(KEY_STATE, STATE_RUNNING).apply();
             mRetryNumber = 0;
             saveProvider(mCurrentProvider);
             if (mListener != null) {
@@ -399,7 +398,7 @@ public class OpenPushHelper {
                 mRetryNumber++;
             } else {
                 if (mListener != null) {
-                    mListener.onError(provider.getName(), result.getErrorCode());
+                    mListener.onRegistrationError(provider.getName(), result.getErrorCode());
                 }
 
                 mRetryNumber = 0;
@@ -407,8 +406,10 @@ public class OpenPushHelper {
                 if (nextProvider != null) {
                     nextProvider.register();
                 } else {
-                    mState = STATE_ERROR;
-                    mListener.onNoAvailableProvider();
+                    mState = STATE_NO_AVAILABLE_PROVIDERS;
+                    if (mListener != null) {
+                        mListener.onNoAvailableProvider();
+                    }
                 }
             }
         }

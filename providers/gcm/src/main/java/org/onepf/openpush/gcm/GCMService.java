@@ -51,7 +51,7 @@ public class GCMService extends IntentService {
         } else if (intent.getExtras() != null) {
             String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                onDeletedMessages(intent);
+                onDeletedMessages();
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 onMessage(intent);
             }
@@ -59,8 +59,8 @@ public class GCMService extends IntentService {
         GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    protected void onDeletedMessages(Intent intent) {
-        OpenPushHelper.getInstance(this).onDeletedMessages(GCMProvider.NAME, intent.getExtras());
+    protected void onDeletedMessages() {
+        OpenPushHelper.getInstance(this).onDeletedMessages(GCMProvider.NAME, 1);
     }
 
     private void onMessage(Intent intent) {

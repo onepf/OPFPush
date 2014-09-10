@@ -19,24 +19,27 @@ package org.onepf.openpush.adm;
 import android.content.Context;
 
 import com.amazon.device.messaging.ADM;
+import com.amazon.device.messaging.development.ADMManifest;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
+import org.onepf.openpush.util.PackageUtils;
 
 /**
  * Created by krozov on 06.09.14.
  */
-public abstract class ADMProvider extends BasePushProvider {
+public class ADMProvider extends BasePushProvider {
 
     public static final String NAME = "Amazon Device Messaging";
 
+    @NotNull
     private final ADM mAdm;
 
     public ADMProvider(@NotNull Context context) {
-        super(context, "com.amazon.device.messaging.ADM");
-        mAdm = new ADM(getContext());
+        super(context);
+        mAdm = new ADM(context);
     }
 
     @Override
@@ -46,6 +49,15 @@ public abstract class ADMProvider extends BasePushProvider {
         } else {
             throw new OpenPushException("Amazon Device Messaging already registered.");
         }
+    }
+
+    @Override
+    public boolean checkManifest() {
+        Context ctx = getContext();
+        return PackageUtils.checkPermission(ctx, android.Manifest.permission.INTERNET)
+                && PackageUtils.checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                && PackageUtils.checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
+                && PackageUtils.checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package org.onepf.openpush.gcm;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
@@ -50,6 +51,7 @@ public class GCMProvider extends BasePushProvider {
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
     static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
+    private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
 
     private String mRegistrationToken;
     private final String[] mSenderIDs;
@@ -57,7 +59,7 @@ public class GCMProvider extends BasePushProvider {
     private final GoogleCloudMessaging mGoogleCloudMessaging;
 
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
-        super(context, "com.google.android.gms.gcm.GoogleCloudMessaging");
+        super(context);
         mSenderIDs = senderIDs;
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -77,6 +79,22 @@ public class GCMProvider extends BasePushProvider {
         } else {
             throw new OpenPushException("Provider must be registered before unregister.");
         }
+    }
+
+    @Override
+    public boolean checkManifest() {
+        Context ctx = getContext();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
+                && !PackageUtils.checkPermission(ctx, Manifest.permission.GET_ACCOUNTS)) {
+            return false;
+        }
+
+        return PackageUtils.checkPermission(ctx, android.Manifest.permission.INTERNET)
+                && PackageUtils.checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
+                && PackageUtils.checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                && PackageUtils.checkPermission(ctx, PERMISSION_RECEIVE)
+                && PackageUtils.checkPermission(ctx, ctx.getPackageName() + ".permission.C2D_MESSAGE");
     }
 
     @Override
@@ -116,8 +134,7 @@ public class GCMProvider extends BasePushProvider {
         } else {
             if (mPreferences.contains(PREF_APP_VERSION)) {
                 int registeredVersion = mPreferences.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
-                int currentVersion = PackageUtils.getAppVersion(getContext());
-                return registeredVersion > 0 && registeredVersion == currentVersion;
+                return registeredVersion == PackageUtils.getAppVersion(getContext());
             } else {
                 return false;
             }

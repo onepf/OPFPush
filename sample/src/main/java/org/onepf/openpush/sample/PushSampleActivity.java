@@ -20,9 +20,9 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -32,8 +32,6 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.BroadcastListener;
-import org.onepf.openpush.OpenPushBaseReceiver;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
@@ -81,7 +79,7 @@ public class PushSampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (mOpenPushHelper == null) {
             mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
-            mOpenPushHelper.setListener(new BroadcastListener(this));
+            mOpenPushHelper.setListener(new LocalBroadcastListener(this));
             Options.Builder builder = new Options.Builder();
             builder.addProviders(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
             mOpenPushHelper.init(builder.build());
@@ -94,7 +92,7 @@ public class PushSampleActivity extends Activity {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }
-            registerReceiver(this, mOpenPushReceiver);
+            registerReceiver(mOpenPushReceiver);
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
         } else {
@@ -106,7 +104,7 @@ public class PushSampleActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (mOpenPushReceiver != null) {
-            registerReceiver(this, mOpenPushReceiver);
+            registerReceiver(mOpenPushReceiver);
         }
     }
 
@@ -114,20 +112,20 @@ public class PushSampleActivity extends Activity {
     protected void onPause() {
         super.onPause();
         if (mOpenPushReceiver != null) {
-            unregisterReceiver(mOpenPushReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
         }
     }
 
-    private static void registerReceiver(Context context, BroadcastReceiver receiver) {
+    private void registerReceiver(BroadcastReceiver receiver) {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastListener.ACTION_REGISTERED);
-        filter.addAction(BroadcastListener.ACTION_UNREGISTERED);
-        filter.addAction(BroadcastListener.ACTION_MESSAGE);
-        filter.addAction(BroadcastListener.ACTION_ERROR);
-        filter.addAction(BroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
-        filter.addAction(BroadcastListener.ACTION_DELETED_MESSAGES);
-        filter.addAction(BroadcastListener.ACTION_HOST_APP_REMOVED);
-        context.registerReceiver(receiver, filter);
+        filter.addAction(LocalBroadcastListener.ACTION_REGISTERED);
+        filter.addAction(LocalBroadcastListener.ACTION_UNREGISTERED);
+        filter.addAction(LocalBroadcastListener.ACTION_MESSAGE);
+        filter.addAction(LocalBroadcastListener.ACTION_REGISTRATION_ERROR);
+        filter.addAction(LocalBroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
+        filter.addAction(LocalBroadcastListener.ACTION_DELETED_MESSAGES);
+        filter.addAction(LocalBroadcastListener.ACTION_HOST_APP_REMOVED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
     }
 
     @OnClick(R.id.register_switch)
@@ -139,7 +137,7 @@ public class PushSampleActivity extends Activity {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }
-            registerReceiver(this, mOpenPushReceiver);
+            registerReceiver(mOpenPushReceiver);
             mOpenPushHelper.register();
         }
     }
@@ -175,7 +173,7 @@ public class PushSampleActivity extends Activity {
         mCopyToClipboardView.setVisibility(View.GONE);
 
         if (mOpenPushReceiver != null) {
-            unregisterReceiver(mOpenPushReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
             mOpenPushReceiver = null;
         }
     }

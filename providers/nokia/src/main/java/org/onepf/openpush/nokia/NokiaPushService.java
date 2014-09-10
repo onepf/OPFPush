@@ -25,7 +25,6 @@ import com.nokia.push.PushConstants;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.BroadcastListener;
 import org.onepf.openpush.OpenPushConstants;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.RegistrationResult;
@@ -83,9 +82,7 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onDeletedMessages(@NotNull Context appContext, int total) {
-        Bundle extras = new Bundle(1);
-        extras.putInt(BroadcastListener.EXTRA_MESSAGES_COUNT, total);
-        OpenPushHelper.getInstance(this).onDeletedMessages(NokiaPushProvider.NAME, extras);
+        OpenPushHelper.getInstance(this).onDeletedMessages(NokiaPushProvider.NAME, total);
     }
 
     /**

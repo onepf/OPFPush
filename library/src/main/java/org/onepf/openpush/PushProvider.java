@@ -78,6 +78,13 @@ public interface PushProvider {
     void close();
 
     /**
+     * Verify does application manifest contains all needed permissions.
+     *
+     * @return {@code true} if all required permissions described in manifest, else {@code false}.
+     */
+    boolean checkManifest();
+
+    /**
      * Callback method, that called when application state change, like update to new version,
      * or system state changed, like update firmware to a newer version and Android ID changed.
      * <p/>

@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package org.onepf.openpush;
+package org.onepf.openpush.sample;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.OpenPushConstants;
+import org.onepf.openpush.OpenPushListener;
 
 /**
  * Created by krozov on 07.09.14.
  */
-public class BroadcastListener implements OpenPushListener {
+public class LocalBroadcastListener implements OpenPushListener {
 
     public static final String ACTION_REGISTERED = "org.onepf.openpush.registered";
     public static final String ACTION_UNREGISTERED = "org.onepf.openpush.unregistered";
     public static final String ACTION_MESSAGE = "org.onepf.openpush.message";
     public static final String ACTION_DELETED_MESSAGES = "org.onepf.openpush.message_deleted";
-    public static final String ACTION_ERROR = "org.onepf.openpush.error";
+    public static final String ACTION_REGISTRATION_ERROR = "org.onepf.openpush.registration_error";
+    public static final String ACTION_UNREGISTRATION_ERROR = "org.onepf.openpush.unregistration_error";
     public static final String ACTION_NO_AVAILABLE_PROVIDER = "org.onepf.openpush.no_available_provider";
     public static final String ACTION_HOST_APP_REMOVED = "org.onepf.openpush.host_app_removed";
 
@@ -45,7 +50,7 @@ public class BroadcastListener implements OpenPushListener {
     @NotNull
     private final Context mAppContext;
 
-    public BroadcastListener(@NotNull Context context) {
+    public LocalBroadcastListener(@NotNull Context context) {
         mAppContext = context.getApplicationContext();
     }
 
@@ -55,8 +60,9 @@ public class BroadcastListener implements OpenPushListener {
     }
 
     @Override
-    public void onDeletedMessages(@NotNull String providerName,
-                                  @Nullable Bundle extras) {
+    public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+        Bundle extras = new Bundle(1);
+        extras.putInt(LocalBroadcastListener.EXTRA_MESSAGES_COUNT, messagesCount);
         sendBroadcast(ACTION_DELETED_MESSAGES, providerName, extras);
     }
 
@@ -68,10 +74,18 @@ public class BroadcastListener implements OpenPushListener {
     }
 
     @Override
-    public void onError(@NotNull String providerName, int errorId) {
+    public void onRegistrationError(@NotNull String providerName,
+                                    @MagicConstant(intValues = {
+                                            OpenPushConstants.ERROR_INVALID_PARAMETERS,
+                                            OpenPushConstants.ERROR_INVALID_SENDER,
+                                            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+                                            OpenPushConstants.ERROR_UNKNOWN,
+                                            OpenPushConstants.NO_ERROR,
+                                            OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
+                                    int errorId) {
         Bundle extras = new Bundle(1);
         extras.putInt(EXTRA_ERROR_ID, errorId);
-        sendBroadcast(ACTION_ERROR, providerName, extras);
+        sendBroadcast(ACTION_REGISTRATION_ERROR, providerName, extras);
     }
 
     @Override
@@ -96,7 +110,22 @@ public class BroadcastListener implements OpenPushListener {
         if (providerName != null) {
             newIntent.putExtra(EXTRA_PROVIDER_NAME, providerName);
         }
-        mAppContext.sendBroadcast(newIntent);
+        LocalBroadcastManager.getInstance(mAppContext).sendBroadcast(newIntent);
+    }
+
+    @Override
+    public void onUnregistrationError(@NotNull String providerName,
+                                      @MagicConstant(intValues = {
+                                              OpenPushConstants.ERROR_INVALID_PARAMETERS,
+                                              OpenPushConstants.ERROR_INVALID_SENDER,
+                                              OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
+                                              OpenPushConstants.ERROR_UNKNOWN,
+                                              OpenPushConstants.NO_ERROR,
+                                              OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
+                                      int errorId) {
+        Bundle extras = new Bundle(1);
+        extras.putInt(EXTRA_ERROR_ID, errorId);
+        sendBroadcast(ACTION_UNREGISTRATION_ERROR, providerName, extras);
     }
 
     @Override
