@@ -14,5 +14,23 @@
  * limitations under the License.
  */
 
-include ':library', ':providers:gcm', ':providers:nokia',':providers:adm'
-include ':samples:local_broadcast_listener', ':samples:event_bus_listener'
+package org.onepf.openpush.sample.event;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Created by  Kirill Rozov on 10.09.14.
+ */
+public class DeleteMessageEvent extends ProviderEvent {
+
+    private int mMessagesCount;
+
+    public DeleteMessageEvent(@NotNull String providerName, int messagesCount) {
+        super(providerName);
+        mMessagesCount = messagesCount;
+    }
+
+    public int getMessagesCount() {
+        return mMessagesCount;
+    }
+}

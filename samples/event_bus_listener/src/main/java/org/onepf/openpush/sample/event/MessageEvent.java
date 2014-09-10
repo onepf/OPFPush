@@ -14,5 +14,26 @@
  * limitations under the License.
  */
 
-include ':library', ':providers:gcm', ':providers:nokia',':providers:adm'
-include ':samples:local_broadcast_listener', ':samples:event_bus_listener'
+package org.onepf.openpush.sample.event;
+
+import android.os.Bundle;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Created by  Kirill Rozov on 10.09.14.
+ */
+public class MessageEvent extends ProviderEvent {
+    private Bundle mExtras;
+
+    public MessageEvent(@NotNull String providerName, @Nullable Bundle extras) {
+        super(providerName);
+        mExtras = extras;
+    }
+
+    @Nullable
+    public Bundle getExtras() {
+        return mExtras;
+    }
+}

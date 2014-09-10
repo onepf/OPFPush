@@ -35,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
+import org.onepf.openpush.sample.event.RegisteredEvent;
+import org.onepf.openpush.sample.event.UnregisteredEvent;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -44,6 +46,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import butterknife.Optional;
+import de.greenrobot.event.EventBus;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -71,7 +74,7 @@ public class PushSampleActivity extends Activity {
     @InjectView(R.id.btn_copy_to_clipboard)
     Button mCopyToClipboardView;
 
-    private BroadcastReceiver mOpenPushReceiver;
+    private boolean mRegistered;
     private static OpenPushHelper mOpenPushHelper;
 
     @Override
@@ -79,7 +82,7 @@ public class PushSampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (mOpenPushHelper == null) {
             mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
-            mOpenPushHelper.setListener(new LocalBroadcastListener(this));
+            mOpenPushHelper.setListener(new EventBusListener());
             Options.Builder builder = new Options.Builder();
             builder.addProviders(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
             mOpenPushHelper.init(builder.build());
@@ -89,10 +92,7 @@ public class PushSampleActivity extends Activity {
         ButterKnife.inject(this);
 
         if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
-            if (mOpenPushReceiver == null) {
-                mOpenPushReceiver = new OpenPushEventReceiver();
-            }
-            registerReceiver(mOpenPushReceiver);
+            mRegistered = true;
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
         } else {
@@ -103,29 +103,15 @@ public class PushSampleActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mOpenPushReceiver != null) {
-            registerReceiver(mOpenPushReceiver);
+        if (mRegistered) {
+            EventBus.getDefault().register(this);
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mOpenPushReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
-        }
-    }
-
-    private void registerReceiver(BroadcastReceiver receiver) {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(LocalBroadcastListener.ACTION_REGISTERED);
-        filter.addAction(LocalBroadcastListener.ACTION_UNREGISTERED);
-        filter.addAction(LocalBroadcastListener.ACTION_MESSAGE);
-        filter.addAction(LocalBroadcastListener.ACTION_REGISTRATION_ERROR);
-        filter.addAction(LocalBroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
-        filter.addAction(LocalBroadcastListener.ACTION_DELETED_MESSAGES);
-        filter.addAction(LocalBroadcastListener.ACTION_HOST_APP_REMOVED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+        EventBus.getDefault().unregister(this);
     }
 
     @OnClick(R.id.register_switch)
@@ -134,11 +120,49 @@ public class PushSampleActivity extends Activity {
             mOpenPushHelper.unregister();
         } else if (mOpenPushHelper.getState()
                 == OpenPushHelper.STATE_NONE) {
-            if (mOpenPushReceiver == null) {
-                mOpenPushReceiver = new OpenPushEventReceiver();
-            }
-            registerReceiver(mOpenPushReceiver);
+            mRegistered = true;
+            EventBus.getDefault().register(this);
             mOpenPushHelper.register();
+        }
+    }
+
+    public void onEventMainThread(UnregisteredEvent e) {
+        Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
+                , e.getProviderName(), e.getOldRegistrationId()));
+        switchToUnregisteredState();
+    }
+
+    public void onEventMainThread(RegisteredEvent e) {
+        Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
+                , e.getProviderName(), e.getRegistrationId()));
+        switchToRegisteredState(e.getProviderName(), e.getRegistrationId());
+
+        // You start the registration process by calling register().
+        // When the registration ID is ready, OpenPushHelper calls onRegistered() on
+        // your app. Transmit the passed-in registration ID to your server, so your
+        // server can send messages to this app instance. onRegistered() is also
+        // called if your registration ID is rotated or changed for any reason; your
+        // app should pass the new registration ID to your server if this occurs.
+        // Your server needs to be able to handle a registration ID up to 1536 characters
+        // in length.
+
+        // The following is an example of sending the registration ID to your
+        // server via a header key/value pair over HTTP.
+        sendRegistrationDataToServer(e.getProviderName(), e.getRegistrationId());
+    }
+
+    private static void sendRegistrationDataToServer(String providerName, String registrationId) {
+        try {
+            URL url = new URL(WEB_SERVER_URL);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.setUseCaches(false);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("RegistrationId", registrationId);
+            con.setRequestProperty("ProviderName", providerName);
+            con.getResponseCode();
+        } catch (IOException e) {
+            Log.e(TAG, "Can't send registration data to server.", e);
         }
     }
 
@@ -165,64 +189,11 @@ public class PushSampleActivity extends Activity {
     }
 
     private void switchToUnregisteredState() {
-        mOpenPushReceiver = null;
+        mRegistered = false;
         mRegistrationIdView.setText(null);
         mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.register)));
         mRegistrationStatusView.setText(Html.fromHtml(getString(R.string.unregistered_status)));
         mCopyToClipboardView.setVisibility(View.GONE);
-
-        if (mOpenPushReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
-            mOpenPushReceiver = null;
-        }
-    }
-
-    public class OpenPushEventReceiver extends OpenPushBaseReceiver {
-
-        public OpenPushEventReceiver() {
-        }
-
-        @Override
-        public void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
-            Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
-                    , providerName, registrationId));
-            switchToRegisteredState(providerName, registrationId);
-
-            // You start the registration process by calling register().
-            // When the registration ID is ready, OpenPushHelper calls onRegistered() on
-            // your app. Transmit the passed-in registration ID to your server, so your
-            // server can send messages to this app instance. onRegistered() is also
-            // called if your registration ID is rotated or changed for any reason; your
-            // app should pass the new registration ID to your server if this occurs.
-            // Your server needs to be able to handle a registration ID up to 1536 characters
-            // in length.
-
-            // The following is an example of sending the registration ID to your
-            // server via a header key/value pair over HTTP.
-            sendRegistrationDataToServer(providerName, registrationId);
-        }
-
-        private void sendRegistrationDataToServer(String providerName, String registrationId) {
-            try {
-                URL url = new URL(WEB_SERVER_URL);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setDoInput(true);
-                con.setUseCaches(false);
-                con.setRequestMethod("POST");
-                con.setRequestProperty("RegistrationId", registrationId);
-                con.setRequestProperty("ProviderName", providerName);
-                con.getResponseCode();
-            } catch (IOException e) {
-                Log.e(TAG, "Can't send registration data to server.", e);
-            }
-        }
-
-        @Override
-        public void onUnregistered(@NotNull String providerName, @Nullable String oldRegistrationId) {
-            Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
-                    , providerName, oldRegistrationId));
-            switchToUnregisteredState();
-        }
     }
 }

@@ -31,7 +31,7 @@ public interface OpenPushListener {
 
     void onDeletedMessages(@NotNull String providerName, int messagesCount);
 
-    void onRegistered(@NotNull String providerName, @Nullable String registrationId);
+    void onRegistered(@NotNull String providerName, @NotNull String registrationId);
 
     void onRegistrationError(@NotNull String providerName,
                              @MagicConstant(intValues = {
@@ -57,7 +57,7 @@ public interface OpenPushListener {
 
     void onNoAvailableProvider();
 
-    void onUnregistered(@NotNull String providerName, @Nullable String registrationId);
+    void onUnregistered(@NotNull String providerName, @NotNull String registrationId);
 
     void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage);
 }

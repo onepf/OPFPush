@@ -14,5 +14,23 @@
  * limitations under the License.
  */
 
-include ':library', ':providers:gcm', ':providers:nokia',':providers:adm'
-include ':samples:local_broadcast_listener', ':samples:event_bus_listener'
+package org.onepf.openpush.sample.event;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Created by  Kirill Rozov on 10.09.14.
+ */
+public final class UnregisteredEvent extends ProviderEvent{
+    private String mOldRegistrationId;
+
+    public UnregisteredEvent(@NotNull String providerName, @NotNull String oldRegistrationId) {
+        super(providerName);
+        mOldRegistrationId = oldRegistrationId;
+    }
+
+    @NotNull
+    public String getOldRegistrationId() {
+        return mOldRegistrationId;
+    }
+}
