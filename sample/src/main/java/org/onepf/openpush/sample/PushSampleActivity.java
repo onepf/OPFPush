@@ -191,8 +191,8 @@ public class PushSampleActivity extends ActionBarActivity {
                     , providerName, registrationId));
             switchToRegisteredState(providerName, registrationId);
 
-            // You start the registration process by calling startRegister() in your Main
-            // Activity. When the registration ID is ready, ADM calls onRegistered() on
+            // You start the registration process by calling register().
+            // When the registration ID is ready, OpenPushHelper calls onRegistered() on
             // your app. Transmit the passed-in registration ID to your server, so your
             // server can send messages to this app instance. onRegistered() is also
             // called if your registration ID is rotated or changed for any reason; your

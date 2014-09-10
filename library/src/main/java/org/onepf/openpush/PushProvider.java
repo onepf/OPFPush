@@ -26,16 +26,22 @@ import org.jetbrains.annotations.Nullable;
 public interface PushProvider {
     /**
      * Initiate registration for the current application.
+     * For start registration call {@link OpenPushHelper#register()}.
+     * <p/>
+     * <b>Don't call this method manually.</b>
      */
     void register();
 
     /**
      * Unregister the application.
+     * For start registration call {@link OpenPushHelper#unregister()}.
+     * <p/>
+     * <b>Don't call this method manually.</b>
      */
     void unregister();
 
     /**
-     * Checks whether the provider is available
+     * Checks whether the provider is available.
      */
     boolean isAvailable();
 
@@ -51,13 +57,13 @@ public interface PushProvider {
     String getRegistrationId();
 
     /**
-     * Returns the name of the provider.
+     * Returns the name of the provider. Always not null value.
      */
     @NotNull
     String getName();
 
     /**
-     * Get package of application that contains API for this provider.
+     * Get package of application that contains API of the provider.
      * Usually, this is store application.
      *
      * @return Host application package.
@@ -67,13 +73,14 @@ public interface PushProvider {
 
     /**
      * Must be called when your application is done using PushProvider, to release internal resources.
+     * {@link OpenPushHelper} call it after successfully unregister.
      */
     void close();
 
     /**
      * Callback method, that called when application state change, like update to new version,
      * or system state changed, like update firmware to a newer version and Android ID changed.
-     *
+     * <p/>
      * When this method call you registration is invalid and you need reset all data associated with
      * previous registration data.
      */

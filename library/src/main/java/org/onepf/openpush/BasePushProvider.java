@@ -19,6 +19,7 @@ package org.onepf.openpush;
 import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kirill Rozov
@@ -30,11 +31,11 @@ public abstract class BasePushProvider implements PushProvider {
     private final Context mContext;
 
     @NotNull
-    private final String mImplementationDependencyClass;
+    private final String mImplementationClass;
 
     public BasePushProvider(@NotNull Context context, @NotNull String implementationClass) {
         mContext = context.getApplicationContext();
-        mImplementationDependencyClass = implementationClass;
+        mImplementationClass = implementationClass;
     }
 
     @NotNull
@@ -45,13 +46,14 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public boolean isAvailable() {
         try {
-            Class.forName(mImplementationDependencyClass);
+            Class.forName(mImplementationClass);
             return true;
         } catch (ClassNotFoundException e) {
             return false;
         }
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getName();

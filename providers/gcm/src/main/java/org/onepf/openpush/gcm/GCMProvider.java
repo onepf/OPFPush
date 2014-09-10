@@ -141,6 +141,7 @@ public class GCMProvider extends BasePushProvider {
         mGoogleCloudMessaging.close();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("%s (senderId: '%s', appVersion: %d)", NAME, Arrays.toString(mSenderIDs),

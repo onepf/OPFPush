@@ -134,6 +134,7 @@ public class OpenPushHelper {
     }
 
     private boolean register(@NotNull PushProvider provider) {
+        mState = STATE_REGISTRATION_RUNNING;
         if (provider.isAvailable() && !provider.isRegistered()) {
             provider.register();
             return true;
@@ -179,24 +180,22 @@ public class OpenPushHelper {
     }
 
     private void registerPackageChangeReceiver(@NotNull PushProvider provider) {
+        mPackageReceiver = new PackageChangeReceiver(provider);
+
+        IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
+        appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+        appUpdateFilter.addDataPath( mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
+        mAppContext.registerReceiver(mPackageReceiver, appUpdateFilter);
+
         try {
             // System apps can't be removed, that's why no sense listen package remove event.
             if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
-                IntentFilter packageRemovedFilter
+                IntentFilter hostAppRemovedFilter
                         = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-                packageRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-                packageRemovedFilter.addDataPath(
+                hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+                hostAppRemovedFilter.addDataPath(
                         provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
-
-                mPackageReceiver = new PackageChangeReceiver(provider);
-                mAppContext.registerReceiver(mPackageReceiver, packageRemovedFilter);
-
-                IntentFilter packageReplaceFilter =
-                        new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
-                packageReplaceFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-                packageReplaceFilter.addDataPath(
-                        mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
-                mAppContext.registerReceiver(mPackageReceiver, packageReplaceFilter);
+                mAppContext.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
             }
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, String.format("Can not find package '%s'.",
@@ -288,7 +287,7 @@ public class OpenPushHelper {
         }
     }
 
-    public void onProviderNeedUpdate(@NotNull String providerName) {
+    public void onNeedRetryRegister(@NotNull String providerName) {
         if (mCurrentProvider != null && providerName.equals(mCurrentProvider.getName())) {
             reset();
             mCurrentProvider.onAppStateChanged();
