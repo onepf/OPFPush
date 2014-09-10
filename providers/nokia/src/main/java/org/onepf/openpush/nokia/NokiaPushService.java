@@ -18,16 +18,14 @@ package org.onepf.openpush.nokia;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.nokia.push.PushBaseIntentService;
 import com.nokia.push.PushConstants;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.OpenPushConstants;
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.RegistrationResult;
+import org.onepf.openpush.*;
+import org.onepf.openpush.Error;
 
 /**
  * @author Kirill Rozov
@@ -109,21 +107,15 @@ public class NokiaPushService extends PushBaseIntentService {
         return false;
     }
 
-    @MagicConstant(intValues = {
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-            OpenPushConstants.ERROR_UNKNOWN
-    })
-    private static int convertError(String errorId) {
+    private static Error convertError(String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+            return Error.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OpenPushConstants.ERROR_INVALID_PARAMETERS;
+            return Error.ERROR_INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
+            return Error.ERROR_SERVICE_NOT_AVAILABLE;
         } else {
-            return OpenPushConstants.ERROR_UNKNOWN;
+            return org.onepf.openpush.Error.ERROR_UNKNOWN;
         }
     }
 

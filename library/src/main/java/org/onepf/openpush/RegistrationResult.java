@@ -16,7 +16,6 @@
 
 package org.onepf.openpush;
 
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,39 +30,25 @@ public final class RegistrationResult {
     @Nullable
     private final String mRegistrationId;
 
-    private final int mErrorCode;
+    private final Error mErrorCode;
     private final boolean mRecoverableError;
 
     public RegistrationResult(@NotNull String providerName, @NotNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
-        mErrorCode = OpenPushConstants.NO_ERROR;
+        mErrorCode = null;
         mRecoverableError = true;
     }
 
-    public RegistrationResult(@NotNull String providerName,
-                              @MagicConstant(intValues = {
-                                      OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                      OpenPushConstants.ERROR_INVALID_SENDER,
-                                      OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                      OpenPushConstants.ERROR_UNKNOWN,
-                                      OpenPushConstants.ERROR_AUTHEFICATION_FAILED
-                              }) int errorCode) {
-        this(providerName, errorCode, true);
+    public RegistrationResult(@NotNull String providerName, @NotNull Error error) {
+        this(providerName, error, true);
     }
 
-    public RegistrationResult(@NotNull String providerName,
-                              @MagicConstant(intValues = {
-                                      OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                      OpenPushConstants.ERROR_INVALID_SENDER,
-                                      OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                      OpenPushConstants.ERROR_UNKNOWN,
-                                      OpenPushConstants.ERROR_AUTHEFICATION_FAILED
-                              }) int errorCode,
+    public RegistrationResult(@NotNull String providerName, @NotNull Error error,
                               boolean recoverableError) {
         mProviderName = providerName;
         mRegistrationId = null;
-        mErrorCode = errorCode;
+        mErrorCode = error;
         mRecoverableError = recoverableError;
     }
 
@@ -82,18 +67,10 @@ public final class RegistrationResult {
     }
 
     public boolean isSuccess() {
-        return mErrorCode == OpenPushConstants.NO_ERROR;
+        return mErrorCode == null;
     }
 
-    @MagicConstant(intValues = {
-            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-            OpenPushConstants.ERROR_INVALID_SENDER,
-            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-            OpenPushConstants.ERROR_UNKNOWN,
-            OpenPushConstants.NO_ERROR,
-            OpenPushConstants.ERROR_AUTHEFICATION_FAILED
-    })
-    public int getErrorCode() {
+    public Error getErrorCode() {
         return mErrorCode;
     }
 }

@@ -17,12 +17,13 @@
 package org.onepf.openpush.sample.event;
 
 import org.jetbrains.annotations.NotNull;
+import  org.onepf.openpush.Error;
 
 /**
  * Created by  Kirill Rozov on 10.09.14.
  */
 public class RegistrationErrorEvent extends ErrorEvent {
-    public RegistrationErrorEvent(@NotNull String providerName, int errorCode) {
+    public RegistrationErrorEvent(@NotNull String providerName, Error errorCode) {
         super(providerName, errorCode);
     }
 }

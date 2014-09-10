@@ -24,8 +24,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.OpenPushConstants;
-import org.onepf.openpush.OpenPushListener;
+import org.onepf.openpush.*;
+import org.onepf.openpush.Error;
 
 /**
  * Created by krozov on 07.09.14.
@@ -74,17 +74,9 @@ public class LocalBroadcastListener implements OpenPushListener {
     }
 
     @Override
-    public void onRegistrationError(@NotNull String providerName,
-                                    @MagicConstant(intValues = {
-                                            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                            OpenPushConstants.ERROR_INVALID_SENDER,
-                                            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                            OpenPushConstants.ERROR_UNKNOWN,
-                                            OpenPushConstants.NO_ERROR,
-                                            OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                    int errorId) {
+    public void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
         Bundle extras = new Bundle(1);
-        extras.putInt(EXTRA_ERROR_ID, errorId);
+        extras.putInt(EXTRA_ERROR_ID, error.ordinal());
         sendBroadcast(ACTION_REGISTRATION_ERROR, providerName, extras);
     }
 
@@ -114,17 +106,9 @@ public class LocalBroadcastListener implements OpenPushListener {
     }
 
     @Override
-    public void onUnregistrationError(@NotNull String providerName,
-                                      @MagicConstant(intValues = {
-                                              OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                              OpenPushConstants.ERROR_INVALID_SENDER,
-                                              OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                              OpenPushConstants.ERROR_UNKNOWN,
-                                              OpenPushConstants.NO_ERROR,
-                                              OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                      int errorId) {
+    public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
         Bundle extras = new Bundle(1);
-        extras.putInt(EXTRA_ERROR_ID, errorId);
+        extras.putInt(EXTRA_ERROR_ID, error.ordinal());
         sendBroadcast(ACTION_UNREGISTRATION_ERROR, providerName, extras);
     }
 

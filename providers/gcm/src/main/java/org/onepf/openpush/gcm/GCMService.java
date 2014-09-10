@@ -23,9 +23,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.OpenPushConstants;
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.RegistrationResult;
+import org.onepf.openpush.*;
+import org.onepf.openpush.Error;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -72,13 +71,13 @@ public class GCMService extends IntentService {
                                  GCMConstants.ERROR_AUTHEFICATION_FAILED,
                                  GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
                          }) String errorId) {
-        int error;
+        Error error;
         if (errorId.equals(GCMConstants.ERROR_SERVICE_NOT_AVAILABLE)) {
-            error = OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE;
+            error = Error.ERROR_SERVICE_NOT_AVAILABLE;
         } else if (errorId.equals(GCMConstants.ERROR_AUTHEFICATION_FAILED)) {
-            error = OpenPushConstants.ERROR_AUTHEFICATION_FAILED;
+            error = Error.ERROR_AUTHEFICATION_FAILED;
         } else {
-            error = OpenPushConstants.ERROR_UNKNOWN;
+            error = org.onepf.openpush.Error.ERROR_UNKNOWN;
         }
 
         OpenPushHelper helper = OpenPushHelper.getInstance(this);

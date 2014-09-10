@@ -24,7 +24,7 @@ import android.os.Bundle;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.OpenPushConstants;
+import org.onepf.openpush.Error;
 
 /**
  * Created by krozov on 07.09.14.
@@ -48,11 +48,15 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
                 onUnregistered(providerName,
                         intent.getStringExtra(LocalBroadcastListener.EXTRA_REGISTRATION_ID));
             } else if (LocalBroadcastListener.ACTION_REGISTRATION_ERROR.equals(action)) {
-                onRegistrationError(providerName,
-                        intent.getIntExtra(LocalBroadcastListener.EXTRA_ERROR_ID, OpenPushConstants.NO_ERROR));
+                int errorIndex = intent.getIntExtra(LocalBroadcastListener.EXTRA_ERROR_ID, -1);
+                if (errorIndex != -1) {
+                    onRegistrationError(providerName, Error.values()[errorIndex]);
+                }
             } else if (LocalBroadcastListener.ACTION_UNREGISTRATION_ERROR.equals(action)) {
-                onUnregistrationError(providerName,
-                        intent.getIntExtra(LocalBroadcastListener.EXTRA_ERROR_ID, OpenPushConstants.NO_ERROR));
+                int errorIndex = intent.getIntExtra(LocalBroadcastListener.EXTRA_ERROR_ID, -1);
+                if (errorIndex != -1) {
+                    onUnregistrationError(providerName, Error.values()[errorIndex]);
+                }
             } else if (LocalBroadcastListener.ACTION_DELETED_MESSAGES.equals(action)) {
                 Bundle extras = new Bundle(intent.getExtras());
                 extras.remove(LocalBroadcastListener.EXTRA_PROVIDER_NAME);
@@ -70,26 +74,10 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
     protected void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
     }
 
-    protected void onRegistrationError(@NotNull String providerName,
-                                       @MagicConstant(intValues = {
-                                               OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                               OpenPushConstants.ERROR_INVALID_SENDER,
-                                               OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                               OpenPushConstants.ERROR_UNKNOWN,
-                                               OpenPushConstants.NO_ERROR,
-                                               OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                       int errorId) {
+    protected void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
     }
 
-    protected void onUnregistrationError(@NotNull String providerName,
-                                       @MagicConstant(intValues = {
-                                               OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                               OpenPushConstants.ERROR_INVALID_SENDER,
-                                               OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                               OpenPushConstants.ERROR_UNKNOWN,
-                                               OpenPushConstants.NO_ERROR,
-                                               OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                       int errorId) {
+    protected void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
     }
 
     protected void onNoAvailableProvider() {

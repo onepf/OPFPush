@@ -18,10 +18,9 @@ package org.onepf.openpush.sample;
 
 import android.os.Bundle;
 
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.OpenPushConstants;
+import org.onepf.openpush.Error;
 import org.onepf.openpush.OpenPushListener;
 import org.onepf.openpush.sample.event.DeleteMessageEvent;
 import org.onepf.openpush.sample.event.HostAppRemovedEvent;
@@ -58,16 +57,8 @@ public class EventBusListener implements OpenPushListener {
     }
 
     @Override
-    public void onRegistrationError(@NotNull String providerName,
-                                    @MagicConstant(intValues = {
-                                            OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                            OpenPushConstants.ERROR_INVALID_SENDER,
-                                            OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                            OpenPushConstants.ERROR_UNKNOWN,
-                                            OpenPushConstants.NO_ERROR,
-                                            OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                    int errorId) {
-        EventBus.getDefault().post(new RegistrationErrorEvent(providerName, errorId));
+    public void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
+        EventBus.getDefault().post(new RegistrationErrorEvent(providerName, error));
     }
 
     @Override
@@ -81,16 +72,8 @@ public class EventBusListener implements OpenPushListener {
     }
 
     @Override
-    public void onUnregistrationError(@NotNull String providerName,
-                                      @MagicConstant(intValues = {
-                                              OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                              OpenPushConstants.ERROR_INVALID_SENDER,
-                                              OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                              OpenPushConstants.ERROR_UNKNOWN,
-                                              OpenPushConstants.NO_ERROR,
-                                              OpenPushConstants.ERROR_AUTHEFICATION_FAILED})
-                                      int errorId) {
-        EventBus.getDefault().post(new UnregistrationErrorEvent(providerName, errorId));
+    public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
+        EventBus.getDefault().post(new UnregistrationErrorEvent(providerName, error));
     }
 
     @Override

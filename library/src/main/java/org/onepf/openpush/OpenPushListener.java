@@ -33,27 +33,9 @@ public interface OpenPushListener {
 
     void onRegistered(@NotNull String providerName, @NotNull String registrationId);
 
-    void onRegistrationError(@NotNull String providerName,
-                             @MagicConstant(intValues = {
-                                     OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                     OpenPushConstants.ERROR_INVALID_SENDER,
-                                     OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                     OpenPushConstants.ERROR_UNKNOWN,
-                                     OpenPushConstants.NO_ERROR,
-                                     OpenPushConstants.ERROR_AUTHEFICATION_FAILED
-                             })
-                             int errorId);
+    void onRegistrationError(@NotNull String providerName, @NotNull Error error);
 
-    void onUnregistrationError(@NotNull String providerName,
-                             @MagicConstant(intValues = {
-                                     OpenPushConstants.ERROR_INVALID_PARAMETERS,
-                                     OpenPushConstants.ERROR_INVALID_SENDER,
-                                     OpenPushConstants.ERROR_SERVICE_NOT_AVAILABLE,
-                                     OpenPushConstants.ERROR_UNKNOWN,
-                                     OpenPushConstants.NO_ERROR,
-                                     OpenPushConstants.ERROR_AUTHEFICATION_FAILED
-                             })
-                             int errorId);
+    void onUnregistrationError(@NotNull String providerName, @NotNull Error error);
 
     void onNoAvailableProvider();
 

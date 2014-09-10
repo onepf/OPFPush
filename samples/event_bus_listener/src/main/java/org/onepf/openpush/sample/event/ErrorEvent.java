@@ -17,19 +17,21 @@
 package org.onepf.openpush.sample.event;
 
 import org.jetbrains.annotations.NotNull;
+import  org.onepf.openpush.Error;
 
 /**
  * Created by  Kirill Rozov on 10.09.14.
  */
 abstract class ErrorEvent extends ProviderEvent {
-    private int mErrorCode;
+    private Error mErrorCode;
 
-    protected ErrorEvent(@NotNull String providerName, int errorCode) {
+    protected ErrorEvent(@NotNull String providerName,Error errorCode) {
         super(providerName);
         mErrorCode = errorCode;
     }
 
-    public int getErrorCode() {
+    @NotNull
+    public Error getErrorCode() {
         return mErrorCode;
     }
 }
