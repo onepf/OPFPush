@@ -16,13 +16,13 @@
 
 package org.onepf.openpush.sample;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -51,7 +51,7 @@ import butterknife.Optional;
  * @author Anton Rutkevich, Alexey Vitenko
  * @since 14.05.14
  */
-public class PushSampleActivity extends ActionBarActivity {
+public class PushSampleActivity extends Activity {
 
     private static final String WEB_SERVER_URL = "http://localhost:8080";
     public static final String GCM_SENDER_ID = "76325631570";
