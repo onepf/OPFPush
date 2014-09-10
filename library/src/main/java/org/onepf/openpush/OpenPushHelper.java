@@ -1,18 +1,18 @@
-/*******************************************************************************
- * Copyright 2014 One Platform Foundation
+/*
+ * Copyright 2012-2014 One Platform Foundation
  *
- *       Licensed under the Apache License, Version 2.0 (the "License");
- *       you may not use this file except in compliance with the License.
- *       You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *           http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *       Unless required by applicable law or agreed to in writing, software
- *       distributed under the License is distributed on an "AS IS" BASIS,
- *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *       See the License for the specific language governing permissions and
- *       limitations under the License.
- ******************************************************************************/
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.onepf.openpush;
 
@@ -34,6 +34,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
+/**
+ * Helper class for manage push providers.
+ * For get instance call {@link OpenPushHelper#getInstance(android.content.Context)}.\
+ *
+ * @author Kirill Rozov
+ * @since 04.09.2014
+ */
 public class OpenPushHelper {
 
     private static final String TAG = "OpenPushHelper";
@@ -41,10 +48,29 @@ public class OpenPushHelper {
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
 
+    /**
+     * Push isn't running.
+     */
     public static final int STATE_NONE = 0;
+
+    /**
+     * Helper is selecting provider for register push.
+     */
     public static final int STATE_REGISTRATION_RUNNING = 1;
+
+    /**
+     * Helper select provider and successfully register it.
+     */
     public static final int STATE_RUNNING = 2;
+
+    /**
+     * Error occur while register on unregister provider.
+     */
     public static final int STATE_ERROR = 3;
+
+    /**
+     * Helper is unregistering current provider.
+     */
     public static final int STATE_UNREGISTRATION_RUNNING = 4;
 
     private static final Handler sHandler = new Handler(Looper.getMainLooper());
@@ -184,7 +210,7 @@ public class OpenPushHelper {
 
         IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
         appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-        appUpdateFilter.addDataPath( mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
+        appUpdateFilter.addDataPath(mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         mAppContext.registerReceiver(mPackageReceiver, appUpdateFilter);
 
         try {
