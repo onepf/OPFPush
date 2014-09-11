@@ -101,30 +101,35 @@ public class OpenPushHelper {
             throw new OpenPushException("Try to init OpenPushHelper twice.");
         }
         mOptions = options;
+        initLastProvider();
+    }
 
-        PushProvider provider = getLastProvider();
-        if (provider != null) {
-            if (provider.isAvailable()) {
-                if (provider.isRegistered()) {
-                    mCurrentProvider = provider;
-                    mState = State.STATE_RUNNING;
-                } else {
-                    mState = State.STATE_REGISTRATION_RUNNING;
-                    if (!registerProvider(provider)) {
-                        mState = State.STATE_NONE;
-                        saveLastProvider(null);
-                    }
-                }
+    private void initLastProvider() {
+        final PushProvider lastProvider = getLastProvider();
+        if (lastProvider == null) {
+            return;
+        }
+
+        if (lastProvider.isAvailable()) {
+            if (lastProvider.isRegistered()) {
+                mCurrentProvider = lastProvider;
+                mState = State.STATE_RUNNING;
             } else {
-                reset();
-                mCurrentProvider = null;
-                if (mListener != null) {
-                    mListener.onProviderBecameUnavailable(provider.getName());
+                mState = State.STATE_REGISTRATION_RUNNING;
+                if (!registerProvider(lastProvider)) {
+                    mState = State.STATE_NONE;
+                    saveLastProvider(null);
                 }
+            }
+        } else {
+            reset();
+            mCurrentProvider = null;
+            if (mListener != null) {
+                mListener.onProviderBecameUnavailable(lastProvider.getName());
+            }
 
-                if (options.isRecoverProvider()) {
-                    register();
-                }
+            if (mOptions.isRecoverProvider()) {
+                register();
             }
         }
     }
