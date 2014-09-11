@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PatternMatcher;
+import android.text.TextUtils;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -63,7 +64,6 @@ public class OpenPushHelper {
     @Nullable
     private PackageChangeReceiver mPackageReceiver;
 
-    @Nullable
     private Options mOptions;
 
     @Nullable
@@ -96,22 +96,19 @@ public class OpenPushHelper {
         mOptions = options;
 
         PushProvider provider = getLastProvider();
-        if (provider != null && provider.isAvailable()) {
-            mCurrentProvider = provider;
-            mState = State.STATE_RUNNING;
-        }
-
-        if (mCurrentProvider != null) {
-            if (mCurrentProvider.isAvailable()) {
-                if (mCurrentProvider.isRegistered()) {
-                    register(mCurrentProvider);
+        if (provider != null) {
+            if (provider.isAvailable()) {
+                if (provider.isRegistered()) {
+                    mCurrentProvider = provider;
+                    mState = State.STATE_RUNNING;
+                } else {
+                    registerProvider(provider);
                 }
             } else {
-                final String providerName = mCurrentProvider.getName();
                 reset();
                 mCurrentProvider = null;
                 if (mListener != null) {
-                    mListener.onProviderBecameUnavailable(providerName);
+                    mListener.onProviderBecameUnavailable(provider.getName());
                 }
 
                 if (options.isRecoverProvider()) {
@@ -128,11 +125,13 @@ public class OpenPushHelper {
     public synchronized void register() {
         checkInitDone();
 
-        if (mState == State.STATE_NONE || mState == State.STATE_NO_AVAILABLE_PROVIDERS) {
+        if (mState == State.STATE_NONE ||
+                mState == State.STATE_NO_AVAILABLE_PROVIDERS) {
             mState = State.STATE_REGISTRATION_RUNNING;
 
             PushProvider provider = getNextCandidate(null);
-            if (provider == null || !register(provider)) {
+            Assert.assertNotNull(provider);
+            if (!registerProvider(provider)) {
                 if (mListener != null) {
                     mListener.onNoAvailableProvider();
                 }
@@ -143,9 +142,15 @@ public class OpenPushHelper {
         }
     }
 
-    private boolean register(@NotNull PushProvider provider) {
-        mState = State.STATE_REGISTRATION_RUNNING;
+    /**
+     * Start registerProvider provider.
+     *
+     * @param provider Provider for registration.
+     * @return Did registration start.
+     */
+    private boolean registerProvider(@NotNull PushProvider provider) {
         if (provider.isAvailable()) {
+            mState = State.STATE_REGISTRATION_RUNNING;
             provider.register();
             return true;
         } else {
@@ -243,9 +248,10 @@ public class OpenPushHelper {
         checkInitDone();
 
         if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
-            final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
-            for (PushProvider provider : mOptions.getProviders()) {
-                if (storedProviderName.equals(provider.getName())) {
+            String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
+            if (!TextUtils.isEmpty(storedProviderName)) {
+                PushProvider provider = getProviderByName(storedProviderName);
+                if (provider != null) {
                     return provider;
                 }
             }
@@ -254,7 +260,7 @@ public class OpenPushHelper {
         return null;
     }
 
-    private void saveProvider(@Nullable PushProvider provider) {
+    private void saveLastProvider(@Nullable PushProvider provider) {
         if (provider == null) {
             mPreferences.edit()
                     .remove(KEY_LAST_PROVIDER_NAME)
@@ -294,7 +300,7 @@ public class OpenPushHelper {
         if (mCurrentProvider != null && providerName.equals(mCurrentProvider.getName())) {
             reset();
             mCurrentProvider.onAppStateChanged();
-            register(mCurrentProvider);
+            registerProvider(mCurrentProvider);
         }
     }
 
@@ -367,10 +373,11 @@ public class OpenPushHelper {
         if (result.isSuccess()) {
             mState = State.STATE_RUNNING;
             mRetryNumber = 0;
-            saveProvider(mCurrentProvider);
             mCurrentProvider = getProviderByName(result.getProviderName());
             Assert.assertNotNull(mCurrentProvider);
-            if (mListener != null && result.getRegistrationId() != null) {
+            saveLastProvider(mCurrentProvider);
+            Assert.assertNotNull(result.getRegistrationId());
+            if (mListener != null) {
                 mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
             }
 
@@ -383,10 +390,10 @@ public class OpenPushHelper {
                     && mRetryNumber < mOptions.getBackoff().tryCount()) {
                 long start = System.currentTimeMillis() +
                         mOptions.getBackoff().getDelay(mRetryNumber);
+                mRetryNumber++;
                 if (mRegistrationRunnable == null) {
                     mRegistrationRunnable = new RetryRegistrationRunnable(provider);
                 }
-                mRetryNumber++;
                 sHandler.postAtTime(mRegistrationRunnable, start);
             } else {
                 if (mListener != null) {
@@ -414,12 +421,12 @@ public class OpenPushHelper {
         STATE_NONE,
 
         /**
-         * Helper is selecting provider for register push.
+         * Helper is selecting provider for registerProvider push.
          */
         STATE_REGISTRATION_RUNNING,
 
         /**
-         * Helper select provider and successfully register it.
+         * Helper select provider and successfully registerProvider it.
          */
         STATE_RUNNING,
 

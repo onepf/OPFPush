@@ -50,7 +50,8 @@ public class Options {
     }
 
     /**
-     * Can the {@code OpenPushHelper} select next available provider, when current became unavailable.
+     * Can the {@code OpenPushHelper} select next available provider,
+     * after current provider became unavailable.
      *
      * @return Can select next available provider for continue push work.
      */
