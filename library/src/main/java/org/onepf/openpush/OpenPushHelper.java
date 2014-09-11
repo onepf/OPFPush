@@ -47,31 +47,6 @@ public class OpenPushHelper {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
 
-    /**
-     * Push isn't running.
-     */
-    public static final int STATE_NONE = 0;
-
-    /**
-     * Helper is selecting provider for register push.
-     */
-    public static final int STATE_REGISTRATION_RUNNING = 1;
-
-    /**
-     * Helper select provider and successfully register it.
-     */
-    public static final int STATE_RUNNING = 2;
-
-    /**
-     * All providers are unavailable or they registration failed.
-     */
-    public static final int STATE_NO_AVAILABLE_PROVIDERS = 3;
-
-    /**
-     * Helper is unregistering current provider.
-     */
-    public static final int STATE_UNREGISTRATION_RUNNING = 4;
-
     private static final Handler sHandler = new Handler(Looper.getMainLooper());
 
     @Nullable
@@ -98,7 +73,7 @@ public class OpenPushHelper {
     @Nullable
     private RetryRegistrationRunnable mRegistrationRunnable;
 
-    private int mState;
+    private State mState = State.STATE_NONE;
     private int mRetryNumber = 0;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
@@ -124,13 +99,7 @@ public class OpenPushHelper {
         PushProvider provider = getLastProvider();
         if (provider != null && provider.isAvailable()) {
             mCurrentProvider = provider;
-            mState = STATE_RUNNING;
-        } else {
-            mState = STATE_NONE;
-        }
-
-        if (mCurrentProvider != null && mState != STATE_RUNNING) {
-            register(mCurrentProvider);
+            mState = State.STATE_RUNNING;
         }
     }
 
@@ -143,15 +112,15 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mState == STATE_NONE || mState == STATE_NO_AVAILABLE_PROVIDERS) {
-            mState = STATE_REGISTRATION_RUNNING;
+        if (mState == State.STATE_NONE || mState == State.STATE_NO_AVAILABLE_PROVIDERS) {
+            mState = State.STATE_REGISTRATION_RUNNING;
 
             PushProvider provider = getNextCandidate(null);
             if (provider == null || !register(provider)) {
                 if (mListener != null) {
                     mListener.onNoAvailableProvider();
                 }
-                mState = STATE_NONE;
+                mState = State.STATE_NONE;
             }
         } else {
             throw new IllegalStateException("Attempt to register twice!");
@@ -159,8 +128,8 @@ public class OpenPushHelper {
     }
 
     private boolean register(@NotNull PushProvider provider) {
-        mState = STATE_REGISTRATION_RUNNING;
-        if (provider.isAvailable() && !provider.isRegistered()) {
+        mState = State.STATE_REGISTRATION_RUNNING;
+        if (provider.isAvailable()) {
             provider.register();
             return true;
         } else {
@@ -173,8 +142,8 @@ public class OpenPushHelper {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
 
-        if (mCurrentProvider != null && mState == STATE_RUNNING) {
-            mState = STATE_UNREGISTRATION_RUNNING;
+        if (mCurrentProvider != null && mState == State.STATE_RUNNING) {
+            mState = State.STATE_UNREGISTRATION_RUNNING;
             unregisterPackageChangeReceiver();
             mCurrentProvider.unregister();
         } else {
@@ -289,14 +258,11 @@ public class OpenPushHelper {
         }
     }
 
-    @MagicConstant(intValues = {
-            STATE_NO_AVAILABLE_PROVIDERS,
-            STATE_REGISTRATION_RUNNING,
-            STATE_NONE,
-            STATE_RUNNING,
-            STATE_UNREGISTRATION_RUNNING
-    })
-    public int getState() {
+    public State getState() {
+        if (mOptions == null) {
+            throw new UnsupportedOperationException("Before register provider call init().");
+        }
+
         return mState;
     }
 
@@ -322,7 +288,7 @@ public class OpenPushHelper {
 
     private void reset() {
         mPreferences.edit().clear().apply();
-        mState = STATE_NONE;
+        mState = State.STATE_NONE;
         mRetryNumber = 0;
         if (mRegistrationRunnable != null) {
             sHandler.removeCallbacks(mRegistrationRunnable);
@@ -345,7 +311,7 @@ public class OpenPushHelper {
         if (mOptions == null) {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
-        if (mState != STATE_UNREGISTRATION_RUNNING) {
+        if (mState != State.STATE_UNREGISTRATION_RUNNING) {
             return;
         }
 
@@ -359,7 +325,7 @@ public class OpenPushHelper {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
-            mState = STATE_RUNNING;
+            mState = State.STATE_RUNNING;
             final PushProvider provider = getProviderByName(result.getProviderName());
             if (provider != null) {
                 mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
@@ -371,31 +337,34 @@ public class OpenPushHelper {
         if (mOptions == null) {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
-        if (mState != STATE_REGISTRATION_RUNNING) {
+        if (mState != State.STATE_REGISTRATION_RUNNING) {
             return;
         }
 
-        final PushProvider provider = getProviderByName(result.getProviderName());
-        Assert.assertNotNull(provider);
         if (result.isSuccess()) {
-            mState = STATE_RUNNING;
-            mCurrentProvider = provider;
+            mState = State.STATE_RUNNING;
             mRetryNumber = 0;
             saveProvider(mCurrentProvider);
-            if (mListener != null) {
+            mCurrentProvider = getProviderByName(result.getProviderName());
+            Assert.assertNotNull(mCurrentProvider);
+            if (mListener != null && result.getRegistrationId() != null) {
                 mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
             }
 
-            registerPackageChangeReceiver(provider);
+            registerPackageChangeReceiver(mCurrentProvider);
         } else {
+            PushProvider provider = getProviderByName(result.getProviderName());
+            Assert.assertNotNull(provider);
+
             if (result.isRecoverableError() && mOptions.getBackoff() != null
                     && mRetryNumber < mOptions.getBackoff().tryCount()) {
+                long start = System.currentTimeMillis() +
+                        mOptions.getBackoff().getDelay(mRetryNumber);
                 if (mRegistrationRunnable == null) {
                     mRegistrationRunnable = new RetryRegistrationRunnable(provider);
                 }
-                sHandler.postDelayed(mRegistrationRunnable,
-                        mOptions.getBackoff().getDelay(mRetryNumber));
                 mRetryNumber++;
+                sHandler.postAtTime(mRegistrationRunnable, start);
             } else {
                 if (mListener != null) {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
@@ -406,13 +375,40 @@ public class OpenPushHelper {
                 if (nextProvider != null) {
                     nextProvider.register();
                 } else {
-                    mState = STATE_NO_AVAILABLE_PROVIDERS;
+                    mState = State.STATE_NO_AVAILABLE_PROVIDERS;
                     if (mListener != null) {
                         mListener.onNoAvailableProvider();
                     }
                 }
             }
         }
+    }
+
+    public static enum State {
+        /**
+         * Push isn't running.
+         */
+        STATE_NONE,
+
+        /**
+         * Helper is selecting provider for register push.
+         */
+        STATE_REGISTRATION_RUNNING,
+
+        /**
+         * Helper select provider and successfully register it.
+         */
+        STATE_RUNNING,
+
+        /**
+         * All providers are unavailable or they registration failed.
+         */
+        STATE_NO_AVAILABLE_PROVIDERS,
+
+        /**
+         * Helper is unregistering current provider.
+         */
+        STATE_UNREGISTRATION_RUNNING
     }
 
     private static class RetryRegistrationRunnable implements Runnable {

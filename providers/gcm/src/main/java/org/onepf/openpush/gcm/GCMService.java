@@ -81,10 +81,14 @@ public class GCMService extends IntentService {
         }
 
         OpenPushHelper helper = OpenPushHelper.getInstance(this);
-        if (helper.getState() == OpenPushHelper.STATE_REGISTRATION_RUNNING) {
-            helper.onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
-        } else if (helper.getState() == OpenPushHelper.STATE_UNREGISTRATION_RUNNING) {
-            helper.onUnregistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+        switch (helper.getState()) {
+            case STATE_REGISTRATION_RUNNING:
+                helper.onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+                break;
+
+            case STATE_UNREGISTRATION_RUNNING:
+                helper.onUnregistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+                break;
         }
     }
 

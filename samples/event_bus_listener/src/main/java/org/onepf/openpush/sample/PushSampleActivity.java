@@ -91,7 +91,7 @@ public class PushSampleActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.State.STATE_RUNNING) {
             mRegistered = true;
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
@@ -116,13 +116,16 @@ public class PushSampleActivity extends Activity {
 
     @OnClick(R.id.register_switch)
     void onRegisterClick() {
-        if (mOpenPushHelper.getState() == OpenPushHelper.STATE_RUNNING) {
-            mOpenPushHelper.unregister();
-        } else if (mOpenPushHelper.getState()
-                == OpenPushHelper.STATE_NONE) {
-            mRegistered = true;
-            EventBus.getDefault().register(this);
-            mOpenPushHelper.register();
+        switch (mOpenPushHelper.getState()) {
+            case STATE_RUNNING:
+                mOpenPushHelper.unregister();
+                break;
+
+            case STATE_NONE:
+                mRegistered = true;
+                EventBus.getDefault().register(this);
+                mOpenPushHelper.register();
+                break;
         }
     }
 

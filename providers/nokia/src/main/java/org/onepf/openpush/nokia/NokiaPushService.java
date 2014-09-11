@@ -57,13 +57,13 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
         switch (OpenPushHelper.getInstance(this).getState()) {
-            case OpenPushHelper.STATE_REGISTRATION_RUNNING:
+            case STATE_REGISTRATION_RUNNING:
                 OpenPushHelper.getInstance(this).onRegistrationEnd(
                         new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
                 );
                 break;
 
-            case OpenPushHelper.STATE_UNREGISTRATION_RUNNING:
+            case STATE_UNREGISTRATION_RUNNING:
                 OpenPushHelper.getInstance(this).onUnregistrationEnd(
                         new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
                 );
