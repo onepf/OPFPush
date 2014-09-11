@@ -18,8 +18,6 @@ package org.onepf.openpush;
 
 import junit.framework.Assert;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -38,7 +36,7 @@ public class OptionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderTwiceAddProvider() {
         Options.Builder builder = new Options.Builder();
-        PushProvider provider = new StubPushProvider();
+        PushProvider provider = new StubPushProvider(Robolectric.application);
         builder.addProviders(provider);
         builder.addProviders(provider);
     }
@@ -51,7 +49,7 @@ public class OptionsTest {
     @Test
     public void testOptionsBuild() {
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new StubPushProvider());
+        builder.addProviders(new StubPushProvider(Robolectric.application));
         builder.setBackoff(new ExponentialBackoff());
 
         Options options = builder.build();
@@ -67,7 +65,7 @@ public class OptionsTest {
     public void testUnmodifiableProviders() {
         Options.Builder builder = new Options.Builder();
         ArrayList<PushProvider> providers = new ArrayList<PushProvider>(1);
-        final StubPushProvider stubPushProvider = new StubPushProvider();
+        final StubPushProvider stubPushProvider = new StubPushProvider(Robolectric.application);
         providers.add(stubPushProvider);
         builder.addProviders(providers);
 
@@ -81,63 +79,4 @@ public class OptionsTest {
         options.getProviders().add(null);
     }
 
-    private static class StubPushProvider extends BasePushProvider {
-
-        private boolean mRegistered;
-
-        private StubPushProvider() {
-            super(Robolectric.application, , );
-        }
-
-        @Override
-        public void register() {
-            mRegistered = true;
-        }
-
-        @Override
-        public void unregister() {
-            mRegistered = false;
-        }
-
-        @Override
-        public boolean isAvailable() {
-            return true;
-        }
-
-        @Override
-        public boolean isRegistered() {
-            return mRegistered;
-        }
-
-        @Nullable
-        @Override
-        public String getRegistrationId() {
-            return "stub registration id";
-        }
-
-        @NotNull
-        @Override
-        public String getName() {
-            return "StubPushProvider";
-        }
-
-        @NotNull
-        @Override
-        public String getHostAppPackage() {
-            return "org.onepf.openpush.sample";
-        }
-
-        @Override
-        public void close() {
-        }
-
-        @Override
-        public void onAppStateChanged() {
-        }
-
-        @Override
-        public boolean checkManifest() {
-            return true;
-        }
-    }
 }

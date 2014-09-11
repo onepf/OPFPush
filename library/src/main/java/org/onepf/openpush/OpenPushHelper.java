@@ -92,7 +92,15 @@ public class OpenPushHelper {
                 mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
     }
 
+    public boolean isInitDone() {
+        return mOptions != null;
+    }
+
     public void init(@NotNull Options options) {
+        if (isInitDone()) {
+            throw new OpenPushException("Try to init OpenPushHelper twice.");
+        }
+
         mOptions = options;
 
         PushProvider provider = getLastProvider();
@@ -101,8 +109,8 @@ public class OpenPushHelper {
                 if (provider.isRegistered()) {
                     mCurrentProvider = provider;
                     mState = State.STATE_RUNNING;
-                } else {
-                    registerProvider(provider);
+                } else if (!registerProvider(provider)) {
+                    saveLastProvider(null);
                 }
             } else {
                 reset();
@@ -359,7 +367,7 @@ public class OpenPushHelper {
 
     private void checkInitDone() {
         if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
+            throw new OpenPushException("Before register provider call init().");
         }
     }
 

@@ -124,7 +124,7 @@ public class PushSampleActivity extends Activity {
         filter.addAction(LocalBroadcastListener.ACTION_REGISTRATION_ERROR);
         filter.addAction(LocalBroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
         filter.addAction(LocalBroadcastListener.ACTION_DELETED_MESSAGES);
-        filter.addAction(LocalBroadcastListener.ACTION_HOST_APP_REMOVED);
+        filter.addAction(LocalBroadcastListener.ACTION_PROVIDER_BECAME_UNAVAILABLE);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
     }
 

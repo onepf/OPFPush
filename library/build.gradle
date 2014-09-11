@@ -51,7 +51,7 @@ robolectric {
 
 dependencies {
     compile 'com.intellij:annotations:12.0'
-
     androidTestCompile 'org.robolectric:robolectric:2.3'
     androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'com.squareup:fest-android:1.0.8'
 }
