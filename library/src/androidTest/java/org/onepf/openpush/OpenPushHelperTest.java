@@ -54,6 +54,18 @@ public class OpenPushHelperTest {
         openPushHelper.init(builder.build());
     }
 
+    @Test(expected = OpenPushException.class)
+    public void testUnregisterWithoutRegister(){
+        OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
+
+        Options.Builder builder = new Options.Builder();
+        builder.addProviders(new MockPushProvider(Robolectric.application));
+        Options options = builder.build();
+        helper.init(options);
+
+        helper.unregister();
+    }
+
     @Test
     public void testRegister() {
         OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
