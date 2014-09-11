@@ -18,6 +18,7 @@ package org.onepf.openpush;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -31,13 +32,30 @@ import java.util.concurrent.TimeUnit;
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class ExponentialBackoffTest {
+
+    private ExponentialBackoff mBackoff;
+
+    @Before
+    public void setup() {
+        mBackoff = new ExponentialBackoff(6);
+    }
+
     @Test
-    public void testPause() {
-        ExponentialBackoff backoff = new ExponentialBackoff(5);
-        Assert.assertEquals(TimeUnit.SECONDS.toMillis(2), backoff.getDelay(1));
-        Assert.assertEquals(TimeUnit.SECONDS.toMillis(4), backoff.getDelay(2));
-        Assert.assertEquals(TimeUnit.SECONDS.toMillis(8), backoff.getDelay(3));
-        Assert.assertEquals(TimeUnit.SECONDS.toMillis(16), backoff.getDelay(4));
-        Assert.assertEquals(TimeUnit.SECONDS.toMillis(32), backoff.getDelay(5));
+    public void testDelay() {
+        for (int tryNumber = 1, expectedDelay = 2000;
+             tryNumber <= mBackoff.getTryCount();
+             tryNumber++, expectedDelay *= 2) {
+            Assert.assertEquals(expectedDelay, mBackoff.getDelay(tryNumber));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetIllegalPause() {
+        mBackoff.getDelay(0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPauseBiggerThanTryCount() {
+        mBackoff.getDelay(mBackoff.getTryCount() + 1);
     }
 }

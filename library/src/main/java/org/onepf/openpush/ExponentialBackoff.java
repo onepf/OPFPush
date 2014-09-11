@@ -16,6 +16,8 @@
 
 package org.onepf.openpush;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by krozov on 05.09.14.
  */
@@ -40,6 +42,12 @@ public final class ExponentialBackoff implements Backoff {
 
     @Override
     public long getDelay(int tryNumber) {
-        return (2 << (tryNumber - 1)) * 1000L;
+        if (tryNumber < 1) {
+            throw new IllegalArgumentException("Try number can't less than 1.");
+        }
+        if (tryNumber > mTryCount) {
+            throw new IllegalArgumentException("Try number can't more than tryCount().");
+        }
+        return TimeUnit.SECONDS.toMillis(2 << (tryNumber - 1));
     }
 }
