@@ -100,7 +100,6 @@ public class OpenPushHelper {
         if (isInitDone()) {
             throw new OpenPushException("Try to init OpenPushHelper twice.");
         }
-
         mOptions = options;
 
         PushProvider provider = getLastProvider();
@@ -133,20 +132,25 @@ public class OpenPushHelper {
     public synchronized void register() {
         checkInitDone();
 
-        if (mState == State.STATE_NONE ||
-                mState == State.STATE_NO_AVAILABLE_PROVIDERS) {
-            mState = State.STATE_REGISTRATION_RUNNING;
+        switch (mState) {
+            case STATE_NONE:
+            case STATE_NO_AVAILABLE_PROVIDERS:
+                mState = State.STATE_REGISTRATION_RUNNING;
 
-            PushProvider provider = getNextCandidate(null);
-            Assert.assertNotNull(provider);
-            if (!registerProvider(provider)) {
-                if (mListener != null) {
-                    mListener.onNoAvailableProvider();
+                PushProvider provider = getNextCandidate(null);
+                if (provider == null || !registerProvider(provider)) {
+                    if (mListener != null) {
+                        mListener.onNoAvailableProvider();
+                    }
+                    mState = State.STATE_NONE;
                 }
-                mState = State.STATE_NONE;
-            }
-        } else {
-            throw new IllegalStateException("Attempt to register twice!");
+                break;
+
+            case STATE_UNREGISTRATION_RUNNING:
+                throw new OpenPushException("Can't register while unregistration is running.");
+
+            default:
+                throw new OpenPushException("Attempt to register twice!");
         }
     }
 
@@ -180,8 +184,6 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getNextCandidate(@Nullable PushProvider lastProvider) {
-        checkInitDone();
-
         int i = 0;
         if (lastProvider != null) {
             int lastCandidateIndex = mOptions.getProviders().indexOf(lastProvider);
@@ -189,6 +191,7 @@ public class OpenPushHelper {
                 i = lastCandidateIndex + 1;
             }
         }
+
         for (int cnt = mOptions.getProviders().size(); i < cnt; ++i) {
             PushProvider candidate = mOptions.getProviders().get(i);
             if (candidate.isAvailable()) {
@@ -241,8 +244,6 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getProviderByName(@NotNull String providerName) {
-        checkInitDone();
-
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
@@ -253,8 +254,6 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
-        checkInitDone();
-
         if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
             String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
             if (!TextUtils.isEmpty(storedProviderName)) {
@@ -269,42 +268,32 @@ public class OpenPushHelper {
     }
 
     private void saveLastProvider(@Nullable PushProvider provider) {
+        SharedPreferences.Editor editor = mPreferences.edit();
         if (provider == null) {
-            mPreferences.edit()
-                    .remove(KEY_LAST_PROVIDER_NAME)
-                    .apply();
+            editor.remove(KEY_LAST_PROVIDER_NAME);
         } else {
-            mPreferences.edit()
-                    .putString(KEY_LAST_PROVIDER_NAME, provider.getName())
-                    .apply();
+            editor.putString(KEY_LAST_PROVIDER_NAME, provider.getName());
         }
+        editor.apply();
     }
 
     public State getState() {
-        checkInitDone();
-
         return mState;
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
-        checkInitDone();
-
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
     }
 
     public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
-        checkInitDone();
-
         if (mListener != null) {
             mListener.onDeletedMessages(providerName, messagesCount);
         }
     }
 
     public void onNeedRetryRegister(@NotNull String providerName) {
-        checkInitDone();
-
         if (mCurrentProvider != null && providerName.equals(mCurrentProvider.getName())) {
             reset();
             mCurrentProvider.onAppStateChanged();
@@ -313,8 +302,6 @@ public class OpenPushHelper {
     }
 
     private void reset() {
-        checkInitDone();
-
         mPreferences.edit().clear().apply();
         mState = State.STATE_NONE;
         mRetryNumber = 0;
@@ -324,9 +311,7 @@ public class OpenPushHelper {
         }
     }
 
-    void onProviderBecameUnavailable(@NotNull PushProvider provider) {
-        checkInitDone();
-
+    public void onProviderBecameUnavailable(@NotNull PushProvider provider) {
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
             mCurrentProvider = null;
@@ -341,8 +326,6 @@ public class OpenPushHelper {
     }
 
     public void onUnregistrationEnd(@NotNull RegistrationResult result) {
-        checkInitDone();
-
         if (mState != State.STATE_UNREGISTRATION_RUNNING) {
             return;
         }
@@ -354,6 +337,7 @@ public class OpenPushHelper {
                 mCurrentProvider = null;
             }
             if (mListener != null) {
+                Assert.assertNotNull(result.getRegistrationId());
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
@@ -366,14 +350,12 @@ public class OpenPushHelper {
     }
 
     private void checkInitDone() {
-        if (mOptions == null) {
-            throw new OpenPushException("Before register provider call init().");
+        if (!isInitDone()) {
+            throw new OpenPushException("Before work with OpenPushHelper call init() first.");
         }
     }
 
     public void onRegistrationEnd(@NotNull RegistrationResult result) {
-        checkInitDone();
-
         if (mState != State.STATE_REGISTRATION_RUNNING) {
             return;
         }
@@ -382,27 +364,22 @@ public class OpenPushHelper {
             mState = State.STATE_RUNNING;
             mRetryNumber = 0;
             mCurrentProvider = getProviderByName(result.getProviderName());
-            Assert.assertNotNull(mCurrentProvider);
             saveLastProvider(mCurrentProvider);
             Assert.assertNotNull(result.getRegistrationId());
             if (mListener != null) {
                 mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
             }
 
+            Assert.assertNotNull(mCurrentProvider);
             registerPackageChangeReceiver(mCurrentProvider);
         } else {
             PushProvider provider = getProviderByName(result.getProviderName());
             Assert.assertNotNull(provider);
 
-            if (result.isRecoverableError() && mOptions.getBackoff() != null
-                    && mRetryNumber < mOptions.getBackoff().tryCount()) {
-                long start = System.currentTimeMillis() +
-                        mOptions.getBackoff().getDelay(mRetryNumber);
-                mRetryNumber++;
-                if (mRegistrationRunnable == null) {
-                    mRegistrationRunnable = new RetryRegistrationRunnable(provider);
-                }
-                sHandler.postAtTime(mRegistrationRunnable, start);
+            if (result.isRecoverableError()
+                    && mOptions.getBackoff() != null
+                    && mRetryNumber < mOptions.getBackoff().getTryCount()) {
+                postRegistrationRetry(provider);
             } else {
                 if (mListener != null) {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
@@ -410,9 +387,7 @@ public class OpenPushHelper {
 
                 mRetryNumber = 0;
                 PushProvider nextProvider = getNextCandidate(provider);
-                if (nextProvider != null) {
-                    nextProvider.register();
-                } else {
+                if (nextProvider == null || !registerProvider(nextProvider)) {
                     mState = State.STATE_NO_AVAILABLE_PROVIDERS;
                     if (mListener != null) {
                         mListener.onNoAvailableProvider();
@@ -420,6 +395,15 @@ public class OpenPushHelper {
                 }
             }
         }
+    }
+
+    private void postRegistrationRetry(@NotNull PushProvider provider) {
+        long start = System.currentTimeMillis() + mOptions.getBackoff().getDelay(mRetryNumber);
+        mRetryNumber++;
+        if (mRegistrationRunnable == null) {
+            mRegistrationRunnable = new RetryRegistrationRunnable(provider);
+        }
+        sHandler.postAtTime(mRegistrationRunnable, start);
     }
 
     public static enum State {

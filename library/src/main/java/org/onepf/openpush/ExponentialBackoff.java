@@ -34,7 +34,7 @@ public final class ExponentialBackoff implements Backoff {
     }
 
     @Override
-    public int tryCount() {
+    public int getTryCount() {
         return mTryCount;
     }
 

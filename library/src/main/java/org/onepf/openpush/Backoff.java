@@ -24,7 +24,7 @@ public interface Backoff {
      * Maximum number of try to register push provider.
      * Zero value means that will be no retry.
      */
-    int tryCount();
+    int getTryCount();
 
     /**
      * Get delay before next attempt to register push provider.

@@ -26,29 +26,27 @@ import java.util.UUID;
 /**
  * Created by  Kirill Rozov on 11.09.14.
  */
-class StubPushProvider extends BasePushProvider {
+class MockPushProvider extends BasePushProvider {
 
-    private boolean mRegistered;
+    public static final String NAME = "StubPushProvider";
     private String mRegistrationId;
 
-    StubPushProvider(@NotNull Context context) {
-        super(context, "StubPushProvider", "org.onepf.openpush.sample");
+    MockPushProvider(@NotNull Context context) {
+        super(context, NAME, "org.onepf.openpush.sample");
     }
 
     @Override
     public void register() {
-        mRegistered = true;
         mRegistrationId = UUID.randomUUID().toString();
-        OpenPushHelper.getInstance(getContext()).onRegistrationEnd(
-                new RegistrationResult(getName(), mRegistrationId));
+        OpenPushHelperKeeper.getInstance(getContext()).onRegistrationEnd(
+                new RegistrationResult(NAME, mRegistrationId));
     }
 
     @Override
     public void unregister() {
         mRegistrationId = null;
-        mRegistered = false;
-        OpenPushHelper.getInstance(getContext()).onUnregistrationEnd(
-                new RegistrationResult(getName(), mRegistrationId));
+        OpenPushHelperKeeper.getInstance(getContext()).onUnregistrationEnd(
+                new RegistrationResult(NAME, mRegistrationId));
     }
 
     @Override
@@ -58,7 +56,7 @@ class StubPushProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        return mRegistered;
+        return mRegistrationId != null;
     }
 
     @Nullable
