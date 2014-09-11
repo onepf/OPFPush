@@ -16,8 +16,6 @@
 
 package org.onepf.openpush;
 
-import android.content.Context;
-
 import junit.framework.Assert;
 
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +86,7 @@ public class OptionsTest {
         private boolean mRegistered;
 
         private StubPushProvider() {
-            super(Robolectric.application);
+            super(Robolectric.application, , );
         }
 
         @Override

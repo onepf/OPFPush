@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.Error;
 import org.onepf.openpush.OpenPushListener;
 import org.onepf.openpush.sample.event.DeleteMessageEvent;
-import org.onepf.openpush.sample.event.HostAppRemovedEvent;
+import org.onepf.openpush.sample.event.ProviderBecameUnavailableEvent;
 import org.onepf.openpush.sample.event.MessageEvent;
 import org.onepf.openpush.sample.event.NoAvailableProviderEvent;
 import org.onepf.openpush.sample.event.RegisteredEvent;
@@ -77,7 +77,7 @@ public class EventBusListener implements OpenPushListener {
     }
 
     @Override
-    public void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage) {
-        EventBus.getDefault().post(new HostAppRemovedEvent(providerName, hostAppPackage));
+    public void onProviderBecameUnavailable(@NotNull String providerName) {
+        EventBus.getDefault().post(new ProviderBecameUnavailableEvent(providerName));
     }
 }

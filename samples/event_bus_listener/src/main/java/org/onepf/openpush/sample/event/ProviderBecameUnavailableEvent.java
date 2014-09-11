@@ -21,16 +21,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by  Kirill Rozov on 10.09.14.
  */
-public class HostAppRemovedEvent extends ProviderEvent {
-    private String mHostAppPackage;
+public class ProviderBecameUnavailableEvent extends ProviderEvent {
 
-    public HostAppRemovedEvent(@NotNull String providerName, @NotNull String hostAppPackage) {
+    public ProviderBecameUnavailableEvent(@NotNull String providerName) {
         super(providerName);
-        mHostAppPackage = hostAppPackage;
-    }
-
-    @NotNull
-    public String getHostAppPackage() {
-        return mHostAppPackage;
     }
 }

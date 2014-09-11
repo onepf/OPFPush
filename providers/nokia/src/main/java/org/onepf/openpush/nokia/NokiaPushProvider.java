@@ -33,7 +33,7 @@ public class NokiaPushProvider extends BasePushProvider {
     private final String[] mSendersId;
 
     public NokiaPushProvider(@NotNull Context context, @NotNull String... sendersID) {
-        super(context);
+        super(context, NAME, "com.nokia.store");
         mSendersId = sendersID;
     }
 
@@ -87,17 +87,5 @@ public class NokiaPushProvider extends BasePushProvider {
         } else {
             throw new OpenPushException("Nokia Push must be registered before unregister.");
         }
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @NotNull
-    @Override
-    public String getHostAppPackage() {
-        return "com.nokia.store";
     }
 }

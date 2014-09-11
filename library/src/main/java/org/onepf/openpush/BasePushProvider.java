@@ -27,15 +27,20 @@ import org.onepf.openpush.util.PackageUtils;
  */
 public abstract class BasePushProvider implements PushProvider {
 
-    @NotNull
     private final Context mAppContext;
+    private final String mName;
+    private final String mHostAppPackage;
 
-    protected BasePushProvider(@NotNull Context context) {
+    protected BasePushProvider(@NotNull Context context,
+                               @NotNull String name,
+                               @NotNull String hostAppPackage) {
         if (!checkManifest()) {
             throw new OpenPushException("Your manifest doesn't contains all required" +
                     " data. Check your app manifest.");
         }
         mAppContext = context.getApplicationContext();
+        mName = name;
+        mHostAppPackage = hostAppPackage;
     }
 
     @NotNull
@@ -51,7 +56,7 @@ public abstract class BasePushProvider implements PushProvider {
     @NotNull
     @Override
     public String toString() {
-        return getName();
+        return mName;
     }
 
     @Override
@@ -64,19 +69,36 @@ public abstract class BasePushProvider implements PushProvider {
         }
 
         BasePushProvider that = (BasePushProvider) o;
-        return getName().equals(that.getName());
+        return mName.equals(that.mName);
     }
 
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return mName.hashCode();
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        return mName;
     }
 
     @Override
     public void close() {
     }
 
+    @NotNull
+    @Override
+    public String getHostAppPackage() {
+        return mHostAppPackage;
+    }
+
     @Override
     public void onAppStateChanged() {
+    }
+
+    @Override
+    public boolean isRegistered() {
+        return getRegistrationId() != null;
     }
 }

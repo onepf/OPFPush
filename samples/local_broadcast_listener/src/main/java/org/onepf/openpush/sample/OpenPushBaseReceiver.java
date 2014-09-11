@@ -58,9 +58,15 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
                     onUnregistrationError(providerName, Error.values()[errorIndex]);
                 }
             } else if (LocalBroadcastListener.ACTION_DELETED_MESSAGES.equals(action)) {
-                Bundle extras = new Bundle(intent.getExtras());
-                extras.remove(LocalBroadcastListener.EXTRA_PROVIDER_NAME);
-                onDeletedMessages(providerName, extras);
+                if (intent.getExtras() != null) {
+                    Bundle extras = new Bundle(intent.getExtras());
+                    extras.remove(LocalBroadcastListener.EXTRA_PROVIDER_NAME);
+                    onDeletedMessages(providerName, extras);
+                } else {
+                    onDeletedMessages(providerName, null);
+                }
+            } else if (LocalBroadcastListener.ACTION_PROVIDER_BECAME_UNAVAILABLE.equals(action)) {
+                onProviderBecameUnavailable(providerName);
             }
         }
     }
@@ -84,5 +90,9 @@ public class OpenPushBaseReceiver extends BroadcastReceiver {
     }
 
     protected void onUnregistered(@NotNull String providerName, @Nullable String oldRegistrationId) {
+    }
+
+    protected void onProviderBecameUnavailable(@NotNull String providerName) {
+
     }
 }

@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.*;
@@ -39,13 +38,13 @@ public class LocalBroadcastListener implements OpenPushListener {
     public static final String ACTION_REGISTRATION_ERROR = "org.onepf.openpush.registration_error";
     public static final String ACTION_UNREGISTRATION_ERROR = "org.onepf.openpush.unregistration_error";
     public static final String ACTION_NO_AVAILABLE_PROVIDER = "org.onepf.openpush.no_available_provider";
-    public static final String ACTION_HOST_APP_REMOVED = "org.onepf.openpush.host_app_removed";
+    public static final String ACTION_PROVIDER_BECAME_UNAVAILABLE
+            = "org.onepf.openpush.provider_became_unavailable";
 
     public static final String EXTRA_PROVIDER_NAME = "org.onepf.openpush.provider_name";
     public static final String EXTRA_REGISTRATION_ID = "org.onepf.openpush.registration_id";
     public static final String EXTRA_ERROR_ID = "org.onepf.openpush.error_id";
     public static final String EXTRA_MESSAGES_COUNT = "org.onepf.openpush.messages_count";
-    public static final String EXTRA_HOST_APP_PACKAGE = "org.onepf.openpush.host_app_package";
 
     @NotNull
     private final Context mAppContext;
@@ -113,9 +112,7 @@ public class LocalBroadcastListener implements OpenPushListener {
     }
 
     @Override
-    public void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage) {
-        Bundle extras = new Bundle(1);
-        extras.putString(EXTRA_HOST_APP_PACKAGE, hostAppPackage);
-        sendBroadcast(ACTION_HOST_APP_REMOVED, providerName, extras);
+    public void onProviderBecameUnavailable(@NotNull String providerName) {
+        sendBroadcast(ACTION_PROVIDER_BECAME_UNAVAILABLE, providerName, null);
     }
 }

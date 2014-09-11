@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,10 +39,23 @@ public class Options {
     @Nullable
     private final Backoff mBackoff;
 
+    private boolean mRecoverProvider;
+
     private Options(@NotNull Collection<? extends PushProvider> providers,
-                    @Nullable Backoff backoff) {
+                    @Nullable Backoff backoff,
+                    boolean recoverProvider) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mBackoff = backoff;
+        mRecoverProvider = recoverProvider;
+    }
+
+    /**
+     * Can the {@code OpenPushHelper} select next available provider, when current became unavailable.
+     *
+     * @return Can select next available provider for continue push work.
+     */
+    public boolean isRecoverProvider() {
+        return mRecoverProvider;
     }
 
     /**
@@ -69,6 +83,12 @@ public class Options {
         @Nullable
         private Backoff mBackoff;
 
+        private boolean mRecoverProvider;
+
+        public Builder() {
+            mRecoverProvider = true;
+        }
+
         /**
          * Add the providers to the options.
          *
@@ -89,10 +109,21 @@ public class Options {
             return this;
         }
 
+        /**
+         * Set does can the {@code OpenPushHelper} select next available provider,
+         * when current became unavailable. By default true.
+         *
+         * @return The {@code Options.Builder}.
+         */
+        public Builder setRecoverProvider(boolean recoverProvider) {
+            mRecoverProvider = recoverProvider;
+            return this;
+        }
+
         @NotNull
-        public Builder addProviders(@NotNull Collection<? extends PushProvider> providers) {
+        public Builder addProviders(@NotNull List<? extends PushProvider> providers) {
             if (mProviders == null) {
-                mProviders = new HashSet<PushProvider>(4);
+                mProviders = new LinkedHashSet<PushProvider>(4);
             }
 
             if (!mProviders.addAll(providers)) {
@@ -119,7 +150,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders, mBackoff);
+            return new Options(mProviders, mBackoff, mRecoverProvider);
         }
     }
 }

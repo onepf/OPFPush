@@ -41,5 +41,5 @@ public interface OpenPushListener {
 
     void onUnregistered(@NotNull String providerName, @NotNull String registrationId);
 
-    void onHostAppRemoved(@NotNull String providerName, @NotNull String hostAppPackage);
+    void onProviderBecameUnavailable(@NotNull String providerName);
 }

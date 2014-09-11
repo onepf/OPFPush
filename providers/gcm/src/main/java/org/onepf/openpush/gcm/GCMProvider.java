@@ -59,7 +59,7 @@ public class GCMProvider extends BasePushProvider {
     private final GoogleCloudMessaging mGoogleCloudMessaging;
 
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
-        super(context);
+        super(context, NAME, "com.android.vending");
         mSenderIDs = senderIDs;
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -68,7 +68,7 @@ public class GCMProvider extends BasePushProvider {
 
     public void register() {
         if (isRegistered()) {
-            throw new OpenPushException("Provider already registered.");
+            throw new OpenPushException("Google Cloud Messaging already registered.");
         }
         new RegisterTask().execute();
     }
@@ -77,7 +77,8 @@ public class GCMProvider extends BasePushProvider {
         if (isRegistered()) {
             new UnregisterTask().execute();
         } else {
-            throw new OpenPushException("Provider must be registered before unregister.");
+            throw new OpenPushException("Google Cloud Messaging must" +
+                    " be registered before unregister.");
         }
     }
 
@@ -139,18 +140,6 @@ public class GCMProvider extends BasePushProvider {
                 return false;
             }
         }
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @NotNull
-    @Override
-    public String getHostAppPackage() {
-        return "com.android.vending";
     }
 
     @Override

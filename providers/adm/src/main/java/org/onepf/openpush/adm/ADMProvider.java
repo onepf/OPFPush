@@ -38,16 +38,16 @@ public class ADMProvider extends BasePushProvider {
     private final ADM mAdm;
 
     public ADMProvider(@NotNull Context context) {
-        super(context);
+        super(context, NAME, "com.amazon.venezia");
         mAdm = new ADM(context);
     }
 
     @Override
     public void register() {
-        if (mAdm.getRegistrationId() == null) {
-            mAdm.startRegister();
-        } else {
+        if (isRegistered()) {
             throw new OpenPushException("Amazon Device Messaging already registered.");
+        } else {
+            mAdm.startRegister();
         }
     }
 
@@ -62,7 +62,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void unregister() {
-        if (mAdm.getRegistrationId() != null) {
+        if (isRegistered()) {
             mAdm.startUnregister();
         } else {
             throw new OpenPushException("Amazon Device Messaging must be registered.");
@@ -75,25 +75,8 @@ public class ADMProvider extends BasePushProvider {
     }
 
     @Override
-    public boolean isRegistered() {
-        return mAdm.getRegistrationId() != null;
-    }
-
-    @Override
     @Nullable
     public String getRegistrationId() {
         return mAdm.getRegistrationId();
-    }
-
-    @NotNull
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @NotNull
-    @Override
-    public String getHostAppPackage() {
-        return "com.amazon.venezia";
     }
 }

@@ -29,7 +29,6 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
@@ -101,6 +100,25 @@ public class OpenPushHelper {
             mCurrentProvider = provider;
             mState = State.STATE_RUNNING;
         }
+
+        if (mCurrentProvider != null) {
+            if (mCurrentProvider.isAvailable()) {
+                if (mCurrentProvider.isRegistered()) {
+                    register(mCurrentProvider);
+                }
+            } else {
+                final String providerName = mCurrentProvider.getName();
+                reset();
+                mCurrentProvider = null;
+                if (mListener != null) {
+                    mListener.onProviderBecameUnavailable(providerName);
+                }
+
+                if (options.isRecoverProvider()) {
+                    register();
+                }
+            }
+        }
     }
 
     public void setListener(@Nullable OpenPushListener l) {
@@ -108,9 +126,7 @@ public class OpenPushHelper {
     }
 
     public synchronized void register() {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         if (mState == State.STATE_NONE || mState == State.STATE_NO_AVAILABLE_PROVIDERS) {
             mState = State.STATE_REGISTRATION_RUNNING;
@@ -138,9 +154,7 @@ public class OpenPushHelper {
     }
 
     public void unregister() {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         if (mCurrentProvider != null && mState == State.STATE_RUNNING) {
             mState = State.STATE_UNREGISTRATION_RUNNING;
@@ -153,9 +167,7 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getNextCandidate(@Nullable PushProvider lastProvider) {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         int i = 0;
         if (lastProvider != null) {
@@ -216,9 +228,7 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getProviderByName(@NotNull String providerName) {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
@@ -230,9 +240,7 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
             final String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
@@ -259,26 +267,30 @@ public class OpenPushHelper {
     }
 
     public State getState() {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
 
         return mState;
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
+        checkInitDone();
+
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
     }
 
     public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+        checkInitDone();
+
         if (mListener != null) {
             mListener.onDeletedMessages(providerName, messagesCount);
         }
     }
 
     public void onNeedRetryRegister(@NotNull String providerName) {
+        checkInitDone();
+
         if (mCurrentProvider != null && providerName.equals(mCurrentProvider.getName())) {
             reset();
             mCurrentProvider.onAppStateChanged();
@@ -287,6 +299,8 @@ public class OpenPushHelper {
     }
 
     private void reset() {
+        checkInitDone();
+
         mPreferences.edit().clear().apply();
         mState = State.STATE_NONE;
         mRetryNumber = 0;
@@ -296,21 +310,25 @@ public class OpenPushHelper {
         }
     }
 
-    void onHostAppRemoved(@NotNull PushProvider provider) {
+    void onProviderBecameUnavailable(@NotNull PushProvider provider) {
+        checkInitDone();
+
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
             mCurrentProvider = null;
             if (mListener != null) {
-                mListener.onHostAppRemoved(provider.getName(), provider.getHostAppPackage());
+                mListener.onProviderBecameUnavailable(provider.getName());
             }
-            register(); //Restart registration
+
+            if (mOptions.isRecoverProvider()) {
+                register(); //Restart registration
+            }
         }
     }
 
     public void onUnregistrationEnd(@NotNull RegistrationResult result) {
-        if (mOptions == null) {
-            throw new UnsupportedOperationException("Before register provider call init().");
-        }
+        checkInitDone();
+
         if (mState != State.STATE_UNREGISTRATION_RUNNING) {
             return;
         }
@@ -333,10 +351,15 @@ public class OpenPushHelper {
         }
     }
 
-    public void onRegistrationEnd(@NotNull RegistrationResult result) {
+    private void checkInitDone() {
         if (mOptions == null) {
             throw new UnsupportedOperationException("Before register provider call init().");
         }
+    }
+
+    public void onRegistrationEnd(@NotNull RegistrationResult result) {
+        checkInitDone();
+
         if (mState != State.STATE_REGISTRATION_RUNNING) {
             return;
         }
@@ -414,7 +437,7 @@ public class OpenPushHelper {
     private static class RetryRegistrationRunnable implements Runnable {
         private final PushProvider mProvider;
 
-        public RetryRegistrationRunnable(@NotNull PushProvider provider) {
+        RetryRegistrationRunnable(@NotNull PushProvider provider) {
             mProvider = provider;
         }
 
