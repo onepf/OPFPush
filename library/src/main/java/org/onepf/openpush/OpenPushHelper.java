@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
-import java.security.Provider;
 import java.util.List;
 
 /**
@@ -47,10 +46,8 @@ import java.util.List;
 public class OpenPushHelper {
 
     private static final String TAG = "OpenPushHelper";
-
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
-
-    private static final Handler sHandler = new Handler(Looper.getMainLooper());
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     @Nullable
     private OpenPushListener mListener;
@@ -111,8 +108,12 @@ public class OpenPushHelper {
                 if (provider.isRegistered()) {
                     mCurrentProvider = provider;
                     mState = State.STATE_RUNNING;
-                } else if (!registerProvider(provider)) {
-                    saveLastProvider(null);
+                } else {
+                    mState = State.STATE_REGISTRATION_RUNNING;
+                    if (!registerProvider(provider)) {
+                        mState = State.STATE_NONE;
+                        saveLastProvider(null);
+                    }
                 }
             } else {
                 reset();
@@ -150,7 +151,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void registerNextProvider(@Nullable PushProvider provider) {
+    private boolean registerNextProvider(@Nullable PushProvider provider) {
         int i = 0;
         final List<PushProvider> providers = mOptions.getProviders();
         if (provider != null) {
@@ -162,7 +163,7 @@ public class OpenPushHelper {
 
         for (int cnt = providers.size(); i < cnt; ++i) {
             if (registerProvider(providers.get(i))) {
-                return;
+                return true;
             }
         }
 
@@ -170,17 +171,17 @@ public class OpenPushHelper {
         if (mListener != null) {
             mListener.onNoAvailableProvider();
         }
+        return false;
     }
 
     /**
      * Start registerProvider provider.
      *
      * @param provider Provider for registration.
-     * @return Did registration start.
+     * @return If provider available and can start registration return true, otherwise - false.
      */
     private boolean registerProvider(@NotNull PushProvider provider) {
         if (provider.isAvailable()) {
-            mState = State.STATE_REGISTRATION_RUNNING;
             provider.register();
             return true;
         } else {
@@ -196,7 +197,7 @@ public class OpenPushHelper {
             unregisterPackageChangeReceiver();
             mCurrentProvider.unregister();
         } else {
-            throw new IllegalStateException("Attempt to unregister not initialised!");
+            throw new OpenPushException("Attempt to unregister not initialised!");
         }
     }
 
@@ -296,7 +297,10 @@ public class OpenPushHelper {
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
             mCurrentProvider.onAppStateChanged();
-            registerProvider(mCurrentProvider);
+            mState = State.STATE_REGISTRATION_RUNNING;
+            if (!registerProvider(mCurrentProvider)) {
+                mState = State.STATE_NONE;
+            }
         }
     }
 
@@ -386,7 +390,7 @@ public class OpenPushHelper {
     private void cancelRetryRegistration() {
         mRetryNumber = 0;
         if (mRegistrationRunnable != null) {
-            sHandler.removeCallbacks(mRegistrationRunnable);
+            MAIN_HANDLER.removeCallbacks(mRegistrationRunnable);
             mRegistrationRunnable = null;
         }
     }
@@ -400,7 +404,7 @@ public class OpenPushHelper {
                     || !mRegistrationRunnable.getProvider().equals(provider)) {
                 mRegistrationRunnable = new RetryRegistrationRunnable(provider);
             }
-            sHandler.postAtTime(mRegistrationRunnable, start);
+            MAIN_HANDLER.postAtTime(mRegistrationRunnable, start);
             return true;
         } else {
             return false;
