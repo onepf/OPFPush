@@ -50,12 +50,12 @@ public class ExponentialBackoffTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetIllegalPause() {
+    public void testGetDelayForZeroTryNumber() {
         mBackoff.getDelay(0);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testPauseBiggerThanTryCount() {
+    public void testGetDelayForTryNumberBiggerThanTryCount() {
         mBackoff.getDelay(mBackoff.getTryCount() + 1);
     }
 }
