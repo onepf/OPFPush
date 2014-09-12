@@ -185,7 +185,7 @@ public class OpenPushHelper {
     }
 
     /**
-     * Start registerProvider provider.
+     * Start register provider.
      *
      * @param provider Provider for registration.
      * @return If provider available and can start registration return true, otherwise - false.
@@ -295,18 +295,22 @@ public class OpenPushHelper {
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
+        LOGD(TAG, String.format("onProviderBecameUnavailable(providerName = %s).", providerName));
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
     }
 
     public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+        LOGD(TAG, String.format("onDeletedMessages(providerName = %s,messagesCount = %d).",
+                providerName, messagesCount));
         if (mListener != null) {
             mListener.onDeletedMessages(providerName, messagesCount);
         }
     }
 
     public void onNeedRetryRegister(@NotNull String providerName) {
+        LOGD(TAG, String.format("onNeedRetryRegister(providerName = %s).", providerName));
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
             mCurrentProvider.onAppStateChanged();
@@ -324,6 +328,7 @@ public class OpenPushHelper {
     }
 
     public void onProviderBecameUnavailable(@NotNull PushProvider provider) {
+        LOGD(TAG, String.format("onProviderBecameUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
             mCurrentProvider = null;
@@ -343,6 +348,7 @@ public class OpenPushHelper {
         }
 
         if (result.isSuccess()) {
+            LOGI(TAG, String.format("Successfully unregister provider '%s'.", result.getProviderName()));
             reset();
             if (mCurrentProvider != null) {
                 mCurrentProvider.close();
@@ -353,6 +359,7 @@ public class OpenPushHelper {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
+            LOGI(TAG, String.format("Error unregister provider '%s'.", result.getProviderName()));
             mState = State.STATE_RUNNING;
             final PushProvider provider = getProviderByName(result.getProviderName());
             if (provider != null) {
@@ -455,6 +462,11 @@ public class OpenPushHelper {
         STATE_UNREGISTRATION_RUNNING
     }
 
+    /**
+     * Uses for delayed retry registration of provider.
+     * Retry registration can be done when provider is available, but some error occur
+     * while try to register it.
+     */
     private class RetryRegistrationRunnable implements Runnable {
         private final PushProvider mProvider;
 
