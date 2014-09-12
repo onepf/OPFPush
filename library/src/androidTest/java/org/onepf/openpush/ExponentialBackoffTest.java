@@ -24,8 +24,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by krozov on 07.09.14.
  */

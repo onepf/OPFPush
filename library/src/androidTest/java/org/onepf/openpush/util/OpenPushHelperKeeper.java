@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.openpush;
+package org.onepf.openpush.util;
 
 import android.content.Context;
 

@@ -99,15 +99,7 @@ public class Options {
          */
         @NotNull
         public Builder addProviders(@NotNull PushProvider... providers) {
-            if (mProviders == null) {
-                mProviders = new HashSet<PushProvider>(3);
-            }
-
-            if (!Collections.addAll(mProviders, providers)) {
-                throw new IllegalArgumentException(
-                        String.format("Provider '%s' already added", Arrays.toString(providers)));
-            }
-            return this;
+            return addProviders(Arrays.asList(providers));
         }
 
         /**

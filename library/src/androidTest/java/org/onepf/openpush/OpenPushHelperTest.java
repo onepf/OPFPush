@@ -16,13 +16,21 @@
 
 package org.onepf.openpush;
 
-import static org.junit.Assert.*;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.openpush.shadow.ShadowPackageManager;
+import org.onepf.openpush.util.OpenPushHelperKeeper;
+import org.onepf.openpush.util.PackageInfoKeeper;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by  Kirill Rozov on 11.09.14.
@@ -31,15 +39,21 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 public class OpenPushHelperTest {
 
+    @Before
+    public void setup() {
+        String hostAppPackage = new MockPushProvider(Robolectric.application).getHostAppPackage();
+        PackageInfoKeeper.installPackage(hostAppPackage);
+    }
+
     @Test
     public void testInit() {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
         OpenPushHelper openPushHelper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
-        assertEquals(false, openPushHelper.isInitDone());
+        assertFalse(openPushHelper.isInitDone());
         assertEquals(OpenPushHelper.State.NONE, openPushHelper.getState());
         openPushHelper.init(builder.build());
-        assertEquals(true, openPushHelper.isInitDone());
+        assertTrue(openPushHelper.isInitDone());
         assertEquals(OpenPushHelper.State.NONE, openPushHelper.getState());
     }
 
@@ -48,14 +62,14 @@ public class OpenPushHelperTest {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
         OpenPushHelper openPushHelper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
-        assertEquals(false, openPushHelper.isInitDone());
+        assertFalse(openPushHelper.isInitDone());
         openPushHelper.init(builder.build());
-        assertEquals(true, openPushHelper.isInitDone());
+        assertTrue(openPushHelper.isInitDone());
         openPushHelper.init(builder.build());
     }
 
     @Test(expected = OpenPushException.class)
-    public void testUnregisterWithoutRegister(){
+    public void testUnregisterWithoutRegister() {
         OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
@@ -71,15 +85,16 @@ public class OpenPushHelperTest {
         OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        final String providerName = "providerName";
+        builder.addProviders(new MockPushProvider(Robolectric.application, providerName));
         Options options = builder.build();
         helper.init(options);
-        assertEquals(true, helper.isInitDone());
+        assertTrue(helper.isInitDone());
         assertEquals(OpenPushHelper.State.NONE, helper.getState());
 
         helper.register();
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
-        assertEquals(MockPushProvider.NAME, helper.getCurrentProviderName());
+        assertEquals(providerName, helper.getCurrentProviderName());
         assertNotNull(helper.getCurrentProviderRegistrationId());
     }
 
@@ -94,19 +109,96 @@ public class OpenPushHelperTest {
     }
 
     @Test
+    public void testRegisterSecondProvider() {
+        OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
+        assertFalse(helper.isInitDone());
+
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider1
+                = new MockPushProvider(Robolectric.application, "providerName1", false);
+        builder.addProviders(provider1);
+        MockPushProvider provider2
+                = new MockPushProvider(Robolectric.application, "providerName2");
+        builder.addProviders(provider2);
+        helper.init(builder.build());
+
+        assertTrue(helper.isInitDone());
+        assertEquals(OpenPushHelper.State.NONE, helper.getState());
+
+        assertFalse(provider1.isRegistered());
+        assertFalse(provider2.isRegistered());
+
+        helper.register();
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
+        assertEquals(provider2.getName(), helper.getCurrentProviderName());
+        assertEquals(provider2.getRegistrationId(),
+                helper.getCurrentProviderRegistrationId());
+
+        assertFalse(provider1.isRegistered());
+        assertTrue(provider2.isRegistered());
+    }
+
+    @Config(shadows = {ShadowPackageManager.class})
+    @Test
+    public void testRemoveHostAppPackage() {
+        OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
+        assertFalse(helper.isInitDone());
+
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider1
+                = new MockPushProvider(Robolectric.application, "provider1", "org.openpf.store1");
+        PackageInfoKeeper.installPackage(provider1.getHostAppPackage());
+        builder.addProviders(provider1);
+        MockPushProvider provider2
+                = new MockPushProvider(Robolectric.application, "provider2", "org.openpf.store2");
+        PackageInfoKeeper.installPackage(provider2.getHostAppPackage());
+        builder.addProviders(provider2);
+        helper.init(builder.build());
+
+        assertFalse(provider1.isRegistered());
+        assertFalse(provider2.isRegistered());
+
+        helper.register();
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
+        assertEquals(provider1.getName(), helper.getCurrentProviderName());
+        assertEquals(provider1.getRegistrationId(),
+                helper.getCurrentProviderRegistrationId());
+
+        assertTrue(provider1.isRegistered());
+        assertFalse(provider2.isRegistered());
+
+        provider1.setHostAppEnable(false);
+        helper.onProviderBecameUnavailable(provider1);
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
+        assertEquals(provider2.getName(), helper.getCurrentProviderName());
+        assertEquals(provider2.getRegistrationId(),
+                helper.getCurrentProviderRegistrationId());
+
+        assertFalse(provider1.isRegistered());
+        assertTrue(provider2.isRegistered());
+
+        PackageInfoKeeper.uninstallPackage(provider1.getHostAppPackage());
+        PackageInfoKeeper.uninstallPackage(provider2.getHostAppPackage());
+
+        assertFalse(provider1.isRegistered());
+        assertTrue(provider2.isRegistered());
+    }
+
+    @Test
     public void testUnregister() {
         OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        final String providerName = "providerName";
+        builder.addProviders(new MockPushProvider(Robolectric.application, providerName));
         Options options = builder.build();
         helper.init(options);
-        assertEquals(true, helper.isInitDone());
+        assertTrue(helper.isInitDone());
         assertEquals(OpenPushHelper.State.NONE, helper.getState());
 
         helper.register();
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
-        assertEquals(MockPushProvider.NAME, helper.getCurrentProviderName());
+        assertEquals(providerName, helper.getCurrentProviderName());
         assertNotNull(helper.getCurrentProviderRegistrationId());
 
         helper.unregister();

@@ -20,6 +20,7 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.util.OpenPushHelperKeeper;
 
 import java.util.UUID;
 
@@ -28,30 +29,66 @@ import java.util.UUID;
  */
 class MockPushProvider extends BasePushProvider {
 
-    public static final String NAME = "StubPushProvider";
     private String mRegistrationId;
+    private final boolean mAvailable;
+
+    private boolean mHostAppEnable = true;
 
     MockPushProvider(@NotNull Context context) {
-        super(context, NAME, "org.onepf.openpush.sample");
+        this(context, MockPushProvider.class.getName());
+    }
+
+    MockPushProvider(@NotNull Context context, String name) {
+        this(context, name, true);
+    }
+
+    MockPushProvider(@NotNull Context context,
+                     @NotNull String name,
+                     boolean available) {
+        this(context, name, available, "org.onepf.store");
+    }
+
+    MockPushProvider(@NotNull Context context,
+                     @NotNull String name,
+                     @NotNull String hotAppPackage) {
+        this(context, name, true, hotAppPackage);
+    }
+
+    MockPushProvider(@NotNull Context context,
+                     @NotNull String name,
+                     boolean available,
+                     @NotNull String hotAppPackage) {
+        super(context, name, hotAppPackage);
+        mAvailable = available;
+    }
+
+    public void setHostAppEnable(boolean hostAppEnable) {
+        mHostAppEnable = hostAppEnable;
     }
 
     @Override
     public void register() {
         mRegistrationId = UUID.randomUUID().toString();
         OpenPushHelperKeeper.getInstance(getContext()).onRegistrationEnd(
-                new RegistrationResult(NAME, mRegistrationId));
+                new RegistrationResult(getName(), mRegistrationId));
     }
 
     @Override
     public void unregister() {
         mRegistrationId = null;
         OpenPushHelperKeeper.getInstance(getContext()).onUnregistrationEnd(
-                new RegistrationResult(NAME, mRegistrationId));
+                new RegistrationResult(getName(), mRegistrationId));
+    }
+
+    @Override
+    public void onAppStateChanged() {
+        super.onAppStateChanged();
+        mRegistrationId = null;
     }
 
     @Override
     public boolean isAvailable() {
-        return true;
+        return mHostAppEnable && mAvailable;
     }
 
     @Override

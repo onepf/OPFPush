@@ -364,6 +364,7 @@ public class OpenPushHelper {
         LOGD(TAG, String.format("onProviderBecameUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
+            mCurrentProvider.onAppStateChanged();
             mCurrentProvider = null;
             if (mListener != null) {
                 mListener.onProviderBecameUnavailable(provider.getName());
