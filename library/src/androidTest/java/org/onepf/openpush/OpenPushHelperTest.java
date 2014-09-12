@@ -168,7 +168,7 @@ public class OpenPushHelperTest {
         assertFalse(provider2.isRegistered());
 
         provider1.setHostAppEnable(false);
-        helper.onProviderBecameUnavailable(provider1);
+        helper.onBecameUnavailable(provider1);
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(provider2.getName(), helper.getCurrentProviderName());
         assertEquals(provider2.getRegistrationId(),

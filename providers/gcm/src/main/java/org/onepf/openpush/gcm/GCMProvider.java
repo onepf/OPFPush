@@ -159,6 +159,11 @@ public class GCMProvider extends BasePushProvider {
         reset();
     }
 
+    @Override
+    public void onUnavailable() {
+        reset();
+    }
+
     private void reset() {
         mRegistrationToken = null;
         mPreferences.edit().clear().apply();

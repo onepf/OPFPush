@@ -328,7 +328,7 @@ public class OpenPushHelper {
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
-        LOGD(TAG, String.format("onProviderBecameUnavailable(providerName = %s).", providerName));
+        LOGD(TAG, String.format("onBecameUnavailable(providerName = %s).", providerName));
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
@@ -360,11 +360,11 @@ public class OpenPushHelper {
         cancelRetryRegistration();
     }
 
-    public void onProviderBecameUnavailable(@NotNull PushProvider provider) {
-        LOGD(TAG, String.format("onProviderBecameUnavailable(provider = %s).", provider));
+    public void onBecameUnavailable(@NotNull PushProvider provider) {
+        LOGD(TAG, String.format("onBecameUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
-            mCurrentProvider.onAppStateChanged();
+            mCurrentProvider.onUnavailable();
             mCurrentProvider = null;
             if (mListener != null) {
                 mListener.onProviderBecameUnavailable(provider.getName());

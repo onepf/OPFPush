@@ -82,7 +82,11 @@ class MockPushProvider extends BasePushProvider {
 
     @Override
     public void onAppStateChanged() {
-        super.onAppStateChanged();
+        mRegistrationId = null;
+    }
+
+    @Override
+    public void onUnavailable() {
         mRegistrationId = null;
     }
 

@@ -91,6 +91,10 @@ public abstract class BasePushProvider implements PushProvider {
     public void close() {
     }
 
+    @Override
+    public void onUnavailable() {
+    }
+
     @NotNull
     @Override
     public String getHostAppPackage() {

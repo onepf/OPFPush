@@ -88,4 +88,14 @@ public class NokiaPushProvider extends BasePushProvider {
             throw new OpenPushException("Nokia Push must be registered before unregister.");
         }
     }
+
+    @Override
+    public void close() {
+        PushRegistrar.onDestroy(getContext());
+    }
+
+    @Override
+    public void onUnavailable() {
+        PushRegistrar.onDestroy(getContext());
+    }
 }

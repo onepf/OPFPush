@@ -93,4 +93,6 @@ public interface PushProvider {
      */
     //TODO Think about method name.
     void onAppStateChanged();
+
+    void onUnavailable();
 }
