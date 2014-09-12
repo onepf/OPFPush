@@ -21,6 +21,8 @@ import android.content.Context;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.OpenPushHelperKeeper;
+import org.onepf.openpush.util.PackageUtils;
+import org.robolectric.Robolectric;
 
 import java.util.UUID;
 
@@ -29,10 +31,9 @@ import java.util.UUID;
  */
 class MockPushProvider extends BasePushProvider {
 
+    public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
     private String mRegistrationId;
     private final boolean mAvailable;
-
-    private boolean mHostAppEnable = true;
 
     MockPushProvider(@NotNull Context context) {
         this(context, MockPushProvider.class.getName());
@@ -45,7 +46,7 @@ class MockPushProvider extends BasePushProvider {
     MockPushProvider(@NotNull Context context,
                      @NotNull String name,
                      boolean available) {
-        this(context, name, available, "org.onepf.store");
+        this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
     MockPushProvider(@NotNull Context context,
@@ -60,10 +61,6 @@ class MockPushProvider extends BasePushProvider {
                      @NotNull String hotAppPackage) {
         super(context, name, hotAppPackage);
         mAvailable = available;
-    }
-
-    public void setHostAppEnable(boolean hostAppEnable) {
-        mHostAppEnable = hostAppEnable;
     }
 
     @Override
@@ -92,7 +89,7 @@ class MockPushProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        return mHostAppEnable && mAvailable;
+        return mAvailable && PackageUtils.isInstalled(Robolectric.application, getHostAppPackage());
     }
 
     @Override

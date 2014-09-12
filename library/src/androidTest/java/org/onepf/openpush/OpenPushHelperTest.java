@@ -16,12 +16,11 @@
 
 package org.onepf.openpush;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.openpush.shadow.ShadowPackageManager;
 import org.onepf.openpush.util.OpenPushHelperKeeper;
-import org.onepf.openpush.util.PackageInfoKeeper;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -41,8 +40,7 @@ public class OpenPushHelperTest {
 
     @Before
     public void setup() {
-        String hostAppPackage = new MockPushProvider(Robolectric.application).getHostAppPackage();
-        PackageInfoKeeper.installPackage(hostAppPackage);
+        Robolectric.packageManager.addPackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 
     @Test
@@ -138,7 +136,6 @@ public class OpenPushHelperTest {
         assertTrue(provider2.isRegistered());
     }
 
-    @Config(shadows = {ShadowPackageManager.class})
     @Test
     public void testRemoveHostAppPackage() {
         OpenPushHelper helper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
@@ -147,11 +144,11 @@ public class OpenPushHelperTest {
         Options.Builder builder = new Options.Builder();
         MockPushProvider provider1
                 = new MockPushProvider(Robolectric.application, "provider1", "org.openpf.store1");
-        PackageInfoKeeper.installPackage(provider1.getHostAppPackage());
+        Robolectric.packageManager.addPackage(provider1.getHostAppPackage());
         builder.addProviders(provider1);
         MockPushProvider provider2
                 = new MockPushProvider(Robolectric.application, "provider2", "org.openpf.store2");
-        PackageInfoKeeper.installPackage(provider2.getHostAppPackage());
+        Robolectric.packageManager.addPackage(provider2.getHostAppPackage());
         builder.addProviders(provider2);
         helper.init(builder.build());
 
@@ -167,7 +164,7 @@ public class OpenPushHelperTest {
         assertTrue(provider1.isRegistered());
         assertFalse(provider2.isRegistered());
 
-        provider1.setHostAppEnable(false);
+        Robolectric.packageManager.removePackage(provider1.getHostAppPackage());
         helper.onBecameUnavailable(provider1);
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(provider2.getName(), helper.getCurrentProviderName());
@@ -177,8 +174,8 @@ public class OpenPushHelperTest {
         assertFalse(provider1.isRegistered());
         assertTrue(provider2.isRegistered());
 
-        PackageInfoKeeper.uninstallPackage(provider1.getHostAppPackage());
-        PackageInfoKeeper.uninstallPackage(provider2.getHostAppPackage());
+        Robolectric.packageManager.removePackage(provider1.getHostAppPackage());
+        Robolectric.packageManager.removePackage(provider2.getHostAppPackage());
 
         assertFalse(provider1.isRegistered());
         assertTrue(provider2.isRegistered());
@@ -217,5 +214,10 @@ public class OpenPushHelperTest {
         helper.register();
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         helper.register();
+    }
+
+    @After
+    public void destroy() {
+        Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 }
