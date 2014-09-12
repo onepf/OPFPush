@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
 import static org.onepf.openpush.util.LogUtils.*;
@@ -53,7 +54,13 @@ public class PackageChangeReceiver extends BroadcastReceiver {
         }
     }
 
+    @Nullable
     private static String getAppPackage(Intent intent) {
-        return intent.getDataString().replace(PackageUtils.PACKAGE_DATA_SCHEME, "").substring(1);
+        String data = intent.getDataString();
+        if (data.startsWith(PackageUtils.PACKAGE_DATA_SCHEME + ':')) {
+            return data.replaceFirst(PackageUtils.PACKAGE_DATA_SCHEME + ':', "");
+        } else {
+            return null;
+        }
     }
 }

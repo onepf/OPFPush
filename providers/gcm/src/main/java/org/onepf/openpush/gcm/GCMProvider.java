@@ -91,7 +91,7 @@ public class GCMProvider extends BasePushProvider {
             return false;
         }
 
-        return PackageUtils.checkPermission(ctx, android.Manifest.permission.INTERNET)
+        return super.checkManifest()
                 && PackageUtils.checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
                 && PackageUtils.checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && PackageUtils.checkPermission(ctx, PERMISSION_RECEIVE)

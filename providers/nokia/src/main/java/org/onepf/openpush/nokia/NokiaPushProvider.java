@@ -55,7 +55,7 @@ public class NokiaPushProvider extends BasePushProvider {
     public boolean checkManifest() {
         try {
             PushRegistrar.checkManifest(getContext());
-            return PackageUtils.checkPermission(getContext(), android.Manifest.permission.INTERNET);
+            return super.checkManifest();
         } catch (UnsupportedOperationException exception) {
             return false;
         }

@@ -54,7 +54,7 @@ public class ADMProvider extends BasePushProvider {
     @Override
     public boolean checkManifest() {
         Context ctx = getContext();
-        return PackageUtils.checkPermission(ctx, android.Manifest.permission.INTERNET)
+        return super.checkManifest()
                 && PackageUtils.checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && PackageUtils.checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
                 && PackageUtils.checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");

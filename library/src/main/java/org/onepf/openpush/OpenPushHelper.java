@@ -75,7 +75,7 @@ public class OpenPushHelper {
     @NotNull
     private State mState = State.STATE_NONE;
 
-    private int mRetryNumber = 0;
+    private int mRetryCount = 0;
     private Options mOptions;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
@@ -105,6 +105,7 @@ public class OpenPushHelper {
         }
         mOptions = options;
         initLastProvider();
+        LOGI(TAG, "Init done.");
     }
 
     private void initLastProvider() {
@@ -152,6 +153,9 @@ public class OpenPushHelper {
                 registerNextProvider(null);
                 break;
 
+            case STATE_REGISTRATION_RUNNING:
+                throw new OpenPushException("Registration is running.");
+
             case STATE_UNREGISTRATION_RUNNING:
                 throw new OpenPushException("Can't register while unregistration is running.");
 
@@ -160,13 +164,20 @@ public class OpenPushHelper {
         }
     }
 
-    private boolean registerNextProvider(@Nullable PushProvider provider) {
+    /**
+     * Register first available provider. Iterate all provider from the next provider after
+     * {@code lastProvider} param.
+     *
+     * @param lastProvider Last provider what check to register or null if has no.
+     * @return True if find provider that can try to register, otherwise false.
+     */
+    private boolean registerNextProvider(@Nullable PushProvider lastProvider) {
         int i = 0;
         final List<PushProvider> providers = mOptions.getProviders();
-        if (provider != null) {
-            int lastCandidateIndex = providers.indexOf(provider);
-            if (lastCandidateIndex != -1) {
-                i = lastCandidateIndex + 1;
+        if (lastProvider != null) {
+            int lastProviderIndex = providers.indexOf(lastProvider);
+            if (lastProviderIndex != -1) {
+                i = lastProviderIndex + 1;
             }
         }
 
@@ -185,20 +196,29 @@ public class OpenPushHelper {
     }
 
     /**
-     * Start register provider.
-     *
-     * @param provider Provider for registration.
-     * @return If provider available and can start registration return true, otherwise - false.
+     * Same that {@link #registerProvider(PushProvider, boolean)} with {@code registerNext} set to false.
      */
     private boolean registerProvider(@NotNull PushProvider provider) {
+        return registerProvider(provider, false);
+    }
+
+    /**
+     * Start register provider.
+     *
+     * @param provider        Provider for registration.
+     * @param tryRegisterNext Try to register next available push provider after the {@code provider},
+     *                        if the {@code provider} isn't available.
+     * @return If provider available and can start registration return true, otherwise - false.
+     */
+    private boolean registerProvider(@NotNull PushProvider provider, boolean tryRegisterNext) {
         if (provider.isAvailable()) {
             LOGI(TAG, String.format("Try register %s.", provider));
             provider.register();
             return true;
-        } else {
-            LOGI(TAG, String.format("Provider '%s' not available.", provider));
-            return false;
         }
+        LOGI(TAG, String.format("Provider '%s' not available.", provider));
+        return tryRegisterNext && registerNextProvider(provider);
+
     }
 
     public void unregister() {
@@ -315,7 +335,7 @@ public class OpenPushHelper {
             reset();
             mCurrentProvider.onAppStateChanged();
             mState = State.STATE_REGISTRATION_RUNNING;
-            if (!registerProvider(mCurrentProvider)) {
+            if (!registerProvider(mCurrentProvider, false)) {
                 mState = State.STATE_NONE;
             }
         }
@@ -402,14 +422,14 @@ public class OpenPushHelper {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
                 }
 
-                mRetryNumber = 0;
+                mRetryCount = 0;
                 registerNextProvider(provider);
             }
         }
     }
 
     private void cancelRetryRegistration() {
-        mRetryNumber = 0;
+        mRetryCount = 0;
         if (mRegistrationRunnable != null) {
             MAIN_HANDLER.removeCallbacks(mRegistrationRunnable);
             mRegistrationRunnable = null;
@@ -418,12 +438,12 @@ public class OpenPushHelper {
 
     private boolean postRegistrationRetry(@NotNull PushProvider provider) {
         Backoff backoff = mOptions.getBackoff();
-        if (backoff != null && mRetryNumber < backoff.getTryCount()) {
-            long delay = backoff.getDelay(mRetryNumber);
+        if (backoff != null && mRetryCount < backoff.getTryCount()) {
+            long delay = backoff.getDelay(mRetryCount);
             long start = System.currentTimeMillis() + delay;
-            LOGI(TAG, String.format("Retry register provider '%s'. Try number = %d," +
-                    " delay = %d ms.", provider.getName(), mRetryNumber, delay));
-            mRetryNumber++;
+            LOGI(TAG, String.format("Retry register provider '%s'. Retry number = %d," +
+                    " delay = %d ms.", provider.getName(), mRetryCount + 1, delay));
+            mRetryCount++;
             if (mRegistrationRunnable == null
                     || !mRegistrationRunnable.getProvider().equals(provider)) {
                 mRegistrationRunnable = new RetryRegistrationRunnable(provider);
@@ -483,7 +503,7 @@ public class OpenPushHelper {
         public void run() {
             LOGI(TAG, String.format("Retry register provider '%s'.", mProvider.getName()));
             if (!registerProvider(mProvider)) {
-                mRetryNumber = 0;
+                mRetryCount = 0;
                 registerNextProvider(mProvider);
             }
         }

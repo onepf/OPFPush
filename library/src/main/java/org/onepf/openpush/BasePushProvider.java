@@ -53,10 +53,9 @@ public abstract class BasePushProvider implements PushProvider {
         return PackageUtils.isInstalled(mAppContext, getHostAppPackage());
     }
 
-    @NotNull
     @Override
     public String toString() {
-        return mName;
+        return mName + "(hostAppPackage='" + mHostAppPackage + ')';
     }
 
     @Override
@@ -70,6 +69,11 @@ public abstract class BasePushProvider implements PushProvider {
 
         BasePushProvider that = (BasePushProvider) o;
         return mName.equals(that.mName);
+    }
+
+    @Override
+    public boolean checkManifest() {
+        return PackageUtils.checkPermission(mAppContext, android.Manifest.permission.INTERNET);
     }
 
     @Override
