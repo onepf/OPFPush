@@ -81,13 +81,13 @@ public class ADMService extends ADMMessageHandlerBase {
                                        String errorId) {
         Error error;
         if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = Error.ERROR_SERVICE_NOT_AVAILABLE;
+            error = Error.SERVICE_NOT_AVAILABLE;
         } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
-            error = Error.ERROR_INVALID_SENDER;
+            error = Error.INVALID_SENDER;
         } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = Error.ERROR_AUTHEFICATION_FAILED;
+            error = Error.AUTHEFICATION_FAILED;
         } else {
-            error = org.onepf.openpush.Error.ERROR_UNKNOWN;
+            error = org.onepf.openpush.Error.UNKNOWN;
         }
         OpenPushHelper.getInstance(this).onRegistrationEnd(
                 new RegistrationResult(ADMProvider.NAME, error));

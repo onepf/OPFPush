@@ -17,12 +17,9 @@
 package org.onepf.openpush.sample;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +27,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
 import org.onepf.openpush.gcm.GCMProvider;
@@ -91,7 +86,7 @@ public class PushSampleActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getState() == OpenPushHelper.State.STATE_RUNNING) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.State.RUNNING) {
             mRegistered = true;
             switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
                     mOpenPushHelper.getCurrentProviderRegistrationId());
@@ -117,11 +112,11 @@ public class PushSampleActivity extends Activity {
     @OnClick(R.id.register_switch)
     void onRegisterClick() {
         switch (mOpenPushHelper.getState()) {
-            case STATE_RUNNING:
+            case RUNNING:
                 mOpenPushHelper.unregister();
                 break;
 
-            case STATE_NONE:
+            case NONE:
                 mRegistered = true;
                 EventBus.getDefault().register(this);
                 mOpenPushHelper.register();

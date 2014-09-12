@@ -88,7 +88,7 @@ public class PushSampleActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getState() == OpenPushHelper.State.STATE_RUNNING) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.State.RUNNING) {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }
@@ -130,10 +130,10 @@ public class PushSampleActivity extends Activity {
 
     @OnClick(R.id.register_switch)
     void onRegisterClick() {
-        if (mOpenPushHelper.getState() == OpenPushHelper.State.STATE_RUNNING) {
+        if (mOpenPushHelper.getState() == OpenPushHelper.State.RUNNING) {
             mOpenPushHelper.unregister();
         } else if (mOpenPushHelper.getState()
-                == OpenPushHelper.State.STATE_NONE) {
+                == OpenPushHelper.State.NONE) {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }

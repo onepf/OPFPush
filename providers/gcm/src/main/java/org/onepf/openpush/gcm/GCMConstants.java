@@ -25,11 +25,10 @@ class GCMConstants {
     static final String ACTION_REGISTRATION = "org.onepf.openpush.gcm.registration";
     static final String ACTION_UNREGISTRATION = "org.onepf.openpush.gcm.unregistration";
     static final String ACTION_ERROR = "org.onepf.openpush.gcm.error";
-    static final String ACTION_ANDROID_ID_CHANGE = "org.onepf.openpush.gcm.android_id_change";
 
     static final String EXTRA_ERROR_ID = "org.onepf.openpush.gcm.error_id";
     static final String EXTRA_TOKEN = "org.onepf.openpush.gcm.token";
 
-    static final String ERROR_AUTHEFICATION_FAILED = "ERROR_AUTHEFICATION_FAILED";
+    static final String ERROR_AUTHEFICATION_FAILED = "AUTHEFICATION_FAILED";
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 }

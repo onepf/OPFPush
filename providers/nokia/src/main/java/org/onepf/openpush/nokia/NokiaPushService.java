@@ -57,13 +57,13 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
         switch (OpenPushHelper.getInstance(this).getState()) {
-            case STATE_REGISTRATION_RUNNING:
+            case REGISTRATION_RUNNING:
                 OpenPushHelper.getInstance(this).onRegistrationEnd(
                         new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
                 );
                 break;
 
-            case STATE_UNREGISTRATION_RUNNING:
+            case UNREGISTRATION_RUNNING:
                 OpenPushHelper.getInstance(this).onUnregistrationEnd(
                         new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
                 );
@@ -109,13 +109,13 @@ public class NokiaPushService extends PushBaseIntentService {
 
     private static Error convertError(String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return Error.ERROR_INVALID_PARAMETERS;
+            return Error.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return Error.ERROR_INVALID_PARAMETERS;
+            return Error.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return Error.ERROR_SERVICE_NOT_AVAILABLE;
+            return Error.SERVICE_NOT_AVAILABLE;
         } else {
-            return org.onepf.openpush.Error.ERROR_UNKNOWN;
+            return org.onepf.openpush.Error.UNKNOWN;
         }
     }
 

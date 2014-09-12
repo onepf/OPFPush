@@ -37,10 +37,10 @@ public class OpenPushHelperTest {
         builder.addProviders(new MockPushProvider(Robolectric.application));
         OpenPushHelper openPushHelper = OpenPushHelperKeeper.getNewInstance(Robolectric.application);
         assertEquals(false, openPushHelper.isInitDone());
-        assertEquals(OpenPushHelper.State.STATE_NONE, openPushHelper.getState());
+        assertEquals(OpenPushHelper.State.NONE, openPushHelper.getState());
         openPushHelper.init(builder.build());
         assertEquals(true, openPushHelper.isInitDone());
-        assertEquals(OpenPushHelper.State.STATE_NONE, openPushHelper.getState());
+        assertEquals(OpenPushHelper.State.NONE, openPushHelper.getState());
     }
 
     @Test(expected = OpenPushException.class)
@@ -75,10 +75,10 @@ public class OpenPushHelperTest {
         Options options = builder.build();
         helper.init(options);
         assertEquals(true, helper.isInitDone());
-        assertEquals(OpenPushHelper.State.STATE_NONE, helper.getState());
+        assertEquals(OpenPushHelper.State.NONE, helper.getState());
 
         helper.register();
-        assertEquals(OpenPushHelper.State.STATE_RUNNING, helper.getState());
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(MockPushProvider.NAME, helper.getCurrentProviderName());
         assertNotNull(helper.getCurrentProviderRegistrationId());
     }
@@ -102,15 +102,15 @@ public class OpenPushHelperTest {
         Options options = builder.build();
         helper.init(options);
         assertEquals(true, helper.isInitDone());
-        assertEquals(OpenPushHelper.State.STATE_NONE, helper.getState());
+        assertEquals(OpenPushHelper.State.NONE, helper.getState());
 
         helper.register();
-        assertEquals(OpenPushHelper.State.STATE_RUNNING, helper.getState());
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(MockPushProvider.NAME, helper.getCurrentProviderName());
         assertNotNull(helper.getCurrentProviderRegistrationId());
 
         helper.unregister();
-        assertEquals(OpenPushHelper.State.STATE_NONE, helper.getState());
+        assertEquals(OpenPushHelper.State.NONE, helper.getState());
         assertNull(helper.getCurrentProviderName());
         assertNull(helper.getCurrentProviderRegistrationId());
     }
@@ -123,7 +123,7 @@ public class OpenPushHelperTest {
         Options options = builder.build();
         helper.init(options);
         helper.register();
-        assertEquals(OpenPushHelper.State.STATE_RUNNING, helper.getState());
+        assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         helper.register();
     }
 }
