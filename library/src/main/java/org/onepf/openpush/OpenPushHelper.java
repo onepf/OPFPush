@@ -64,16 +64,17 @@ public class OpenPushHelper {
     @Nullable
     private PackageChangeReceiver mPackageReceiver;
 
-    private Options mOptions;
-
     @Nullable
     private PushProvider mCurrentProvider;
 
     @Nullable
     private RetryRegistrationRunnable mRegistrationRunnable;
 
+    @NotNull
     private State mState = State.STATE_NONE;
+
     private int mRetryNumber = 0;
+    private Options mOptions;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
         if (sInstance == null) {
