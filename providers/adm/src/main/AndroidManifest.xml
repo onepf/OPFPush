@@ -16,7 +16,6 @@
 
 <manifest
     package="org.onepf.openpush.adm"
-    xmlns:amazon="http://schemas.amazon.com/apk/res/android"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <permission
@@ -29,10 +28,6 @@
     <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
 
     <application>
-        <amazon:enable-feature
-            android:name="com.amazon.device.messaging"
-            android:required="true"/>
-
         <service
             android:name=".ADMService"
             android:exported="false"/>
