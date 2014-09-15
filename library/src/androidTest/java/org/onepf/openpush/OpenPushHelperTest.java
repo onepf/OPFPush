@@ -192,7 +192,7 @@ public class OpenPushHelperTest {
         assertFalse(provider2.isRegistered());
 
         Robolectric.packageManager.removePackage(provider1.getHostAppPackage());
-        helper.onBecameUnavailable(provider1);
+        helper.onUnavailable(provider1);
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(provider2.getName(), helper.getCurrentProviderName());
         assertEquals(provider2.getRegistrationId(),

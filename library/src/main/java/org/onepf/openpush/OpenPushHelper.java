@@ -20,13 +20,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PatternMatcher;
 import android.text.TextUtils;
-import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -150,6 +148,14 @@ public class OpenPushHelper {
             case NONE:
             case NO_AVAILABLE_PROVIDERS:
                 mState = State.REGISTRATION_RUNNING;
+                if (mOptions.isSystemPushPreferred()) {
+                    for (PushProvider provider : mOptions.getProviders()) {
+                        if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())
+                                && registerProvider(provider, false)) {
+                            return;
+                        }
+                    }
+                }
                 registerNextProvider(null);
                 break;
 
@@ -254,19 +260,14 @@ public class OpenPushHelper {
         appUpdateFilter.addDataPath(mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         mAppContext.registerReceiver(mPackageReceiver, appUpdateFilter);
 
-        try {
-            // System apps can't be removed, that's why no sense listen package remove event.
-            if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
-                IntentFilter hostAppRemovedFilter
-                        = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-                hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-                hostAppRemovedFilter.addDataPath(
-                        provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
-                mAppContext.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, String.format("Can not find package '%s'.",
-                    provider.getHostAppPackage()), e);
+        // System apps can't be removed, that's why no sense listen package remove event.
+        if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
+            IntentFilter hostAppRemovedFilter
+                    = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+            hostAppRemovedFilter.addDataPath(
+                    provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
+            mAppContext.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
         }
     }
 
@@ -328,7 +329,7 @@ public class OpenPushHelper {
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
-        LOGD(TAG, String.format("onBecameUnavailable(providerName = %s).", providerName));
+        LOGD(TAG, String.format("onUnavailable(providerName = %s).", providerName));
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
@@ -360,8 +361,8 @@ public class OpenPushHelper {
         cancelRetryRegistration();
     }
 
-    public void onBecameUnavailable(@NotNull PushProvider provider) {
-        LOGD(TAG, String.format("onBecameUnavailable(provider = %s).", provider));
+    public void onUnavailable(@NotNull PushProvider provider) {
+        LOGD(TAG, String.format("onUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
             mCurrentProvider.onUnavailable();

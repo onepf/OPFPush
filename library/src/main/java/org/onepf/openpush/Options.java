@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,14 +38,18 @@ public class Options {
     @Nullable
     private final Backoff mBackoff;
 
-    private boolean mRecoverProvider;
+    private final boolean mRecoverProvider;
+
+    private final boolean mSystemPushPreferred;
 
     private Options(@NotNull Collection<? extends PushProvider> providers,
                     @Nullable Backoff backoff,
-                    boolean recoverProvider) {
+                    boolean recoverProvider,
+                    boolean systemPushPreferred) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mBackoff = backoff;
         mRecoverProvider = recoverProvider;
+        mSystemPushPreferred = systemPushPreferred;
     }
 
     /**
@@ -57,6 +60,10 @@ public class Options {
      */
     public boolean isRecoverProvider() {
         return mRecoverProvider;
+    }
+
+    public boolean isSystemPushPreferred() {
+        return mSystemPushPreferred;
     }
 
     /**
@@ -86,8 +93,11 @@ public class Options {
 
         private boolean mRecoverProvider;
 
+        private boolean mSystemPushPreferred;
+
         public Builder() {
             mRecoverProvider = true;
+            mSystemPushPreferred = false;
         }
 
         /**
@@ -100,6 +110,11 @@ public class Options {
         @NotNull
         public Builder addProviders(@NotNull PushProvider... providers) {
             return addProviders(Arrays.asList(providers));
+        }
+
+        public Builder setSystemPushPreferred(boolean systemPushPreferred) {
+            mSystemPushPreferred = systemPushPreferred;
+            return this;
         }
 
         /**
@@ -143,7 +158,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders, mBackoff, mRecoverProvider);
+            return new Options(mProviders, mBackoff, mRecoverProvider, mSystemPushPreferred);
         }
     }
 }

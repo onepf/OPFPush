@@ -45,11 +45,14 @@ public final class PackageUtils {
         return Integer.MIN_VALUE;
     }
 
-    public static boolean isSystemApp(@NotNull Context context, @NotNull String appPackage)
-            throws PackageManager.NameNotFoundException {
-        ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
-        return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
-                (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+    public static boolean isSystemApp(@NotNull Context context, @NotNull String appPackage) {
+        try {
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
+            return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
+                    (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     public static boolean isInstalled(@NotNull Context context, @NotNull String appPackage) {

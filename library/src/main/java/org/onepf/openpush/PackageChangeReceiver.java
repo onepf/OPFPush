@@ -45,7 +45,7 @@ public class PackageChangeReceiver extends BroadcastReceiver {
             if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
                 LOGI(TAG, String.format("Host app '%s' of provider '%s' removed.",
                         mProvider.getHostAppPackage(), mProvider.getName()));
-                OpenPushHelper.getInstance(context).onBecameUnavailable(mProvider);
+                OpenPushHelper.getInstance(context).onUnavailable(mProvider);
             }
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
             if (context.getPackageName().equals(getAppPackage(intent))) {
