@@ -22,8 +22,9 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.provider.Settings;
 import android.text.TextUtils;
 
@@ -58,24 +59,30 @@ public class GCMProvider extends BasePushProvider {
     private final SharedPreferences mPreferences;
     private final GoogleCloudMessaging mGoogleCloudMessaging;
 
+    private final HandlerThread WORKER_THREAD = new HandlerThread(NAME);
+    private final Handler mHandler;
+
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
         super(context, NAME, "com.android.vending");
         mSenderIDs = senderIDs;
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
+
+        WORKER_THREAD.start();
+        mHandler = new Handler(WORKER_THREAD.getLooper());
     }
 
     public void register() {
         if (isRegistered()) {
             throw new OpenPushException("Google Cloud Messaging already registered.");
         }
-        new RegisterTask().execute();
+        mHandler.post(new RegisterTask());
     }
 
     public void unregister() {
         if (isRegistered()) {
-            new UnregisterTask().execute();
+            mHandler.post(new UnregisterTask(mRegistrationToken));
         } else {
             throw new OpenPushException("Google Cloud Messaging must" +
                     " be registered before unregister.");
@@ -167,79 +174,61 @@ public class GCMProvider extends BasePushProvider {
     private void reset() {
         mRegistrationToken = null;
         mPreferences.edit().clear().apply();
+        WORKER_THREAD.quit();
     }
 
-    private class UnregisterTask extends AsyncTask<Void, Void, Boolean> {
+    private class UnregisterTask implements Runnable {
         private String mOldRegistrationToken;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mOldRegistrationToken = mRegistrationToken;
+        private UnregisterTask(String oldRegistrationToken) {
+            mOldRegistrationToken = oldRegistrationToken;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        public void run() {
             try {
                 mGoogleCloudMessaging.unregister();
-                return true;
-            } catch (IOException e) {
-                return false;
-            }
-        }
 
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
                 reset();
 
                 Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
                 intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
                 getContext().sendBroadcast(intent);
-            } else {
+            } catch (IOException e) {
                 //TODO Send error.
             }
         }
     }
 
-    private class RegisterTask extends AsyncTask<Void, Void, String> {
+    private class RegisterTask implements Runnable {
 
         @Override
-        protected void onPreExecute() {
+        public void run() {
             reset();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
             try {
-                return mGoogleCloudMessaging.register(mSenderIDs);
+                mRegistrationToken = mGoogleCloudMessaging.register(mSenderIDs);
+                if (mRegistrationToken != null) {
+                    mPreferences.edit()
+                            .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
+                            .putString(PREF_REGISTRATION_TOKEN, mRegistrationToken)
+                            .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
+                            .apply();
+
+                    Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+                    intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
+                    getContext().sendBroadcast(intent);
+                } else {
+                    Intent intent = new Intent(GCMConstants.ACTION_ERROR);
+                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                            GCMConstants.ERROR_AUTHEFICATION_FAILED);
+                    getContext().sendBroadcast(intent);
+                }
             } catch (IOException e) {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
                     intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                 }
-                getContext().sendBroadcast(intent);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String registrationId) {
-            mRegistrationToken = registrationId;
-            if (mRegistrationToken != null) {
-                mPreferences.edit()
-                        .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                        .putString(PREF_REGISTRATION_TOKEN, registrationId)
-                        .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
-                        .apply();
-
-                Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
-                intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
-                getContext().sendBroadcast(intent);
-            } else {
-                Intent intent = new Intent(GCMConstants.ACTION_ERROR);
-                intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_AUTHEFICATION_FAILED);
                 getContext().sendBroadcast(intent);
             }
         }
