@@ -56,17 +56,16 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NotNull Context appContext, String errorId) {
-        switch (OpenPushHelper.getInstance(this).getState()) {
+        OpenPushHelper openPushHelper = OpenPushHelper.getInstance(this);
+        RegistrationResult result =
+                new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false);
+        switch (openPushHelper.getState()) {
             case REGISTRATION_RUNNING:
-                OpenPushHelper.getInstance(this).onRegistrationEnd(
-                        new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
-                );
+                openPushHelper.onRegistrationEnd(result);
                 break;
 
             case UNREGISTRATION_RUNNING:
-                OpenPushHelper.getInstance(this).onUnregistrationEnd(
-                        new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), false)
-                );
+                openPushHelper.onUnregistrationEnd(result);
                 break;
         }
     }
@@ -101,13 +100,20 @@ public class NokiaPushService extends PushBaseIntentService {
                                                  PushConstants.ERROR_SERVICE_NOT_AVAILABLE
                                          })
                                          String errorId) {
+        Error error = convertError(errorId);
         OpenPushHelper.getInstance(this)
-                .onRegistrationEnd(
-                        new RegistrationResult(NokiaPushProvider.NAME, convertError(errorId), true));
+                .onRegistrationEnd(new RegistrationResult(NokiaPushProvider.NAME, error, true));
         return false;
     }
 
-    private static Error convertError(String errorId) {
+    @NotNull
+    private static Error convertError(
+            @NotNull
+            @MagicConstant(stringValues = {
+                    PushConstants.ERROR_INVALID_PARAMETERS,
+                    PushConstants.ERROR_INVALID_SENDER,
+                    PushConstants.ERROR_SERVICE_NOT_AVAILABLE
+            }) String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
             return Error.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
@@ -128,8 +134,9 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onRegistered(@NotNull Context appContext,
                                 @NotNull String registrationToken) {
-        OpenPushHelper.getInstance(this)
-                .onRegistrationEnd(new RegistrationResult(NokiaPushProvider.NAME, registrationToken));
+        RegistrationResult result =
+                new RegistrationResult(NokiaPushProvider.NAME, registrationToken);
+        OpenPushHelper.getInstance(this).onRegistrationEnd(result);
     }
 
     /**
@@ -141,7 +148,8 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onUnregistered(@NotNull Context appContext,
                                   @NotNull String oldRegistrationToken) {
-        OpenPushHelper.getInstance(this)
-                .onUnregistrationEnd(new RegistrationResult(NokiaPushProvider.NAME, oldRegistrationToken));
+        RegistrationResult result =
+                new RegistrationResult(NokiaPushProvider.NAME, oldRegistrationToken);
+        OpenPushHelper.getInstance(this).onUnregistrationEnd(result);
     }
 }

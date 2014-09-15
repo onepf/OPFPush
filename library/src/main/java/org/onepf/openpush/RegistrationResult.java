@@ -26,10 +26,7 @@ public final class RegistrationResult {
 
     @NotNull
     private final String mProviderName;
-
-    @Nullable
     private final String mRegistrationId;
-
     private final Error mErrorCode;
     private final boolean mRecoverableError;
 
@@ -38,10 +35,6 @@ public final class RegistrationResult {
         mRegistrationId = registrationId;
         mErrorCode = null;
         mRecoverableError = true;
-    }
-
-    public RegistrationResult(@NotNull String providerName, @NotNull Error error) {
-        this(providerName, error, true);
     }
 
     public RegistrationResult(@NotNull String providerName, @NotNull Error error,

@@ -17,6 +17,7 @@
 package org.onepf.openpush;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,10 @@ import org.onepf.openpush.util.OpenPushHelperKeeper;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowApplication;
+import org.robolectric.shadows.ShadowLog;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,6 +42,11 @@ import static org.junit.Assert.assertTrue;
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class OpenPushHelperTest {
+
+    static {
+        // redirect the Log.x output to stdout. Stdout will be recorded in the test result report
+        ShadowLog.stream = System.out;
+    }
 
     @Before
     public void setup() {
@@ -94,6 +104,23 @@ public class OpenPushHelperTest {
         assertEquals(OpenPushHelper.State.RUNNING, helper.getState());
         assertEquals(providerName, helper.getCurrentProviderName());
         assertNotNull(helper.getCurrentProviderRegistrationId());
+        testPackageChangeReceiverRegistered();
+    }
+
+    public void testPackageChangeReceiverRegistered() {
+        List<ShadowApplication.Wrapper> registeredReceivers = Robolectric.getShadowApplication().getRegisteredReceivers();
+        assertFalse(registeredReceivers.isEmpty());
+        boolean receiverFound = false;
+        final String packageChangeReceiverClassName = PackageChangeReceiver.class.getSimpleName();
+        for (ShadowApplication.Wrapper wrapper : registeredReceivers) {
+            if (packageChangeReceiverClassName.equals(
+                    wrapper.broadcastReceiver.getClass().getSimpleName())) {
+                receiverFound = true;
+                break;
+            }
+        }
+
+        Assert.assertTrue(receiverFound); //will be false if not found
     }
 
     @Test(expected = OpenPushException.class)

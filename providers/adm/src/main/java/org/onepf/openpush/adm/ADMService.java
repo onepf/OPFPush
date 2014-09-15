@@ -18,6 +18,7 @@ package org.onepf.openpush.adm;
 
 import android.content.Intent;
 
+import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
@@ -79,6 +80,22 @@ public class ADMService extends ADMMessageHandlerBase {
                                                ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
                                        })
                                        String errorId) {
+        if (!ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            Error error = convertError(errorId);
+            OpenPushHelper.getInstance(this).onRegistrationEnd(
+                    new RegistrationResult(ADMProvider.NAME, error, false));
+        }
+    }
+
+    @NotNull
+    private Error convertError(
+            @NotNull
+            @MagicConstant(stringValues = {
+                    ADMConstants.ERROR_AUTHENTICATION_FAILED,
+                    ADMConstants.ERROR_INVALID_SENDER,
+                    ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
+            })
+            String errorId) {
         Error error;
         if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;
@@ -87,10 +104,9 @@ public class ADMService extends ADMMessageHandlerBase {
         } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
             error = Error.AUTHEFICATION_FAILED;
         } else {
-            error = org.onepf.openpush.Error.UNKNOWN;
+            error = Error.UNKNOWN;
         }
-        OpenPushHelper.getInstance(this).onRegistrationEnd(
-                new RegistrationResult(ADMProvider.NAME, error));
+        return error;
     }
 
     /**

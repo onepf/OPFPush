@@ -224,11 +224,11 @@ public class OpenPushHelper {
     public void unregister() {
         checkInitDone();
 
-        if (mCurrentProvider == null){
+        if (mCurrentProvider == null) {
             throw new OpenPushException("No provider to unregister!");
         }
 
-        switch (mState){
+        switch (mState) {
             case RUNNING:
                 mState = State.UNREGISTRATION_RUNNING;
                 unregisterPackageChangeReceiver();

@@ -77,17 +77,20 @@ public class GCMService extends IntentService {
         } else if (errorId.equals(GCMConstants.ERROR_AUTHEFICATION_FAILED)) {
             error = Error.AUTHEFICATION_FAILED;
         } else {
-            error = org.onepf.openpush.Error.UNKNOWN;
+            error = Error.UNKNOWN;
         }
 
         OpenPushHelper helper = OpenPushHelper.getInstance(this);
+        final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
         switch (helper.getState()) {
             case REGISTRATION_RUNNING:
-                helper.onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+                helper.onRegistrationEnd(
+                        new RegistrationResult(GCMProvider.NAME, error, recoverableError));
                 break;
 
             case UNREGISTRATION_RUNNING:
-                helper.onUnregistrationEnd(new RegistrationResult(GCMProvider.NAME, error));
+                helper.onUnregistrationEnd(
+                        new RegistrationResult(GCMProvider.NAME, error, recoverableError));
                 break;
         }
     }

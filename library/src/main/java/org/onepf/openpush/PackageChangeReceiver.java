@@ -29,6 +29,7 @@ import static org.onepf.openpush.util.LogUtils.*;
 public class PackageChangeReceiver extends BroadcastReceiver {
 
     private static final String TAG = makeLogTag(PackageChangeReceiver.class);
+    private static final String PACKAGE_URI_PREFIX = PackageUtils.PACKAGE_DATA_SCHEME + ':';
 
     @NotNull
     private PushProvider mProvider;
@@ -56,11 +57,8 @@ public class PackageChangeReceiver extends BroadcastReceiver {
 
     @Nullable
     private static String getAppPackage(Intent intent) {
-        String data = intent.getDataString();
-        if (data.startsWith(PackageUtils.PACKAGE_DATA_SCHEME + ':')) {
-            return data.replaceFirst(PackageUtils.PACKAGE_DATA_SCHEME + ':', "");
-        } else {
-            return null;
-        }
+        final String data = intent.getDataString();
+        return data.startsWith(PACKAGE_URI_PREFIX) ?
+                data.replaceFirst(PACKAGE_URI_PREFIX, "") : null;
     }
 }
