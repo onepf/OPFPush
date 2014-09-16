@@ -27,8 +27,13 @@ import org.onepf.openpush.util.PackageUtils;
  */
 public abstract class BasePushProvider implements PushProvider {
 
+    @NotNull
     private final Context mAppContext;
+
+    @NotNull
     private final String mName;
+
+    @NotNull
     private final String mHostAppPackage;
 
     protected BasePushProvider(@NotNull Context context,
