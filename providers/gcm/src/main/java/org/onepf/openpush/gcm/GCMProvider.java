@@ -23,8 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.provider.Settings;
 import android.text.TextUtils;
 
@@ -40,7 +38,6 @@ import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

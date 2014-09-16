@@ -34,13 +34,14 @@ public abstract class BasePushProvider implements PushProvider {
     protected BasePushProvider(@NotNull Context context,
                                @NotNull String name,
                                @NotNull String hostAppPackage) {
-        if (!checkManifest()) {
-            throw new OpenPushException("Your manifest doesn't contains all required" +
-                    " data. Check your app manifest.");
-        }
         mAppContext = context.getApplicationContext();
         mName = name;
         mHostAppPackage = hostAppPackage;
+
+        if (!checkManifest()) {
+            throw new OpenPushException("Your manifest doesn't contain all required permissions." +
+                    " Check your AndroidManifest.xml.");
+        }
     }
 
     @NotNull

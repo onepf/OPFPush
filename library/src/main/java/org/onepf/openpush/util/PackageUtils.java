@@ -41,8 +41,8 @@ public final class PackageUtils {
             return packageInfo == null ? Integer.MIN_VALUE : packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             // should never happen
+            return Integer.MIN_VALUE;
         }
-        return Integer.MIN_VALUE;
     }
 
     public static boolean isSystemApp(@NotNull Context context, @NotNull String appPackage) {
@@ -57,9 +57,7 @@ public final class PackageUtils {
 
     public static boolean isInstalled(@NotNull Context context, @NotNull String appPackage) {
         try {
-            PackageManager packageManager = context.getPackageManager();
-            ApplicationInfo appInfo = packageManager.getApplicationInfo(appPackage, 0);
-            return appInfo != null;
+            return context.getPackageManager().getApplicationInfo(appPackage, 0) != null;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
