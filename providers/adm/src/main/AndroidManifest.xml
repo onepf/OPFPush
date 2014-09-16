@@ -18,14 +18,14 @@
     package="org.onepf.openpush.adm"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
     <permission
-        android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"
+        android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"
         android:protectionLevel="signature"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>
-    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
+    <uses-permission android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"/>
 
     <application>
         <service
@@ -40,7 +40,7 @@
                 <action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>
                 <action android:name="com.amazon.device.messaging.intent.RECEIVE"/>
 
-                <category android:name="${applicationId}"/>
+                <category android:name="${packageId}"/>
             </intent-filter>
         </receiver>
     </application>
