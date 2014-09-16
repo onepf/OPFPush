@@ -40,6 +40,9 @@ import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -59,8 +62,7 @@ public class GCMProvider extends BasePushProvider {
     private final SharedPreferences mPreferences;
     private final GoogleCloudMessaging mGoogleCloudMessaging;
 
-    private final HandlerThread WORKER_THREAD = new HandlerThread(NAME);
-    private final Handler mHandler;
+    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
         super(context, NAME, "com.android.vending");
@@ -68,21 +70,18 @@ public class GCMProvider extends BasePushProvider {
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
-
-        WORKER_THREAD.start();
-        mHandler = new Handler(WORKER_THREAD.getLooper());
     }
 
     public void register() {
         if (isRegistered()) {
             throw new OpenPushException("Google Cloud Messaging already registered.");
         }
-        mHandler.post(new RegisterTask());
+        mExecutor.execute(new RegisterTask());
     }
 
     public void unregister() {
         if (isRegistered()) {
-            mHandler.post(new UnregisterTask(mRegistrationToken));
+            mExecutor.execute(new UnregisterTask(mRegistrationToken));
         } else {
             throw new OpenPushException("Google Cloud Messaging must" +
                     " be registered before unregister.");
@@ -152,6 +151,7 @@ public class GCMProvider extends BasePushProvider {
     @Override
     public void close() {
         mGoogleCloudMessaging.close();
+        mExecutor.shutdown();
     }
 
     @NotNull
@@ -174,7 +174,6 @@ public class GCMProvider extends BasePushProvider {
     private void reset() {
         mRegistrationToken = null;
         mPreferences.edit().clear().apply();
-        WORKER_THREAD.quit();
     }
 
     private class UnregisterTask implements Runnable {
