@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
-import org.onepf.openpush.util.PackageUtils;
 
 /**
  * Created by krozov on 06.09.14.
@@ -55,9 +54,9 @@ public class ADMProvider extends BasePushProvider {
     public boolean checkManifest() {
         Context ctx = getContext();
         return super.checkManifest()
-                && PackageUtils.checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                && PackageUtils.checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
-                && PackageUtils.checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
+                && checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                && checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
+                && checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
     }
 
     @Override

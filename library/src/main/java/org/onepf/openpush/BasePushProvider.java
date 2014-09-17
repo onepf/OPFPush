@@ -17,6 +17,7 @@
 package org.onepf.openpush;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.util.PackageUtils;
@@ -43,9 +44,17 @@ public abstract class BasePushProvider implements PushProvider {
         mName = name;
         mHostAppPackage = hostAppPackage;
 
-        if (!checkManifest()) {
-            throw new OpenPushException("Your manifest doesn't contain all required permissions." +
-                    " Check your AndroidManifest.xml.");
+        checkManifest();
+    }
+
+    protected static boolean checkPermission(@NotNull Context context, @NotNull String permission) {
+        boolean granted = context.getPackageManager().checkPermission(permission, context.getPackageName())
+                == PackageManager.PERMISSION_GRANTED;
+        if (granted) {
+            return true;
+        } else {
+            throw new OpenPushException("Your manifest doesn't contain permission '"
+                    + permission + ".' Check your AndroidManifest.xml.");
         }
     }
 
@@ -79,7 +88,7 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public boolean checkManifest() {
-        return PackageUtils.checkPermission(mAppContext, android.Manifest.permission.INTERNET);
+        return checkPermission(mAppContext, android.Manifest.permission.INTERNET);
     }
 
     @Override

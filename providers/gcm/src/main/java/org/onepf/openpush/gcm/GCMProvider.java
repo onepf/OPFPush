@@ -90,15 +90,15 @@ public class GCMProvider extends BasePushProvider {
         Context ctx = getContext();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
                 && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
-                && !PackageUtils.checkPermission(ctx, Manifest.permission.GET_ACCOUNTS)) {
+                && !checkPermission(ctx, Manifest.permission.GET_ACCOUNTS)) {
             return false;
         }
 
         return super.checkManifest()
-                && PackageUtils.checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
-                && PackageUtils.checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                && PackageUtils.checkPermission(ctx, PERMISSION_RECEIVE)
-                && PackageUtils.checkPermission(ctx, ctx.getPackageName() + ".permission.C2D_MESSAGE");
+                && checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
+                && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                && checkPermission(ctx, PERMISSION_RECEIVE)
+                && checkPermission(ctx, ctx.getPackageName() + ".permission.C2D_MESSAGE");
     }
 
     @Override

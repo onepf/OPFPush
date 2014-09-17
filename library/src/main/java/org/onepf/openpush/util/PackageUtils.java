@@ -63,11 +63,6 @@ public final class PackageUtils {
         }
     }
 
-    public static boolean checkPermission(@NotNull Context context, @NotNull String permission) {
-        return context.getPackageManager().checkPermission(permission, context.getPackageName())
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
     private PackageUtils() {
     }
 }
