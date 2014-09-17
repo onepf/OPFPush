@@ -156,7 +156,7 @@ public class PushSampleActivity extends Activity {
     @OnClick(R.id.btn_copy_to_clipboard)
     void setBtnCopyToClipboard() {
         Toast.makeText(PushSampleActivity.this,
-                PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
+                getString(R.string.toast_registration_id_copied),
                 Toast.LENGTH_LONG)
                 .show();
 

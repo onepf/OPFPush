@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-
-
 apply plugin: 'com.android.application'
+
+dependencies {
+    compile 'org.onepf:openpush:2.0.0-SNAPSHOT@aar'
+    compile 'org.onepf:openpush-gcm:2.0.0-SNAPSHOT@aar'
+    //noinspection GradleDependency
+    compile 'com.google.android.gms:play-services:5.0.89'
+    compile 'com.jakewharton:butterknife:5.1.2'
+    compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'com.intellij:annotations:12.0'
+}
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -28,60 +36,6 @@ android {
         versionCode 2
         versionName "2.0"
 
-        applicationId 'org.onepf.openpush.sample'
-    }
-}
-
-dependencies {
-    compile project(':providers:gcm')
-    //noinspection GradleDependency
-    compile 'com.google.android.gms:play-services:5.0.89'
-    compile 'com.jakewharton:butterknife:5.1.2'
-    compile 'de.greenrobot:eventbus:2.2.1'
-}
-
-afterEvaluate { project ->
-    android.applicationVariants.each { variant ->
-        variant.javaCompile.dependsOn stripPlayServices
-    }
-}
-
-task stripPlayServices << {
-    def playServiceRootFolder = new File(rootProject.buildDir, "intermediates/exploded-aar/com.google.android.gms/play-services/")
-    playServiceRootFolder.list().each { versionName ->
-        def versionFolder = new File(playServiceRootFolder, versionName)
-        copy {
-            from (file(new File(versionFolder, "classes.jar")))
-            into (file(versionFolder))
-            rename { fileName ->
-                fileName = "classes_orig.jar"
-            }
-        }
-        tasks.create(name: "strip" + versionName, type: Jar) {
-            destinationDir = versionFolder
-            archiveName = "classes.jar"
-            from (zipTree(new File(versionFolder, "classes_orig.jar"))) {
-                exclude "com/google/ads/**"
-                exclude "com/google/android/gms/ads/**"
-                exclude "com/google/android/gms/analytics/**"
-                exclude "com/google/android/gms/appindexing/**"
-//                exclude "com/google/android/gms/appstate/**"
-                exclude "com/google/android/gms/cast/**"
-                exclude "com/google/android/gms/drive/**"
-//                exclude "com/google/android/gms/dynamic/**"
-                exclude "com/google/android/gms/games/**"
-                exclude "com/google/android/gms/location/**"
-                exclude "com/google/android/gms/maps/**"
-                exclude "com/google/android/gms/panorama/**"
-                exclude "com/google/android/gms/plus/**"
-                exclude "com/google/android/gms/security/**"
-                exclude "com/google/android/gms/tagmanager/**"
-                exclude "com/google/android/gms/wallet/**"
-                exclude "com/google/android/gms/wearable/**"
-            }
-        }.execute()
-        delete {
-            delete (file(new File(versionFolder, "classes_orig.jar")))
-        }
+        applicationId 'org.onepf.openpush.sample.eventbus'
     }
 }
