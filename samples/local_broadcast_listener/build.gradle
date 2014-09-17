@@ -33,7 +33,6 @@ android {
 }
 
 dependencies {
-    compile project(':library')
     compile project(':providers:gcm')
     //noinspection GradleDependency
     compile 'com.google.android.gms:play-services:5.0.89'

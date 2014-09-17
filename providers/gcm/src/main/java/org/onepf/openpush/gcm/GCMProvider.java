@@ -109,6 +109,14 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
+        //Need verify that GCM classes present, because depende
+        try {
+            Class.forName("com.google.android.gms.gcm.GoogleCloudMessaging");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+
         if (super.isAvailable()) {
             if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())
                     == ConnectionResult.SUCCESS) {

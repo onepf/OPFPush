@@ -203,18 +203,6 @@ public class PushSampleActivity extends Activity {
         }
 
         private void sendRegistrationDataToServer(String providerName, String registrationId) {
-            try {
-                URL url = new URL(WEB_SERVER_URL);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setDoInput(true);
-                con.setUseCaches(false);
-                con.setRequestMethod("POST");
-                con.setRequestProperty("RegistrationId", registrationId);
-                con.setRequestProperty("ProviderName", providerName);
-                con.getResponseCode();
-            } catch (IOException e) {
-                Log.e(TAG, "Can't send registration data to server.", e);
-            }
         }
 
         @Override
