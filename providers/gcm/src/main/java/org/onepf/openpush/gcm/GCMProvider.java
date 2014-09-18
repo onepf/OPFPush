@@ -205,18 +205,19 @@ public class GCMProvider extends BasePushProvider {
     }
 
     private class RegisterTask implements Runnable {
-
         @Override
         public void run() {
             reset();
+
             try {
-                mRegistrationToken = mGoogleCloudMessaging.register(mSenderIDs);
-                if (mRegistrationToken != null) {
+                final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
+                if (registrationId != null) {
                     mPreferences.edit()
                             .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                            .putString(PREF_REGISTRATION_TOKEN, mRegistrationToken)
+                            .putString(PREF_REGISTRATION_TOKEN, registrationId)
                             .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
                             .apply();
+                    mRegistrationToken = registrationId;
 
                     Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
                     intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
