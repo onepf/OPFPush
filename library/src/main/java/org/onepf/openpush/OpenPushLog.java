@@ -32,65 +32,65 @@ public final class OpenPushLog {
         sLogEnable = logEnable;
     }
 
-    static void LOGD(String message) {
+    public static void LOGD(String message) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, message);
         }
     }
 
-    static void LOGD(String message, Throwable cause) {
+    public static void LOGD(String message, Throwable cause) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, message, cause);
         }
     }
 
-    static void LOGV(String message) {
+    public static void LOGV(String message) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (sLogEnable && BuildConfig.DEBUG && Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, message);
         }
     }
 
-    static void LOGV(String message, Throwable cause) {
+    public static void LOGV(String message, Throwable cause) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (sLogEnable && BuildConfig.DEBUG && Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, message, cause);
         }
     }
 
-    static void LOGI(String message) {
+    public static void LOGI(String message) {
         if (sLogEnable) {
             Log.i(TAG, message);
         }
     }
 
-    static void LOGI(String message, Throwable cause) {
+    public static void LOGI(String message, Throwable cause) {
         if (sLogEnable) {
             Log.i(TAG, message, cause);
         }
     }
 
-    static void LOGW(String message) {
+    public static void LOGW(String message) {
         if (sLogEnable) {
             Log.w(TAG, message);
         }
     }
 
-    static void LOGW(String message, Throwable cause) {
+    public static void LOGW(String message, Throwable cause) {
         if (sLogEnable) {
             Log.w(TAG, message, cause);
         }
     }
 
-    static void LOGE(String message) {
+    public static void LOGE(String message) {
         if (sLogEnable) {
             Log.e(TAG, message);
         }
     }
 
-    static void LOGE(String message, Throwable cause) {
+    public static void LOGE(String message, Throwable cause) {
         if (sLogEnable) {
             Log.e(TAG, message, cause);
         }

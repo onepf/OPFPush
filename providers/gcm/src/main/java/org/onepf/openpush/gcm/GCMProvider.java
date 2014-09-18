@@ -37,9 +37,12 @@ import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static org.onepf.openpush.OpenPushLog.LOGE;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -54,7 +57,7 @@ public class GCMProvider extends BasePushProvider {
     static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
 
-    private String mRegistrationToken;
+    private volatile String mRegistrationToken;
     private final String[] mSenderIDs;
     private final SharedPreferences mPreferences;
     private final GoogleCloudMessaging mGoogleCloudMessaging;
@@ -78,7 +81,8 @@ public class GCMProvider extends BasePushProvider {
 
     public void unregister() {
         if (isRegistered()) {
-            mExecutor.execute(new UnregisterTask(mRegistrationToken));
+            reset();
+            mExecutor.execute(new UnregisterTask(getContext(), mRegistrationToken));
         } else {
             throw new OpenPushException("Google Cloud Messaging must" +
                     " be registered before unregister.");
@@ -181,25 +185,30 @@ public class GCMProvider extends BasePushProvider {
         mPreferences.edit().clear().apply();
     }
 
-    private class UnregisterTask implements Runnable {
-        private String mOldRegistrationToken;
+    private static class UnregisterTask implements Runnable {
+        private final String mOldRegistrationToken;
+        private final WeakReference<Context> mContextRef;
 
-        private UnregisterTask(String oldRegistrationToken) {
+        private UnregisterTask(@NotNull Context context, @NotNull String oldRegistrationToken) {
             mOldRegistrationToken = oldRegistrationToken;
+            mContextRef = new WeakReference<Context>(context.getApplicationContext());
         }
 
         @Override
         public void run() {
-            try {
-                mGoogleCloudMessaging.unregister();
+            final Context context = mContextRef.get();
+            if (context != null) {
+                try {
+                    GoogleCloudMessaging.getInstance(context).unregister();
 
-                reset();
-
-                Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
-                intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
-                getContext().sendBroadcast(intent);
-            } catch (IOException e) {
-                //TODO Send error.
+                    Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+                    intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
+                    context.sendBroadcast(intent);
+                } catch (IOException e) {
+                    //TODO Send error.
+                }
+            } else {
+                LOGE("Can't unregister - Context is null");
             }
         }
     }
