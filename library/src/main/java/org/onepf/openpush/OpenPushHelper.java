@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.onepf.openpush.OpenPushLog.*;
 
@@ -72,7 +73,7 @@ public class OpenPushHelper {
     @NotNull
     private volatile State mState = State.NONE;
 
-    private int mRetryCount = 0;
+    private AtomicInteger mRetryCount = new AtomicInteger(0);
     private Options mOptions;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
@@ -436,14 +437,14 @@ public class OpenPushHelper {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
                 }
 
-                mRetryCount = 0;
+                mRetryCount.set(0);
                 registerNextProvider(provider);
             }
         }
     }
 
     private void cancelRetryRegistration() {
-        mRetryCount = 0;
+        mRetryCount.set(0);
         if (mRegistrationRunnable != null) {
             MAIN_HANDLER.removeCallbacks(mRegistrationRunnable);
             mRegistrationRunnable = null;
@@ -452,12 +453,12 @@ public class OpenPushHelper {
 
     private boolean postRegistrationRetry(@NotNull PushProvider provider) {
         Backoff backoff = mOptions.getBackoff();
-        if (backoff != null && mRetryCount < backoff.getTryCount()) {
-            long delay = backoff.getDelay(mRetryCount);
+        if (backoff != null && mRetryCount.get() < backoff.getTryCount()) {
+            long delay = backoff.getDelay(mRetryCount.get());
             long start = System.currentTimeMillis() + delay;
             LOGI(String.format("Retry register provider '%s'. Retry number = %d," +
-                    " delay = %d ms.", provider.getName(), mRetryCount + 1, delay));
-            mRetryCount++;
+                    " delay = %d ms.", provider.getName(), mRetryCount.get() + 1, delay));
+            mRetryCount.incrementAndGet();
             if (mRegistrationRunnable == null
                     || !mRegistrationRunnable.getProvider().equals(provider)) {
                 mRegistrationRunnable = new RetryRegistrationRunnable(provider);
@@ -526,7 +527,7 @@ public class OpenPushHelper {
         public void run() {
             LOGI(String.format("Retry register provider '%s'.", mProvider.getName()));
             if (!registerProvider(mProvider)) {
-                mRetryCount = 0;
+                mRetryCount.set(0);
                 registerNextProvider(mProvider);
             }
         }

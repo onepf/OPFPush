@@ -160,7 +160,7 @@ public class GCMProvider extends BasePushProvider {
     @Override
     public void close() {
         mGoogleCloudMessaging.close();
-        mExecutor.shutdown();
+        mExecutor.shutdownNow();
     }
 
     @NotNull
