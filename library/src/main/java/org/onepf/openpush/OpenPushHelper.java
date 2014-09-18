@@ -34,7 +34,7 @@ import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
 
-import static org.onepf.openpush.util.LogUtils.*;
+import static org.onepf.openpush.OpenPushLog.*;
 
 /**
  * Helper class for manage push providers.
@@ -45,7 +45,6 @@ import static org.onepf.openpush.util.LogUtils.*;
  */
 public class OpenPushHelper {
 
-    private static final String TAG = makeLogTag(OpenPushHelper.class);
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
@@ -103,7 +102,7 @@ public class OpenPushHelper {
         }
         mOptions = options;
         initLastProvider();
-        LOGI(TAG, "Init done.");
+        LOGI("Init done.");
     }
 
     private void initLastProvider() {
@@ -112,15 +111,15 @@ public class OpenPushHelper {
             return;
         }
 
-        LOGI(TAG, String.format("Try restore last provider '%s'.", lastProvider));
+        LOGI(String.format("Try restore last provider '%s'.", lastProvider));
 
         if (lastProvider.isAvailable()) {
             if (lastProvider.isRegistered()) {
-                LOGI(TAG, "Last provider running.");
+                LOGI("Last provider running.");
                 mCurrentProvider = lastProvider;
                 mState = State.RUNNING;
             } else {
-                LOGI(TAG, "Last provider need register.");
+                LOGI("Last provider need register.");
                 mState = State.REGISTRATION_RUNNING;
                 if (!registerProvider(lastProvider)) {
                     mState = State.NONE;
@@ -128,10 +127,10 @@ public class OpenPushHelper {
                 }
             }
         } else {
-            LOGI(TAG, "Last provider isn't available.");
+            LOGI("Last provider isn't available.");
             reset();
             if (mOptions.isRecoverProvider()) {
-                LOGI(TAG, "Try register any available provider.");
+                LOGI("Try register any available provider.");
                 register();
             }
         }
@@ -194,7 +193,7 @@ public class OpenPushHelper {
         }
 
         mState = State.NO_AVAILABLE_PROVIDERS;
-        LOGI(TAG, "No more available providers.");
+        LOGI("No more available providers.");
         if (mListener != null) {
             mListener.onNoAvailableProvider();
         }
@@ -218,11 +217,11 @@ public class OpenPushHelper {
      */
     private boolean registerProvider(@NotNull PushProvider provider, boolean tryRegisterNext) {
         if (provider.isAvailable()) {
-            LOGI(TAG, String.format("Try register %s.", provider));
+            LOGI(String.format("Try register %s.", provider));
             provider.register();
             return true;
         }
-        LOGI(TAG, String.format("Provider '%s' not available.", provider));
+        LOGI(String.format("Provider '%s' not available.", provider));
         return tryRegisterNext && registerNextProvider(provider);
 
     }
@@ -329,14 +328,14 @@ public class OpenPushHelper {
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
-        LOGD(TAG, String.format("onUnavailable(providerName = %s).", providerName));
+        LOGD(String.format("onUnavailable(providerName = %s).", providerName));
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
     }
 
     public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
-        LOGD(TAG, String.format("onDeletedMessages(providerName = %s,messagesCount = %d).",
+        LOGD(String.format("onDeletedMessages(providerName = %s,messagesCount = %d).",
                 providerName, messagesCount));
         if (mListener != null) {
             mListener.onDeletedMessages(providerName, messagesCount);
@@ -344,7 +343,7 @@ public class OpenPushHelper {
     }
 
     public void onNeedRetryRegister(@NotNull String providerName) {
-        LOGD(TAG, String.format("onNeedRetryRegister(providerName = %s).", providerName));
+        LOGD(String.format("onNeedRetryRegister(providerName = %s).", providerName));
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
             mCurrentProvider.onAppStateChanged();
@@ -362,7 +361,7 @@ public class OpenPushHelper {
     }
 
     public void onUnavailable(@NotNull PushProvider provider) {
-        LOGD(TAG, String.format("onUnavailable(provider = %s).", provider));
+        LOGD(String.format("onUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
             mCurrentProvider.onUnavailable();
@@ -383,7 +382,7 @@ public class OpenPushHelper {
         }
 
         if (result.isSuccess()) {
-            LOGI(TAG, String.format("Successfully unregister provider '%s'.", result.getProviderName()));
+            LOGI(String.format("Successfully unregister provider '%s'.", result.getProviderName()));
             reset();
             if (mCurrentProvider != null) {
                 mCurrentProvider.close();
@@ -394,7 +393,7 @@ public class OpenPushHelper {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
-            LOGI(TAG, String.format("Error unregister provider '%s'.", result.getProviderName()));
+            LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
             mState = State.RUNNING;
             final PushProvider provider = getProviderByName(result.getProviderName());
             if (provider != null) {
@@ -415,7 +414,7 @@ public class OpenPushHelper {
         }
 
         if (result.isSuccess()) {
-            LOGI(TAG, String.format("Successfully register provider '%s'.", result.getProviderName()));
+            LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             mState = State.RUNNING;
             cancelRetryRegistration();
 
@@ -429,7 +428,7 @@ public class OpenPushHelper {
             Assert.assertNotNull(mCurrentProvider);
             registerPackageChangeReceiver(mCurrentProvider);
         } else {
-            LOGI(TAG, String.format("Error register provider '%s'.", result.getProviderName()));
+            LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
             PushProvider provider = getProviderByName(result.getProviderName());
             if (provider != null
                     && (!result.isRecoverableError() || !postRegistrationRetry(provider))) {
@@ -456,7 +455,7 @@ public class OpenPushHelper {
         if (backoff != null && mRetryCount < backoff.getTryCount()) {
             long delay = backoff.getDelay(mRetryCount);
             long start = System.currentTimeMillis() + delay;
-            LOGI(TAG, String.format("Retry register provider '%s'. Retry number = %d," +
+            LOGI(String.format("Retry register provider '%s'. Retry number = %d," +
                     " delay = %d ms.", provider.getName(), mRetryCount + 1, delay));
             mRetryCount++;
             if (mRegistrationRunnable == null
@@ -516,7 +515,7 @@ public class OpenPushHelper {
 
         @Override
         public void run() {
-            LOGI(TAG, String.format("Retry register provider '%s'.", mProvider.getName()));
+            LOGI(String.format("Retry register provider '%s'.", mProvider.getName()));
             if (!registerProvider(mProvider)) {
                 mRetryCount = 0;
                 registerNextProvider(mProvider);

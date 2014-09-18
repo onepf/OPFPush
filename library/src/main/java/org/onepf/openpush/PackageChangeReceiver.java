@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
-import static org.onepf.openpush.util.LogUtils.*;
+import static org.onepf.openpush.OpenPushLog.*;
 
 public class PackageChangeReceiver extends BroadcastReceiver {
 
