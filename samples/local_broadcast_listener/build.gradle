@@ -29,6 +29,8 @@ android {
         versionName "2.0"
 
         applicationId 'org.onepf.openpush.sample.localbroadcast'
+
+        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 }
 

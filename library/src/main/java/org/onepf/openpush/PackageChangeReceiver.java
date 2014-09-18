@@ -28,7 +28,6 @@ import static org.onepf.openpush.OpenPushLog.*;
 
 public class PackageChangeReceiver extends BroadcastReceiver {
 
-    private static final String TAG = makeLogTag(PackageChangeReceiver.class);
     private static final String PACKAGE_URI_PREFIX = PackageUtils.PACKAGE_DATA_SCHEME + ':';
 
     @NotNull
@@ -43,13 +42,13 @@ public class PackageChangeReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
-                LOGI(TAG, String.format("Host app '%s' of provider '%s' removed.",
+                LOGI(String.format("Host app '%s' of provider '%s' removed.",
                         mProvider.getHostAppPackage(), mProvider.getName()));
                 OpenPushHelper.getInstance(context).onUnavailable(mProvider);
             }
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
             if (context.getPackageName().equals(getAppPackage(intent))) {
-                LOGI(TAG, "Application updated.");
+                LOGI("Application updated.");
                 OpenPushHelper.getInstance(context).onNeedRetryRegister(mProvider.getName());
             }
         }

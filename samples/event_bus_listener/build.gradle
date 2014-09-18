@@ -37,5 +37,7 @@ android {
         versionName "2.0"
 
         applicationId 'org.onepf.openpush.sample.eventbus'
+
+        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 }
