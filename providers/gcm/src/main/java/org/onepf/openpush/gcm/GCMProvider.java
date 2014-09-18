@@ -22,6 +22,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -41,6 +42,9 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import support.AsyncTaskCompat;
 
 import static org.onepf.openpush.OpenPushLog.LOGE;
 
@@ -50,6 +54,7 @@ public class GCMProvider extends BasePushProvider {
 
     private static final String PREF_REGISTRATION_TOKEN = "registration_token";
     private static final String PREF_APP_VERSION = "app_version";
+    private static final String PREF_MESSAGE_ID = "message_id";
     static final String PREF_ANDROID_ID = "android_id";
 
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
@@ -64,12 +69,20 @@ public class GCMProvider extends BasePushProvider {
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
-    public GCMProvider(@NotNull Context context, @NotNull String... senderIDs) {
+    private final AtomicInteger mMsgId;
+
+    public GCMProvider(@NotNull Context context, @NotNull String senderID, String... senderIDs) {
         super(context, NAME, "com.android.vending");
-        mSenderIDs = senderIDs;
+        mSenderIDs = new String[1 + senderIDs.length];
+        mSenderIDs[0] = senderID;
+        if (senderIDs.length > 0) {
+            System.arraycopy(senderIDs, 0, mSenderIDs, 1, senderIDs.length);
+        }
+
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
+        mMsgId = new AtomicInteger(mPreferences.getInt(PREF_MESSAGE_ID, 0));
     }
 
     public void register() {
@@ -183,6 +196,54 @@ public class GCMProvider extends BasePushProvider {
     private void reset() {
         mRegistrationToken = null;
         mPreferences.edit().clear().apply();
+    }
+
+    public void send(@NotNull GCMMessage msg) {
+        send(mSenderIDs[0], msg);
+    }
+
+    @NotNull
+    public String[] getSenderIDs() {
+        return mSenderIDs;
+    }
+
+    public void send(@NotNull String senderId, @NotNull GCMMessage msg) {
+        final int msgId = mMsgId.incrementAndGet();
+        mPreferences.edit()
+                .putInt(PREF_MESSAGE_ID, msgId)
+                .apply();
+        AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
+    }
+
+    private static class SendMessageTask extends AsyncTask<Void, Void, Void> {
+        private static final String GCM_SENDER_SUFFIX = "@gcm.googleapis.com";
+
+        private final String mTo;
+        private final GCMMessage mMessage;
+        private final WeakReference<Context> mContextRef;
+
+        private SendMessageTask(@NotNull Context context,
+                                @NotNull String senderId,
+                                @NotNull GCMMessage message) {
+            mTo = senderId + GCM_SENDER_SUFFIX;
+            mMessage = message;
+            mContextRef = new WeakReference<Context>(context.getApplicationContext());
+        }
+
+        protected Void doInBackground(Void... params) {
+            Context context = mContextRef.get();
+            if (context != null) {
+                try {
+                    GoogleCloudMessaging.getInstance(context)
+                            .send(mTo,
+                                    mMessage.getMessageId(),
+                                    mMessage.getTimeToLeave(),
+                                    mMessage.getData());
+                } catch (IOException ex) {
+                }
+            }
+            return null;
+        }
     }
 
     private static class UnregisterTask implements Runnable {
