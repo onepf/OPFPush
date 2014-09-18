@@ -24,6 +24,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 
@@ -42,6 +44,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import support.AsyncTaskCompat;
@@ -71,6 +74,8 @@ public class GCMProvider extends BasePushProvider {
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     private final AtomicInteger mMsgId;
+
+    private AtomicInteger mTryNumber = new AtomicInteger(1);
 
     public GCMProvider(@NotNull Context context, @NotNull String senderID, String... senderIDs) {
         super(context, NAME, "com.android.vending");
@@ -237,7 +242,7 @@ public class GCMProvider extends BasePushProvider {
             if (context != null) {
                 try {
                     GoogleCloudMessaging.getInstance(context)
-                            .send(mTo,  mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
+                            .send(mTo, mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
                     LOGI(String.format("Message '%s' has sent.", mMessage));
                 } catch (IOException ex) {
                     LOGE(String.format("Error while send Message '%s'.", mMessage), ex);
@@ -247,6 +252,10 @@ public class GCMProvider extends BasePushProvider {
             }
             return null;
         }
+    }
+
+    public long getDelay() {
+        return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() - 1));
     }
 
     private static class UnregisterTask implements Runnable {
@@ -284,6 +293,7 @@ public class GCMProvider extends BasePushProvider {
 
             try {
                 final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
+                mTryNumber.set(0);
                 if (registrationId != null) {
                     mPreferences.edit()
                             .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
@@ -304,11 +314,25 @@ public class GCMProvider extends BasePushProvider {
             } catch (IOException e) {
                 Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
+                    long when = System.currentTimeMillis() + getDelay();
+                    postRetryRegister(when);
                     intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                } else {
+                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                            GCMConstants.ERROR_AUTHEFICATION_FAILED);
                 }
                 getContext().sendBroadcast(intent);
             }
+        }
+
+        private void postRetryRegister(long when) {
+            new Handler(Looper.getMainLooper()).postAtTime(new Runnable() {
+                @Override
+                public void run() {
+                    register();
+                }
+            }, when);
         }
     }
 }

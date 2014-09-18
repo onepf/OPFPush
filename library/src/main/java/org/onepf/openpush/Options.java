@@ -35,19 +35,14 @@ public class Options {
     @NotNull
     private final List<PushProvider> mProviders;
 
-    @Nullable
-    private final Backoff mBackoff;
-
     private final boolean mRecoverProvider;
 
     private final boolean mSystemPushPreferred;
 
     private Options(@NotNull Collection<? extends PushProvider> providers,
-                    @Nullable Backoff backoff,
                     boolean recoverProvider,
                     boolean systemPushPreferred) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
-        mBackoff = backoff;
         mRecoverProvider = recoverProvider;
         mSystemPushPreferred = systemPushPreferred;
     }
@@ -76,16 +71,10 @@ public class Options {
         return mProviders;
     }
 
-    @Nullable
-    public Backoff getBackoff() {
-        return mBackoff;
-    }
-
     @Override
     public String toString() {
         return "Options{" +
                 "providers=" + mProviders +
-                ", backoff=" + mBackoff +
                 ", recoverProvider=" + mRecoverProvider +
                 ", systemPushPreferred=" + mSystemPushPreferred +
                 '}';
@@ -97,9 +86,6 @@ public class Options {
     public static class Builder {
         @Nullable
         private Set<PushProvider> mProviders;
-
-        @Nullable
-        private Backoff mBackoff;
 
         private boolean mRecoverProvider;
 
@@ -151,12 +137,6 @@ public class Options {
             return this;
         }
 
-        @NotNull
-        public Builder setBackoff(@Nullable Backoff backoff) {
-            mBackoff = backoff;
-            return this;
-        }
-
         /**
          * Create instance of {@link org.onepf.openpush.Options} with data from the builder.
          *
@@ -168,14 +148,13 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders, mBackoff, mRecoverProvider, mSystemPushPreferred);
+            return new Options(mProviders, mRecoverProvider, mSystemPushPreferred);
         }
 
         @Override
         public String toString() {
             return "Builder{" +
                     "providers=" + mProviders +
-                    ", backoff=" + mBackoff +
                     ", recoverProvider=" + mRecoverProvider +
                     ", systemPushPreferred=" + mSystemPushPreferred +
                     '}';

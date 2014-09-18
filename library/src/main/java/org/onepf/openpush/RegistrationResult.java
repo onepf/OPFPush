@@ -49,13 +49,13 @@ public final class RegistrationResult {
     public String toString() {
         if (mErrorCode == null) {
             return "RegistrationResult{" +
-                    "mProviderName='" + mProviderName + '\'' +
-                    ", mRegistrationId='" + mRegistrationId + "\'}";
+                    "providerName='" + mProviderName + '\'' +
+                    ", registrationId='" + mRegistrationId + "\'}";
         } else {
             return "RegistrationResult{" +
-                    "mProviderName='" + mProviderName + '\'' +
-                    ", mErrorCode='" + mErrorCode + '\'' +
-                    ", mRecoverableError='" + mRecoverableError + '\'' +
+                    "providerName='" + mProviderName + '\'' +
+                    ", errorCode='" + mErrorCode + '\'' +
+                    ", recoverableError='" + mRecoverableError + '\'' +
                     "}";
         }
     }

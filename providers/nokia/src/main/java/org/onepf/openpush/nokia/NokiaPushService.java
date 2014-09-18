@@ -103,7 +103,7 @@ public class NokiaPushService extends PushBaseIntentService {
         Error error = convertError(errorId);
         OpenPushHelper.getInstance(this)
                 .onRegistrationEnd(new RegistrationResult(NokiaPushProvider.NAME, error, true));
-        return false;
+        return true;
     }
 
     @NotNull

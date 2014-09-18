@@ -33,9 +33,10 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.onepf.openpush.OpenPushLog.*;
+import static org.onepf.openpush.OpenPushLog.LOGD;
+import static org.onepf.openpush.OpenPushLog.LOGI;
+import static org.onepf.openpush.OpenPushLog.LOGW;
 
 /**
  * Helper class for manage push providers.
@@ -47,7 +48,6 @@ import static org.onepf.openpush.OpenPushLog.*;
 public class OpenPushHelper {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
-    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     @Nullable
     private OpenPushListener mListener;
@@ -67,13 +67,9 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider mCurrentProvider;
 
-    @Nullable
-    private RetryRegistrationRunnable mRegistrationRunnable;
-
     @NotNull
     private volatile State mState = State.NONE;
 
-    private AtomicInteger mRetryCount = new AtomicInteger(0);
     private Options mOptions;
 
     public static OpenPushHelper getInstance(@NotNull Context context) {
@@ -364,7 +360,6 @@ public class OpenPushHelper {
     private void reset() {
         mPreferences.edit().clear().apply();
         mState = State.NONE;
-        cancelRetryRegistration();
     }
 
     public void onUnavailable(@NotNull PushProvider provider) {
@@ -423,7 +418,6 @@ public class OpenPushHelper {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             mState = State.RUNNING;
-            cancelRetryRegistration();
 
             mCurrentProvider = getProviderByName(result.getProviderName());
             saveLastProvider(mCurrentProvider);
@@ -437,42 +431,15 @@ public class OpenPushHelper {
         } else {
             LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
             PushProvider provider = getProviderByName(result.getProviderName());
-            if (provider != null
-                    && (!result.isRecoverableError() || !postRegistrationRetry(provider))) {
+            if (provider != null) {
                 if (mListener != null) {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
                 }
 
-                mRetryCount.set(0);
-                registerNextProvider(provider);
+                if (!result.isRecoverableError()) {
+                    registerNextProvider(provider);
+                }
             }
-        }
-    }
-
-    private void cancelRetryRegistration() {
-        mRetryCount.set(0);
-        if (mRegistrationRunnable != null) {
-            MAIN_HANDLER.removeCallbacks(mRegistrationRunnable);
-            mRegistrationRunnable = null;
-        }
-    }
-
-    private boolean postRegistrationRetry(@NotNull PushProvider provider) {
-        Backoff backoff = mOptions.getBackoff();
-        if (backoff != null && mRetryCount.get() < backoff.getTryCount()) {
-            long delay = backoff.getDelay(mRetryCount.get());
-            long start = System.currentTimeMillis() + delay;
-            LOGI(String.format("Retry register provider '%s'. Retry number = %d," +
-                    " delay = %d ms.", provider.getName(), mRetryCount.get() + 1, delay));
-            mRetryCount.incrementAndGet();
-            if (mRegistrationRunnable == null
-                    || !mRegistrationRunnable.getProvider().equals(provider)) {
-                mRegistrationRunnable = new RetryRegistrationRunnable(provider);
-            }
-            MAIN_HANDLER.postAtTime(mRegistrationRunnable, start);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -510,34 +477,5 @@ public class OpenPushHelper {
          * Helper is unregistering current provider.
          */
         UNREGISTRATION_RUNNING
-    }
-
-    /**
-     * Uses for delayed retry registration of provider.
-     * Retry registration can be done when provider is available, but some error occur
-     * while try to register it.
-     */
-    private class RetryRegistrationRunnable implements Runnable {
-        private final PushProvider mProvider;
-
-        RetryRegistrationRunnable(@NotNull PushProvider provider) {
-            mProvider = provider;
-        }
-
-        @NotNull
-        public PushProvider getProvider() {
-            return mProvider;
-        }
-
-        @Override
-        public void run() {
-            LOGI(String.format("Retry register provider '%s'.", mProvider.getName()));
-            if (!registerProvider(mProvider)) {
-                LOGI(String.format("Can't retry register provider '%s'. " +
-                        "Try register next available.", mProvider.getName()));
-                mRetryCount.set(0);
-                registerNextProvider(mProvider);
-            }
-        }
     }
 }
