@@ -31,4 +31,13 @@ public class GCMMessage {
     public long getTimeToLeave() {
         return mTimeToLeave;
     }
+
+    @Override
+    public String toString() {
+        return "GCMMessage{" +
+                "messageId='" + mMessageId + '\'' +
+                ", data=" + mData +
+                ", TTL=" + mTimeToLeave +
+                '}';
+    }
 }

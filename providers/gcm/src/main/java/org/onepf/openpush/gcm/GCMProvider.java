@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import support.AsyncTaskCompat;
 
 import static org.onepf.openpush.OpenPushLog.LOGE;
+import static org.onepf.openpush.OpenPushLog.LOGI;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -126,7 +127,7 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        //Need verify that GCM classes present, because depende
+        //Need verify that GCM classes present, because dependency provided.
         try {
             Class.forName("com.google.android.gms.gcm.GoogleCloudMessaging");
         } catch (ClassNotFoundException e) {
@@ -239,8 +240,12 @@ public class GCMProvider extends BasePushProvider {
                                     mMessage.getMessageId(),
                                     mMessage.getTimeToLeave(),
                                     mMessage.getData());
+                    LOGI(String.format("Message '%s' has sent.", mMessage));
                 } catch (IOException ex) {
+                    LOGE(String.format("Error while send Message '%s'.", mMessage), ex);
                 }
+            } else {
+                LOGE(String.format("Error while send Message '%s'. No context.", mMessage));
             }
             return null;
         }
