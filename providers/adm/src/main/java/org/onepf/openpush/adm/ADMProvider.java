@@ -52,11 +52,15 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        Context ctx = getContext();
-        return super.checkManifest()
-                && checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                && checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
-                && checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
+        if (super.checkManifest() && ADMUtils.isKindleFire()) {
+            Context ctx = getContext();
+            return super.checkManifest()
+                    && checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                    && checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
+                    && checkPermission(ctx, ctx.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
+        } else {
+            return false;
+        }
     }
 
     @Override
