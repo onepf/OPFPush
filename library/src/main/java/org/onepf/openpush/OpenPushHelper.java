@@ -527,6 +527,8 @@ public class OpenPushHelper {
         public void run() {
             LOGI(String.format("Retry register provider '%s'.", mProvider.getName()));
             if (!registerProvider(mProvider)) {
+                LOGI(String.format("Can't retry register provider '%s'. " +
+                        "Try register next available.", mProvider.getName()));
                 mRetryCount.set(0);
                 registerNextProvider(mProvider);
             }
