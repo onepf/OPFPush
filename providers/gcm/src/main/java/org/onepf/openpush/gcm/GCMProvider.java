@@ -293,8 +293,8 @@ public class GCMProvider extends BasePushProvider {
 
             try {
                 final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
-                mTryNumber.set(0);
                 if (registrationId != null) {
+                    mTryNumber.set(0);
                     mPreferences.edit()
                             .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
                             .putString(PREF_REGISTRATION_TOKEN, registrationId)
@@ -306,24 +306,29 @@ public class GCMProvider extends BasePushProvider {
                     intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
                     getContext().sendBroadcast(intent);
                 } else {
-                    Intent intent = new Intent(GCMConstants.ACTION_ERROR);
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                            GCMConstants.ERROR_AUTHEFICATION_FAILED);
-                    getContext().sendBroadcast(intent);
+                    onAuthError();
                 }
             } catch (IOException e) {
-                Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
                     long when = System.currentTimeMillis() + getDelay();
                     postRetryRegister(when);
+
+                    Intent intent = new Intent(GCMConstants.ACTION_ERROR);
                     intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                    getContext().sendBroadcast(intent);
                 } else {
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                            GCMConstants.ERROR_AUTHEFICATION_FAILED);
+                   onAuthError();
                 }
-                getContext().sendBroadcast(intent);
             }
+        }
+
+        private void onAuthError() {
+            mTryNumber.set(0);
+            Intent intent = new Intent(GCMConstants.ACTION_ERROR);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                    GCMConstants.ERROR_AUTHEFICATION_FAILED);
+            getContext().sendBroadcast(intent);
         }
 
         private void postRetryRegister(long when) {
