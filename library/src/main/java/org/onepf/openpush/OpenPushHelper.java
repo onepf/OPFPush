@@ -148,13 +148,9 @@ public class OpenPushHelper {
             case NONE:
             case NO_AVAILABLE_PROVIDERS:
                 mState = State.REGISTRATION_RUNNING;
-                if (mOptions.isSystemPushPreferred()) {
-                    for (PushProvider provider : mOptions.getProviders()) {
-                        if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())
-                                && registerProvider(provider, false)) {
-                            return;
-                        }
-                    }
+                if (mOptions.isSystemPushPreferred()
+                        && registerSystemPreferredProvider()) {
+                    return;
                 }
                 registerNextProvider(null);
                 break;
@@ -168,6 +164,16 @@ public class OpenPushHelper {
             default:
                 throw new OpenPushException("Attempt to register twice!");
         }
+    }
+
+    private boolean registerSystemPreferredProvider() {
+        for (PushProvider provider : mOptions.getProviders()) {
+            if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())
+                    && registerProvider(provider)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -194,7 +200,7 @@ public class OpenPushHelper {
         }
 
         mState = State.NO_AVAILABLE_PROVIDERS;
-        LOGI("No more available providers.");
+        LOGW("No more available providers.");
         if (mListener != null) {
             mListener.onNoAvailableProvider();
         }
@@ -218,7 +224,7 @@ public class OpenPushHelper {
      */
     private boolean registerProvider(@NotNull PushProvider provider, boolean tryRegisterNext) {
         if (provider.isAvailable()) {
-            LOGI(String.format("Try register %s.", provider));
+            LOGD(String.format("Try register %s.", provider));
             provider.register();
             return true;
         }
