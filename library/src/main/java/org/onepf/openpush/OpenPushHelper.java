@@ -70,7 +70,7 @@ public class OpenPushHelper {
     private RetryRegistrationRunnable mRegistrationRunnable;
 
     @NotNull
-    private State mState = State.NONE;
+    private volatile State mState = State.NONE;
 
     private int mRetryCount = 0;
     private Options mOptions;
@@ -140,7 +140,7 @@ public class OpenPushHelper {
         mListener = l;
     }
 
-    public synchronized void register() {
+    public void register() {
         checkInitDone();
 
         switch (mState) {
@@ -467,6 +467,15 @@ public class OpenPushHelper {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "OpenPushHelper{" +
+                "state=" + mState +
+                ", options=" + mOptions +
+                ", currentProvider=" + mCurrentProvider +
+                '}';
     }
 
     public static enum State {

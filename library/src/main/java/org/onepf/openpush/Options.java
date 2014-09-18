@@ -81,6 +81,16 @@ public class Options {
         return mBackoff;
     }
 
+    @Override
+    public String toString() {
+        return "Options{" +
+                "providers=" + mProviders +
+                ", backoff=" + mBackoff +
+                ", recoverProvider=" + mRecoverProvider +
+                ", systemPushPreferred=" + mSystemPushPreferred +
+                '}';
+    }
+
     /**
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
@@ -159,6 +169,16 @@ public class Options {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
             return new Options(mProviders, mBackoff, mRecoverProvider, mSystemPushPreferred);
+        }
+
+        @Override
+        public String toString() {
+            return "Builder{" +
+                    "providers=" + mProviders +
+                    ", backoff=" + mBackoff +
+                    ", recoverProvider=" + mRecoverProvider +
+                    ", systemPushPreferred=" + mSystemPushPreferred +
+                    '}';
         }
     }
 }
