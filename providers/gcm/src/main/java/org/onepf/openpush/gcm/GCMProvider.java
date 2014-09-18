@@ -173,6 +173,7 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public void close() {
+        mMsgId.set(0);
         mGoogleCloudMessaging.close();
         mExecutor.shutdownNow();
     }
@@ -236,10 +237,7 @@ public class GCMProvider extends BasePushProvider {
             if (context != null) {
                 try {
                     GoogleCloudMessaging.getInstance(context)
-                            .send(mTo,
-                                    mMessage.getMessageId(),
-                                    mMessage.getTimeToLeave(),
-                                    mMessage.getData());
+                            .send(mTo,  mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
                     LOGI(String.format("Message '%s' has sent.", mMessage));
                 } catch (IOException ex) {
                     LOGE(String.format("Error while send Message '%s'.", mMessage), ex);
