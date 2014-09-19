@@ -80,11 +80,8 @@ public class ADMService extends ADMMessageHandlerBase {
                                                ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
                                        })
                                        String errorId) {
-        if (!ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            Error error = convertError(errorId);
-            OpenPushHelper.getInstance(this).onRegistrationEnd(
-                    new RegistrationResult(ADMProvider.NAME, error, false));
-        }
+        OpenPushHelper.getInstance(this).onRegistrationEnd(
+                new RegistrationResult(ADMProvider.NAME, convertError(errorId), false));
     }
 
     @NotNull
