@@ -26,7 +26,7 @@ android {
         versionCode 2
         versionName "2.0"
 
-        manifestPlaceholders = [packageId: "\${}".toString()]
+        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 }
 
