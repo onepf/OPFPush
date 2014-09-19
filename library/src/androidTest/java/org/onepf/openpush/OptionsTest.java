@@ -50,15 +50,10 @@ public class OptionsTest {
     public void testOptionsBuild() {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
-        builder.setBackoff(new ExponentialBackoff());
 
         Options options = builder.build();
         Assert.assertEquals(1, options.getProviders().size());
         Assert.assertEquals(MockPushProvider.class, options.getProviders().get(0).getClass());
-
-        final Backoff backoff = options.getBackoff();
-        Assert.assertNotNull(backoff);
-        Assert.assertEquals(ExponentialBackoff.class, backoff.getClass());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -70,7 +65,6 @@ public class OptionsTest {
         builder.addProviders(providers);
 
         Options options = builder.build();
-        Assert.assertNull(options.getBackoff());
         Assert.assertNotNull(options.getProviders());
         Assert.assertNotSame(providers, options.getProviders());
         Assert.assertEquals(1, options.getProviders().size());
