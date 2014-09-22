@@ -66,15 +66,15 @@ class MockPushProvider extends BasePushProvider {
     @Override
     public void register() {
         mRegistrationId = UUID.randomUUID().toString();
-        OpenPushHelperKeeper.getInstance(getContext()).onRegistrationEnd(
-                new RegistrationResult(getName(), mRegistrationId));
+        OpenPushHelperKeeper.getInstance(getContext())
+                .onResult(new RegistrationResult(getName(), mRegistrationId));
     }
 
     @Override
     public void unregister() {
         mRegistrationId = null;
-        OpenPushHelperKeeper.getInstance(getContext()).onUnregistrationEnd(
-                new RegistrationResult(getName(), mRegistrationId));
+        OpenPushHelperKeeper.getInstance(getContext())
+                .onResult(new RegistrationResult(getName(), mRegistrationId));
     }
 
     @Override

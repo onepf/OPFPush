@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.PatternMatcher;
 import android.text.TextUtils;
 
@@ -133,6 +131,10 @@ public class OpenPushHelper {
         }
     }
 
+    public boolean isRegistered() {
+        return mCurrentProvider != null && mCurrentProvider.isRegistered();
+    }
+
     public void setListener(@Nullable OpenPushListener l) {
         mListener = l;
     }
@@ -141,6 +143,9 @@ public class OpenPushHelper {
         checkInitDone();
 
         switch (mState) {
+            case REGISTRATION_RUNNING:
+                break;
+
             case NONE:
             case NO_AVAILABLE_PROVIDERS:
                 mState = State.REGISTRATION_RUNNING;
@@ -150,9 +155,6 @@ public class OpenPushHelper {
                 }
                 registerNextProvider(null);
                 break;
-
-            case REGISTRATION_RUNNING:
-                throw new OpenPushException("Registration is running.");
 
             case UNREGISTRATION_RUNNING:
                 throw new OpenPushException("Can't register while unregistration is running.");
@@ -180,17 +182,19 @@ public class OpenPushHelper {
      * @return True if find provider that can try to register, otherwise false.
      */
     private boolean registerNextProvider(@Nullable PushProvider lastProvider) {
-        int i = 0;
+        int nextProviderIndex = 0;
         final List<PushProvider> providers = mOptions.getProviders();
         if (lastProvider != null) {
             int lastProviderIndex = providers.indexOf(lastProvider);
             if (lastProviderIndex != -1) {
-                i = lastProviderIndex + 1;
+                nextProviderIndex = lastProviderIndex + 1;
             }
         }
 
-        for (int cnt = providers.size(); i < cnt; ++i) {
-            if (registerProvider(providers.get(i))) {
+        for (int providersCount = providers.size();
+             nextProviderIndex < providersCount; ++nextProviderIndex) {
+
+            if (registerProvider(providers.get(nextProviderIndex))) {
                 return true;
             }
         }
@@ -237,6 +241,9 @@ public class OpenPushHelper {
         }
 
         switch (mState) {
+            case UNREGISTRATION_RUNNING:
+                break;
+
             case RUNNING:
                 mState = State.UNREGISTRATION_RUNNING;
                 unregisterPackageChangeReceiver();
@@ -245,9 +252,6 @@ public class OpenPushHelper {
 
             case REGISTRATION_RUNNING:
                 throw new OpenPushException("Can't unregister while registration is running.");
-
-            case UNREGISTRATION_RUNNING:
-                throw new OpenPushException("Unregistration is running.");
 
             default:
                 throw new OpenPushException("Before to unregister you must register provider.!");
@@ -281,17 +285,12 @@ public class OpenPushHelper {
     }
 
     @Nullable
-    public String getCurrentProviderName() {
-        return mCurrentProvider == null ? null : mCurrentProvider.getName();
+    public PushProvider getCurrentProvider() {
+        return mCurrentProvider;
     }
 
     @Nullable
-    public String getCurrentProviderRegistrationId() {
-        return mCurrentProvider == null ? null : mCurrentProvider.getRegistrationId();
-    }
-
-    @Nullable
-    private PushProvider getProviderByName(@NotNull String providerName) {
+    private PushProvider getProvider(@NotNull String providerName) {
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
@@ -305,7 +304,7 @@ public class OpenPushHelper {
         if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
             String storedProviderName = mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
             if (!TextUtils.isEmpty(storedProviderName)) {
-                PushProvider provider = getProviderByName(storedProviderName);
+                PushProvider provider = getProvider(storedProviderName);
                 if (provider != null) {
                     return provider;
                 }
@@ -323,11 +322,6 @@ public class OpenPushHelper {
             editor.putString(KEY_LAST_PROVIDER_NAME, provider.getName());
         }
         editor.apply();
-    }
-
-    @NotNull
-    public State getState() {
-        return mState;
     }
 
     public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
@@ -378,7 +372,7 @@ public class OpenPushHelper {
         }
     }
 
-    public void onUnregistrationEnd(@NotNull RegistrationResult result) {
+    private void onUnregistrationEnd(@NotNull RegistrationResult result) {
         if (mState != State.UNREGISTRATION_RUNNING) {
             return;
         }
@@ -397,7 +391,7 @@ public class OpenPushHelper {
         } else if (mListener != null) {
             LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
             mState = State.RUNNING;
-            final PushProvider provider = getProviderByName(result.getProviderName());
+            final PushProvider provider = getProvider(result.getProviderName());
             if (provider != null) {
                 mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
             }
@@ -410,7 +404,18 @@ public class OpenPushHelper {
         }
     }
 
-    public void onRegistrationEnd(@NotNull RegistrationResult result) {
+    public void onResult(RegistrationResult result) {
+        if (mState == State.REGISTRATION_RUNNING) {
+            onRegistrationEnd(result);
+        } else if (mState == State.UNREGISTRATION_RUNNING) {
+            onUnregistrationEnd(result);
+        } else {
+            throw new UnsupportedOperationException("New result can be handled only when" +
+                    " registration or unregistration is running.");
+        }
+    }
+
+    private void onRegistrationEnd(@NotNull RegistrationResult result) {
         if (mState != State.REGISTRATION_RUNNING) {
             return;
         }
@@ -419,7 +424,7 @@ public class OpenPushHelper {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             mState = State.RUNNING;
 
-            mCurrentProvider = getProviderByName(result.getProviderName());
+            mCurrentProvider = getProvider(result.getProviderName());
             saveLastProvider(mCurrentProvider);
             Assert.assertNotNull(result.getRegistrationId());
             if (mListener != null) {
@@ -430,7 +435,7 @@ public class OpenPushHelper {
             registerPackageChangeReceiver(mCurrentProvider);
         } else {
             LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
-            PushProvider provider = getProviderByName(result.getProviderName());
+            PushProvider provider = getProvider(result.getProviderName());
             if (provider != null) {
                 if (mListener != null) {
                     mListener.onRegistrationError(provider.getName(), result.getErrorCode());
@@ -452,7 +457,7 @@ public class OpenPushHelper {
                 '}';
     }
 
-    public static enum State {
+    private static enum State {
         /**
          * Push isn't running.
          */

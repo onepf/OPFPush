@@ -29,6 +29,6 @@ class GCMConstants {
     static final String EXTRA_ERROR_ID = "org.onepf.openpush.gcm.error_id";
     static final String EXTRA_TOKEN = "org.onepf.openpush.gcm.token";
 
-    static final String ERROR_AUTHEFICATION_FAILED = "AUTHEFICATION_FAILED";
+    static final String ERROR_AUTHEFICATION_FAILED = "AUTHENTICATION_FAILED";
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 }

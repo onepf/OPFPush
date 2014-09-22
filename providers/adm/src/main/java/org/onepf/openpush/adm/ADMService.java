@@ -18,7 +18,6 @@ package org.onepf.openpush.adm;
 
 import android.content.Intent;
 
-import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
@@ -80,7 +79,7 @@ public class ADMService extends ADMMessageHandlerBase {
                                                ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
                                        })
                                        String errorId) {
-        OpenPushHelper.getInstance(this).onRegistrationEnd(
+        OpenPushHelper.getInstance(this).onResult(
                 new RegistrationResult(ADMProvider.NAME, convertError(errorId), false));
     }
 
@@ -99,9 +98,9 @@ public class ADMService extends ADMMessageHandlerBase {
         } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
             error = Error.INVALID_SENDER;
         } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = Error.AUTHEFICATION_FAILED;
+            error = Error.AUTHENTICATION_FAILED;
         } else {
-            error = Error.UNKNOWN;
+            throw new OpenPushException(String.format("Unknown error '%s'.", errorId));
         }
         return error;
     }
@@ -120,7 +119,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistered(@NotNull String registrationId) {
         //TODO Send registration id.
         OpenPushHelper.getInstance(this)
-                .onRegistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
+                .onResult(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 
     /**
@@ -138,6 +137,6 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@NotNull String registrationId) {
         OpenPushHelper.getInstance(this)
-                .onUnregistrationEnd(new RegistrationResult(ADMProvider.NAME, registrationId));
+                .onResult(new RegistrationResult(ADMProvider.NAME, registrationId));
     }
 }

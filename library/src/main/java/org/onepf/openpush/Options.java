@@ -105,6 +105,10 @@ public class Options {
          */
         @NotNull
         public Builder addProviders(@NotNull PushProvider... providers) {
+            if (providers.length == 0) {
+                return this;
+            }
+
             return addProviders(Arrays.asList(providers));
         }
 
@@ -126,13 +130,17 @@ public class Options {
 
         @NotNull
         public Builder addProviders(@NotNull List<? extends PushProvider> providers) {
+            if (providers.isEmpty()) {
+                return this;
+            }
+
             if (mProviders == null) {
                 mProviders = new LinkedHashSet<PushProvider>(4);
             }
 
             if (!mProviders.addAll(providers)) {
                 throw new IllegalArgumentException(
-                        String.format("Provider '%s' already added", providers));
+                        String.format("Providers '%s' already added", providers));
             }
             return this;
         }

@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Options;
+import org.onepf.openpush.PushProvider;
 import org.onepf.openpush.gcm.GCMProvider;
 
 import java.io.IOException;
@@ -88,13 +89,15 @@ public class PushSampleActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (mOpenPushHelper.getState() == OpenPushHelper.State.RUNNING) {
+        if (!mOpenPushHelper.isRegistered()) {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }
             registerReceiver(mOpenPushReceiver);
-            switchToRegisteredState(mOpenPushHelper.getCurrentProviderName(),
-                    mOpenPushHelper.getCurrentProviderRegistrationId());
+            PushProvider currentProvider = mOpenPushHelper.getCurrentProvider();
+            if (currentProvider != null) {
+                switchToRegisteredState(currentProvider.getName(), currentProvider.getRegistrationId());
+            }
         } else {
             switchToUnregisteredState();
         }
@@ -130,10 +133,9 @@ public class PushSampleActivity extends Activity {
 
     @OnClick(R.id.register_switch)
     void onRegisterClick() {
-        if (mOpenPushHelper.getState() == OpenPushHelper.State.RUNNING) {
+        if (mOpenPushHelper.isRegistered()) {
             mOpenPushHelper.unregister();
-        } else if (mOpenPushHelper.getState()
-                == OpenPushHelper.State.NONE) {
+        } else {
             if (mOpenPushReceiver == null) {
                 mOpenPushReceiver = new OpenPushEventReceiver();
             }

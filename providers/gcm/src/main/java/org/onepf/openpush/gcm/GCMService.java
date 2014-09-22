@@ -22,7 +22,6 @@ import android.content.Intent;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
 
@@ -46,7 +45,7 @@ public class GCMService extends IntentService {
         } else if (GCMConstants.ACTION_UNREGISTRATION.equals(intent.getAction())) {
             onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
         } else if (GCMConstants.ACTION_ERROR.equals(intent.getAction())) {
-            onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID));
+            onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), intent.getAction());
         } else if (intent.getExtras() != null) {
             String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
@@ -66,43 +65,43 @@ public class GCMService extends IntentService {
         OpenPushHelper.getInstance(this).onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
-    private void onError(@NotNull
-                         @MagicConstant(stringValues = {
+    private void onError(@MagicConstant(stringValues = {
                                  GCMConstants.ERROR_AUTHEFICATION_FAILED,
                                  GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
-                         }) String errorId) {
+                         }) String errorId,
+                         @MagicConstant(stringValues = {
+                                 GCMConstants.ACTION_REGISTRATION,
+                                 GCMConstants.ACTION_UNREGISTRATION
+                         }) String action) {
         Error error;
-        if (errorId.equals(GCMConstants.ERROR_SERVICE_NOT_AVAILABLE)) {
+        if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;
-        } else if (errorId.equals(GCMConstants.ERROR_AUTHEFICATION_FAILED)) {
-            error = Error.AUTHEFICATION_FAILED;
+        } else if (GCMConstants.ERROR_AUTHEFICATION_FAILED.equals(errorId)) {
+            error = Error.AUTHENTICATION_FAILED;
         } else {
-            error = Error.UNKNOWN;
+            throw new OpenPushException(String.format("Unknown error '%s'.", errorId));
         }
 
         OpenPushHelper helper = OpenPushHelper.getInstance(this);
         final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
-        switch (helper.getState()) {
-            case REGISTRATION_RUNNING:
-                helper.onRegistrationEnd(
-                        new RegistrationResult(GCMProvider.NAME, error, recoverableError));
-                break;
-
-            case UNREGISTRATION_RUNNING:
-                helper.onUnregistrationEnd(
-                        new RegistrationResult(GCMProvider.NAME, error, recoverableError));
-                break;
+        RegistrationResult result = new RegistrationResult(GCMProvider.NAME, error, recoverableError);
+        if (GCMConstants.ACTION_REGISTRATION.equals(action)) {
+            helper.onResult(result);
+        } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
+            helper.onResult(result);
+        } else {
+            throw new OpenPushException(String.format("Unknown action '%s'.", action));
         }
     }
 
     private void onRegistered(String registrationToken) {
         OpenPushHelper.getInstance(this)
-                .onRegistrationEnd(new RegistrationResult(GCMProvider.NAME, registrationToken));
+                .onResult(new RegistrationResult(GCMProvider.NAME, registrationToken));
     }
 
     private void onUnregistered(String oldRegistrationToken) {
         OpenPushHelper.getInstance(this)
-                .onUnregistrationEnd(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
+                .onResult(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
     }
 
 }
