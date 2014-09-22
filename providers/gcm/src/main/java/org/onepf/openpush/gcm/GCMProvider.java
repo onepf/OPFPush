@@ -258,8 +258,6 @@ public class GCMProvider extends BasePushProvider {
     private class RegisterTask implements Runnable {
         @Override
         public void run() {
-            reset();
-
             try {
                 final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
                 if (registrationId != null) {
