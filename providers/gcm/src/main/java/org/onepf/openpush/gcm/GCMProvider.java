@@ -61,6 +61,7 @@ public class GCMProvider extends BasePushProvider {
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
     static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
+    private final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     private volatile String mRegistrationToken;
     private final String[] mSenderIDs;
@@ -240,7 +241,7 @@ public class GCMProvider extends BasePushProvider {
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
 
-                    postRetry();
+                    MAIN_HANDLER.postDelayed(this, getDelay());
                 } else {
                     //TODO Notify event about error.
                 }
@@ -251,15 +252,6 @@ public class GCMProvider extends BasePushProvider {
             Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
             intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
             getContext().sendBroadcast(intent);
-        }
-
-        private void postRetry() {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    unregister();
-                }
-            }, getDelay());
         }
     }
 
@@ -282,7 +274,7 @@ public class GCMProvider extends BasePushProvider {
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
 
-                    postRetry();
+                    MAIN_HANDLER.postDelayed(this, getDelay());
                 } else {
                     onAuthError();
                 }
@@ -309,15 +301,6 @@ public class GCMProvider extends BasePushProvider {
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                     GCMConstants.ERROR_AUTHEFICATION_FAILED);
             getContext().sendBroadcast(intent);
-        }
-
-        private void postRetry() {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    register();
-                }
-            }, getDelay());
         }
     }
 }
