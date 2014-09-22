@@ -73,20 +73,12 @@ public class NokiaPushProvider extends BasePushProvider {
 
     @Override
     public void register() {
-        if (isRegistered()) {
-            throw new OpenPushException("Nokia Push already registered.");
-        } else {
-            PushRegistrar.register(getContext(), mSendersId);
-        }
+        PushRegistrar.register(getContext(), mSendersId);
     }
 
     @Override
     public void unregister() {
-        if (isRegistered()) {
-            PushRegistrar.unregister(getContext());
-        } else {
-            throw new OpenPushException("Nokia Push must be registered before unregister.");
-        }
+        PushRegistrar.unregister(getContext());
     }
 
     @Override

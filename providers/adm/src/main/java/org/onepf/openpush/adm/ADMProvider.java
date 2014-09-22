@@ -43,11 +43,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void register() {
-        if (isRegistered()) {
-            throw new OpenPushException("Amazon Device Messaging already registered.");
-        } else {
-            mAdm.startRegister();
-        }
+        mAdm.startRegister();
     }
 
     @Override
@@ -65,11 +61,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void unregister() {
-        if (isRegistered()) {
-            mAdm.startUnregister();
-        } else {
-            throw new OpenPushException("Amazon Device Messaging must be registered.");
-        }
+        mAdm.startUnregister();
     }
 
     @Override

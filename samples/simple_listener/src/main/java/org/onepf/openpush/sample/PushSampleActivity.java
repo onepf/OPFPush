@@ -199,11 +199,15 @@ public class PushSampleActivity extends Activity {
         }
 
         @Override
-        public void onRegistrationError(@NotNull String providerName, @NotNull org.onepf.openpush.Error error) {
+        public void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
+            Toast.makeText(PushSampleActivity.this,
+                    String.format("Registration error '%s'", error), Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
+            Toast.makeText(PushSampleActivity.this,
+                    String.format("Unregistration error '%s'", error), Toast.LENGTH_LONG).show();
         }
 
         @Override

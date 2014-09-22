@@ -44,13 +44,19 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
-            onRegistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
-        } else if (GCMConstants.ACTION_UNREGISTRATION.equals(intent.getAction())) {
-            String token = intent.getStringExtra(GCMConstants.EXTRA_TOKEN);
-            onUnregistered(token);
-        } else if (GCMConstants.ACTION_ERROR.equals(intent.getAction())) {
-            onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), intent.getAction());
+        String action = intent.getAction();
+        if (GCMConstants.ACTION_REGISTRATION.equals(action)) {
+            if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
+                onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), action);
+            } else {
+                onRegistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
+            }
+        } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
+            if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
+                onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), action);
+            } else {
+                onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
+            }
         } else if (intent.getExtras() != null) {
             String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {

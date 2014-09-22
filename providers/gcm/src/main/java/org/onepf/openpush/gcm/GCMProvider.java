@@ -22,7 +22,6 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,11 +35,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import support.AsyncTaskCompat;
 
 import static org.onepf.openpush.OpenPushLog.LOGE;
-import static org.onepf.openpush.OpenPushLog.LOGI;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -92,9 +88,6 @@ public class GCMProvider extends BasePushProvider {
     }
 
     public void register() {
-        if (isRegistered()) {
-            throw new OpenPushException("Google Cloud Messaging already registered.");
-        }
         if (mExecutor == null || mExecutor.isShutdown()) {
             mExecutor = Executors.newSingleThreadExecutor();
         }
@@ -102,14 +95,7 @@ public class GCMProvider extends BasePushProvider {
     }
 
     public void unregister() {
-        if (isRegistered()) {
-            String oldToken = mRegistrationToken;
-            reset();
-            mExecutor.execute(new UnregisterTask(getContext(), oldToken));
-        } else {
-            throw new OpenPushException("Google Cloud Messaging must" +
-                    " be registered before unregister.");
-        }
+        mExecutor.execute(new UnregisterTask(mRegistrationToken));
     }
 
     @Override
@@ -229,66 +215,29 @@ public class GCMProvider extends BasePushProvider {
         AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
     }
 
-    private static class SendMessageTask extends AsyncTask<Void, Void, Void> {
-        private static final String GCM_SENDER_SUFFIX = "@gcm.googleapis.com";
-
-        private final String mTo;
-        private final GCMMessage mMessage;
-        private final WeakReference<Context> mContextRef;
-
-        private SendMessageTask(@NotNull Context context,
-                                @NotNull String senderId,
-                                @NotNull GCMMessage message) {
-            mTo = senderId + GCM_SENDER_SUFFIX;
-            mMessage = message;
-            mContextRef = new WeakReference<Context>(context.getApplicationContext());
-        }
-
-        protected Void doInBackground(Void... params) {
-            Context context = mContextRef.get();
-            if (context != null) {
-                try {
-                    GoogleCloudMessaging.getInstance(context)
-                            .send(mTo, mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
-                    LOGI(String.format("Message '%s' has sent.", mMessage));
-                } catch (IOException ex) {
-                    LOGE(String.format("Error while send Message '%s'.", mMessage), ex);
-                }
-            } else {
-                LOGE(String.format("Error while send Message '%s'. No context.", mMessage));
-            }
-            return null;
-        }
-    }
-
     public long getDelay() {
         return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() - 1));
     }
 
-    private static class UnregisterTask implements Runnable {
+    private class UnregisterTask implements Runnable {
         private final String mOldRegistrationToken;
-        private final WeakReference<Context> mContextRef;
 
-        private UnregisterTask(@NotNull Context context, @NotNull String oldRegistrationToken) {
+        private UnregisterTask(@NotNull String oldRegistrationToken) {
             mOldRegistrationToken = oldRegistrationToken;
-            mContextRef = new WeakReference<Context>(context.getApplicationContext());
         }
 
         @Override
         public void run() {
-            final Context context = mContextRef.get();
-            if (context != null) {
-                try {
-                    GoogleCloudMessaging.getInstance(context).unregister();
+            try {
+                GoogleCloudMessaging.getInstance(getContext()).unregister();
+                reset();
 
-                    Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
-                    intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
-                    context.sendBroadcast(intent);
-                } catch (IOException e) {
-                    //TODO Send error.
-                }
-            } else {
-                LOGE("Can't unregister - Context is null");
+                Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+                intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
+                getContext().sendBroadcast(intent);
+            } catch (IOException e) {
+                LOGE("Error unregistering.", e);
+                //TODO Send error.
             }
         }
     }
@@ -307,15 +256,13 @@ public class GCMProvider extends BasePushProvider {
                 }
             } catch (IOException e) {
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
-                    long when = System.currentTimeMillis() + getDelay();
-                    postRetryRegister(when);
+                    postRetryRegister();
 
-                    Intent intent = new Intent(GCMConstants.ACTION_ERROR);
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                    Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
                 } else {
-                   onAuthError();
+                    onAuthError();
                 }
             }
         }
@@ -336,19 +283,19 @@ public class GCMProvider extends BasePushProvider {
 
         private void onAuthError() {
             mTryNumber.set(0);
-            Intent intent = new Intent(GCMConstants.ACTION_ERROR);
+            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                     GCMConstants.ERROR_AUTHEFICATION_FAILED);
             getContext().sendBroadcast(intent);
         }
 
-        private void postRetryRegister(long when) {
-            new Handler(Looper.getMainLooper()).postAtTime(new Runnable() {
+        private void postRetryRegister() {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     register();
                 }
-            }, when);
+            }, getDelay());
         }
     }
 }
