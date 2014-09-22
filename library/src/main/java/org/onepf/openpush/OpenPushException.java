@@ -24,4 +24,8 @@ public class OpenPushException extends RuntimeException {
     public OpenPushException(String detailMessage) {
         super(detailMessage);
     }
+
+    public OpenPushException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
+    }
 }

@@ -91,10 +91,7 @@ public class PushSampleActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (mOpenPushHelper.isRegistered()) {
-            PushProvider currentProvider = mOpenPushHelper.getCurrentProvider();
-            if (currentProvider != null) {
-                switchToRegisteredState(currentProvider.getName(), currentProvider.getRegistrationId());
-            }
+            switchToRegisteredState();
         } else {
             switchToUnregisteredState();
         }
@@ -139,9 +136,14 @@ public class PushSampleActivity extends Activity {
         );
     }
 
-    private void switchToRegisteredState(String providerName, String registrationId) {
+    private void switchToRegisteredState() {
+        PushProvider provider = mOpenPushHelper.getCurrentProvider();
+        String registrationId = provider == null ? "null" : String.valueOf(provider.getRegistrationId());
         mRegistrationIdView.setText(Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
-        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, providerName)));
+
+        String name = provider == null ? "null" : provider.getName();
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, name)));
+
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.unregister)));
         mRegisterSwitchView.setEnabled(true);
         mCopyToClipboardView.setVisibility(View.VISIBLE);
@@ -164,7 +166,7 @@ public class PushSampleActivity extends Activity {
         public void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
             Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
                     , providerName, registrationId));
-            switchToRegisteredState(providerName, registrationId);
+            switchToRegisteredState();
 
             // You start the registration process by calling register().
             // When the registration ID is ready, OpenPushHelper calls onRegistered() on
@@ -202,12 +204,18 @@ public class PushSampleActivity extends Activity {
         public void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Registration error '%s'", error), Toast.LENGTH_LONG).show();
+            if (!error.isRecoverable()) {
+                switchToUnregisteredState();
+            }
         }
 
         @Override
         public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Unregistration error '%s'", error), Toast.LENGTH_LONG).show();
+            if (!error.isRecoverable()) {
+                switchToRegisteredState();
+            }
         }
 
         @Override

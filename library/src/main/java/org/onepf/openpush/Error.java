@@ -20,8 +20,18 @@ package org.onepf.openpush;
  * Created by krozov on 09.09.14.
  */
 public enum Error {
-    SERVICE_NOT_AVAILABLE,
-    INVALID_PARAMETERS,
-    INVALID_SENDER,
-    AUTHENTICATION_FAILED
+    SERVICE_NOT_AVAILABLE(true),
+    INVALID_PARAMETERS(false),
+    INVALID_SENDER(false),
+    AUTHENTICATION_FAILED(false);
+
+    private boolean mRecoverable;
+
+    Error(boolean recoverable) {
+        mRecoverable = recoverable;
+    }
+
+    public boolean isRecoverable() {
+        return mRecoverable;
+    }
 }

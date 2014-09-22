@@ -35,6 +35,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
+import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
@@ -241,11 +242,22 @@ public class GCMProvider extends BasePushProvider {
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
 
-                    MAIN_HANDLER.postDelayed(this, getDelay());
+                    postDelayed();
+                } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(e.getMessage())) {
+                    throw new OpenPushException("GCM unregister crash", e);
                 } else {
                     //TODO Notify event about error.
                 }
             }
+        }
+
+        private void postDelayed() {
+            MAIN_HANDLER.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                   register();
+                }
+            }, getDelay());
         }
 
         private void onUnregistrationSuccess() {
@@ -259,34 +271,46 @@ public class GCMProvider extends BasePushProvider {
         @Override
         public void run() {
             try {
-                final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
-                if (registrationId != null) {
-                    onRegistrationSuccess(registrationId);
+                final String registrationToken = mGoogleCloudMessaging.register(mSenderIDs);
+                if (registrationToken != null) {
+                    onRegistrationSuccess(registrationToken);
                 } else {
                     onAuthError();
                 }
             } catch (IOException e) {
-                if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
+                String error = e.getMessage();
+                if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(error)) {
                     Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
                     intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
 
-                    MAIN_HANDLER.postDelayed(this, getDelay());
+                    postDelayed();
+                } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(error)) {
+                    throw new OpenPushException("GCM register crash", e);
                 } else {
                     onAuthError();
                 }
             }
         }
 
-        private void onRegistrationSuccess(String registrationId) {
+        private void postDelayed() {
+            MAIN_HANDLER.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                   unregister();
+                }
+            }, getDelay());
+        }
+
+        private void onRegistrationSuccess(String registrationToken) {
             mTryNumber.set(0);
             mPreferences.edit()
                     .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                    .putString(PREF_REGISTRATION_TOKEN, registrationId)
+                    .putString(PREF_REGISTRATION_TOKEN, registrationToken)
                     .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
                     .apply();
-            mRegistrationToken = registrationId;
+            mRegistrationToken = registrationToken;
 
             Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
             intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
