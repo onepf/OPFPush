@@ -71,7 +71,7 @@ public class GCMProvider extends BasePushProvider {
     private final SharedPreferences mPreferences;
     private final GoogleCloudMessaging mGoogleCloudMessaging;
 
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     private final AtomicInteger mMsgId;
 
@@ -95,13 +95,17 @@ public class GCMProvider extends BasePushProvider {
         if (isRegistered()) {
             throw new OpenPushException("Google Cloud Messaging already registered.");
         }
+        if (mExecutor == null || mExecutor.isShutdown()) {
+            mExecutor = Executors.newSingleThreadExecutor();
+        }
         mExecutor.execute(new RegisterTask());
     }
 
     public void unregister() {
         if (isRegistered()) {
+            String oldToken = mRegistrationToken;
             reset();
-            mExecutor.execute(new UnregisterTask(getContext(), mRegistrationToken));
+            mExecutor.execute(new UnregisterTask(getContext(), oldToken));
         } else {
             throw new OpenPushException("Google Cloud Messaging must" +
                     " be registered before unregister.");
@@ -180,7 +184,9 @@ public class GCMProvider extends BasePushProvider {
     public void close() {
         mMsgId.set(0);
         mGoogleCloudMessaging.close();
+
         mExecutor.shutdownNow();
+        mExecutor = null;
     }
 
     @NotNull
@@ -198,6 +204,7 @@ public class GCMProvider extends BasePushProvider {
     @Override
     public void onUnavailable() {
         reset();
+        close();
     }
 
     private void reset() {
@@ -294,17 +301,7 @@ public class GCMProvider extends BasePushProvider {
             try {
                 final String registrationId = mGoogleCloudMessaging.register(mSenderIDs);
                 if (registrationId != null) {
-                    mTryNumber.set(0);
-                    mPreferences.edit()
-                            .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                            .putString(PREF_REGISTRATION_TOKEN, registrationId)
-                            .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
-                            .apply();
-                    mRegistrationToken = registrationId;
-
-                    Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
-                    intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
-                    getContext().sendBroadcast(intent);
+                    onRegistrationSuccess(registrationId);
                 } else {
                     onAuthError();
                 }
@@ -321,6 +318,20 @@ public class GCMProvider extends BasePushProvider {
                    onAuthError();
                 }
             }
+        }
+
+        private void onRegistrationSuccess(String registrationId) {
+            mTryNumber.set(0);
+            mPreferences.edit()
+                    .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
+                    .putString(PREF_REGISTRATION_TOKEN, registrationId)
+                    .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
+                    .apply();
+            mRegistrationToken = registrationId;
+
+            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+            intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
+            getContext().sendBroadcast(intent);
         }
 
         private void onAuthError() {

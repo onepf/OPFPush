@@ -48,7 +48,7 @@ public class OpenPushHelper {
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
 
     @Nullable
-    private OpenPushListener mListener;
+    private static OpenPushHelper sInstance;
 
     @NotNull
     private final Context mAppContext;
@@ -57,7 +57,7 @@ public class OpenPushHelper {
     private final SharedPreferences mPreferences;
 
     @Nullable
-    private static OpenPushHelper sInstance;
+    private OpenPushListener mListener;
 
     @Nullable
     private PackageChangeReceiver mPackageReceiver;
@@ -70,6 +70,12 @@ public class OpenPushHelper {
 
     private Options mOptions;
 
+    private OpenPushHelper(@NotNull Context context) {
+        mAppContext = context.getApplicationContext();
+        mPreferences =
+                mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
+    }
+
     public static OpenPushHelper getInstance(@NotNull Context context) {
         if (sInstance == null) {
             synchronized (OpenPushHelper.class) {
@@ -81,14 +87,18 @@ public class OpenPushHelper {
         return sInstance;
     }
 
-    private OpenPushHelper(@NotNull Context context) {
-        mAppContext = context.getApplicationContext();
-        mPreferences =
-                mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
-    }
-
     public boolean isInitDone() {
         return mOptions != null;
+    }
+
+    public boolean isRegistered() {
+        return mCurrentProvider != null && mCurrentProvider.isRegistered();
+    }
+
+    private void checkInitDone() {
+        if (!isInitDone()) {
+            throw new OpenPushException("Before work with OpenPushHelper call init() first.");
+        }
     }
 
     public void init(@NotNull Options options) {
@@ -131,10 +141,6 @@ public class OpenPushHelper {
         }
     }
 
-    public boolean isRegistered() {
-        return mCurrentProvider != null && mCurrentProvider.isRegistered();
-    }
-
     public void setListener(@Nullable OpenPushListener l) {
         mListener = l;
     }
@@ -147,7 +153,6 @@ public class OpenPushHelper {
                 break;
 
             case NONE:
-            case NO_AVAILABLE_PROVIDERS:
                 mState = State.REGISTRATION_RUNNING;
                 if (mOptions.isSystemPushPreferred()
                         && registerSystemPreferredProvider()) {
@@ -199,7 +204,7 @@ public class OpenPushHelper {
             }
         }
 
-        mState = State.NO_AVAILABLE_PROVIDERS;
+        mState = State.NONE;
         LOGW("No more available providers.");
         if (mListener != null) {
             mListener.onNoAvailableProvider();
@@ -372,7 +377,18 @@ public class OpenPushHelper {
         }
     }
 
-    private void onUnregistrationEnd(@NotNull RegistrationResult result) {
+    public void onResult(RegistrationResult result) {
+        if (mState == State.REGISTRATION_RUNNING) {
+            onRegistrationEnd(result);
+        } else if (mState == State.UNREGISTRATION_RUNNING) {
+            onUnregistrationEnd(result);
+        } else {
+            throw new UnsupportedOperationException("New result can be handled only when" +
+                    " registration or unregistration is running.");
+        }
+    }
+
+    private synchronized void onUnregistrationEnd(@NotNull RegistrationResult result) {
         if (mState != State.UNREGISTRATION_RUNNING) {
             return;
         }
@@ -398,24 +414,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void checkInitDone() {
-        if (!isInitDone()) {
-            throw new OpenPushException("Before work with OpenPushHelper call init() first.");
-        }
-    }
-
-    public void onResult(RegistrationResult result) {
-        if (mState == State.REGISTRATION_RUNNING) {
-            onRegistrationEnd(result);
-        } else if (mState == State.UNREGISTRATION_RUNNING) {
-            onUnregistrationEnd(result);
-        } else {
-            throw new UnsupportedOperationException("New result can be handled only when" +
-                    " registration or unregistration is running.");
-        }
-    }
-
-    private void onRegistrationEnd(@NotNull RegistrationResult result) {
+    private synchronized void onRegistrationEnd(@NotNull RegistrationResult result) {
         if (mState != State.REGISTRATION_RUNNING) {
             return;
         }
@@ -472,11 +471,6 @@ public class OpenPushHelper {
          * Helper select provider and successfully registerProvider it.
          */
         RUNNING,
-
-        /**
-         * All providers are unavailable or they registration failed.
-         */
-        NO_AVAILABLE_PROVIDERS,
 
         /**
          * Helper is unregistering current provider.
