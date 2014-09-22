@@ -72,5 +72,4 @@ public class OptionsTest {
 
         options.getProviders().add(null);
     }
-
 }
