@@ -122,10 +122,10 @@ public class OpenPushHelper {
             if (lastProvider.isRegistered()) {
                 LOGI("Last provider running.");
                 mCurrentProvider = lastProvider;
-                mState = State.RUNNING;
+                mState = State.WORKING;
             } else {
                 LOGI("Last provider need register.");
-                mState = State.REGISTRATION_RUNNING;
+                mState = State.REGISTERING;
                 if (!registerProvider(lastProvider)) {
                     mState = State.NONE;
                     saveLastProvider(null);
@@ -145,15 +145,15 @@ public class OpenPushHelper {
         mListener = l;
     }
 
-    public void register() {
+    public synchronized void register() {
         checkInitDone();
 
         switch (mState) {
-            case REGISTRATION_RUNNING:
+            case REGISTERING:
                 break;
 
             case NONE:
-                mState = State.REGISTRATION_RUNNING;
+                mState = State.REGISTERING;
                 if (mOptions.isSystemPushPreferred()
                         && registerSystemPreferredProvider()) {
                     return;
@@ -161,10 +161,10 @@ public class OpenPushHelper {
                 registerNextProvider(null);
                 break;
 
-            case UNREGISTRATION_RUNNING:
+            case UNREGISTERING:
                 throw new OpenPushException("Can't register while unregistration is running.");
 
-            default:
+            case WORKING:
                 throw new OpenPushException("Attempt to register twice!");
         }
     }
@@ -238,7 +238,7 @@ public class OpenPushHelper {
 
     }
 
-    public void unregister() {
+    public synchronized void unregister() {
         checkInitDone();
 
         if (mCurrentProvider == null) {
@@ -246,19 +246,17 @@ public class OpenPushHelper {
         }
 
         switch (mState) {
-            case UNREGISTRATION_RUNNING:
-                break;
-
-            case RUNNING:
-                mState = State.UNREGISTRATION_RUNNING;
+            case WORKING:
+                mState = State.UNREGISTERING;
                 unregisterPackageChangeReceiver();
                 mCurrentProvider.unregister();
                 break;
 
-            case REGISTRATION_RUNNING:
-                throw new OpenPushException("Can't unregister while registration is running.");
+            case UNREGISTERING:
+                break;
 
-            default:
+            case REGISTERING:
+            case NONE:
                 throw new OpenPushException("Before to unregister you must register provider.!");
         }
     }
@@ -349,7 +347,7 @@ public class OpenPushHelper {
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
             mCurrentProvider.onAppStateChanged();
-            mState = State.REGISTRATION_RUNNING;
+            mState = State.REGISTERING;
             if (!registerProvider(mCurrentProvider, false)) {
                 mState = State.NONE;
             }
@@ -378,21 +376,22 @@ public class OpenPushHelper {
     }
 
     public void onResult(RegistrationResult result) {
-        if (mState == State.REGISTRATION_RUNNING) {
-            onRegistrationEnd(result);
-        } else if (mState == State.UNREGISTRATION_RUNNING) {
-            onUnregistrationEnd(result);
-        } else {
-            throw new UnsupportedOperationException("New result can be handled only when" +
-                    " registration or unregistration is running.");
+        switch (mState) {
+            case REGISTERING:
+                onRegistrationEnd(result);
+                break;
+
+            case UNREGISTERING:
+                onUnregistrationEnd(result);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("New result can be handled only when" +
+                        " registration or unregistration is running.");
         }
     }
 
     private synchronized void onUnregistrationEnd(@NotNull RegistrationResult result) {
-        if (mState != State.UNREGISTRATION_RUNNING) {
-            return;
-        }
-
         if (result.isSuccess()) {
             LOGI(String.format("Successfully unregister provider '%s'.", result.getProviderName()));
             reset();
@@ -406,7 +405,7 @@ public class OpenPushHelper {
             }
         } else if (mListener != null) {
             LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
-            mState = State.RUNNING;
+            mState = State.WORKING;
             final PushProvider provider = getProvider(result.getProviderName());
             if (provider != null) {
                 mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
@@ -415,13 +414,9 @@ public class OpenPushHelper {
     }
 
     private synchronized void onRegistrationEnd(@NotNull RegistrationResult result) {
-        if (mState != State.REGISTRATION_RUNNING) {
-            return;
-        }
-
         if (result.isSuccess()) {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
-            mState = State.RUNNING;
+            mState = State.WORKING;
 
             mCurrentProvider = getProvider(result.getProviderName());
             saveLastProvider(mCurrentProvider);
@@ -450,31 +445,15 @@ public class OpenPushHelper {
     @Override
     public String toString() {
         return "OpenPushHelper{" +
-                "state=" + mState +
-                ", options=" + mOptions +
+                "options=" + mOptions +
                 ", currentProvider=" + mCurrentProvider +
                 '}';
     }
 
     private static enum State {
-        /**
-         * Push isn't running.
-         */
         NONE,
-
-        /**
-         * Helper is selecting provider for registerProvider push.
-         */
-        REGISTRATION_RUNNING,
-
-        /**
-         * Helper select provider and successfully registerProvider it.
-         */
-        RUNNING,
-
-        /**
-         * Helper is unregistering current provider.
-         */
-        UNREGISTRATION_RUNNING
+        REGISTERING,
+        WORKING,
+        UNREGISTERING
     }
 }
