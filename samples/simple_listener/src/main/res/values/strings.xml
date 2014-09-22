@@ -19,13 +19,13 @@
 
     <string name="app_name">Push Notifications</string>
     <string name="register">Register</string>
+    <string name="register_in_progress">Registering…</string>
+    <string name="unregister_in_progress">Unregistering…</string>
     <string name="registration_id_text"><![CDATA[<b>Registration id:</b><br/>%s]]></string>
     <string name="btn_copy_to_clipboard">Copy to clipboard</string>
     <string name="push_provider_text"><![CDATA[<b>Provider:<br/></b>%s]]></string>
     <string name="unregister">Unregister</string>
     <string name="toast_registration_id_copied">Registration id copied</string>
-    <string name="registered_status"><![CDATA[<b>Registration status:</b><br/>Registered]]></string>
-    <string name="unregistered_status"><![CDATA[<b>Registration status:</b><br/>Not registered]]></string>
     <string name="message">message</string>
 
 </resources>

@@ -32,9 +32,8 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.Options;
-import org.onepf.openpush.PushProvider;
+import org.onepf.openpush.*;
+import org.onepf.openpush.Error;
 import org.onepf.openpush.gcm.GCMProvider;
 
 import java.io.IOException;
@@ -52,15 +51,11 @@ import butterknife.Optional;
  */
 public class PushSampleActivity extends Activity {
 
-    private static final String WEB_SERVER_URL = "http://localhost:8080";
     public static final String GCM_SENDER_ID = "76325631570";
     private static final String TAG = "PushSampleActivity";
 
     @InjectView(R.id.registration_id)
     TextView mRegistrationIdView;
-
-    @InjectView(R.id.registration_status)
-    TextView mRegistrationStatusView;
 
     @InjectView(R.id.push_provider_name)
     TextView mProviderNameView;
@@ -72,28 +67,30 @@ public class PushSampleActivity extends Activity {
     @InjectView(R.id.btn_copy_to_clipboard)
     Button mCopyToClipboardView;
 
-    private BroadcastReceiver mOpenPushReceiver;
     private static OpenPushHelper mOpenPushHelper;
+    private PushSampleActivity.OpenPushEventReceiver mEventReceiver
+            = new PushSampleActivity.OpenPushEventReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (mOpenPushHelper == null) {
-            mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
-            mOpenPushHelper.setListener(new LocalBroadcastListener(this));
-            Options.Builder builder = new Options.Builder();
-            builder.addProviders(new GCMProvider(PushSampleActivity.this, GCM_SENDER_ID));
-            mOpenPushHelper.init(builder.build());
-        }
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        if (!mOpenPushHelper.isRegistered()) {
-            if (mOpenPushReceiver == null) {
-                mOpenPushReceiver = new OpenPushEventReceiver();
-            }
-            registerReceiver(mOpenPushReceiver);
+        if (mOpenPushHelper == null) {
+            mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+            mOpenPushHelper.setListener(mEventReceiver);
+            Options.Builder builder = new Options.Builder();
+            builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
+            mOpenPushHelper.init(builder.build());
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (mOpenPushHelper.isRegistered()) {
             PushProvider currentProvider = mOpenPushHelper.getCurrentProvider();
             if (currentProvider != null) {
                 switchToRegisteredState(currentProvider.getName(), currentProvider.getRegistrationId());
@@ -106,41 +103,25 @@ public class PushSampleActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mOpenPushReceiver != null) {
-            registerReceiver(mOpenPushReceiver);
-        }
+        mOpenPushHelper.setListener(mEventReceiver);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mOpenPushReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
-        }
-    }
-
-    private void registerReceiver(BroadcastReceiver receiver) {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(LocalBroadcastListener.ACTION_REGISTERED);
-        filter.addAction(LocalBroadcastListener.ACTION_UNREGISTERED);
-        filter.addAction(LocalBroadcastListener.ACTION_MESSAGE);
-        filter.addAction(LocalBroadcastListener.ACTION_REGISTRATION_ERROR);
-        filter.addAction(LocalBroadcastListener.ACTION_NO_AVAILABLE_PROVIDER);
-        filter.addAction(LocalBroadcastListener.ACTION_DELETED_MESSAGES);
-        filter.addAction(LocalBroadcastListener.ACTION_PROVIDER_BECAME_UNAVAILABLE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+        mOpenPushHelper.setListener(null);
     }
 
     @OnClick(R.id.register_switch)
     void onRegisterClick() {
         if (mOpenPushHelper.isRegistered()) {
             mOpenPushHelper.unregister();
+            mRegisterSwitchView.setText(R.string.unregister_in_progress);
+            mRegisterSwitchView.setEnabled(false);
         } else {
-            if (mOpenPushReceiver == null) {
-                mOpenPushReceiver = new OpenPushEventReceiver();
-            }
-            registerReceiver(mOpenPushReceiver);
             mOpenPushHelper.register();
+            mRegisterSwitchView.setText(R.string.register_in_progress);
+            mRegisterSwitchView.setEnabled(false);
         }
     }
 
@@ -162,7 +143,7 @@ public class PushSampleActivity extends Activity {
         mRegistrationIdView.setText(Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
         mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, providerName)));
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.unregister)));
-        mRegistrationStatusView.setText(Html.fromHtml(getString(R.string.registered_status)));
+        mRegisterSwitchView.setEnabled(true);
         mCopyToClipboardView.setVisibility(View.VISIBLE);
     }
 
@@ -170,16 +151,11 @@ public class PushSampleActivity extends Activity {
         mRegistrationIdView.setText(null);
         mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.register)));
-        mRegistrationStatusView.setText(Html.fromHtml(getString(R.string.unregistered_status)));
+        mRegisterSwitchView.setEnabled(true);
         mCopyToClipboardView.setVisibility(View.GONE);
-
-        if (mOpenPushReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mOpenPushReceiver);
-            mOpenPushReceiver = null;
-        }
     }
 
-    public class OpenPushEventReceiver extends OpenPushBaseReceiver {
+    public class OpenPushEventReceiver implements OpenPushListener {
 
         public OpenPushEventReceiver() {
         }
@@ -212,6 +188,30 @@ public class PushSampleActivity extends Activity {
             Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
                     , providerName, oldRegistrationId));
             switchToUnregisteredState();
+        }
+
+        @Override
+        public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
+        }
+
+        @Override
+        public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+        }
+
+        @Override
+        public void onRegistrationError(@NotNull String providerName, @NotNull org.onepf.openpush.Error error) {
+        }
+
+        @Override
+        public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
+        }
+
+        @Override
+        public void onNoAvailableProvider() {
+        }
+
+        @Override
+        public void onProviderBecameUnavailable(@NotNull String providerName) {
         }
     }
 }

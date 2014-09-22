@@ -27,14 +27,6 @@
     tools:context="org.onepf.openpush.sample.PushSampleActivity">
 
     <TextView
-        android:id="@+id/registration_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        tools:text="Registered"/>
-
-    <TextView
         android:id="@+id/push_provider_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
