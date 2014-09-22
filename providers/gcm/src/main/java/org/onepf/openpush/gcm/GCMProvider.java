@@ -232,13 +232,34 @@ public class GCMProvider extends BasePushProvider {
                 GoogleCloudMessaging.getInstance(getContext()).unregister();
                 reset();
 
-                Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
-                intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
-                getContext().sendBroadcast(intent);
+                onUnregistrationSuccess();
             } catch (IOException e) {
-                LOGE("Error unregistering.", e);
-                //TODO Send error.
+                if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
+                    Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                    getContext().sendBroadcast(intent);
+
+                    postRetry();
+                } else {
+                    //TODO Notify event about error.
+                }
             }
+        }
+
+        private void onUnregistrationSuccess() {
+            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+            intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
+            getContext().sendBroadcast(intent);
+        }
+
+        private void postRetry() {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    unregister();
+                }
+            }, getDelay());
         }
     }
 
@@ -256,11 +277,12 @@ public class GCMProvider extends BasePushProvider {
                 }
             } catch (IOException e) {
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
-                    postRetryRegister();
-
                     Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
+
+                    postRetry();
                 } else {
                     onAuthError();
                 }
@@ -289,7 +311,7 @@ public class GCMProvider extends BasePushProvider {
             getContext().sendBroadcast(intent);
         }
 
-        private void postRetryRegister() {
+        private void postRetry() {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
