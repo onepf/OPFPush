@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import support.AsyncTaskCompat;
 
 import static org.onepf.openpush.OpenPushLog.LOGE;
+import static org.onepf.openpush.OpenPushLog.LOGI;
 
 public class GCMProvider extends BasePushProvider {
 
@@ -252,12 +253,14 @@ public class GCMProvider extends BasePushProvider {
         }
 
         private void postDelayed() {
+            LOGI("Post unregistration retry.");
+            long delay = getDelay();
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                    register();
                 }
-            }, getDelay());
+            }, delay);
         }
 
         private void onUnregistrationSuccess() {
@@ -295,12 +298,14 @@ public class GCMProvider extends BasePushProvider {
         }
 
         private void postDelayed() {
+            LOGI("Post registration retry.");
+            long delay = getDelay();
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                    unregister();
                 }
-            }, getDelay());
+            }, delay);
         }
 
         private void onRegistrationSuccess(String registrationToken) {
