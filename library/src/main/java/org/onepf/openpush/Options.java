@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -85,8 +88,9 @@ public class Options {
      * Helper class to create instance of {@link org.onepf.openpush.Options}.
      */
     public static class Builder {
+        public static final int PROVIDERS_CAPACITY = 4;
         @Nullable
-        private Set<PushProvider> mProviders;
+        private Map<String, PushProvider> mProviders;
 
         private boolean mRecoverProvider;
 
@@ -136,12 +140,17 @@ public class Options {
             }
 
             if (mProviders == null) {
-                mProviders = new LinkedHashSet<PushProvider>(4);
+                mProviders = new LinkedHashMap<String, PushProvider>(PROVIDERS_CAPACITY);
             }
 
-            if (!mProviders.addAll(providers)) {
-                throw new IllegalArgumentException(
-                        String.format("Providers '%s' already added", providers));
+            for (PushProvider provider : providers) {
+                final String providerName = provider.getName();
+                if (mProviders.containsKey(providerName)) {
+                    throw new IllegalArgumentException(
+                            String.format("Provider '%s' already added.", provider));
+                } else{
+                    mProviders.put(providerName, provider);
+                }
             }
             return this;
         }
@@ -157,7 +166,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders, mRecoverProvider, mSystemPushPreferred);
+            return new Options(mProviders.values(), mRecoverProvider, mSystemPushPreferred);
         }
 
         @Override
