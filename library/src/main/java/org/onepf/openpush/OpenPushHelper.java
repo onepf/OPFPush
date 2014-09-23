@@ -445,6 +445,16 @@ public class OpenPushHelper {
         }
     }
 
+    @Override
+    public String toString() {
+        return "OpenPushHelper{" +
+                "options=" + mOptions +
+                ", currentProvider=" + mCurrentProvider +
+                ", inited=" + isInitDone() +
+                ", registered=" + isRegistered() +
+                '}';
+    }
+
     private static class MainThreadListenerWrapper implements OpenPushListener {
         private static final Handler HANDLER = new Handler(Looper.getMainLooper());
         private final OpenPushListener mListener;
@@ -538,14 +548,6 @@ public class OpenPushHelper {
                 }
             });
         }
-    }
-
-    @Override
-    public String toString() {
-        return "OpenPushHelper{" +
-                "options=" + mOptions +
-                ", currentProvider=" + mCurrentProvider +
-                '}';
     }
 
     private static enum State {
