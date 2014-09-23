@@ -296,6 +296,13 @@ public class OpenPushHelper {
         return mCurrentProvider;
     }
 
+    /**
+     * Search provider by name in {@code options} and return in.
+     * If {@code} doesn't contain provider with described name return null.
+     *
+     * @param providerName Name of provider for search.
+     * @return Provider with described name or null if nothing have found.
+     */
     @Nullable
     private PushProvider getProvider(@NotNull String providerName) {
         for (PushProvider provider : mOptions.getProviders()) {
