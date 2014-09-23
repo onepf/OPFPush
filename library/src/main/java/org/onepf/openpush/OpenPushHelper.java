@@ -92,6 +92,20 @@ public class OpenPushHelper {
         return sInstance;
     }
 
+    /**
+     * Create new instance of {@link OpenPushHelper}.
+     * <b>Use for test purposes only!</b>
+     *
+     * @param context
+     * @return New instance of {@link OpenPushHelper}.
+     */
+    static OpenPushHelper getNewInstance(@NotNull Context context) {
+        synchronized (OpenPushHelper.class) {
+            sInstance = new OpenPushHelper(context);
+        }
+        return sInstance;
+    }
+
     public boolean isInitDone() {
         return mOptions != null;
     }

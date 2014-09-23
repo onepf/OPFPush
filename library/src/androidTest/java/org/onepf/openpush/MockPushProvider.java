@@ -20,7 +20,6 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.onepf.openpush.util.OpenPushHelperKeeper;
 import org.onepf.openpush.util.PackageUtils;
 import org.robolectric.Robolectric;
 
@@ -66,14 +65,14 @@ class MockPushProvider extends BasePushProvider {
     @Override
     public void register() {
         mRegistrationId = UUID.randomUUID().toString();
-        OpenPushHelperKeeper.getInstance(getContext())
+        OpenPushHelper.getInstance(getContext())
                 .onResult(new RegistrationResult(getName(), mRegistrationId));
     }
 
     @Override
     public void unregister() {
         mRegistrationId = null;
-        OpenPushHelperKeeper.getInstance(getContext())
+        OpenPushHelper.getInstance(getContext())
                 .onResult(new RegistrationResult(getName(), mRegistrationId));
     }
 
