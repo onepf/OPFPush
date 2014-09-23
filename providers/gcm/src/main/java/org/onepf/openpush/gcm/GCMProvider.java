@@ -19,6 +19,7 @@ package org.onepf.openpush.gcm;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -258,7 +259,7 @@ public class GCMProvider extends BasePushProvider {
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                   register();
+                   unregister();
                 }
             }, delay);
         }
@@ -275,6 +276,7 @@ public class GCMProvider extends BasePushProvider {
         public void run() {
             try {
                 final String registrationToken = mGoogleCloudMessaging.register(mSenderIDs);
+                LOGI(String.format("registrationToken=%s", registrationToken));
                 if (registrationToken != null) {
                     onRegistrationSuccess(registrationToken);
                 } else {
@@ -303,12 +305,12 @@ public class GCMProvider extends BasePushProvider {
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                   unregister();
+                   register();
                 }
             }, delay);
         }
 
-        private void onRegistrationSuccess(String registrationToken) {
+        private void onRegistrationSuccess(final String registrationToken) {
             mTryNumber.set(0);
             mPreferences.edit()
                     .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
@@ -318,6 +320,7 @@ public class GCMProvider extends BasePushProvider {
             mRegistrationToken = registrationToken;
 
             Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+            intent.setComponent(new ComponentName(getContext(), GCMBroadcastReceiver.class));
             intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
             getContext().sendBroadcast(intent);
         }
