@@ -16,14 +16,12 @@
 
 package org.onepf.openpush;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PatternMatcher;
 import android.text.TextUtils;
 
 import junit.framework.Assert;
@@ -68,12 +66,12 @@ public class OpenPushHelper {
     private OpenPushListener mListener;
 
     @Nullable
-    private PackageChangeReceiver mPackageReceiver;
+    private BroadcastReceiver mPackageReceiver;
 
     @Nullable
     private PushProvider mCurrentProvider;
 
-    private volatile AtomicInteger mState = new AtomicInteger(STATE_NONE);
+    private AtomicInteger mState = new AtomicInteger(STATE_NONE);
 
     private Options mOptions;
 
@@ -248,9 +246,11 @@ public class OpenPushHelper {
     public synchronized void unregister() {
         checkInitDone();
 
-        if (mCurrentProvider == null) {
-            throw new OpenPushException("No provider to unregister!");
+        if (!isRegistered()) {
+            throw new OpenPushException("No one provider is registered!");
         }
+
+        Assert.assertNotNull(mCurrentProvider);
 
         switch (mState.get()) {
             case STATE_WORKING:
@@ -263,27 +263,10 @@ public class OpenPushHelper {
                 break;
 
             case STATE_REGISTERING:
+                throw new OpenPushException("Can't unregister when registration in progress.!");
+
             case STATE_NONE:
                 throw new OpenPushException("Before to unregister you must register provider.!");
-        }
-    }
-
-    private void registerPackageChangeReceiver(@NotNull PushProvider provider) {
-        mPackageReceiver = new PackageChangeReceiver(provider);
-
-        IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
-        appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-        appUpdateFilter.addDataPath(mAppContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
-        mAppContext.registerReceiver(mPackageReceiver, appUpdateFilter);
-
-        // System apps can't be removed, that's why no sense listen package remove event.
-        if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())) {
-            IntentFilter hostAppRemovedFilter
-                    = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-            hostAppRemovedFilter.addDataPath(
-                    provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
-            mAppContext.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
         }
     }
 
@@ -427,14 +410,16 @@ public class OpenPushHelper {
             mState.set(STATE_WORKING);
 
             mCurrentProvider = getProvider(result.getProviderName());
+            Assert.assertNotNull(mCurrentProvider);
+
             saveLastProvider(mCurrentProvider);
             Assert.assertNotNull(result.getRegistrationId());
             if (mListener != null) {
                 mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
             }
 
-            Assert.assertNotNull(mCurrentProvider);
-            registerPackageChangeReceiver(mCurrentProvider);
+            mPackageReceiver =
+                    PackageUtils.registerPackageChangeReceiver(mAppContext, mCurrentProvider);
         } else {
             LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
             PushProvider provider = getProvider(result.getProviderName());

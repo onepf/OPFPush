@@ -53,6 +53,7 @@ public class Options {
      *
      * @return Can select next available provider for continue push work.
      */
+    //TODO Find better name for this logic.
     public boolean isRecoverProvider() {
         return mRecoverProvider;
     }

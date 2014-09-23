@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.openpush.util.OpenPushHelperKeeper;
+import org.onepf.openpush.util.PackageUtils;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -47,6 +48,8 @@ public class OpenPushHelperTest {
         // redirect the Log.x output to stdout. Stdout will be recorded in the test result report
         ShadowLog.stream = System.out;
     }
+
+    public static final String PACKAGE_CHANGE_RECEIVER_CLASS_NAME = "PackageChangeReceiver";
 
     @Before
     public void setup() {
@@ -107,12 +110,12 @@ public class OpenPushHelperTest {
     }
 
     public void testPackageChangeReceiverRegistered() {
-        List<ShadowApplication.Wrapper> registeredReceivers = Robolectric.getShadowApplication().getRegisteredReceivers();
+        List<ShadowApplication.Wrapper> registeredReceivers =
+                Robolectric.getShadowApplication().getRegisteredReceivers();
         assertFalse(registeredReceivers.isEmpty());
         boolean receiverFound = false;
-        final String packageChangeReceiverClassName = PackageChangeReceiver.class.getSimpleName();
         for (ShadowApplication.Wrapper wrapper : registeredReceivers) {
-            if (packageChangeReceiverClassName.equals(
+            if (PACKAGE_CHANGE_RECEIVER_CLASS_NAME.equals(
                     wrapper.broadcastReceiver.getClass().getSimpleName())) {
                 receiverFound = true;
                 break;

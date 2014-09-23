@@ -16,12 +16,21 @@
 
 package org.onepf.openpush.util;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.PatternMatcher;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.PushProvider;
+
+import static org.onepf.openpush.OpenPushLog.LOGI;
 
 /**
  * Created by krozov on 07.09.14.
@@ -63,6 +72,63 @@ public final class PackageUtils {
         }
     }
 
+    public static BroadcastReceiver registerPackageChangeReceiver(@NotNull Context context,
+                                                                  @NotNull PushProvider provider) {
+        PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
+
+        IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
+        appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+        appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
+        context.registerReceiver(mPackageReceiver, appUpdateFilter);
+
+        // System apps can't be removed, that's why no sense listen package remove event.
+        if (PackageUtils.isSystemApp(context, provider.getHostAppPackage())) {
+            IntentFilter hostAppRemovedFilter
+                    = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+            hostAppRemovedFilter.addDataPath(
+                    provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
+            context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
+        }
+        return mPackageReceiver;
+    }
+
     private PackageUtils() {
+    }
+
+    private static class PackageChangeReceiver extends BroadcastReceiver {
+
+        private static final String PACKAGE_URI_PREFIX = PACKAGE_DATA_SCHEME + ':';
+
+        @NotNull
+        private PushProvider mProvider;
+
+        PackageChangeReceiver(@NotNull PushProvider provider) {
+            mProvider = provider;
+        }
+
+        @Override
+        public void onReceive(@NotNull Context context, @NotNull Intent intent) {
+            final String action = intent.getAction();
+            if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
+                if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
+                    LOGI(String.format("Host app '%s' of provider '%s' removed.",
+                            mProvider.getHostAppPackage(), mProvider.getName()));
+                    OpenPushHelper.getInstance(context).onUnavailable(mProvider);
+                }
+            } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
+                if (context.getPackageName().equals(getAppPackage(intent))) {
+                    LOGI("Application updated.");
+                    OpenPushHelper.getInstance(context).onNeedRetryRegister(mProvider.getName());
+                }
+            }
+        }
+
+        @Nullable
+        private static String getAppPackage(Intent intent) {
+            final String data = intent.getDataString();
+            return data.startsWith(PACKAGE_URI_PREFIX) ?
+                    data.replaceFirst(PACKAGE_URI_PREFIX, "") : null;
+        }
     }
 }
