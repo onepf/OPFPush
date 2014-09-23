@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by krozov on 05.09.14.
  */
-public final class RegistrationResult {
+public final class Result {
 
     @NotNull
     private final String mProviderName;
@@ -30,15 +30,15 @@ public final class RegistrationResult {
     private final Error mErrorCode;
     private final boolean mRecoverableError;
 
-    public RegistrationResult(@NotNull String providerName, @NotNull String registrationId) {
+    public Result(@NotNull String providerName, @NotNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = null;
         mRecoverableError = true;
     }
 
-    public RegistrationResult(@NotNull String providerName, @NotNull Error error,
-                              boolean recoverableError) {
+    public Result(@NotNull String providerName, @NotNull Error error,
+                  boolean recoverableError) {
         mProviderName = providerName;
         mRegistrationId = null;
         mErrorCode = error;

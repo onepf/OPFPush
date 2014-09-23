@@ -18,8 +18,6 @@ package org.onepf.openpush.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -97,7 +95,7 @@ public class GCMService extends IntentService {
         if (GCMConstants.ACTION_REGISTRATION.equals(action)
                 || GCMConstants.ACTION_UNREGISTRATION.equals(action))
             OpenPushHelper.getInstance(GCMService.this)
-                    .onResult(new RegistrationResult(GCMProvider.NAME, error, recoverableError));
+                    .onResult(new Result(GCMProvider.NAME, error, recoverableError));
         else {
             throw new OpenPushException(String.format("Unknown action '%s'.", action));
         }
@@ -105,12 +103,12 @@ public class GCMService extends IntentService {
 
     private void onRegistered(final String registrationToken) {
         OpenPushHelper.getInstance(GCMService.this)
-                .onResult(new RegistrationResult(GCMProvider.NAME, registrationToken));
+                .onResult(new Result(GCMProvider.NAME, registrationToken));
     }
 
     private void onUnregistered(final String oldRegistrationToken) {
         OpenPushHelper.getInstance(GCMService.this)
-                .onResult(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
+                .onResult(new Result(GCMProvider.NAME, oldRegistrationToken));
     }
 
 }
