@@ -25,6 +25,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by krozov on 09.09.14.
@@ -39,6 +40,35 @@ public class OptionsTest {
         PushProvider provider = new MockPushProvider(Robolectric.application);
         builder.addProviders(provider);
         builder.addProviders(provider);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuilderAddProviderWithSameName() {
+        Options.Builder builder = new Options.Builder();
+        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider(Robolectric.application));
+    }
+
+    public void testBuilderProviderOrder() {
+        Options.Builder builder = new Options.Builder();
+        PushProvider[] providers = {
+                new MockPushProvider(Robolectric.application, "provider1"),
+                new MockPushProvider(Robolectric.application, "provider2"),
+                new MockPushProvider(Robolectric.application, "provider3"),
+                new MockPushProvider(Robolectric.application, "provider4")
+        };
+        builder.addProviders(providers);
+
+        Options options = builder.build();
+
+        List<PushProvider> optionsProviders = options.getProviders();
+        Assert.assertEquals(providers.length, optionsProviders.size());
+        for (int i = 0; i < providers.length; i++) {
+            PushProvider provider = optionsProviders.get(i);
+            Assert.assertNotNull(provider);
+            Assert.assertEquals(providers[i].getName(), provider.getName());
+            Assert.assertEquals(providers[i], provider);
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
