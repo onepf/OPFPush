@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PatternMatcher;
 import android.text.TextUtils;
 
@@ -142,7 +144,7 @@ public class OpenPushHelper {
     }
 
     public void setListener(@Nullable OpenPushListener l) {
-        mListener = l;
+        mListener = l == null ? null : new MainThreadListenerWrapper(l);
     }
 
     public synchronized void register() {
@@ -440,6 +442,101 @@ public class OpenPushHelper {
                     registerNextProvider(provider);
                 }
             }
+        }
+    }
+
+    private static class MainThreadListenerWrapper implements OpenPushListener {
+        private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+        private final OpenPushListener mListener;
+
+        MainThreadListenerWrapper(OpenPushListener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        public void onMessage(@NotNull final String providerName, @Nullable final Bundle extras) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onMessage(providerName, extras);
+                }
+            });
+        }
+
+        @Override
+        public void onDeletedMessages(@NotNull final String providerName, final int messagesCount) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onDeletedMessages(providerName, messagesCount);
+                }
+            });
+
+        }
+
+        @Override
+        public void onRegistered(@NotNull final String providerName,
+                                 @NotNull final String registrationId) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onRegistered(providerName, registrationId);
+                }
+            });
+
+        }
+
+        @Override
+        public void onRegistrationError(@NotNull final String providerName, @NotNull final Error error) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onRegistrationError(providerName, error);
+                }
+            });
+
+        }
+
+        @Override
+        public void onUnregistrationError(@NotNull final String providerName,
+                                          @NotNull final Error error) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onUnregistrationError(providerName, error);
+                }
+            });
+        }
+
+        @Override
+        public void onNoAvailableProvider() {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onNoAvailableProvider();
+                }
+            });
+        }
+
+        @Override
+        public void onUnregistered(@NotNull final String providerName,
+                                   @NotNull final String registrationId) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onUnregistered(providerName, registrationId);
+                }
+            });
+        }
+
+        @Override
+        public void onProviderBecameUnavailable(@NotNull final String providerName) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.onProviderBecameUnavailable(providerName);
+                }
+            });
         }
     }
 

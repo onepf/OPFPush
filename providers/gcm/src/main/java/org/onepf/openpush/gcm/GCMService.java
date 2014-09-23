@@ -36,8 +36,6 @@ import org.onepf.openpush.Error;
  */
 public class GCMService extends IntentService {
 
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-
     public GCMService() {
         super("GCMService");
     }
@@ -69,23 +67,13 @@ public class GCMService extends IntentService {
     }
 
     protected void onDeletedMessages() {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                OpenPushHelper.getInstance(GCMService.this)
-                        .onDeletedMessages(GCMProvider.NAME, 1);
-            }
-        });
+        OpenPushHelper.getInstance(GCMService.this)
+                .onDeletedMessages(GCMProvider.NAME, 1);
     }
 
     private void onMessage(final Intent intent) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                OpenPushHelper.getInstance(GCMService.this)
-                        .onMessage(GCMProvider.NAME, intent.getExtras());
-            }
-        });
+        OpenPushHelper.getInstance(GCMService.this)
+                .onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
     private void onError(@MagicConstant(stringValues = {
@@ -108,36 +96,21 @@ public class GCMService extends IntentService {
         final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
         if (GCMConstants.ACTION_REGISTRATION.equals(action)
                 || GCMConstants.ACTION_UNREGISTRATION.equals(action))
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    OpenPushHelper.getInstance(GCMService.this)
-                            .onResult(new RegistrationResult(GCMProvider.NAME, error, recoverableError));
-                }
-            });
+            OpenPushHelper.getInstance(GCMService.this)
+                    .onResult(new RegistrationResult(GCMProvider.NAME, error, recoverableError));
         else {
             throw new OpenPushException(String.format("Unknown action '%s'.", action));
         }
     }
 
     private void onRegistered(final String registrationToken) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                OpenPushHelper.getInstance(GCMService.this)
-                        .onResult(new RegistrationResult(GCMProvider.NAME, registrationToken));
-            }
-        });
+        OpenPushHelper.getInstance(GCMService.this)
+                .onResult(new RegistrationResult(GCMProvider.NAME, registrationToken));
     }
 
     private void onUnregistered(final String oldRegistrationToken) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                OpenPushHelper.getInstance(GCMService.this)
-                        .onResult(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
-            }
-        });
+        OpenPushHelper.getInstance(GCMService.this)
+                .onResult(new RegistrationResult(GCMProvider.NAME, oldRegistrationToken));
     }
 
 }
