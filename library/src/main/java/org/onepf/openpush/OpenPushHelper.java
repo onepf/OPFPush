@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.onepf.openpush.OpenPushLog.LOGD;
 import static org.onepf.openpush.OpenPushLog.LOGI;
@@ -48,6 +49,11 @@ import static org.onepf.openpush.OpenPushLog.LOGW;
 public class OpenPushHelper {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
+
+    private static final int STATE_NONE = 0;
+    private static final int STATE_REGISTERING = 1;
+    private static final int STATE_WORKING = 2;
+    private static final int STATE_UNREGISTERING = 3;
 
     @Nullable
     private static OpenPushHelper sInstance;
@@ -67,8 +73,7 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider mCurrentProvider;
 
-    @NotNull
-    private volatile State mState = State.NONE;
+    private volatile AtomicInteger mState = new AtomicInteger(STATE_NONE);
 
     private Options mOptions;
 
@@ -124,12 +129,12 @@ public class OpenPushHelper {
             if (lastProvider.isRegistered()) {
                 LOGI("Last provider running.");
                 mCurrentProvider = lastProvider;
-                mState = State.WORKING;
+                mState.set(STATE_WORKING);
             } else {
                 LOGI("Last provider need register.");
-                mState = State.REGISTERING;
+                mState.set(STATE_REGISTERING);
                 if (!registerProvider(lastProvider)) {
-                    mState = State.NONE;
+                    mState.set(STATE_NONE);
                     saveLastProvider(null);
                 }
             }
@@ -150,12 +155,12 @@ public class OpenPushHelper {
     public synchronized void register() {
         checkInitDone();
 
-        switch (mState) {
-            case REGISTERING:
+        switch (mState.get()) {
+            case STATE_REGISTERING:
                 break;
 
-            case NONE:
-                mState = State.REGISTERING;
+            case STATE_NONE:
+                mState.set(STATE_REGISTERING);
                 if (mOptions.isSystemPushPreferred()
                         && registerSystemPreferredProvider()) {
                     return;
@@ -163,10 +168,10 @@ public class OpenPushHelper {
                 registerNextProvider(null);
                 break;
 
-            case UNREGISTERING:
+            case STATE_UNREGISTERING:
                 throw new OpenPushException("Can't register while unregistration is running.");
 
-            case WORKING:
+            case STATE_WORKING:
                 throw new OpenPushException("Attempt to register twice!");
         }
     }
@@ -206,7 +211,7 @@ public class OpenPushHelper {
             }
         }
 
-        mState = State.NONE;
+        mState.set(STATE_NONE);
         LOGW("No more available providers.");
         if (mListener != null) {
             mListener.onNoAvailableProvider();
@@ -247,18 +252,18 @@ public class OpenPushHelper {
             throw new OpenPushException("No provider to unregister!");
         }
 
-        switch (mState) {
-            case WORKING:
-                mState = State.UNREGISTERING;
+        switch (mState.get()) {
+            case STATE_WORKING:
+                mState.set(STATE_UNREGISTERING);
                 unregisterPackageChangeReceiver();
                 mCurrentProvider.unregister();
                 break;
 
-            case UNREGISTERING:
+            case STATE_UNREGISTERING:
                 break;
 
-            case REGISTERING:
-            case NONE:
+            case STATE_REGISTERING:
+            case STATE_NONE:
                 throw new OpenPushException("Before to unregister you must register provider.!");
         }
     }
@@ -349,16 +354,16 @@ public class OpenPushHelper {
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
             mCurrentProvider.onAppStateChanged();
-            mState = State.REGISTERING;
+            mState.set(STATE_REGISTERING);
             if (!registerProvider(mCurrentProvider, false)) {
-                mState = State.NONE;
+                mState.set(STATE_NONE);
             }
         }
     }
 
     private void reset() {
         mPreferences.edit().clear().apply();
-        mState = State.NONE;
+        mState.set(STATE_NONE);
     }
 
     public void onUnavailable(@NotNull PushProvider provider) {
@@ -378,12 +383,12 @@ public class OpenPushHelper {
     }
 
     public synchronized void onResult(RegistrationResult result) {
-        switch (mState) {
-            case REGISTERING:
+        switch (mState.get()) {
+            case STATE_REGISTERING:
                 onRegistrationEnd(result);
                 break;
 
-            case UNREGISTERING:
+            case STATE_UNREGISTERING:
                 onUnregistrationEnd(result);
                 break;
 
@@ -407,7 +412,7 @@ public class OpenPushHelper {
             }
         } else if (mListener != null) {
             LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
-            mState = State.WORKING;
+            mState.set(STATE_WORKING);
             final PushProvider provider = getProvider(result.getProviderName());
             if (provider != null) {
                 mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
@@ -419,7 +424,7 @@ public class OpenPushHelper {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             LOGI(String.format("Register id '%s'.", result.getRegistrationId()));
-            mState = State.WORKING;
+            mState.set(STATE_WORKING);
 
             mCurrentProvider = getProvider(result.getProviderName());
             saveLastProvider(mCurrentProvider);
@@ -548,12 +553,5 @@ public class OpenPushHelper {
                 }
             });
         }
-    }
-
-    private static enum State {
-        NONE,
-        REGISTERING,
-        WORKING,
-        UNREGISTERING
     }
 }
