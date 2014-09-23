@@ -389,11 +389,11 @@ public class OpenPushHelper {
     public synchronized void onResult(RegistrationResult result) {
         switch (mState.get()) {
             case STATE_REGISTERING:
-                onRegistrationEnd(result);
+                onRegistrationResult(result);
                 break;
 
             case STATE_UNREGISTERING:
-                onUnregistrationEnd(result);
+                onUnregistrationResult(result);
                 break;
 
             default:
@@ -402,7 +402,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void onUnregistrationEnd(@NotNull RegistrationResult result) {
+    private void onUnregistrationResult(@NotNull RegistrationResult result) {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully unregister provider '%s'.", result.getProviderName()));
             reset();
@@ -416,7 +416,6 @@ public class OpenPushHelper {
             }
         } else if (mListener != null) {
             LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
-            mState.set(STATE_WORKING);
             final PushProvider provider = getProvider(result.getProviderName());
             if (provider != null) {
                 mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
@@ -424,7 +423,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void onRegistrationEnd(@NotNull RegistrationResult result) {
+    private void onRegistrationResult(@NotNull RegistrationResult result) {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             LOGI(String.format("Register id '%s'.", result.getRegistrationId()));
