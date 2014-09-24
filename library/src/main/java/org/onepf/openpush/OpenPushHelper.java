@@ -132,7 +132,7 @@ public class OpenPushHelper {
                 }
             }
         } else {
-            throw new OpenPushException("Before work with OpenPushHelper call init() first.");
+            throw new OpenPushException("Attempt to init twice.");
         }
 
         initLastProvider();

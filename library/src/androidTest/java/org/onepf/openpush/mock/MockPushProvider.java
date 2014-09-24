@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.openpush;
+package org.onepf.openpush.mock;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.openpush.BasePushProvider;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.Result;
 import org.onepf.openpush.util.PackageUtils;
 import org.robolectric.Robolectric;
 
@@ -28,27 +31,27 @@ import java.util.UUID;
 /**
  * Created by  Kirill Rozov on 11.09.14.
  */
-class MockPushProvider extends BasePushProvider {
+public class MockPushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
     private String mRegistrationId;
     private final boolean mAvailable;
 
-    MockPushProvider(@NonNull Context context) {
+    public MockPushProvider(@NonNull Context context) {
         this(context, MockPushProvider.class.getName());
     }
 
-    MockPushProvider(@NonNull Context context, String name) {
+    public MockPushProvider(@NonNull Context context, String name) {
         this(context, name, true);
     }
 
-    MockPushProvider(@NonNull Context context,
+    public MockPushProvider(@NonNull Context context,
                      @NonNull String name,
                      boolean available) {
         this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
-    MockPushProvider(@NonNull Context context,
+    public MockPushProvider(@NonNull Context context,
                      @NonNull String name,
                      @NonNull String hotAppPackage) {
         this(context, name, true, hotAppPackage);
