@@ -16,9 +16,8 @@
 
 package org.onepf.openpush;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +31,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLog;
-import org.robolectric.shadows.ShadowPreferenceManager;
 
 import java.util.List;
 
@@ -300,7 +298,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreLastProvider() {
+    public void testRestoreLastProvider() throws Exception {
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         MockPushProvider provider
@@ -314,9 +312,16 @@ public class OpenPushHelperTest {
         assertTrue(helper.isRegistered());
         assertSame(provider, helper.getCurrentProvider());
 
+        SharedPreferences prefs =
+                Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE);
+        String lastProviderName = prefs.getString(OpenPushHelper.KEY_LAST_PROVIDER_NAME, null);
+        assertNotNull(lastProviderName);
+        assertEquals(provider.getName(), lastProviderName);
+
         helper = OpenPushHelper.getNewInstance(Robolectric.application);
         helper.init(options);
         assertSame(provider, helper.getCurrentProvider());
+        assertTrue(helper.isRegistered());
     }
 
     @Test
@@ -333,7 +338,7 @@ public class OpenPushHelperTest {
     }
 
     @After
-    public void destroy() {
+    public void tearDown() {
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 }

@@ -29,7 +29,6 @@ import junit.framework.Assert;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.onepf.openpush.OpenPushLog.LOGD;
@@ -46,6 +45,7 @@ import static org.onepf.openpush.OpenPushLog.LOGW;
 public class OpenPushHelper {
 
     static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
+    static final String PREF_NAME = "org.onepf.openpush";
 
     private static final int STATE_NONE = 0;
     private static final int STATE_REGISTERING = 1;
@@ -80,7 +80,7 @@ public class OpenPushHelper {
     private OpenPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mPreferences =
-                mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
+                mAppContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     public static OpenPushHelper getInstance(@NonNull Context context) {
