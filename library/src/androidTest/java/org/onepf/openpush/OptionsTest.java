@@ -58,7 +58,6 @@ public class OptionsTest {
                 new MockPushProvider(Robolectric.application, "provider4")
         };
         builder.addProviders(providers);
-
         Options options = builder.build();
 
         List<PushProvider> optionsProviders = options.getProviders();
