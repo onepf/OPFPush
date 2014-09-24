@@ -125,10 +125,12 @@ public class OpenPushHelper {
     }
 
     public void init(@NonNull Options options) {
-        checkInitDone();
-        synchronized (mInitLock) {
-            checkInitDone();
-            mOptions = options;
+        if (mOptions == null) {
+            synchronized (mInitLock) {
+                if (mOptions == null) {
+                    mOptions = options;
+                }
+            }
         }
 
         initLastProvider();

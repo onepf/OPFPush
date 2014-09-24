@@ -17,9 +17,9 @@
 package org.onepf.openpush;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 import org.robolectric.Robolectric;
 
