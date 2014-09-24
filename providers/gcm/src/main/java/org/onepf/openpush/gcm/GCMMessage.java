@@ -1,8 +1,7 @@
 package org.onepf.openpush.gcm;
 
 import android.os.Bundle;
-
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
 
 /**
  * Created by  Kirill Rozov on 18.09.14.
@@ -22,12 +21,12 @@ public class GCMMessage {
         mTimeToLeave = timeToLeave;
     }
 
-    @NotNull
+    @NonNull
     public String getId() {
         return mId;
     }
 
-    @NotNull
+    @NonNull
     public Bundle getData() {
         return mData;
     }
@@ -36,7 +35,7 @@ public class GCMMessage {
         return mTimeToLeave;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return "GCMMessage{" +

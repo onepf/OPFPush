@@ -17,12 +17,11 @@
 package org.onepf.openpush.adm;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
-import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
 
@@ -56,7 +55,7 @@ public class ADMService extends ADMMessageHandlerBase {
      *               see SampleADMMessageHandler.java in the ADMMessenger sample app.
      */
     @Override
-    protected void onMessage(@NotNull Intent intent) {
+    protected void onMessage(@NonNull Intent intent) {
         OpenPushHelper.getInstance(this).onMessage(ADMProvider.NAME, intent.getExtras());
     }
 
@@ -72,26 +71,13 @@ public class ADMService extends ADMMessageHandlerBase {
      *                {@link ADMConstants#ERROR_SERVICE_NOT_AVAILABLE}.
      */
     @Override
-    protected void onRegistrationError(@NotNull
-                                       @MagicConstant(stringValues = {
-                                               ADMConstants.ERROR_AUTHENTICATION_FAILED,
-                                               ADMConstants.ERROR_INVALID_SENDER,
-                                               ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
-                                       })
-                                       String errorId) {
+    protected void onRegistrationError(@NonNull @ADMError String errorId) {
         OpenPushHelper.getInstance(this).onResult(
                 new Result(ADMProvider.NAME, convertError(errorId), false));
     }
 
-    @NotNull
-    private Error convertError(
-            @NotNull
-            @MagicConstant(stringValues = {
-                    ADMConstants.ERROR_AUTHENTICATION_FAILED,
-                    ADMConstants.ERROR_INVALID_SENDER,
-                    ADMConstants.ERROR_SERVICE_NOT_AVAILABLE
-            })
-            String errorId) {
+    @NonNull
+    private Error convertError(@NonNull @ADMError String errorId) {
         Error error;
         if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;
@@ -116,7 +102,7 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       method also obtains the registration ID for an instance of your app.
      */
     @Override
-    protected void onRegistered(@NotNull String registrationId) {
+    protected void onRegistered(@NonNull String registrationId) {
         //TODO Send registration id.
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(ADMProvider.NAME, registrationId));
@@ -135,7 +121,7 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       will show the registration ID for an unregistered app as {@code null}.
      */
     @Override
-    protected void onUnregistered(@NotNull String registrationId) {
+    protected void onUnregistered(@NonNull String registrationId) {
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(ADMProvider.NAME, registrationId));
     }

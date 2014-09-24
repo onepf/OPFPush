@@ -44,7 +44,7 @@ public class NokiaPushService extends PushBaseIntentService {
      * @param intent     Intent containing the message payload as extras.
      */
     @Override
-    protected void onMessage(@NotNull Context appContext, Intent intent) {
+    protected void onMessage(@NonNull Context appContext, Intent intent) {
         OpenPushHelper.getInstance(this).onMessage(NokiaPushProvider.NAME, intent.getExtras());
     }
 
@@ -55,7 +55,7 @@ public class NokiaPushService extends PushBaseIntentService {
      * @param errorId    Error id returned by the Push Notifications service.
      */
     @Override
-    protected void onError(@NotNull Context appContext, String errorId) {
+    protected void onError(@NonNull Context appContext, String errorId) {
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(NokiaPushProvider.NAME, convertError(errorId), false));
     }
@@ -68,7 +68,7 @@ public class NokiaPushService extends PushBaseIntentService {
      * @param total      Total number of collapsed messages.
      */
     @Override
-    protected void onDeletedMessages(@NotNull Context appContext, int total) {
+    protected void onDeletedMessages(@NonNull Context appContext, int total) {
         OpenPushHelper.getInstance(this).onDeletedMessages(NokiaPushProvider.NAME, total);
     }
 
@@ -82,8 +82,8 @@ public class NokiaPushService extends PushBaseIntentService {
      * @return If true, failed operation will be retried (using exponential backoff).
      */
     @Override
-    protected boolean onRecoverableError(@NotNull Context appContext,
-                                         @NotNull
+    protected boolean onRecoverableError(@NonNull Context appContext,
+                                         @NonNull
                                          @MagicConstant(stringValues = {
                                                  PushConstants.ERROR_INVALID_PARAMETERS,
                                                  PushConstants.ERROR_INVALID_SENDER,
@@ -96,9 +96,9 @@ public class NokiaPushService extends PushBaseIntentService {
         return true;
     }
 
-    @NotNull
+    @NonNull
     private static Error convertError(
-            @NotNull
+            @NonNull
             @MagicConstant(stringValues = {
                     PushConstants.ERROR_INVALID_PARAMETERS,
                     PushConstants.ERROR_INVALID_SENDER,
@@ -122,8 +122,8 @@ public class NokiaPushService extends PushBaseIntentService {
      * @param registrationToken The registration id returned by the Push Notifications service.
      */
     @Override
-    protected void onRegistered(@NotNull Context appContext,
-                                @NotNull String registrationToken) {
+    protected void onRegistered(@NonNull Context appContext,
+                                @NonNull String registrationToken) {
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(NokiaPushProvider.NAME, registrationToken));
     }
@@ -135,8 +135,8 @@ public class NokiaPushService extends PushBaseIntentService {
      * @param oldRegistrationToken the registration id that was previously registered.
      */
     @Override
-    protected void onUnregistered(@NotNull Context appContext,
-                                  @NotNull String oldRegistrationToken) {
+    protected void onUnregistered(@NonNull Context appContext,
+                                  @NonNull String oldRegistrationToken) {
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(NokiaPushProvider.NAME, oldRegistrationToken));
     }

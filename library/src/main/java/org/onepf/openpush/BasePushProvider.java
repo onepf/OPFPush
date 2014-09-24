@@ -18,8 +18,8 @@ package org.onepf.openpush;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 
-import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.util.PackageUtils;
 
 /**
@@ -28,18 +28,18 @@ import org.onepf.openpush.util.PackageUtils;
  */
 public abstract class BasePushProvider implements PushProvider {
 
-    @NotNull
+    @NonNull
     private final Context mAppContext;
 
-    @NotNull
+    @NonNull
     private final String mName;
 
-    @NotNull
+    @NonNull
     private final String mHostAppPackage;
 
-    protected BasePushProvider(@NotNull Context context,
-                               @NotNull String name,
-                               @NotNull String hostAppPackage) {
+    protected BasePushProvider(@NonNull Context context,
+                               @NonNull String name,
+                               @NonNull String hostAppPackage) {
         mAppContext = context.getApplicationContext();
         mName = name;
         mHostAppPackage = hostAppPackage;
@@ -47,7 +47,7 @@ public abstract class BasePushProvider implements PushProvider {
         checkManifest();
     }
 
-    protected static boolean checkPermission(@NotNull Context context, @NotNull String permission) {
+    protected static boolean checkPermission(@NonNull Context context, @NonNull String permission) {
         boolean granted = context.getPackageManager().checkPermission(permission, context.getPackageName())
                 == PackageManager.PERMISSION_GRANTED;
         if (granted) {
@@ -58,7 +58,7 @@ public abstract class BasePushProvider implements PushProvider {
         }
     }
 
-    @NotNull
+    @NonNull
     protected Context getContext() {
         return mAppContext;
     }
@@ -96,7 +96,7 @@ public abstract class BasePushProvider implements PushProvider {
         return mName.hashCode();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return mName;
@@ -110,7 +110,7 @@ public abstract class BasePushProvider implements PushProvider {
     public void onUnavailable() {
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getHostAppPackage() {
         return mHostAppPackage;

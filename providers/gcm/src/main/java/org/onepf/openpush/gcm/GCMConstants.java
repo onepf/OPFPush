@@ -16,7 +16,12 @@
 
 package org.onepf.openpush.gcm;
 
+import android.support.annotation.StringDef;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by krozov on 06.09.14.
@@ -28,6 +33,27 @@ class GCMConstants {
     static final String EXTRA_ERROR_ID = "org.onepf.openpush.gcm.error_id";
     static final String EXTRA_TOKEN = "org.onepf.openpush.gcm.token";
 
-    static final String ERROR_AUTHEFICATION_FAILED = "AUTHENTICATION_FAILED";
+    static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
+
+    /**
+     * Created by krozov on 24.09.14.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({
+            ERROR_AUTHENTICATION_FAILED,
+            ERROR_SERVICE_NOT_AVAILABLE
+    })
+    public static @interface GCMError {
+    }
+    /**
+     * Created by krozov on 24.09.14.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({
+            GCMConstants.ACTION_REGISTRATION,
+            GCMConstants.ACTION_UNREGISTRATION
+    })
+    public static @interface GCMAction {
+    }
 }

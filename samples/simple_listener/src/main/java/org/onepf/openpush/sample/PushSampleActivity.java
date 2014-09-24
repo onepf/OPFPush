@@ -17,12 +17,11 @@
 package org.onepf.openpush.sample;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +29,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
 import org.onepf.openpush.gcm.GCMProvider;
@@ -163,7 +160,7 @@ public class PushSampleActivity extends Activity {
         }
 
         @Override
-        public void onRegistered(@NotNull String providerName, @Nullable String registrationId) {
+        public void onRegistered(@NonNull String providerName, @Nullable String registrationId) {
             Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
                     , providerName, registrationId));
             switchToRegisteredState();
@@ -186,22 +183,22 @@ public class PushSampleActivity extends Activity {
         }
 
         @Override
-        public void onUnregistered(@NotNull String providerName, @Nullable String oldRegistrationId) {
+        public void onUnregistered(@NonNull String providerName, @Nullable String oldRegistrationId) {
             Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
                     , providerName, oldRegistrationId));
             switchToUnregisteredState();
         }
 
         @Override
-        public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
+        public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
         }
 
         @Override
-        public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+        public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
         }
 
         @Override
-        public void onRegistrationError(@NotNull String providerName, @NotNull Error error) {
+        public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Registration error '%s'", error), Toast.LENGTH_LONG).show();
             if (!error.isRecoverable()) {
@@ -210,7 +207,7 @@ public class PushSampleActivity extends Activity {
         }
 
         @Override
-        public void onUnregistrationError(@NotNull String providerName, @NotNull Error error) {
+        public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Unregistration error '%s'", error), Toast.LENGTH_LONG).show();
             if (!error.isRecoverable()) {
@@ -223,7 +220,7 @@ public class PushSampleActivity extends Activity {
         }
 
         @Override
-        public void onProviderBecameUnavailable(@NotNull String providerName) {
+        public void onProviderBecameUnavailable(@NonNull String providerName) {
         }
     }
 }

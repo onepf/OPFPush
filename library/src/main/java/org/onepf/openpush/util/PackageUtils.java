@@ -24,9 +24,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.PatternMatcher;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.PushProvider;
 
@@ -43,7 +43,7 @@ public final class PackageUtils {
      *
      * @return If find app - return it's version code, else {@link Integer#MIN_VALUE}.
      */
-    public static int getAppVersion(@NotNull Context context) {
+    public static int getAppVersion(@NonNull Context context) {
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);
@@ -54,7 +54,7 @@ public final class PackageUtils {
         }
     }
 
-    public static boolean isSystemApp(@NotNull Context context, @NotNull String appPackage) {
+    public static boolean isSystemApp(@NonNull Context context, @NonNull String appPackage) {
         try {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
             return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
@@ -64,7 +64,7 @@ public final class PackageUtils {
         }
     }
 
-    public static boolean isInstalled(@NotNull Context context, @NotNull String appPackage) {
+    public static boolean isInstalled(@NonNull Context context, @NonNull String appPackage) {
         try {
             return context.getPackageManager().getApplicationInfo(appPackage, 0) != null;
         } catch (PackageManager.NameNotFoundException e) {
@@ -72,8 +72,8 @@ public final class PackageUtils {
         }
     }
 
-    public static BroadcastReceiver registerPackageChangeReceiver(@NotNull Context context,
-                                                                  @NotNull PushProvider provider) {
+    public static BroadcastReceiver registerPackageChangeReceiver(@NonNull Context context,
+                                                                  @NonNull PushProvider provider) {
         PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
 
         IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
@@ -100,15 +100,15 @@ public final class PackageUtils {
 
         private static final String PACKAGE_URI_PREFIX = PACKAGE_DATA_SCHEME + ':';
 
-        @NotNull
+        @NonNull
         private PushProvider mProvider;
 
-        PackageChangeReceiver(@NotNull PushProvider provider) {
+        PackageChangeReceiver(@NonNull PushProvider provider) {
             mProvider = provider;
         }
 
         @Override
-        public void onReceive(@NotNull Context context, @NotNull Intent intent) {
+        public void onReceive(@NonNull Context context, @NonNull Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
                 if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {

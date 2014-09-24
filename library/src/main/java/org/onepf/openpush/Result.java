@@ -16,28 +16,28 @@
 
 package org.onepf.openpush;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Created by krozov on 05.09.14.
  */
 public final class Result {
 
-    @NotNull
+    @NonNull
     private final String mProviderName;
     private final String mRegistrationId;
     private final Error mErrorCode;
     private final boolean mRecoverableError;
 
-    public Result(@NotNull String providerName, @NotNull String registrationId) {
+    public Result(@NonNull String providerName, @NonNull String registrationId) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = null;
         mRecoverableError = true;
     }
 
-    public Result(@NotNull String providerName, @NotNull Error error,
+    public Result(@NonNull String providerName, @NonNull Error error,
                   boolean recoverableError) {
         mProviderName = providerName;
         mRegistrationId = null;
@@ -69,7 +69,7 @@ public final class Result {
         return mRegistrationId;
     }
 
-    @NotNull
+    @NonNull
     public String getProviderName() {
         return mProviderName;
     }

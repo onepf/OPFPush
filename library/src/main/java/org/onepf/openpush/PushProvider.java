@@ -16,8 +16,8 @@
 
 package org.onepf.openpush;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * @author Anton Rutkevich, Alexey Vitenko
@@ -59,7 +59,7 @@ public interface PushProvider {
     /**
      * Returns the name of the provider. Always not null value.
      */
-    @NotNull
+    @NonNull
     String getName();
 
     /**
@@ -68,7 +68,7 @@ public interface PushProvider {
      *
      * @return Host application package.
      */
-    @NotNull
+    @NonNull
     String getHostAppPackage();
 
     /**

@@ -16,33 +16,31 @@
 
 package org.onepf.openpush;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Kirill Rozov
  * @since 04.09.2014
  */
 public class Options {
-    @NotNull
+    @NonNull
     private final List<PushProvider> mProviders;
 
     private final boolean mRecoverProvider;
 
     private final boolean mSystemPushPreferred;
 
-    private Options(@NotNull Collection<? extends PushProvider> providers,
+    private Options(@NonNull Collection<? extends PushProvider> providers,
                     boolean recoverProvider,
                     boolean systemPushPreferred) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
@@ -70,7 +68,7 @@ public class Options {
      *
      * @return List of all available push providers.
      */
-    @NotNull
+    @NonNull
     public List<PushProvider> getProviders() {
         return mProviders;
     }
@@ -108,8 +106,8 @@ public class Options {
          * @return Current instance of builder.
          * @throws java.lang.IllegalArgumentException If try to add already added providers.
          */
-        @NotNull
-        public Builder addProviders(@NotNull PushProvider... providers) {
+        @NonNull
+        public Builder addProviders(@NonNull PushProvider... providers) {
             if (providers.length == 0) {
                 return this;
             }
@@ -133,8 +131,8 @@ public class Options {
             return this;
         }
 
-        @NotNull
-        public Builder addProviders(@NotNull List<? extends PushProvider> providers) {
+        @NonNull
+        public Builder addProviders(@NonNull List<? extends PushProvider> providers) {
             if (providers.isEmpty()) {
                 return this;
             }
@@ -161,7 +159,7 @@ public class Options {
          * @return New options object.
          * @throws java.lang.IllegalArgumentException If no one provider added.
          */
-        @NotNull
+        @NonNull
         public Options build() {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");

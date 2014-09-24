@@ -27,14 +27,14 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
@@ -48,7 +48,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import support.AsyncTaskCompat;
 
-import static org.onepf.openpush.OpenPushLog.LOGE;
 import static org.onepf.openpush.OpenPushLog.LOGI;
 
 public class GCMProvider extends BasePushProvider {
@@ -77,7 +76,7 @@ public class GCMProvider extends BasePushProvider {
 
     private AtomicInteger mTryNumber = new AtomicInteger(1);
 
-    public GCMProvider(@NotNull Context context, @NotNull String senderID, String... senderIDs) {
+    public GCMProvider(@NonNull Context context, @NonNull String senderID, String... senderIDs) {
         super(context, NAME, "com.android.vending");
         mSenderIDs = new String[1 + senderIDs.length];
         mSenderIDs[0] = senderID;
@@ -179,7 +178,7 @@ public class GCMProvider extends BasePushProvider {
         mExecutor = null;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return String.format("%s (senderId: '%s', appVersion: %d)", NAME, Arrays.toString(mSenderIDs),
@@ -202,16 +201,16 @@ public class GCMProvider extends BasePushProvider {
         mPreferences.edit().clear().apply();
     }
 
-    public void send(@NotNull GCMMessage msg) {
+    public void send(@NonNull GCMMessage msg) {
         send(mSenderIDs[0], msg);
     }
 
-    @NotNull
+    @NonNull
     public String[] getSenderIDs() {
         return mSenderIDs;
     }
 
-    public void send(@NotNull String senderId, @NotNull GCMMessage msg) {
+    public void send(@NonNull String senderId, @NonNull GCMMessage msg) {
         final int msgId = mMsgId.incrementAndGet();
         mPreferences.edit()
                 .putInt(PREF_MESSAGE_ID, msgId)
@@ -226,7 +225,7 @@ public class GCMProvider extends BasePushProvider {
     private class UnregisterTask implements Runnable {
         private final String mOldRegistrationToken;
 
-        private UnregisterTask(@NotNull String oldRegistrationToken) {
+        private UnregisterTask(@NonNull String oldRegistrationToken) {
             mOldRegistrationToken = oldRegistrationToken;
         }
 
@@ -329,7 +328,7 @@ public class GCMProvider extends BasePushProvider {
             mTryNumber.set(0);
             Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                    GCMConstants.ERROR_AUTHEFICATION_FAILED);
+                    GCMConstants.ERROR_AUTHENTICATION_FAILED);
             getContext().sendBroadcast(intent);
         }
     }

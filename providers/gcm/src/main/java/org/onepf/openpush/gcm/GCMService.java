@@ -21,7 +21,6 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import org.intellij.lang.annotations.MagicConstant;
 import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
 
@@ -40,16 +39,20 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String action = intent.getAction();
+        @GCMConstants.GCMAction String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
-                onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), action);
+                @GCMConstants.GCMError String errorId
+                        = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
+                onError(errorId, action);
             } else {
                 onRegistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
             }
         } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
-                onError(intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID), action);
+                @GCMConstants.GCMError String errorId
+                        = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
+                onError(errorId, action);
             } else {
                 onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
             }
@@ -74,18 +77,12 @@ public class GCMService extends IntentService {
                 .onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
-    private void onError(@MagicConstant(stringValues = {
-            GCMConstants.ERROR_AUTHEFICATION_FAILED,
-            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
-    }) String errorId,
-                         @MagicConstant(stringValues = {
-                                 GCMConstants.ACTION_REGISTRATION,
-                                 GCMConstants.ACTION_UNREGISTRATION
-                         }) String action) {
+    private void onError(@GCMConstants.GCMError String errorId,
+                         @GCMConstants.GCMAction String action) {
         final Error error;
         if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;
-        } else if (GCMConstants.ERROR_AUTHEFICATION_FAILED.equals(errorId)) {
+        } else if (GCMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
             error = Error.AUTHENTICATION_FAILED;
         } else {
             throw new OpenPushException(String.format("Unknown error '%s'.", errorId));

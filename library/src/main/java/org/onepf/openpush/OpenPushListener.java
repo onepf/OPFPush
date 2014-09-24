@@ -17,29 +17,27 @@
 package org.onepf.openpush;
 
 import android.os.Bundle;
-
-import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Created by krozov on 07.09.14.
  */
 public interface OpenPushListener {
 
-    void onMessage(@NotNull String providerName, @Nullable Bundle extras);
+    void onMessage(@NonNull String providerName, @Nullable Bundle extras);
 
-    void onDeletedMessages(@NotNull String providerName, int messagesCount);
+    void onDeletedMessages(@NonNull String providerName, int messagesCount);
 
-    void onRegistered(@NotNull String providerName, @NotNull String registrationId);
+    void onRegistered(@NonNull String providerName, @NonNull String registrationId);
 
-    void onRegistrationError(@NotNull String providerName, @NotNull Error error);
+    void onRegistrationError(@NonNull String providerName, @NonNull Error error);
 
-    void onUnregistrationError(@NotNull String providerName, @NotNull Error error);
+    void onUnregistrationError(@NonNull String providerName, @NonNull Error error);
 
     void onNoAvailableProvider();
 
-    void onUnregistered(@NotNull String providerName, @NotNull String registrationId);
+    void onUnregistered(@NonNull String providerName, @NonNull String registrationId);
 
-    void onProviderBecameUnavailable(@NotNull String providerName);
+    void onProviderBecameUnavailable(@NonNull String providerName);
 }

@@ -32,7 +32,7 @@ public class NokiaPushProvider extends BasePushProvider {
 
     private final String[] mSendersId;
 
-    public NokiaPushProvider(@NotNull Context context, @NotNull String... sendersID) {
+    public NokiaPushProvider(@NonNull Context context, @NonNull String... sendersID) {
         super(context, NAME, "com.nokia.store");
         mSendersId = sendersID;
     }

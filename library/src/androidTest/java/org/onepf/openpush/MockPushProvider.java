@@ -34,30 +34,30 @@ class MockPushProvider extends BasePushProvider {
     private String mRegistrationId;
     private final boolean mAvailable;
 
-    MockPushProvider(@NotNull Context context) {
+    MockPushProvider(@NonNull Context context) {
         this(context, MockPushProvider.class.getName());
     }
 
-    MockPushProvider(@NotNull Context context, String name) {
+    MockPushProvider(@NonNull Context context, String name) {
         this(context, name, true);
     }
 
-    MockPushProvider(@NotNull Context context,
-                     @NotNull String name,
+    MockPushProvider(@NonNull Context context,
+                     @NonNull String name,
                      boolean available) {
         this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
-    MockPushProvider(@NotNull Context context,
-                     @NotNull String name,
-                     @NotNull String hotAppPackage) {
+    MockPushProvider(@NonNull Context context,
+                     @NonNull String name,
+                     @NonNull String hotAppPackage) {
         this(context, name, true, hotAppPackage);
     }
 
-    MockPushProvider(@NotNull Context context,
-                     @NotNull String name,
+    MockPushProvider(@NonNull Context context,
+                     @NonNull String name,
                      boolean available,
-                     @NotNull String hotAppPackage) {
+                     @NonNull String hotAppPackage) {
         super(context, name, hotAppPackage);
         mAvailable = available;
     }

@@ -20,16 +20,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import junit.framework.Assert;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.util.PackageUtils;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,10 +56,10 @@ public class OpenPushHelper {
     @Nullable
     private static OpenPushHelper sInstance;
 
-    @NotNull
+    @NonNull
     private final Context mAppContext;
 
-    @NotNull
+    @NonNull
     private final SharedPreferences mPreferences;
 
     @Nullable
@@ -75,13 +75,13 @@ public class OpenPushHelper {
 
     private Options mOptions;
 
-    private OpenPushHelper(@NotNull Context context) {
+    private OpenPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mPreferences =
                 mAppContext.getSharedPreferences("org.onepf.openpush", Context.MODE_PRIVATE);
     }
 
-    public static OpenPushHelper getInstance(@NotNull Context context) {
+    public static OpenPushHelper getInstance(@NonNull Context context) {
         if (sInstance == null) {
             synchronized (OpenPushHelper.class) {
                 if (sInstance == null) {
@@ -99,7 +99,7 @@ public class OpenPushHelper {
      * @param context
      * @return New instance of {@link OpenPushHelper}.
      */
-    static OpenPushHelper getNewInstance(@NotNull Context context) {
+    static OpenPushHelper getNewInstance(@NonNull Context context) {
         synchronized (OpenPushHelper.class) {
             sInstance = new OpenPushHelper(context);
         }
@@ -120,7 +120,7 @@ public class OpenPushHelper {
         }
     }
 
-    public void init(@NotNull Options options) {
+    public void init(@NonNull Options options) {
         if (isInitDone()) {
             throw new OpenPushException("Try to init OpenPushHelper twice.");
         }
@@ -234,7 +234,7 @@ public class OpenPushHelper {
     /**
      * Same that {@link #registerProvider(PushProvider, boolean)} with {@code registerNext} set to false.
      */
-    private boolean registerProvider(@NotNull PushProvider provider) {
+    private boolean registerProvider(@NonNull PushProvider provider) {
         return registerProvider(provider, false);
     }
 
@@ -246,7 +246,7 @@ public class OpenPushHelper {
      *                        if the {@code provider} isn't available.
      * @return If provider available and can start registration return true, otherwise - false.
      */
-    private boolean registerProvider(@NotNull PushProvider provider, boolean tryRegisterNext) {
+    private boolean registerProvider(@NonNull PushProvider provider, boolean tryRegisterNext) {
         if (provider.isAvailable()) {
             LOGD(String.format("Try register %s.", provider));
             provider.register();
@@ -304,7 +304,7 @@ public class OpenPushHelper {
      * @return Provider with described name or null if nothing have found.
      */
     @Nullable
-    private PushProvider getProvider(@NotNull String providerName) {
+    private PushProvider getProvider(@NonNull String providerName) {
         for (PushProvider provider : mOptions.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
@@ -338,14 +338,14 @@ public class OpenPushHelper {
         editor.apply();
     }
 
-    public void onMessage(@NotNull String providerName, @Nullable Bundle extras) {
+    public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
         LOGD(String.format("onUnavailable(providerName = %s).", providerName));
         if (mListener != null) {
             mListener.onMessage(providerName, extras);
         }
     }
 
-    public void onDeletedMessages(@NotNull String providerName, int messagesCount) {
+    public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
         LOGD(String.format("onDeletedMessages(providerName = %s,messagesCount = %d).",
                 providerName, messagesCount));
         if (mListener != null) {
@@ -353,7 +353,7 @@ public class OpenPushHelper {
         }
     }
 
-    public void onNeedRetryRegister(@NotNull String providerName) {
+    public void onNeedRetryRegister(@NonNull String providerName) {
         LOGD(String.format("onNeedRetryRegister(providerName = %s).", providerName));
         if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
             reset();
@@ -370,7 +370,7 @@ public class OpenPushHelper {
         mState.set(STATE_NONE);
     }
 
-    public void onUnavailable(@NotNull PushProvider provider) {
+    public void onUnavailable(@NonNull PushProvider provider) {
         LOGD(String.format("onUnavailable(provider = %s).", provider));
         if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
             reset();
@@ -402,7 +402,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void onUnregistrationResult(@NotNull Result result) {
+    private void onUnregistrationResult(@NonNull Result result) {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully unregister provider '%s'.", result.getProviderName()));
             reset();
@@ -423,7 +423,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void onRegistrationResult(@NotNull Result result) {
+    private void onRegistrationResult(@NonNull Result result) {
         if (result.isSuccess()) {
             LOGI(String.format("Successfully register provider '%s'.", result.getProviderName()));
             LOGI(String.format("Register id '%s'.", result.getRegistrationId()));
@@ -465,98 +465,4 @@ public class OpenPushHelper {
                 '}';
     }
 
-    private static class MainThreadListenerWrapper implements OpenPushListener {
-        private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-        private final OpenPushListener mListener;
-
-        MainThreadListenerWrapper(OpenPushListener listener) {
-            mListener = listener;
-        }
-
-        @Override
-        public void onMessage(@NotNull final String providerName, @Nullable final Bundle extras) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onMessage(providerName, extras);
-                }
-            });
-        }
-
-        @Override
-        public void onDeletedMessages(@NotNull final String providerName, final int messagesCount) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onDeletedMessages(providerName, messagesCount);
-                }
-            });
-
-        }
-
-        @Override
-        public void onRegistered(@NotNull final String providerName,
-                                 @NotNull final String registrationId) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onRegistered(providerName, registrationId);
-                }
-            });
-
-        }
-
-        @Override
-        public void onRegistrationError(@NotNull final String providerName, @NotNull final Error error) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onRegistrationError(providerName, error);
-                }
-            });
-
-        }
-
-        @Override
-        public void onUnregistrationError(@NotNull final String providerName,
-                                          @NotNull final Error error) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onUnregistrationError(providerName, error);
-                }
-            });
-        }
-
-        @Override
-        public void onNoAvailableProvider() {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onNoAvailableProvider();
-                }
-            });
-        }
-
-        @Override
-        public void onUnregistered(@NotNull final String providerName,
-                                   @NotNull final String registrationId) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onUnregistered(providerName, registrationId);
-                }
-            });
-        }
-
-        @Override
-        public void onProviderBecameUnavailable(@NotNull final String providerName) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onProviderBecameUnavailable(providerName);
-                }
-            });
-        }
-    }
 }

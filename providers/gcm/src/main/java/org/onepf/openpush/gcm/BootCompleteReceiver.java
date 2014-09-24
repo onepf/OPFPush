@@ -21,8 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 
-import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.OpenPushHelper;
 
 /**
@@ -31,20 +31,20 @@ import org.onepf.openpush.OpenPushHelper;
 public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(@NotNull Context context, Intent intent) {
+    public void onReceive(@NonNull Context context, Intent intent) {
         if (!Settings.Secure.ANDROID_ID.equals(getLastAndroidId(context))) {
             saveAndroidId(context);
             OpenPushHelper.getInstance(context).onNeedRetryRegister(GCMProvider.NAME);
         }
     }
 
-    private static String getLastAndroidId(@NotNull Context context) {
+    private static String getLastAndroidId(@NonNull Context context) {
         SharedPreferences prefs = context.getApplicationContext()
                 .getSharedPreferences(GCMProvider.PREFERENCES_NAME, Context.MODE_PRIVATE);
         return prefs.getString(GCMProvider.PREF_ANDROID_ID, null);
     }
 
-    private static void saveAndroidId(@NotNull Context context) {
+    private static void saveAndroidId(@NonNull Context context) {
         SharedPreferences.Editor editor = context.getApplicationContext()
                 .getSharedPreferences(GCMProvider.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
         editor.putString(GCMProvider.PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)

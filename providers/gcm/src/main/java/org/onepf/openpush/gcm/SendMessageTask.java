@@ -2,10 +2,9 @@ package org.onepf.openpush.gcm;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -23,9 +22,9 @@ class SendMessageTask extends AsyncTask<Void, Void, Void> {
     private final GCMMessage mMessage;
     private final WeakReference<Context> mContextRef;
 
-    SendMessageTask(@NotNull Context context,
-                    @NotNull String senderId,
-                    @NotNull GCMMessage message) {
+    SendMessageTask(@NonNull Context context,
+                    @NonNull String senderId,
+                    @NonNull GCMMessage message) {
         mTo = senderId + GCM_SENDER_SUFFIX;
         mMessage = message;
         mContextRef = new WeakReference<Context>(context.getApplicationContext());

@@ -17,14 +17,13 @@
 package org.onepf.openpush.adm;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.OpenPushException;
 
 /**
  * Created by krozov on 06.09.14.
@@ -33,10 +32,10 @@ public class ADMProvider extends BasePushProvider {
 
     public static final String NAME = "Amazon Device Messaging";
 
-    @NotNull
+    @NonNull
     private final ADM mAdm;
 
-    public ADMProvider(@NotNull Context context) {
+    public ADMProvider(@NonNull Context context) {
         super(context, NAME, "com.amazon.venezia");
         mAdm = new ADM(context);
     }
