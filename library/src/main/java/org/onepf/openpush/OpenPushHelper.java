@@ -131,6 +131,8 @@ public class OpenPushHelper {
                     mOptions = options;
                 }
             }
+        } else {
+            throw new OpenPushException("Before work with OpenPushHelper call init() first.");
         }
 
         initLastProvider();
