@@ -45,7 +45,7 @@ import static org.onepf.openpush.OpenPushLog.LOGW;
  */
 public class OpenPushHelper {
 
-    private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
+    static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
 
     private static final int STATE_NONE = 0;
     private static final int STATE_REGISTERING = 1;

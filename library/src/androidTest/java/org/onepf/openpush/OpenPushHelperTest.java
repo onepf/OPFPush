@@ -16,8 +16,11 @@
 
 package org.onepf.openpush;
 
+import android.content.SharedPreferences;
+
+import junit.framework.Assert;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +32,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLog;
+import org.robolectric.shadows.ShadowPreferenceManager;
 
 import java.util.List;
 
@@ -36,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -123,7 +128,7 @@ public class OpenPushHelperTest {
             }
         }
 
-        Assert.assertTrue(receiverFound); //will be false if not found
+        assertTrue(receiverFound); //will be false if not found
     }
 
     @Test(expected = OpenPushException.class)
@@ -249,9 +254,9 @@ public class OpenPushHelperTest {
     public void testUnregisterWhileRegistrationRun() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
 
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.register();
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.unregister();
     }
 
@@ -259,11 +264,11 @@ public class OpenPushHelperTest {
     public void testRegisterWhileRegistrationRun() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
 
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.register();
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.register();
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
     }
 
     private static OpenPushHelper createHelperWithInfinityRegisterProvider() {
@@ -278,11 +283,11 @@ public class OpenPushHelperTest {
     public void testRegisterWhileUnregistrationRun() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
 
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.register();
-        Assert.assertTrue(helper.isRegistered());
+        assertTrue(helper.isRegistered());
         helper.unregister();
-        Assert.assertTrue(helper.isRegistered());
+        assertTrue(helper.isRegistered());
         helper.register();
     }
 
@@ -295,16 +300,36 @@ public class OpenPushHelperTest {
     }
 
     @Test
+    public void testRestoreLastProvider() {
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider
+                = new MockPushProvider(Robolectric.application, "providerForPref");
+        builder.addProviders(provider);
+        Options options = builder.build();
+        helper.init(options);
+
+        assertFalse(helper.isRegistered());
+        helper.register();
+        assertTrue(helper.isRegistered());
+        assertSame(provider, helper.getCurrentProvider());
+
+        helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(options);
+        assertSame(provider, helper.getCurrentProvider());
+    }
+
+    @Test
     public void testUnregisterWhileUnregistrationRun() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
 
-        Assert.assertFalse(helper.isRegistered());
+        assertFalse(helper.isRegistered());
         helper.register();
-        Assert.assertTrue(helper.isRegistered());
+        assertTrue(helper.isRegistered());
         helper.unregister();
-        Assert.assertTrue(helper.isRegistered());
+        assertTrue(helper.isRegistered());
         helper.unregister();
-        Assert.assertTrue(helper.isRegistered());
+        assertTrue(helper.isRegistered());
     }
 
     @After
