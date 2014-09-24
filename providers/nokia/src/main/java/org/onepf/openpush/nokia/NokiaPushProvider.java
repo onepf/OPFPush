@@ -17,13 +17,11 @@
 package org.onepf.openpush.nokia;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.nokia.push.PushRegistrar;
 
-import org.jetbrains.annotations.NotNull;
 import org.onepf.openpush.BasePushProvider;
-import org.onepf.openpush.OpenPushException;
-import org.onepf.openpush.util.PackageUtils;
 
 
 public class NokiaPushProvider extends BasePushProvider {

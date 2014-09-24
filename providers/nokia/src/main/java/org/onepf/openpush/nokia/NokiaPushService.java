@@ -18,14 +18,15 @@ package org.onepf.openpush.nokia;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import com.nokia.push.PushBaseIntentService;
 import com.nokia.push.PushConstants;
 
-import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.NotNull;
-import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
+import org.onepf.openpush.OpenPushException;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.Result;
 
 /**
  * @author Kirill Rozov
@@ -83,13 +84,7 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected boolean onRecoverableError(@NonNull Context appContext,
-                                         @NonNull
-                                         @MagicConstant(stringValues = {
-                                                 PushConstants.ERROR_INVALID_PARAMETERS,
-                                                 PushConstants.ERROR_INVALID_SENDER,
-                                                 PushConstants.ERROR_SERVICE_NOT_AVAILABLE
-                                         })
-                                         String errorId) {
+                                         @NonNull @NokiaError String errorId) {
         Error error = convertError(errorId);
         OpenPushHelper.getInstance(this)
                 .onResult(new Result(NokiaPushProvider.NAME, error, true));
@@ -97,13 +92,7 @@ public class NokiaPushService extends PushBaseIntentService {
     }
 
     @NonNull
-    private static Error convertError(
-            @NonNull
-            @MagicConstant(stringValues = {
-                    PushConstants.ERROR_INVALID_PARAMETERS,
-                    PushConstants.ERROR_INVALID_SENDER,
-                    PushConstants.ERROR_SERVICE_NOT_AVAILABLE
-            }) String errorId) {
+    private static Error convertError(@NonNull @NokiaError String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
             return Error.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {

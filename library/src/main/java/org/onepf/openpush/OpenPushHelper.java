@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.onepf.openpush.OpenPushLog.LOGD;
@@ -73,6 +74,9 @@ public class OpenPushHelper {
 
     private Options mOptions;
 
+    private final Object mRegistrationLock = new Object();
+    private final Object mInitLock = new Object();
+
     private OpenPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mPreferences =
@@ -105,7 +109,9 @@ public class OpenPushHelper {
     }
 
     public boolean isInitDone() {
-        return mOptions != null;
+        synchronized (mInitLock) {
+            return mOptions != null;
+        }
     }
 
     public boolean isRegistered() {
@@ -119,10 +125,12 @@ public class OpenPushHelper {
     }
 
     public void init(@NonNull Options options) {
-        if (isInitDone()) {
-            throw new OpenPushException("Try to init OpenPushHelper twice.");
+        checkInitDone();
+        synchronized (mInitLock) {
+            checkInitDone();
+            mOptions = options;
         }
-        mOptions = options;
+
         initLastProvider();
         LOGI("Init done.");
     }
@@ -162,27 +170,30 @@ public class OpenPushHelper {
         mListener = l == null ? null : new MainThreadListenerWrapper(l);
     }
 
-    public synchronized void register() {
+    public void register() {
         checkInitDone();
 
-        switch (mState.get()) {
-            case STATE_REGISTERING:
-                break;
+        synchronized (mRegistrationLock) {
 
-            case STATE_NONE:
-                mState.set(STATE_REGISTERING);
-                if (mOptions.isSystemPushPreferred()
-                        && registerSystemPreferredProvider()) {
-                    return;
-                }
-                registerNextProvider(null);
-                break;
+            switch (mState.get()) {
+                case STATE_REGISTERING:
+                    break;
 
-            case STATE_UNREGISTERING:
-                throw new OpenPushException("Can't register while unregistration is running.");
+                case STATE_NONE:
+                    mState.set(STATE_REGISTERING);
+                    if (mOptions.isSystemPushPreferred()
+                            && registerSystemPreferredProvider()) {
+                        return;
+                    }
+                    registerNextProvider(null);
+                    break;
 
-            case STATE_WORKING:
-                throw new OpenPushException("Attempt to register twice!");
+                case STATE_UNREGISTERING:
+                    throw new OpenPushException("Can't register while unregistration is running.");
+
+                case STATE_WORKING:
+                    throw new OpenPushException("Attempt to register twice!");
+            }
         }
     }
 
@@ -255,30 +266,32 @@ public class OpenPushHelper {
 
     }
 
-    public synchronized void unregister() {
+    public void unregister() {
         checkInitDone();
 
-        if (!isRegistered()) {
-            throw new OpenPushException("No one provider is registered!");
-        }
+        synchronized (mRegistrationLock) {
+            if (!isRegistered()) {
+                throw new OpenPushException("No one provider is registered!");
+            }
 
-        Assert.assertNotNull(mCurrentProvider);
+            Assert.assertNotNull(mCurrentProvider);
 
-        switch (mState.get()) {
-            case STATE_WORKING:
-                mState.set(STATE_UNREGISTERING);
-                unregisterPackageChangeReceiver();
-                mCurrentProvider.unregister();
-                break;
+            switch (mState.get()) {
+                case STATE_WORKING:
+                    mState.set(STATE_UNREGISTERING);
+                    unregisterPackageChangeReceiver();
+                    mCurrentProvider.unregister();
+                    break;
 
-            case STATE_UNREGISTERING:
-                break;
+                case STATE_UNREGISTERING:
+                    break;
 
-            case STATE_REGISTERING:
-                throw new OpenPushException("Can't unregister when registration in progress.!");
+                case STATE_REGISTERING:
+                    throw new OpenPushException("Can't unregister when registration in progress.!");
 
-            case STATE_NONE:
-                throw new OpenPushException("Before to unregister you must register provider.!");
+                case STATE_NONE:
+                    throw new OpenPushException("Before to unregister you must register provider.!");
+            }
         }
     }
 
