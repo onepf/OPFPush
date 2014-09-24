@@ -239,6 +239,7 @@ public class OpenPushHelperTest {
         builder.addProviders(new MockPushProvider(Robolectric.application));
         Options options = builder.build();
         helper.init(options);
+
         helper.register();
         assertTrue(helper.isRegistered());
         helper.register();
@@ -246,47 +247,58 @@ public class OpenPushHelperTest {
 
     @Test(expected = OpenPushException.class)
     public void testUnregisterWhileRegistrationRun() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
-        Options options = builder.build();
-        helper.init(options);
+        OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
+
+        Assert.assertFalse(helper.isRegistered());
         helper.register();
+        Assert.assertFalse(helper.isRegistered());
         helper.unregister();
     }
 
     @Test
     public void testRegisterWhileRegistrationRun() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
+
+        Assert.assertFalse(helper.isRegistered());
+        helper.register();
+        Assert.assertFalse(helper.isRegistered());
+        helper.register();
+        Assert.assertFalse(helper.isRegistered());
+    }
+
+    private static OpenPushHelper createHelperWithInfinityRegisterProvider() {
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
-        Options options = builder.build();
-        helper.init(options);
-        helper.register();
-        Assert.assertFalse(helper.isRegistered());
-        helper.register();
-        Assert.assertFalse(helper.isRegistered());
+        helper.init(builder.build());
+        return helper;
     }
 
     @Test(expected = OpenPushException.class)
     public void testRegisterWhileUnregistrationRun() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
+
+        Assert.assertFalse(helper.isRegistered());
+        helper.register();
+        Assert.assertTrue(helper.isRegistered());
+        helper.unregister();
+        Assert.assertTrue(helper.isRegistered());
+        helper.register();
+    }
+
+    private static OpenPushHelper createHelperWithInfinityUnregisterProvider() {
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
-        Options options = builder.build();
-        helper.init(options);
-        helper.register();
-        helper.unregister();
-        helper.register();
+        helper.init(builder.build());
+        return helper;
     }
 
     @Test
     public void testUnregisterWhileUnregistrationRun() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
-        Options options = builder.build();
-        helper.init(options);
+        OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
+
+        Assert.assertFalse(helper.isRegistered());
         helper.register();
         Assert.assertTrue(helper.isRegistered());
         helper.unregister();
