@@ -34,11 +34,12 @@ import java.util.UUID;
 public class MockPushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
+    public static final String DEFAULT_NAME = MockPushProvider.class.getName();
     private String mRegistrationId;
-    private final boolean mAvailable;
+    private boolean mAvailable;
 
     public MockPushProvider(@NonNull Context context) {
-        this(context, MockPushProvider.class.getName());
+        this(context, DEFAULT_NAME);
     }
 
     public MockPushProvider(@NonNull Context context, String name) {
@@ -49,6 +50,11 @@ public class MockPushProvider extends BasePushProvider {
                      @NonNull String name,
                      boolean available) {
         this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
+    }
+
+    public MockPushProvider(@NonNull Context context,
+                     boolean available) {
+        this(context, DEFAULT_NAME, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
     public MockPushProvider(@NonNull Context context,
@@ -77,6 +83,10 @@ public class MockPushProvider extends BasePushProvider {
         mRegistrationId = null;
         OpenPushHelper.getInstance(getContext())
                 .onResult(new Result(getName(), mRegistrationId));
+    }
+
+    public void setAvailable(boolean available) {
+        mAvailable = available;
     }
 
     @Override

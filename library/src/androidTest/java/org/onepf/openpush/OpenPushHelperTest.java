@@ -18,6 +18,7 @@ package org.onepf.openpush;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -299,18 +300,7 @@ public class OpenPushHelperTest {
 
     @Test
     public void testRestoreLastProvider() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        Options.Builder builder = new Options.Builder();
-        MockPushProvider provider
-                = new MockPushProvider(Robolectric.application, "providerForPref");
-        builder.addProviders(provider);
-        Options options = builder.build();
-        helper.init(options);
-
-        assertFalse(helper.isRegistered());
-        helper.register();
-        assertTrue(helper.isRegistered());
-        assertSame(provider, helper.getCurrentProvider());
+        MockPushProvider provider = initWithMockProvider();
 
         SharedPreferences prefs =
                 Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE);
@@ -318,8 +308,8 @@ public class OpenPushHelperTest {
         assertNotNull(lastProviderName);
         assertEquals(provider.getName(), lastProviderName);
 
-        helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        helper.init(options);
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(new Options.Builder().addProviders(provider).build());
         assertSame(provider, helper.getCurrentProvider());
         assertTrue(helper.isRegistered());
     }
@@ -337,8 +327,136 @@ public class OpenPushHelperTest {
         assertTrue(helper.isRegistered());
     }
 
+    private static MockPushProvider initWithMockProvider() {
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider
+                = new MockPushProvider(Robolectric.application, "providerForPref");
+        builder.addProviders(provider);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+        helper.register();
+        return provider;
+    }
+
+    @Test
+    public void testRestoreUnavailableProvider() {
+        MockPushProvider provider = initWithMockProvider();
+        provider.setAvailable(false);
+
+        SharedPreferences prefs =
+                Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE);
+        assertTrue(prefs.contains(OpenPushHelper.KEY_LAST_PROVIDER_NAME));
+        String lastProviderName = prefs.getString(OpenPushHelper.KEY_LAST_PROVIDER_NAME, null);
+        assertFalse(TextUtils.isEmpty(lastProviderName));
+        assertEquals(provider.getName(), lastProviderName);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(new Options.Builder().addProviders(provider).build());
+        assertNull(helper.getCurrentProvider());
+        assertFalse(helper.isRegistered());
+        assertFalse(prefs.contains(OpenPushHelper.KEY_LAST_PROVIDER_NAME));
+    }
+
+    @Test
+    public void testRestoreUnavailableProviderAndSwitchToNext() {
+        MockPushProvider lastProvider = initWithMockProvider();
+        lastProvider.setAvailable(false);
+
+        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
+
+        Options.Builder builder = new Options.Builder();
+        builder.setRecoverProvider(true);
+        builder.addProviders(lastProvider);
+        builder.addProviders(nextProvider);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+
+        assertTrue(helper.isRegistered());
+
+        final PushProvider currentProvider = helper.getCurrentProvider();
+        assertNotNull(currentProvider);
+        assertTrue(currentProvider.isRegistered());
+        assertSame(nextProvider, currentProvider);
+
+        assertFalse(lastProvider.isRegistered());
+        assertNull(lastProvider.getRegistrationId());
+    }
+
+    @Test
+    public void testRestoreUnavailableProvider_RecoverDisable() {
+        MockPushProvider lastProvider = initWithMockProvider();
+        lastProvider.setAvailable(false);
+
+        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
+
+        PushProvider[] providers = {lastProvider, nextProvider};
+        restoreUnavailableProvider_RecoverEnable(nextProvider, providers);
+    }
+
+    @Test
+    public void testRestoreUnavailableProvider_RecoverDisable2() {
+        MockPushProvider lastProvider = initWithMockProvider();
+        lastProvider.setAvailable(false);
+
+        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
+
+        PushProvider[] providers = {nextProvider, lastProvider};
+        restoreUnavailableProvider_RecoverEnable(nextProvider, providers);
+    }
+
+    private static void restoreUnavailableProvider_RecoverEnable(
+            PushProvider expectedRegisterProvider,
+            PushProvider[] providers) {
+
+        Options.Builder builder = new Options.Builder();
+        builder.setRecoverProvider(false);
+        builder.addProviders(providers);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+
+        assertNull(helper.getCurrentProvider());
+        assertFalse(helper.isRegistered());
+        assertFalse(expectedRegisterProvider.isRegistered());
+
+        for (PushProvider provider : providers) {
+            if (provider != expectedRegisterProvider) {
+                assertFalse(provider.isRegistered());
+                assertNull(provider.getRegistrationId());
+            }
+        }
+    }
+
+    @Test
+    public void testRestoreUnavailableProvider_RecoverEnable_AllProvidersUnavailable() {
+        MockPushProvider lastProvider = initWithMockProvider();
+        lastProvider.setAvailable(false);
+
+        PushProvider nextProvider = new MockPushProvider(Robolectric.application, false);
+
+        Options.Builder builder = new Options.Builder();
+        builder.setRecoverProvider(true);
+        PushProvider[] providers = {nextProvider, lastProvider};
+        builder.addProviders(providers);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+
+        assertNull(helper.getCurrentProvider());
+        assertFalse(helper.isRegistered());
+        for (PushProvider provider : providers) {
+            assertFalse(provider.isRegistered());
+            assertNull(provider.getRegistrationId());
+        }
+    }
+
     @After
     public void tearDown() {
+        Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear();
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 }
