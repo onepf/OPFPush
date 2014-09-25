@@ -89,23 +89,25 @@ public class GCMService extends IntentService {
         }
 
         final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
-        if (GCMConstants.ACTION_REGISTRATION.equals(action)
-                || GCMConstants.ACTION_UNREGISTRATION.equals(action))
-            OpenPushHelper.getInstance(GCMService.this)
-                    .onResult(Result.error(GCMProvider.NAME, error, recoverableError));
+        if (GCMConstants.ACTION_REGISTRATION.equals(action))
+            OpenPushHelper.getInstance(GCMService.this).onResult(
+                    Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.REGISTRATION));
+        else if (GCMConstants.ACTION_UNREGISTRATION.equals(action))
+            OpenPushHelper.getInstance(GCMService.this).onResult(
+                    Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.UNREGISTRATION));
         else {
             throw new OpenPushException(String.format("Unknown action '%s'.", action));
         }
     }
 
     private void onRegistered(final String registrationToken) {
-        OpenPushHelper.getInstance(GCMService.this)
-                .onResult(Result.success(GCMProvider.NAME, registrationToken));
+        OpenPushHelper.getInstance(GCMService.this).onResult(
+                Result.success(GCMProvider.NAME, registrationToken, Result.Type.REGISTRATION));
     }
 
     private void onUnregistered(final String oldRegistrationToken) {
-        OpenPushHelper.getInstance(GCMService.this)
-                .onResult(Result.success(GCMProvider.NAME, oldRegistrationToken));
+        OpenPushHelper.getInstance(GCMService.this).onResult(
+                Result.success(GCMProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 
 }

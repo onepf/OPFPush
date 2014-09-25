@@ -405,18 +405,34 @@ public class OpenPushHelper {
 
     public void onResult(@NonNull Result result) {
         synchronized (mRegistrationLock) {
-            switch (mState.get()) {
-                case STATE_REGISTERING:
+            if (result.getType() == Result.Type.REGISTRATION) {
+                if (mState.get() == STATE_REGISTERING) {
                     onRegistrationResult(result);
-                    break;
-
-                case STATE_UNREGISTERING:
+                } else {
+                    throw new UnsupportedOperationException("Registration result can be" +
+                            " handled only when registration is running.");
+                }
+            } else if (result.getType() == Result.Type.UNREGISTRATION) {
+                if (mState.get() == STATE_UNREGISTERING) {
                     onUnregistrationResult(result);
-                    break;
+                } else {
+                    throw new UnsupportedOperationException("Unregistration result can be" +
+                            " handled only when unregistration is running.");
+                }
+            } else {
+                switch (mState.get()) {
+                    case STATE_REGISTERING:
+                        onRegistrationResult(result);
+                        return;
 
-                default:
-                    throw new UnsupportedOperationException("New result can be handled only when" +
-                            " registration or unregistration is running.");
+                    case STATE_UNREGISTERING:
+                        onUnregistrationResult(result);
+                        break;
+
+                    default:
+                        throw new UnsupportedOperationException("Result of unknown type can be" +
+                                " handled only when registration or unregistration is running.");
+                }
             }
         }
     }

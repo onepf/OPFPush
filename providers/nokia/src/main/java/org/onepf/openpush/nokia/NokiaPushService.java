@@ -57,8 +57,8 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NonNull Context appContext, String errorId) {
-        OpenPushHelper.getInstance(this)
-                .onResult(Result.error(NokiaPushProvider.NAME, convertError(errorId), false));
+        OpenPushHelper.getInstance(this).onResult(
+                Result.error(NokiaPushProvider.NAME, convertError(errorId), false, Result.Type.UNKNOWN));
     }
 
     /**
@@ -86,8 +86,8 @@ public class NokiaPushService extends PushBaseIntentService {
     protected boolean onRecoverableError(@NonNull Context appContext,
                                          @NonNull @NokiaError String errorId) {
         Error error = convertError(errorId);
-        OpenPushHelper.getInstance(this)
-                .onResult(Result.error(NokiaPushProvider.NAME, error, true));
+        OpenPushHelper.getInstance(this).onResult(
+                Result.error(NokiaPushProvider.NAME, error, true, Result.Type.REGISTRATION));
         return true;
     }
 
@@ -113,8 +113,8 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onRegistered(@NonNull Context appContext,
                                 @NonNull String registrationToken) {
-        OpenPushHelper.getInstance(this)
-                .onResult(Result.success(NokiaPushProvider.NAME, registrationToken));
+        OpenPushHelper.getInstance(this).onResult(
+                Result.success(NokiaPushProvider.NAME, registrationToken, Result.Type.REGISTRATION));
     }
 
     /**
@@ -126,7 +126,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onUnregistered(@NonNull Context appContext,
                                   @NonNull String oldRegistrationToken) {
-        OpenPushHelper.getInstance(this)
-                .onResult(Result.success(NokiaPushProvider.NAME, oldRegistrationToken));
+        OpenPushHelper.getInstance(this).onResult(
+                Result.success(NokiaPushProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 }

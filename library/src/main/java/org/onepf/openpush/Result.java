@@ -29,26 +29,31 @@ public final class Result {
     private final String mRegistrationId;
     private final Error mErrorCode;
     private final boolean mRecoverableError;
+    private final Type mType;
 
     private Result(@NonNull String providerName,
                    @Nullable String registrationId,
                    @Nullable Error error,
-                   boolean recoverableError) {
+                   boolean recoverableError,
+                   Type type) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = error;
         mRecoverableError = recoverableError;
+        mType = type;
     }
 
     public static Result success(@NonNull String providerName,
-                                 @NonNull String registrationId) {
-        return new Result(providerName, registrationId, null, false);
+                                 @NonNull String registrationId,
+                                 @NonNull Type type) {
+        return new Result(providerName, registrationId, null, false, type);
     }
 
     public static Result error(@NonNull String providerName,
                                @NonNull Error error,
-                               boolean recoverableError) {
-        return new Result(providerName, null, error, recoverableError);
+                               boolean recoverableError,
+                               @NonNull Type type) {
+        return new Result(providerName, null, error, recoverableError, type);
     }
 
     @Override
@@ -86,5 +91,15 @@ public final class Result {
 
     public Error getErrorCode() {
         return mErrorCode;
+    }
+
+    public Type getType() {
+        return mType;
+    }
+
+    public static enum Type {
+        UNKNOWN,
+        REGISTRATION,
+        UNREGISTRATION
     }
 }

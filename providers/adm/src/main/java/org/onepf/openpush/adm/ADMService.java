@@ -73,7 +73,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
         OpenPushHelper.getInstance(this).onResult(
-                Result.error(ADMProvider.NAME, convertError(errorId), false));
+                Result.error(ADMProvider.NAME, convertError(errorId), false, Result.Type.REGISTRATION));
     }
 
     @NonNull
@@ -105,7 +105,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistered(@NonNull String registrationId) {
         //TODO Send registration id.
         OpenPushHelper.getInstance(this)
-                .onResult(Result.success(ADMProvider.NAME, registrationId));
+                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.REGISTRATION));
     }
 
     /**
@@ -123,6 +123,6 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@NonNull String registrationId) {
         OpenPushHelper.getInstance(this)
-                .onResult(Result.success(ADMProvider.NAME, registrationId));
+                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.UNREGISTRATION));
     }
 }
