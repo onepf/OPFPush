@@ -72,7 +72,7 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider mCurrentProvider;
 
-    private AtomicInteger mState = new AtomicInteger(STATE_NONE);
+    private final AtomicInteger mState = new AtomicInteger(STATE_NONE);
 
     private Options mOptions;
 
