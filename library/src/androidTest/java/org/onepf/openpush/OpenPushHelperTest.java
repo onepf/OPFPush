@@ -59,6 +59,62 @@ public class OpenPushHelperTest {
 
     public static final String PACKAGE_CHANGE_RECEIVER_CLASS_NAME = "PackageChangeReceiver";
 
+    private static void checkProviderRegistrationState(@Nullable PushProvider expectedRegisteredProvider,
+                                                @NonNull PushProvider[] providers) {
+        for (PushProvider provider : providers) {
+            if (provider == expectedRegisteredProvider) {
+                assertTrue(provider.isRegistered());
+                assertNotNull(provider.getRegistrationId());
+            } else {
+                assertFalse(provider.isRegistered());
+                assertNull(provider.getRegistrationId());
+            }
+        }
+    }
+
+    private static OpenPushHelper createHelperWithInfinityRegisterProvider() {
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        Options.Builder builder = new Options.Builder();
+        builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
+        helper.init(builder.build());
+        return helper;
+    }
+
+    private static OpenPushHelper createHelperWithInfinityUnregisterProvider() {
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        Options.Builder builder = new Options.Builder();
+        builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
+        helper.init(builder.build());
+        return helper;
+    }
+
+    private static MockPushProvider initWithMockProvider() {
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider
+                = new MockPushProvider(Robolectric.application, "providerForPref");
+        builder.addProviders(provider);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+        helper.register();
+        return provider;
+    }
+
+    private static void restoreUnavailableProvider_RecoverDisable(
+            PushProvider... providers) {
+
+        Options.Builder builder = new Options.Builder();
+        builder.setRecoverProvider(false);
+        builder.addProviders(providers);
+
+        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        helper.init(builder.build());
+
+        assertNull(helper.getCurrentProvider());
+
+        checkProviderRegistrationState(null, providers);
+    }
+
     @Before
     public void setup() {
         Robolectric.packageManager.addPackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
@@ -170,19 +226,6 @@ public class OpenPushHelperTest {
         checkProviderRegistrationState(currentProvider, providers);
     }
 
-    private static void checkProviderRegistrationState(@Nullable PushProvider expectedRegisteredProvider,
-                                                @NonNull PushProvider[] providers) {
-        for (PushProvider provider : providers) {
-            if (provider == expectedRegisteredProvider) {
-                assertTrue(provider.isRegistered());
-                assertNotNull(provider.getRegistrationId());
-            } else {
-                assertFalse(provider.isRegistered());
-                assertNull(provider.getRegistrationId());
-            }
-        }
-    }
-
     @Test
     public void testRemoveHostAppPackage() throws Exception {
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
@@ -281,14 +324,6 @@ public class OpenPushHelperTest {
         assertFalse(helper.isRegistered());
     }
 
-    private static OpenPushHelper createHelperWithInfinityRegisterProvider() {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
-        helper.init(builder.build());
-        return helper;
-    }
-
     @Test(expected = OpenPushException.class)
     public void testRegisterWhileUnregistrationRun() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
@@ -299,14 +334,6 @@ public class OpenPushHelperTest {
         helper.unregister();
         assertTrue(helper.isRegistered());
         helper.register();
-    }
-
-    private static OpenPushHelper createHelperWithInfinityUnregisterProvider() {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
-        helper.init(builder.build());
-        return helper;
     }
 
     @Test
@@ -338,18 +365,6 @@ public class OpenPushHelperTest {
         assertTrue(helper.isRegistered());
     }
 
-    private static MockPushProvider initWithMockProvider() {
-        Options.Builder builder = new Options.Builder();
-        MockPushProvider provider
-                = new MockPushProvider(Robolectric.application, "providerForPref");
-        builder.addProviders(provider);
-
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        helper.init(builder.build());
-        helper.register();
-        return provider;
-    }
-
     @Test
     public void testRestoreUnavailableProvider() {
         MockPushProvider provider = initWithMockProvider();
@@ -370,7 +385,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProviderAndSwitchToNext() {
+    public void testRestoreUnavailableProvider_RecoverEnable() {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
@@ -396,37 +411,16 @@ public class OpenPushHelperTest {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
-        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
-
-        PushProvider[] providers = {lastProvider, nextProvider};
-        restoreUnavailableProvider_RecoverDisable(nextProvider, providers);
+        restoreUnavailableProvider_RecoverDisable(
+                lastProvider, new MockPushProvider(Robolectric.application));
     }
 
     @Test
     public void testRestoreUnavailableProvider_RecoverDisable2() {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
-
-        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
-
-        PushProvider[] providers = {nextProvider, lastProvider};
-        restoreUnavailableProvider_RecoverDisable(nextProvider, providers);
-    }
-
-    private static void restoreUnavailableProvider_RecoverDisable(
-            PushProvider expectedRegisteredProvider,
-            PushProvider[] providers) {
-
-        Options.Builder builder = new Options.Builder();
-        builder.setRecoverProvider(false);
-        builder.addProviders(providers);
-
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
-        helper.init(builder.build());
-
-        assertNull(helper.getCurrentProvider());
-
-        checkProviderRegistrationState(null, providers);
+        restoreUnavailableProvider_RecoverDisable(
+                new MockPushProvider(Robolectric.application), lastProvider);
     }
 
     @Test
