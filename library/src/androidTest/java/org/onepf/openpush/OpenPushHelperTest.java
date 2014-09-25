@@ -60,8 +60,8 @@ public class OpenPushHelperTest {
 
     public static final String PACKAGE_CHANGE_RECEIVER_CLASS_NAME = "PackageChangeReceiver";
 
-    private static void checkProviderRegistrationState( @NonNull OpenPushHelper helper,
-            @Nullable PushProvider expectedRegisteredProvider) {
+    private static void checkProviderRegistrationState(@NonNull OpenPushHelper helper,
+                                                       @Nullable PushProvider expectedRegisteredProvider) {
 
         if (expectedRegisteredProvider != null) {
             assertTrue(helper.isRegistered());
@@ -386,7 +386,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProvider() {
+    public void testRestoreUnavailableProvider() throws Exception {
         MockPushProvider provider = initWithMockProvider();
         provider.setAvailable(false);
 
@@ -405,7 +405,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProvider_RecoverEnable() {
+    public void testRestoreUnavailableProvider_RecoverEnable() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
@@ -428,7 +428,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProvider_RecoverDisable() {
+    public void testRestoreUnavailableProvider_RecoverDisable() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
@@ -437,7 +437,7 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProvider_RecoverDisable2() {
+    public void testRestoreUnavailableProvider_RecoverDisable2() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
         restoreUnavailableProvider_RecoverDisable(
@@ -445,7 +445,9 @@ public class OpenPushHelperTest {
     }
 
     @Test
-    public void testRestoreUnavailableProvider_RecoverEnable_AllProvidersUnavailable() {
+    public void testRestoreUnavailableProvider_RecoverEnable_AllProvidersUnavailable()
+            throws Exception {
+
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
@@ -461,6 +463,53 @@ public class OpenPushHelperTest {
         helper.init(builder.build());
 
         checkProviderRegistrationState(helper, null);
+    }
+
+    @Test
+    public void testSendRegistrationResult_RegistrationRunning() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
+        helper.register();
+        helper.onResult(
+                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
+        );
+    }
+
+    @Test(expected = OpenPushException.class)
+    public void testSendResultWithNonExistenProvider_RegistrationRunning() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
+        helper.register();
+        helper.onResult(
+                Result.success("123123123", "testId", Result.Type.REGISTRATION)
+        );
+    }
+
+    @Test(expected = OpenPushException.class)
+    public void testSendUnregistrationResult_RegistrationRunning() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
+        helper.register();
+        helper.onResult(
+                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
+        );
+    }
+
+    @Test(expected = OpenPushException.class)
+    public void testSendRegistrationResult_UnregistrationRunning() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
+        helper.register();
+        helper.unregister();
+        helper.onResult(
+                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
+        );
+    }
+
+    @Test
+    public void testSendUnregistrationResult_UnregistrationRunning() throws Exception {
+        OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
+        helper.register();
+        helper.unregister();
+        helper.onResult(
+                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
+        );
     }
 
     @After

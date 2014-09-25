@@ -330,6 +330,16 @@ public class OpenPushHelper {
         return null;
     }
 
+    @NonNull
+    private PushProvider getProviderWithException(@NonNull String providerName) {
+        PushProvider provider = getProvider(providerName);
+        if (provider == null) {
+            throw new OpenPushException(
+                    String.format("Provider with name '%s' not found.", providerName));
+        }
+        return provider;
+    }
+
     @Nullable
     private PushProvider getLastProvider() {
         if (mPreferences.contains(KEY_LAST_PROVIDER_NAME)) {
@@ -409,14 +419,14 @@ public class OpenPushHelper {
                 if (mState.get() == STATE_REGISTERING) {
                     onRegistrationResult(result);
                 } else {
-                    throw new UnsupportedOperationException("Registration result can be" +
+                    throw new OpenPushException("Registration result can be" +
                             " handled only when registration is running.");
                 }
             } else if (result.getType() == Result.Type.UNREGISTRATION) {
                 if (mState.get() == STATE_UNREGISTERING) {
                     onUnregistrationResult(result);
                 } else {
-                    throw new UnsupportedOperationException("Unregistration result can be" +
+                    throw new OpenPushException("Unregistration result can be" +
                             " handled only when unregistration is running.");
                 }
             } else {
@@ -430,7 +440,7 @@ public class OpenPushHelper {
                         break;
 
                     default:
-                        throw new UnsupportedOperationException("Result of unknown type can be" +
+                        throw new OpenPushException("Result of unknown type can be" +
                                 " handled only when registration or unregistration is running.");
                 }
             }
@@ -450,11 +460,11 @@ public class OpenPushHelper {
                 mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
             }
         } else if (mListener != null) {
+            Assert.assertNotNull(result.getErrorCode());
+
             LOGI(String.format("Error unregister provider '%s'.", result.getProviderName()));
-            final PushProvider provider = getProvider(result.getProviderName());
-            if (provider != null) {
-                mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
-            }
+            PushProvider provider = getProviderWithException(result.getProviderName());
+            mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
         }
     }
 
@@ -464,9 +474,7 @@ public class OpenPushHelper {
             LOGI(String.format("Register id '%s'.", result.getRegistrationId()));
             mState.set(STATE_WORKING);
 
-            mCurrentProvider = getProvider(result.getProviderName());
-            Assert.assertNotNull(mCurrentProvider);
-
+            mCurrentProvider = getProviderWithException(result.getProviderName());
             saveLastProvider(mCurrentProvider);
             Assert.assertNotNull(result.getRegistrationId());
             if (mListener != null) {
@@ -476,16 +484,16 @@ public class OpenPushHelper {
             mPackageReceiver =
                     PackageUtils.registerPackageChangeReceiver(mAppContext, mCurrentProvider);
         } else {
-            LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
-            PushProvider provider = getProvider(result.getProviderName());
-            if (provider != null) {
-                if (mListener != null) {
-                    mListener.onRegistrationError(provider.getName(), result.getErrorCode());
-                }
+            Assert.assertNotNull(result.getErrorCode());
 
-                if (!result.isRecoverableError()) {
-                    registerNextProvider(provider);
-                }
+            LOGI(String.format("Error register provider '%s'.", result.getProviderName()));
+            PushProvider provider = getProviderWithException(result.getProviderName());
+            if (mListener != null) {
+                mListener.onRegistrationError(provider.getName(), result.getErrorCode());
+            }
+
+            if (!result.isRecoverableError()) {
+                registerNextProvider(provider);
             }
         }
     }
