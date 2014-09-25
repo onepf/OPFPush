@@ -41,6 +41,8 @@ import static org.onepf.openpush.OpenPushLog.LOGW;
  *
  * @author Kirill Rozov
  * @since 04.09.2014
+ * <p/>
+ * {@link }
  */
 public class OpenPushHelper {
 
@@ -161,6 +163,7 @@ public class OpenPushHelper {
                 }
             }
         } else {
+            lastProvider.onUnavailable();
             LOGI("Last provider isn't available.");
             reset();
             if (mOptions.isRecoverProvider()) {
@@ -380,7 +383,7 @@ public class OpenPushHelper {
         }
     }
 
-    private void reset() {
+    void reset() {
         mPreferences.edit().clear().apply();
         mState.set(STATE_NONE);
     }
@@ -401,19 +404,21 @@ public class OpenPushHelper {
         }
     }
 
-    public synchronized void onResult(Result result) {
-        switch (mState.get()) {
-            case STATE_REGISTERING:
-                onRegistrationResult(result);
-                break;
+    public void onResult(Result result) {
+        synchronized (mRegistrationLock) {
+            switch (mState.get()) {
+                case STATE_REGISTERING:
+                    onRegistrationResult(result);
+                    break;
 
-            case STATE_UNREGISTERING:
-                onUnregistrationResult(result);
-                break;
+                case STATE_UNREGISTERING:
+                    onUnregistrationResult(result);
+                    break;
 
-            default:
-                throw new UnsupportedOperationException("New result can be handled only when" +
-                        " registration or unregistration is running.");
+                default:
+                    throw new UnsupportedOperationException("New result can be handled only when" +
+                            " registration or unregistration is running.");
+            }
         }
     }
 
