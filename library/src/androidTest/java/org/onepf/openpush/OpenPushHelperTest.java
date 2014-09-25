@@ -59,8 +59,22 @@ public class OpenPushHelperTest {
 
     public static final String PACKAGE_CHANGE_RECEIVER_CLASS_NAME = "PackageChangeReceiver";
 
-    private static void checkProviderRegistrationState(@Nullable PushProvider expectedRegisteredProvider,
-                                                @NonNull PushProvider[] providers) {
+    private static void checkProviderRegistrationState(
+            @NonNull OpenPushHelper helper,
+            @Nullable PushProvider expectedRegisteredProvider,
+            @NonNull PushProvider[] providers) {
+
+        if (expectedRegisteredProvider != null) {
+            assertTrue(helper.isRegistered());
+
+            PushProvider currentProvider = helper.getCurrentProvider();
+            assertNotNull(currentProvider);
+            assertSame(expectedRegisteredProvider, currentProvider);
+        } else {
+            assertFalse(helper.isRegistered());
+            assertNull(helper.getCurrentProvider());
+        }
+
         for (PushProvider provider : providers) {
             if (provider == expectedRegisteredProvider) {
                 assertTrue(provider.isRegistered());
@@ -112,7 +126,7 @@ public class OpenPushHelperTest {
 
         assertNull(helper.getCurrentProvider());
 
-        checkProviderRegistrationState(null, providers);
+        checkProviderRegistrationState(helper, null, providers);
     }
 
     @Before
@@ -223,7 +237,7 @@ public class OpenPushHelperTest {
         PushProvider currentProvider = helper.getCurrentProvider();
         assertNotNull(currentProvider);
 
-        checkProviderRegistrationState(currentProvider, providers);
+        checkProviderRegistrationState(helper, currentProvider, providers);
     }
 
     @Test
@@ -249,7 +263,7 @@ public class OpenPushHelperTest {
         PushProvider currentProvider = helper.getCurrentProvider();
         assertNotNull(currentProvider);
 
-        checkProviderRegistrationState(currentProvider, providers);
+        checkProviderRegistrationState(helper, currentProvider, providers);
 
         Robolectric.packageManager.removePackage(currentProvider.getHostAppPackage());
         helper.onUnavailable(currentProvider);
@@ -260,7 +274,7 @@ public class OpenPushHelperTest {
         assertNotNull(currentProvider);
         assertNotSame(oldCurrentProvider, currentProvider);
 
-        checkProviderRegistrationState(currentProvider, providers);
+        checkProviderRegistrationState(helper, currentProvider, providers);
 
         for (PushProvider provider : providers) {
             Robolectric.packageManager.removePackage(provider.getHostAppPackage());
@@ -402,8 +416,9 @@ public class OpenPushHelperTest {
 
         final PushProvider currentProvider = helper.getCurrentProvider();
         assertNotNull(currentProvider);
-        checkProviderRegistrationState(currentProvider,
-                new PushProvider[]{nextProvider, lastProvider});
+        checkProviderRegistrationState(
+                helper, currentProvider, new PushProvider[]{nextProvider, lastProvider}
+        );
     }
 
     @Test
@@ -428,22 +443,18 @@ public class OpenPushHelperTest {
         MockPushProvider lastProvider = initWithMockProvider();
         lastProvider.setAvailable(false);
 
-        PushProvider nextProvider = new MockPushProvider(Robolectric.application, false);
-
         Options.Builder builder = new Options.Builder();
         builder.setRecoverProvider(true);
-        PushProvider[] providers = {nextProvider, lastProvider};
+        PushProvider[] providers = {
+                new MockPushProvider(Robolectric.application, false),
+                lastProvider
+        };
         builder.addProviders(providers);
 
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
         helper.init(builder.build());
 
-        assertNull(helper.getCurrentProvider());
-        assertFalse(helper.isRegistered());
-        for (PushProvider provider : providers) {
-            assertFalse(provider.isRegistered());
-            assertNull(provider.getRegistrationId());
-        }
+        checkProviderRegistrationState(helper, null, providers);
     }
 
     @After
