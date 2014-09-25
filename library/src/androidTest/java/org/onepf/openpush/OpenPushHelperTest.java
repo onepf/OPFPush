@@ -60,8 +60,7 @@ public class OpenPushHelperTest {
 
     public static final String PACKAGE_CHANGE_RECEIVER_CLASS_NAME = "PackageChangeReceiver";
 
-    private static void checkProviderRegistrationState(
-            @NonNull OpenPushHelper helper,
+    private static void checkProviderRegistrationState( @NonNull OpenPushHelper helper,
             @Nullable PushProvider expectedRegisteredProvider) {
 
         if (expectedRegisteredProvider != null) {
