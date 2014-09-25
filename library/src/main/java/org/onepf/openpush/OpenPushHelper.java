@@ -181,7 +181,6 @@ public class OpenPushHelper {
         checkInitDone();
 
         synchronized (mRegistrationLock) {
-
             switch (mState.get()) {
                 case STATE_REGISTERING:
                     break;
@@ -404,7 +403,7 @@ public class OpenPushHelper {
         }
     }
 
-    public void onResult(Result result) {
+    public void onResult(@NonNull Result result) {
         synchronized (mRegistrationLock) {
             switch (mState.get()) {
                 case STATE_REGISTERING:

@@ -30,19 +30,25 @@ public final class Result {
     private final Error mErrorCode;
     private final boolean mRecoverableError;
 
-    public Result(@NonNull String providerName, @NonNull String registrationId) {
+    private Result(@NonNull String providerName,
+                   @Nullable String registrationId,
+                   @Nullable Error error,
+                   boolean recoverableError) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
-        mErrorCode = null;
-        mRecoverableError = true;
-    }
-
-    public Result(@NonNull String providerName, @NonNull Error error,
-                  boolean recoverableError) {
-        mProviderName = providerName;
-        mRegistrationId = null;
         mErrorCode = error;
         mRecoverableError = recoverableError;
+    }
+
+    public static Result success(@NonNull String providerName,
+                                 @NonNull String registrationId) {
+        return new Result(providerName, registrationId, null, false);
+    }
+
+    public static Result error(@NonNull String providerName,
+                               @NonNull Error error,
+                               boolean recoverableError) {
+        return new Result(providerName, null, error, recoverableError);
     }
 
     @Override

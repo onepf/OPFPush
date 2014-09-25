@@ -46,24 +46,21 @@ public class MockPushProvider extends BasePushProvider {
         this(context, name, true);
     }
 
-    public MockPushProvider(@NonNull Context context,
-                     @NonNull String name,
-                     boolean available) {
+    public MockPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
         this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
-    public MockPushProvider(@NonNull Context context,
-                     boolean available) {
+    public MockPushProvider(@NonNull Context context, boolean available) {
         this(context, DEFAULT_NAME, available, DEFAULT_HOST_APP_PACKAGE);
     }
 
     public MockPushProvider(@NonNull Context context,
-                     @NonNull String name,
-                     @NonNull String hotAppPackage) {
+                            @NonNull String name,
+                            @NonNull String hotAppPackage) {
         this(context, name, true, hotAppPackage);
     }
 
-    MockPushProvider(@NonNull Context context,
+    public MockPushProvider(@NonNull Context context,
                      @NonNull String name,
                      boolean available,
                      @NonNull String hotAppPackage) {
@@ -75,14 +72,14 @@ public class MockPushProvider extends BasePushProvider {
     public void register() {
         mRegistrationId = UUID.randomUUID().toString();
         OpenPushHelper.getInstance(getContext())
-                .onResult(new Result(getName(), mRegistrationId));
+                .onResult(Result.success(getName(), mRegistrationId));
     }
 
     @Override
     public void unregister() {
         mRegistrationId = null;
         OpenPushHelper.getInstance(getContext())
-                .onResult(new Result(getName(), mRegistrationId));
+                .onResult(Result.success(getName(), mRegistrationId));
     }
 
     public void setAvailable(boolean available) {

@@ -58,7 +58,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onError(@NonNull Context appContext, String errorId) {
         OpenPushHelper.getInstance(this)
-                .onResult(new Result(NokiaPushProvider.NAME, convertError(errorId), false));
+                .onResult(Result.error(NokiaPushProvider.NAME, convertError(errorId), false));
     }
 
     /**
@@ -87,7 +87,7 @@ public class NokiaPushService extends PushBaseIntentService {
                                          @NonNull @NokiaError String errorId) {
         Error error = convertError(errorId);
         OpenPushHelper.getInstance(this)
-                .onResult(new Result(NokiaPushProvider.NAME, error, true));
+                .onResult(Result.error(NokiaPushProvider.NAME, error, true));
         return true;
     }
 
@@ -114,7 +114,7 @@ public class NokiaPushService extends PushBaseIntentService {
     protected void onRegistered(@NonNull Context appContext,
                                 @NonNull String registrationToken) {
         OpenPushHelper.getInstance(this)
-                .onResult(new Result(NokiaPushProvider.NAME, registrationToken));
+                .onResult(Result.success(NokiaPushProvider.NAME, registrationToken));
     }
 
     /**
@@ -127,6 +127,6 @@ public class NokiaPushService extends PushBaseIntentService {
     protected void onUnregistered(@NonNull Context appContext,
                                   @NonNull String oldRegistrationToken) {
         OpenPushHelper.getInstance(this)
-                .onResult(new Result(NokiaPushProvider.NAME, oldRegistrationToken));
+                .onResult(Result.success(NokiaPushProvider.NAME, oldRegistrationToken));
     }
 }
