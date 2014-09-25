@@ -18,6 +18,8 @@ package org.onepf.openpush;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.junit.After;
@@ -38,6 +40,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -146,28 +149,38 @@ public class OpenPushHelperTest {
         assertFalse(helper.isInitDone());
 
         Options.Builder builder = new Options.Builder();
-        MockPushProvider provider1
-                = new MockPushProvider(Robolectric.application, "providerName1", false);
-        builder.addProviders(provider1);
-        MockPushProvider provider2
-                = new MockPushProvider(Robolectric.application, "providerName2");
-        builder.addProviders(provider2);
+        PushProvider[] providers = {
+                new MockPushProvider(Robolectric.application, "providerName1", false),
+                new MockPushProvider(Robolectric.application, "providerName2")
+        };
+        builder.addProviders(providers);
         helper.init(builder.build());
 
         assertTrue(helper.isInitDone());
 
-        assertFalse(provider1.isRegistered());
-        assertFalse(provider2.isRegistered());
+        for (PushProvider provider : providers) {
+            assertFalse(provider.isRegistered());
+            assertNull(provider.getRegistrationId());
+        }
 
         helper.register();
-        PushProvider provider = helper.getCurrentProvider();
-        assertNotNull(provider);
-        assertTrue(provider.isRegistered());
-        assertEquals(provider2.getName(), provider.getName());
-        assertEquals(provider2.getRegistrationId(), provider.getRegistrationId());
+        PushProvider currentProvider = helper.getCurrentProvider();
+        assertNotNull(currentProvider);
 
-        assertFalse(provider1.isRegistered());
-        assertTrue(provider2.isRegistered());
+        checkProviderRegistrationState(currentProvider, providers);
+    }
+
+    private static void checkProviderRegistrationState(@Nullable PushProvider expectedRegisteredProvider,
+                                                @NonNull PushProvider[] providers) {
+        for (PushProvider provider : providers) {
+            if (provider == expectedRegisteredProvider) {
+                assertTrue(provider.isRegistered());
+                assertNotNull(provider.getRegistrationId());
+            } else {
+                assertFalse(provider.isRegistered());
+                assertNull(provider.getRegistrationId());
+            }
+        }
     }
 
     @Test
@@ -176,41 +189,39 @@ public class OpenPushHelperTest {
         assertFalse(helper.isInitDone());
 
         Options.Builder builder = new Options.Builder();
-        MockPushProvider provider1
-                = new MockPushProvider(Robolectric.application, "provider1", "org.openpf.store1");
-        Robolectric.packageManager.addPackage(provider1.getHostAppPackage());
-        builder.addProviders(provider1);
-        MockPushProvider provider2
-                = new MockPushProvider(Robolectric.application, "provider2", "org.openpf.store2");
-        Robolectric.packageManager.addPackage(provider2.getHostAppPackage());
-        builder.addProviders(provider2);
+        final PushProvider[] providers = {
+                new MockPushProvider(Robolectric.application, "provider1", "org.openpf.store1"),
+                new MockPushProvider(Robolectric.application, "provider2", "org.openpf.store2")
+        };
+        builder.addProviders(providers);
         helper.init(builder.build());
 
-        assertFalse(provider1.isRegistered());
-        assertFalse(provider2.isRegistered());
+        for (PushProvider provider : providers) {
+            Robolectric.packageManager.addPackage(provider.getHostAppPackage());
+            assertFalse(provider.isRegistered());
+        }
 
         helper.register();
-        assertNotNull(helper.getCurrentProvider());
-        assertEquals(provider1.getName(), helper.getCurrentProvider().getName());
-        assertEquals(provider1.getRegistrationId(), helper.getCurrentProvider().getRegistrationId());
 
-        assertTrue(provider1.isRegistered());
-        assertFalse(provider2.isRegistered());
+        PushProvider currentProvider = helper.getCurrentProvider();
+        assertNotNull(currentProvider);
 
-        Robolectric.packageManager.removePackage(provider1.getHostAppPackage());
-        helper.onUnavailable(provider1);
-        assertNotNull(helper.getCurrentProvider());
-        assertEquals(provider2.getName(), helper.getCurrentProvider().getName());
-        assertEquals(provider2.getRegistrationId(), helper.getCurrentProvider().getRegistrationId());
+        checkProviderRegistrationState(currentProvider, providers);
 
-        assertFalse(provider1.isRegistered());
-        assertTrue(provider2.isRegistered());
+        Robolectric.packageManager.removePackage(currentProvider.getHostAppPackage());
+        helper.onUnavailable(currentProvider);
 
-        Robolectric.packageManager.removePackage(provider1.getHostAppPackage());
-        Robolectric.packageManager.removePackage(provider2.getHostAppPackage());
+        PushProvider oldCurrentProvider = currentProvider;
+        currentProvider = helper.getCurrentProvider();
 
-        assertFalse(provider1.isRegistered());
-        assertTrue(provider2.isRegistered());
+        assertNotNull(currentProvider);
+        assertNotSame(oldCurrentProvider, currentProvider);
+
+        checkProviderRegistrationState(currentProvider, providers);
+
+        for (PushProvider provider : providers) {
+            Robolectric.packageManager.removePackage(provider.getHostAppPackage());
+        }
     }
 
     @Test
@@ -225,14 +236,14 @@ public class OpenPushHelperTest {
         assertTrue(helper.isInitDone());
 
         helper.register();
-        PushProvider currentProvider = helper.getCurrentProvider();
-        assertNotNull(currentProvider);
-        assertTrue(helper.isRegistered());
-        assertEquals(providerName, helper.getCurrentProvider().getName());
-        assertNotNull(helper.getCurrentProvider().getRegistrationId());
+
+        PushProvider registeredProvider = helper.getCurrentProvider();
+        assertNotNull(registeredProvider);
 
         helper.unregister();
-        assertFalse(currentProvider.isRegistered());
+
+        assertFalse(helper.isRegistered());
+        assertFalse(registeredProvider.isRegistered());
         assertNull(helper.getCurrentProvider());
     }
 
@@ -372,16 +383,12 @@ public class OpenPushHelperTest {
 
         OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
         helper.init(builder.build());
-
         assertTrue(helper.isRegistered());
 
         final PushProvider currentProvider = helper.getCurrentProvider();
         assertNotNull(currentProvider);
-        assertTrue(currentProvider.isRegistered());
-        assertSame(nextProvider, currentProvider);
-
-        assertFalse(lastProvider.isRegistered());
-        assertNull(lastProvider.getRegistrationId());
+        checkProviderRegistrationState(currentProvider,
+                new PushProvider[]{nextProvider, lastProvider});
     }
 
     @Test
@@ -392,7 +399,7 @@ public class OpenPushHelperTest {
         PushProvider nextProvider = new MockPushProvider(Robolectric.application);
 
         PushProvider[] providers = {lastProvider, nextProvider};
-        restoreUnavailableProvider_RecoverEnable(nextProvider, providers);
+        restoreUnavailableProvider_RecoverDisable(nextProvider, providers);
     }
 
     @Test
@@ -403,11 +410,11 @@ public class OpenPushHelperTest {
         PushProvider nextProvider = new MockPushProvider(Robolectric.application);
 
         PushProvider[] providers = {nextProvider, lastProvider};
-        restoreUnavailableProvider_RecoverEnable(nextProvider, providers);
+        restoreUnavailableProvider_RecoverDisable(nextProvider, providers);
     }
 
-    private static void restoreUnavailableProvider_RecoverEnable(
-            PushProvider expectedRegisterProvider,
+    private static void restoreUnavailableProvider_RecoverDisable(
+            PushProvider expectedRegisteredProvider,
             PushProvider[] providers) {
 
         Options.Builder builder = new Options.Builder();
@@ -418,15 +425,8 @@ public class OpenPushHelperTest {
         helper.init(builder.build());
 
         assertNull(helper.getCurrentProvider());
-        assertFalse(helper.isRegistered());
-        assertFalse(expectedRegisterProvider.isRegistered());
 
-        for (PushProvider provider : providers) {
-            if (provider != expectedRegisterProvider) {
-                assertFalse(provider.isRegistered());
-                assertNull(provider.getRegistrationId());
-            }
-        }
+        checkProviderRegistrationState(null, providers);
     }
 
     @Test
