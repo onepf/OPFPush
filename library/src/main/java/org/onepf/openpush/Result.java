@@ -59,15 +59,18 @@ public final class Result {
     @Override
     public String toString() {
         if (mErrorCode == null) {
-            return "RegistrationResult{" +
+            return "Success{" +
                     "providerName='" + mProviderName + '\'' +
-                    ", registrationId='" + mRegistrationId + "\'}";
+                    ", registrationId='" + mRegistrationId + '\'' +
+                    ", type=" + mType + '\'' +
+                    '}';
         } else {
-            return "RegistrationResult{" +
+            return "Error{" +
                     "providerName='" + mProviderName + '\'' +
                     ", errorCode='" + mErrorCode + '\'' +
                     ", recoverableError='" + mRecoverableError + '\'' +
-                    "}";
+                    ", type=" + mType + '\'' +
+                    '}';
         }
     }
 
@@ -89,10 +92,12 @@ public final class Result {
         return mErrorCode == null;
     }
 
+    @Nullable
     public Error getErrorCode() {
         return mErrorCode;
     }
 
+    @NonNull
     public Type getType() {
         return mType;
     }
