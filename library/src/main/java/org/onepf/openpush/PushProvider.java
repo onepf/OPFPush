@@ -20,12 +20,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * @author Anton Rutkevich, Alexey Vitenko
+ * {@code PushProvider} represent provider for push notification from server to client app.
+ *
+ * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
  * @since 14.05.14
  */
 public interface PushProvider {
     /**
-     * Initiate registration for the current application.
+     * Initiate registration of the provider. Must be async.
      * For start registration call {@link OpenPushHelper#register()}.
      * <p/>
      * <b>Don't call this method manually.</b>
@@ -33,7 +35,7 @@ public interface PushProvider {
     void register();
 
     /**
-     * Unregister the application.
+     * Unregister the provider from receive push notification. Must be async.
      * For start registration call {@link OpenPushHelper#unregister()}.
      * <p/>
      * <b>Don't call this method manually.</b>
@@ -51,13 +53,15 @@ public interface PushProvider {
     boolean isRegistered();
 
     /**
-     * Gets the registration id.
+     * Gets the registration id. If registration not done will return null.
      */
     @Nullable
     String getRegistrationId();
 
     /**
-     * Returns the name of the provider. Always not null value.
+     * Get name of the provider. Must be unique for all providers.
+     *
+     * @return Provider name.
      */
     @NonNull
     String getName();
@@ -68,7 +72,7 @@ public interface PushProvider {
      *
      * @return Host application package.
      */
-    @NonNull
+    @Nullable
     String getHostAppPackage();
 
     /**
@@ -81,18 +85,24 @@ public interface PushProvider {
      * Verify does application manifest contains all needed permissions.
      *
      * @return {@code true} if all required permissions described in manifest, else {@code false}.
+     * @throws OpenPushException When application's AndroidManifest.xml file doesn't contain all
+     *                           needed permission for provider.
      */
     boolean checkManifest();
 
     /**
-     * Callback method, that called when application state change, like update to new version,
-     * or system state changed, like update firmware to a newer version and Android ID changed.
+     * Callback method, that called when the application state change, like update to new version,
+     * or system state changed, like update firmware to a newer version.
      * <p/>
-     * When this method call you registration is invalid and you need reset all data associated with
-     * previous registration data.
+     * When this method call you registration is invalid
+     * and you need reset all saved registration data.
      */
     //TODO Think about method name.
     void onAppStateChanged();
 
+    /**
+     * Callback method for notify that the provider become unavailable.
+     * In this method you must reset all saved registration data.
+     */
     void onUnavailable();
 }

@@ -25,6 +25,10 @@ public class OpenPushException extends RuntimeException {
         super(detailMessage);
     }
 
+    public OpenPushException(String messageFormat, Object... args) {
+        super(String.format(messageFormat, args));
+    }
+
     public OpenPushException(String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
     }

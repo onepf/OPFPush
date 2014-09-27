@@ -39,6 +39,13 @@ public final class OpenPushLog {
         }
     }
 
+    public static void LOGD(String messageFormat, Object... args) {
+        //noinspection PointlessBooleanExpression,ConstantConditions
+        if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, String.format(messageFormat, args));
+        }
+    }
+
     public static void LOGD(String message, Throwable cause) {
         //noinspection PointlessBooleanExpression,ConstantConditions
         if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
@@ -63,6 +70,12 @@ public final class OpenPushLog {
     public static void LOGI(String message) {
         if (sLogEnable) {
             Log.i(TAG, message);
+        }
+    }
+
+    public static void LOGI(String messageFormat, Object... args) {
+        if (sLogEnable) {
+            Log.i(TAG, String.format(messageFormat, args));
         }
     }
 

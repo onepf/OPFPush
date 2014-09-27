@@ -48,6 +48,8 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Created by  Kirill Rozov on 11.09.14.
+ *
+ * @see OpenPushHelper
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -98,7 +100,7 @@ public class OpenPushHelperTest {
     }
 
     private static OpenPushHelper createHelperWithInfinityRegisterProvider() {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
         helper.init(builder.build());
@@ -106,7 +108,7 @@ public class OpenPushHelperTest {
     }
 
     private static OpenPushHelper createHelperWithInfinityUnregisterProvider() {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
         helper.init(builder.build());
@@ -119,7 +121,7 @@ public class OpenPushHelperTest {
                 = new MockPushProvider(Robolectric.application, "providerForPref");
         builder.addProviders(provider);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(builder.build());
         helper.register();
         return provider;
@@ -131,7 +133,7 @@ public class OpenPushHelperTest {
         builder.setRecoverProvider(false);
         builder.addProviders(providers);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(builder.build());
 
         assertNull(helper.getCurrentProvider());
@@ -148,7 +150,7 @@ public class OpenPushHelperTest {
     public void testInit() throws Exception {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
-        OpenPushHelper openPushHelper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper openPushHelper = OpenPushHelper.newInstance(Robolectric.application);
         assertFalse(openPushHelper.isInitDone());
         openPushHelper.init(builder.build());
         assertTrue(openPushHelper.isInitDone());
@@ -158,7 +160,7 @@ public class OpenPushHelperTest {
     public void testInitTwice() throws Exception {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
-        OpenPushHelper openPushHelper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper openPushHelper = OpenPushHelper.newInstance(Robolectric.application);
         assertFalse(openPushHelper.isInitDone());
         openPushHelper.init(builder.build());
         assertTrue(openPushHelper.isInitDone());
@@ -167,7 +169,7 @@ public class OpenPushHelperTest {
 
     @Test(expected = OpenPushException.class)
     public void testUnregisterWithoutRegister() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
@@ -179,7 +181,7 @@ public class OpenPushHelperTest {
 
     @Test
     public void testRegister() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
         final String providerName = "providerName";
@@ -215,17 +217,17 @@ public class OpenPushHelperTest {
 
     @Test(expected = OpenPushException.class)
     public void testUnregisterBeforeInit() throws Exception {
-        OpenPushHelper.getNewInstance(Robolectric.application).unregister();
+        OpenPushHelper.newInstance(Robolectric.application).unregister();
     }
 
     @Test(expected = OpenPushException.class)
     public void testRegisterBeforeInit() throws Exception {
-        OpenPushHelper.getNewInstance(Robolectric.application).register();
+        OpenPushHelper.newInstance(Robolectric.application).register();
     }
 
     @Test
     public void testRegisterSecondProvider() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         assertFalse(helper.isInitDone());
 
         Options.Builder builder = new Options.Builder();
@@ -248,7 +250,7 @@ public class OpenPushHelperTest {
 
     @Test
     public void testRemoveHostAppPackage() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         assertFalse(helper.isInitDone());
 
         Options.Builder builder = new Options.Builder();
@@ -289,7 +291,7 @@ public class OpenPushHelperTest {
 
     @Test
     public void testUnregister() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
         final String providerName = "providerName";
@@ -312,7 +314,7 @@ public class OpenPushHelperTest {
 
     @Test(expected = OpenPushException.class)
     public void testRegisterTwice() throws Exception {
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
         Options options = builder.build();
@@ -366,7 +368,7 @@ public class OpenPushHelperTest {
         assertNotNull(lastProviderName);
         assertEquals(provider.getName(), lastProviderName);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(new Options.Builder().addProviders(provider).build());
         assertSame(provider, helper.getCurrentProvider());
         assertTrue(helper.isRegistered());
@@ -397,7 +399,7 @@ public class OpenPushHelperTest {
         assertFalse(TextUtils.isEmpty(lastProviderName));
         assertEquals(provider.getName(), lastProviderName);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(new Options.Builder().addProviders(provider).build());
         assertNull(helper.getCurrentProvider());
         assertFalse(helper.isRegistered());
@@ -416,7 +418,7 @@ public class OpenPushHelperTest {
         builder.addProviders(lastProvider);
         builder.addProviders(nextProvider);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(builder.build());
         assertTrue(helper.isRegistered());
 
@@ -459,7 +461,7 @@ public class OpenPushHelperTest {
         };
         builder.addProviders(providers);
 
-        OpenPushHelper helper = OpenPushHelper.getNewInstance(Robolectric.application);
+        OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(builder.build());
 
         checkProviderRegistrationState(helper, null);

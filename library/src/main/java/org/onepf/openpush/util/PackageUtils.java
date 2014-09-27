@@ -33,6 +33,8 @@ import org.onepf.openpush.PushProvider;
 import static org.onepf.openpush.OpenPushLog.LOGI;
 
 /**
+ * Different utils for check info about installed packages on device.
+ * <p/>
  * Created by krozov on 07.09.14.
  */
 public final class PackageUtils {
@@ -54,6 +56,13 @@ public final class PackageUtils {
         }
     }
 
+    /**
+     * Check is application system.
+     *
+     * @param context
+     * @param appPackage Package of application for verify.
+     * @return True when application is system, false - otherwise.
+     */
     public static boolean isSystemApp(@NonNull Context context, @NonNull String appPackage) {
         try {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
@@ -64,6 +73,13 @@ public final class PackageUtils {
         }
     }
 
+    /**
+     * Check is application installed on device.
+     *
+     * @param context
+     * @param appPackage Package of application for verify.
+     * @return True when application is installed, false - otherwise.
+     */
     public static boolean isInstalled(@NonNull Context context, @NonNull String appPackage) {
         try {
             return context.getPackageManager().getApplicationInfo(appPackage, 0) != null;
@@ -72,6 +88,14 @@ public final class PackageUtils {
         }
     }
 
+    /**
+     * Register {@code BroadcastReceiver} for listen changes associated with {@code PushProvider}.
+     * Listen update of current application and remove host application package.
+     *
+     * @param context
+     * @param provider Provider for what listen package changes.
+     * @return Created {@code BroadcastReceiver}.
+     */
     public static BroadcastReceiver registerPackageChangeReceiver(@NonNull Context context,
                                                                   @NonNull PushProvider provider) {
         PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
@@ -81,15 +105,16 @@ public final class PackageUtils {
         appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         context.registerReceiver(mPackageReceiver, appUpdateFilter);
 
-        // System apps can't be removed, that's why no sense listen package remove event.
-        if (PackageUtils.isSystemApp(context, provider.getHostAppPackage())) {
+        String hostAppPackage = provider.getHostAppPackage();
+        if (hostAppPackage != null) {
             IntentFilter hostAppRemovedFilter
                     = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
             hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
             hostAppRemovedFilter.addDataPath(
-                    provider.getHostAppPackage(), PatternMatcher.PATTERN_LITERAL);
+                    hostAppPackage, PatternMatcher.PATTERN_LITERAL);
             context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
         }
+
         return mPackageReceiver;
     }
 
@@ -111,7 +136,8 @@ public final class PackageUtils {
         public void onReceive(@NonNull Context context, @NonNull Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
+                if (mProvider.getHostAppPackage() != null &&
+                        mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
                     LOGI(String.format("Host app '%s' of provider '%s' removed.",
                             mProvider.getHostAppPackage(), mProvider.getName()));
                     OpenPushHelper.getInstance(context).onUnavailable(mProvider);

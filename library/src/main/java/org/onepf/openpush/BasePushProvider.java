@@ -23,6 +23,8 @@ import android.support.annotation.NonNull;
 import org.onepf.openpush.util.PackageUtils;
 
 /**
+ * Base class for create {@code PushProvider}.
+ *
  * @author Kirill Rozov
  * @since 05.09.14
  */
@@ -37,6 +39,14 @@ public abstract class BasePushProvider implements PushProvider {
     @NonNull
     private final String mHostAppPackage;
 
+    /**
+     * Base constructor for subclass.
+     *
+     * @param context        Any instance of {@code Context}.
+     * @param name           Provider name.
+     * @param hostAppPackage Package of application that handle push message from server
+     *                       and deliver it to applications.
+     */
     protected BasePushProvider(@NonNull Context context,
                                @NonNull String name,
                                @NonNull String hostAppPackage) {
@@ -47,17 +57,29 @@ public abstract class BasePushProvider implements PushProvider {
         checkManifest();
     }
 
-    protected static boolean checkPermission(@NonNull Context context, @NonNull String permission) {
-        boolean granted = context.getPackageManager().checkPermission(permission, context.getPackageName())
-                == PackageManager.PERMISSION_GRANTED;
-        if (granted) {
-            return true;
-        } else {
-            throw new OpenPushException("Your manifest doesn't contain permission '"
-                    + permission + ".' Check your AndroidManifest.xml.");
+    /**
+     * Verify is manifest contains permission.
+     *
+     * @param ctx        Any instance of {@code Context}.
+     * @param permission Permission for verify.
+     * @return
+     */
+    protected static boolean checkPermission(@NonNull Context ctx, @NonNull String permission) {
+        switch (ctx.getPackageManager().checkPermission(permission, ctx.getPackageName())) {
+            case PackageManager.PERMISSION_GRANTED:
+                return true;
+
+            default:
+                throw new OpenPushException("Your manifest doesn't contain permission '"
+                        + permission + ".' Check your AndroidManifest.xml.");
         }
     }
 
+    /**
+     * Get {@code Context} instance.
+     *
+     * @return Instance of {@link Context}.
+     */
     @NonNull
     protected Context getContext() {
         return mAppContext;
