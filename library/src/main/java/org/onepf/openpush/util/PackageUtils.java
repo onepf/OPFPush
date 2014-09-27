@@ -140,12 +140,14 @@ public final class PackageUtils {
                         mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
                     LOGI(String.format("Host app '%s' of provider '%s' removed.",
                             mProvider.getHostAppPackage(), mProvider.getName()));
-                    OpenPushHelper.getInstance(context).onUnavailable(mProvider);
+                    OpenPushHelper.getInstance(context).getProviderCallback()
+                            .onUnavailable(mProvider);
                 }
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
                 if (context.getPackageName().equals(getAppPackage(intent))) {
                     LOGI("Application updated.");
-                    OpenPushHelper.getInstance(context).onNeedRetryRegister(mProvider.getName());
+                    OpenPushHelper.getInstance(context).getProviderCallback()
+                            .onNeedRetryRegister(mProvider.getName());
                 }
             }
         }

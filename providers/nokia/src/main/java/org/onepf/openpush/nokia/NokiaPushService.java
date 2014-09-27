@@ -46,7 +46,8 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onMessage(@NonNull Context appContext, Intent intent) {
-        OpenPushHelper.getInstance(this).onMessage(NokiaPushProvider.NAME, intent.getExtras());
+        OpenPushHelper.getInstance(this).getProviderCallback()
+                .onMessage(NokiaPushProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -57,7 +58,7 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NonNull Context appContext, String errorId) {
-        OpenPushHelper.getInstance(this).onResult(
+        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.error(NokiaPushProvider.NAME, convertError(errorId), false, Result.Type.UNKNOWN));
     }
 
@@ -70,7 +71,8 @@ public class NokiaPushService extends PushBaseIntentService {
      */
     @Override
     protected void onDeletedMessages(@NonNull Context appContext, int total) {
-        OpenPushHelper.getInstance(this).onDeletedMessages(NokiaPushProvider.NAME, total);
+        OpenPushHelper.getInstance(this).getProviderCallback()
+                .onDeletedMessages(NokiaPushProvider.NAME, total);
     }
 
     /**
@@ -86,7 +88,7 @@ public class NokiaPushService extends PushBaseIntentService {
     protected boolean onRecoverableError(@NonNull Context appContext,
                                          @NonNull @NokiaError String errorId) {
         Error error = convertError(errorId);
-        OpenPushHelper.getInstance(this).onResult(
+        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.error(NokiaPushProvider.NAME, error, true, Result.Type.REGISTRATION));
         return true;
     }
@@ -113,7 +115,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onRegistered(@NonNull Context appContext,
                                 @NonNull String registrationToken) {
-        OpenPushHelper.getInstance(this).onResult(
+        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.success(NokiaPushProvider.NAME, registrationToken, Result.Type.REGISTRATION));
     }
 
@@ -126,7 +128,7 @@ public class NokiaPushService extends PushBaseIntentService {
     @Override
     protected void onUnregistered(@NonNull Context appContext,
                                   @NonNull String oldRegistrationToken) {
-        OpenPushHelper.getInstance(this).onResult(
+        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.success(NokiaPushProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 }

@@ -68,12 +68,12 @@ public class GCMService extends IntentService {
     }
 
     protected void onDeletedMessages() {
-        OpenPushHelper.getInstance(GCMService.this)
+        OpenPushHelper.getInstance(GCMService.this).getProviderCallback()
                 .onDeletedMessages(GCMProvider.NAME, 1);
     }
 
     private void onMessage(final Intent intent) {
-        OpenPushHelper.getInstance(GCMService.this)
+        OpenPushHelper.getInstance(GCMService.this).getProviderCallback()
                 .onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
@@ -90,10 +90,10 @@ public class GCMService extends IntentService {
 
         final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
         if (GCMConstants.ACTION_REGISTRATION.equals(action))
-            OpenPushHelper.getInstance(GCMService.this).onResult(
+            OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.REGISTRATION));
         else if (GCMConstants.ACTION_UNREGISTRATION.equals(action))
-            OpenPushHelper.getInstance(GCMService.this).onResult(
+            OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.UNREGISTRATION));
         else {
             throw new OpenPushException(String.format("Unknown action '%s'.", action));
@@ -101,12 +101,12 @@ public class GCMService extends IntentService {
     }
 
     private void onRegistered(final String registrationToken) {
-        OpenPushHelper.getInstance(GCMService.this).onResult(
+        OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                 Result.success(GCMProvider.NAME, registrationToken, Result.Type.REGISTRATION));
     }
 
     private void onUnregistered(final String oldRegistrationToken) {
-        OpenPushHelper.getInstance(GCMService.this).onResult(
+        OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                 Result.success(GCMProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 

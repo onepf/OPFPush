@@ -81,6 +81,8 @@ public class OpenPushHelper {
     private final Object mRegistrationLock = new Object();
     private final Object mInitLock = new Object();
 
+    private final ProviderCallback mProviderCallback = new ProviderCallback();
+
     private OpenPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mPreferences =
@@ -402,192 +404,9 @@ public class OpenPushHelper {
         }
     }
 
-    /**
-     * Provider must call this method when new message received.
-     *
-     * @param providerName Name of provider from what message received.
-     * @param extras       Message extras.
-     * @throws OpenPushException When call this method when registration not done
-     *                           or {@code providerName} isn't current registered provider.
-     */
-    public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        checkProviderWorking(providerName);
-
-        LOGD("onMessage(providerName = %s).", providerName);
-        if (mListener != null) {
-            mListener.onMessage(providerName, extras);
-        }
-    }
-
-    private void checkProviderWorking(String providerName) {
-        if (!isRegistered() || mCurrentProvider == null) {
-            throw new OpenPushException("Can't receive message when not registered.");
-        }
-        if (providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
-            throw new OpenPushException("Can't receive message for not registered provider. " +
-                    "Current provider '%s', message source ='%s'",
-                    mCurrentProvider.getName(), providerName);
-        }
-    }
-
-    /**
-     * Provider must call this method when new message deleted.
-     *
-     * @param providerName  Name of provider from what message deleted.
-     * @param messagesCount Deleted messages count. If messages count is unknown pass -1.
-     * @throws OpenPushException When call this method when registration not done
-     *                           or {@code providerName} isn't current registered provider.
-     */
-    public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
-        checkProviderWorking(providerName);
-
-        LOGD("onDeletedMessages(providerName = %s, messagesCount = %d).", providerName, messagesCount);
-        if (mListener != null) {
-            mListener.onDeletedMessages(providerName, messagesCount);
-        }
-    }
-
-    /**
-     * Call this method when device state changed and need retry registration.
-     *
-     * @param providerName Name of provider that need retry register.
-     * @throws OpenPushException When call this method when registration not done
-     *                           or {@code providerName} isn't current registered provider.
-     */
-    public void onNeedRetryRegister(@NonNull String providerName) {
-        checkProviderWorking(providerName);
-
-        LOGD("onNeedRetryRegister(providerName = %s).", providerName);
-        if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
-            reset();
-            mCurrentProvider.onAppStateChanged();
-            mState.set(STATE_REGISTERING);
-            if (!registerProvider(mCurrentProvider, false)) {
-                mState.set(STATE_NONE);
-            }
-        }
-    }
-
     private void reset() {
         mPreferences.edit().clear().apply();
         mState.set(STATE_NONE);
-    }
-
-    /**
-     * Call this method when current provider become unavailable.
-     *
-     * @param provider Provider that become unavailable.
-     * @throws OpenPushException When call this method when registration not done
-     *                           or {@code providerName} isn't current registered provider.
-     */
-    public void onUnavailable(@NonNull PushProvider provider) {
-        checkProviderWorking(provider.getName());
-
-        LOGD("onUnavailable(provider = %s).", provider);
-        if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
-            reset();
-            mCurrentProvider.onUnavailable();
-            mCurrentProvider = null;
-            if (mListener != null) {
-                mListener.onProviderBecameUnavailable(provider.getName());
-            }
-
-            if (mOptions.isRecoverProvider()) {
-                register(); //Restart registration
-            }
-        }
-    }
-
-    /**
-     * Call this method on new registration or unregistration result.
-     *
-     * @param result Registration or unregistration result.
-     * @throws OpenPushException When result type can't be handle
-     *                           in current state of {@code OpenPushHelper}.
-     */
-    public void onResult(@NonNull Result result) {
-        synchronized (mRegistrationLock) {
-            if (result.getType() == Result.Type.REGISTRATION) {
-                if (mState.get() == STATE_REGISTERING) {
-                    onRegistrationResult(result);
-                } else {
-                    throw new OpenPushException("Registration result can be" +
-                            " handled only when registration is running.");
-                }
-            } else if (result.getType() == Result.Type.UNREGISTRATION) {
-                if (mState.get() == STATE_UNREGISTERING) {
-                    onUnregistrationResult(result);
-                } else {
-                    throw new OpenPushException("Unregistration result can be" +
-                            " handled only when unregistration is running.");
-                }
-            } else {
-                switch (mState.get()) {
-                    case STATE_REGISTERING:
-                        onRegistrationResult(result);
-                        return;
-
-                    case STATE_UNREGISTERING:
-                        onUnregistrationResult(result);
-                        break;
-
-                    default:
-                        throw new OpenPushException("Result of unknown type can be" +
-                                " handled only when registration or unregistration is running.");
-                }
-            }
-        }
-    }
-
-    private void onUnregistrationResult(@NonNull Result result) {
-        if (result.isSuccess()) {
-            LOGI("Successfully unregister provider '%s'.", result.getProviderName());
-            reset();
-            if (mCurrentProvider != null) {
-                mCurrentProvider.close();
-                mCurrentProvider = null;
-            }
-            if (mListener != null) {
-                Assert.assertNotNull(result.getRegistrationId());
-                mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
-            }
-        } else if (mListener != null) {
-            Assert.assertNotNull(result.getErrorCode());
-
-            LOGI("Error unregister provider '%s'.", result.getProviderName());
-            PushProvider provider = getProviderWithException(result.getProviderName());
-            mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
-        }
-    }
-
-    private void onRegistrationResult(@NonNull Result result) {
-        if (result.isSuccess()) {
-            LOGI("Successfully register provider '%s'.", result.getProviderName());
-            LOGI("Register id '%s'.", result.getRegistrationId());
-            mState.set(STATE_WORKING);
-
-            mCurrentProvider = getProviderWithException(result.getProviderName());
-            saveLastProvider(mCurrentProvider);
-            Assert.assertNotNull(result.getRegistrationId());
-            if (mListener != null) {
-                mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
-            }
-
-            mPackageReceiver =
-                    PackageUtils.registerPackageChangeReceiver(mAppContext, mCurrentProvider);
-        } else {
-            Assert.assertNotNull(result.getErrorCode());
-
-            LOGI("Error register provider '%s'.", result.getProviderName());
-            PushProvider provider = getProviderWithException(result.getProviderName());
-            if (mListener != null) {
-                mListener.onRegistrationError(provider.getName(), result.getErrorCode());
-            }
-
-            if (!result.isRecoverableError()) {
-                registerNextProvider(provider);
-            }
-        }
     }
 
     @Override
@@ -600,4 +419,198 @@ public class OpenPushHelper {
                 '}';
     }
 
+    public ProviderCallback getProviderCallback() {
+        checkInitDone();
+
+        return mProviderCallback;
+    }
+
+    public class ProviderCallback {
+
+        private ProviderCallback() {
+        }
+
+        /**
+         * Provider must call this method when new message received.
+         *
+         * @param providerName Name of provider from what message received.
+         * @param extras       Message extras.
+         * @throws OpenPushException When call this method when registration not done
+         *                           or {@code providerName} isn't current registered provider.
+         */
+        public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
+            checkProviderWorking(providerName);
+
+            LOGD("onMessage(providerName = %s).", providerName);
+            if (mListener != null) {
+                mListener.onMessage(providerName, extras);
+            }
+        }
+
+        private void checkProviderWorking(String providerName) {
+            if (!isRegistered() || mCurrentProvider == null) {
+                throw new OpenPushException("Can't receive message when not registered.");
+            }
+            if (providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
+                throw new OpenPushException("Can't receive message for not registered provider. " +
+                        "Current provider '%s', message source ='%s'",
+                        mCurrentProvider.getName(), providerName);
+            }
+        }
+
+        /**
+         * Provider must call this method when new message deleted.
+         *
+         * @param providerName  Name of provider from what message deleted.
+         * @param messagesCount Deleted messages count. If messages count is unknown pass -1.
+         * @throws OpenPushException When call this method when registration not done
+         *                           or {@code providerName} isn't current registered provider.
+         */
+        public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
+            checkProviderWorking(providerName);
+
+            LOGD("onDeletedMessages(providerName = %s, messagesCount = %d).", providerName, messagesCount);
+            if (mListener != null) {
+                mListener.onDeletedMessages(providerName, messagesCount);
+            }
+        }
+
+        /**
+         * Call this method when device state changed and need retry registration.
+         *
+         * @param providerName Name of provider that need retry register.
+         * @throws OpenPushException When call this method when registration not done
+         *                           or {@code providerName} isn't current registered provider.
+         */
+        public void onNeedRetryRegister(@NonNull String providerName) {
+            checkProviderWorking(providerName);
+
+            LOGD("onNeedRetryRegister(providerName = %s).", providerName);
+            if (mCurrentProvider != null && mCurrentProvider.getName().equals(providerName)) {
+                reset();
+                mCurrentProvider.onAppStateChanged();
+                mState.set(STATE_REGISTERING);
+                if (!registerProvider(mCurrentProvider, false)) {
+                    mState.set(STATE_NONE);
+                }
+            }
+        }
+
+        /**
+         * Call this method when current provider become unavailable.
+         *
+         * @param provider Provider that become unavailable.
+         * @throws OpenPushException When call this method when registration not done
+         *                           or {@code providerName} isn't current registered provider.
+         */
+        public void onUnavailable(@NonNull PushProvider provider) {
+            checkProviderWorking(provider.getName());
+
+            LOGD("onUnavailable(provider = %s).", provider);
+            if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
+                reset();
+                mCurrentProvider.onUnavailable();
+                mCurrentProvider = null;
+                if (mListener != null) {
+                    mListener.onProviderBecameUnavailable(provider.getName());
+                }
+
+                if (mOptions.isRecoverProvider()) {
+                    register(); //Restart registration
+                }
+            }
+        }
+
+        /**
+         * Call this method on new registration or unregistration result.
+         *
+         * @param result Registration or unregistration result.
+         * @throws OpenPushException When result type can't be handle
+         *                           in current state of {@code OpenPushHelper}.
+         */
+        public void onResult(@NonNull Result result) {
+            synchronized (mRegistrationLock) {
+                if (result.getType() == Result.Type.REGISTRATION) {
+                    if (mState.get() == STATE_REGISTERING) {
+                        onRegistrationResult(result);
+                    } else {
+                        throw new OpenPushException("Registration result can be" +
+                                " handled only when registration is running.");
+                    }
+                } else if (result.getType() == Result.Type.UNREGISTRATION) {
+                    if (mState.get() == STATE_UNREGISTERING) {
+                        onUnregistrationResult(result);
+                    } else {
+                        throw new OpenPushException("Unregistration result can be" +
+                                " handled only when unregistration is running.");
+                    }
+                } else {
+                    switch (mState.get()) {
+                        case STATE_REGISTERING:
+                            onRegistrationResult(result);
+                            return;
+
+                        case STATE_UNREGISTERING:
+                            onUnregistrationResult(result);
+                            break;
+
+                        default:
+                            throw new OpenPushException("Result of unknown type can be" +
+                                    " handled only when registration or unregistration is running.");
+                    }
+                }
+            }
+        }
+
+        private void onUnregistrationResult(@NonNull Result result) {
+            if (result.isSuccess()) {
+                LOGI("Successfully unregister provider '%s'.", result.getProviderName());
+                reset();
+                if (mCurrentProvider != null) {
+                    mCurrentProvider.close();
+                    mCurrentProvider = null;
+                }
+                if (mListener != null) {
+                    Assert.assertNotNull(result.getRegistrationId());
+                    mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
+                }
+            } else if (mListener != null) {
+                Assert.assertNotNull(result.getErrorCode());
+
+                LOGI("Error unregister provider '%s'.", result.getProviderName());
+                PushProvider provider = getProviderWithException(result.getProviderName());
+                mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
+            }
+        }
+
+        private void onRegistrationResult(@NonNull Result result) {
+            if (result.isSuccess()) {
+                LOGI("Successfully register provider '%s'.", result.getProviderName());
+                LOGI("Register id '%s'.", result.getRegistrationId());
+                mState.set(STATE_WORKING);
+
+                mCurrentProvider = getProviderWithException(result.getProviderName());
+                saveLastProvider(mCurrentProvider);
+                Assert.assertNotNull(result.getRegistrationId());
+                if (mListener != null) {
+                    mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
+                }
+
+                mPackageReceiver =
+                        PackageUtils.registerPackageChangeReceiver(mAppContext, mCurrentProvider);
+            } else {
+                Assert.assertNotNull(result.getErrorCode());
+
+                LOGI("Error register provider '%s'.", result.getProviderName());
+                PushProvider provider = getProviderWithException(result.getProviderName());
+                if (mListener != null) {
+                    mListener.onRegistrationError(provider.getName(), result.getErrorCode());
+                }
+
+                if (!result.isRecoverableError()) {
+                    registerNextProvider(provider);
+                }
+            }
+        }
+    }
 }
