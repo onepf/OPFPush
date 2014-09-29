@@ -33,10 +33,6 @@ import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
 import org.onepf.openpush.gcm.GCMProvider;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -88,9 +84,9 @@ public class PushSampleActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (mOpenPushHelper.isRegistered()) {
-            switchToRegisteredState();
+            onPushRegistered();
         } else {
-            switchToUnregisteredState();
+            onPushUnregistered();
         }
     }
 
@@ -107,7 +103,7 @@ public class PushSampleActivity extends Activity {
     }
 
     @OnClick(R.id.register_switch)
-    void onRegisterClick() {
+    void switchRegisterState() {
         if (mOpenPushHelper.isRegistered()) {
             mOpenPushHelper.unregister();
             mRegisterSwitchView.setText(R.string.unregister_in_progress);
@@ -121,7 +117,7 @@ public class PushSampleActivity extends Activity {
 
     @Optional
     @OnClick(R.id.btn_copy_to_clipboard)
-    void setBtnCopyToClipboard() {
+    void copyToClipboard() {
         Toast.makeText(PushSampleActivity.this,
                 PushSampleActivity.this.getString(R.string.toast_registration_id_copied),
                 Toast.LENGTH_LONG)
@@ -133,7 +129,7 @@ public class PushSampleActivity extends Activity {
         );
     }
 
-    private void switchToRegisteredState() {
+    void onPushRegistered() {
         PushProvider provider = mOpenPushHelper.getCurrentProvider();
         String registrationId = provider == null ? "null" : String.valueOf(provider.getRegistrationId());
         mRegistrationIdView.setText(Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
@@ -146,7 +142,7 @@ public class PushSampleActivity extends Activity {
         mCopyToClipboardView.setVisibility(View.VISIBLE);
     }
 
-    private void switchToUnregisteredState() {
+    void onPushUnregistered() {
         mRegistrationIdView.setText(null);
         mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.register)));
@@ -154,7 +150,7 @@ public class PushSampleActivity extends Activity {
         mCopyToClipboardView.setVisibility(View.GONE);
     }
 
-    public class OpenPushEventReceiver implements OpenPushListener {
+    public final class OpenPushEventReceiver implements OpenPushListener {
 
         public OpenPushEventReceiver() {
         }
@@ -163,7 +159,7 @@ public class PushSampleActivity extends Activity {
         public void onRegistered(@NonNull String providerName, @Nullable String registrationId) {
             Log.i(TAG, String.format("onRegistered(providerName = %s, registrationId = %s)"
                     , providerName, registrationId));
-            switchToRegisteredState();
+            onPushRegistered();
 
             // You start the registration process by calling register().
             // When the registration ID is ready, OpenPushHelper calls onRegistered() on
@@ -186,7 +182,7 @@ public class PushSampleActivity extends Activity {
         public void onUnregistered(@NonNull String providerName, @Nullable String oldRegistrationId) {
             Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
                     , providerName, oldRegistrationId));
-            switchToUnregisteredState();
+            PushSampleActivity.this.onPushUnregistered();
         }
 
         @Override
@@ -202,7 +198,7 @@ public class PushSampleActivity extends Activity {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Registration error '%s'", error), Toast.LENGTH_LONG).show();
             if (!error.isRecoverable()) {
-                switchToUnregisteredState();
+                PushSampleActivity.this.onPushUnregistered();
             }
         }
 
@@ -211,7 +207,7 @@ public class PushSampleActivity extends Activity {
             Toast.makeText(PushSampleActivity.this,
                     String.format("Unregistration error '%s'", error), Toast.LENGTH_LONG).show();
             if (!error.isRecoverable()) {
-                switchToRegisteredState();
+                onPushRegistered();
             }
         }
 
