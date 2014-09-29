@@ -39,7 +39,7 @@
             android:exported="false"/>
 
         <receiver
-            android:name=".ADMBroadcastReceiver"
+            android:name=".ADMReceiver"
             android:permission="com.amazon.device.messaging.permission.SEND">
 
             <intent-filter>

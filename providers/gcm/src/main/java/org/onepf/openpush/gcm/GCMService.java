@@ -39,10 +39,10 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        @GCMConstants.GCMAction String action = intent.getAction();
+        @GCMAction String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
-                @GCMConstants.GCMError String errorId
+                @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
                 onError(errorId, action);
             } else {
@@ -50,7 +50,7 @@ public class GCMService extends IntentService {
             }
         } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
-                @GCMConstants.GCMError String errorId
+                @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
                 onError(errorId, action);
             } else {
@@ -77,8 +77,8 @@ public class GCMService extends IntentService {
                 .onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
-    private void onError(@GCMConstants.GCMError String errorId,
-                         @GCMConstants.GCMAction String action) {
+    private void onError(@GCMError String errorId,
+                         @GCMAction String action) {
         final Error error;
         if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;

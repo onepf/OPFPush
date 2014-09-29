@@ -39,7 +39,7 @@ import butterknife.OnClick;
 import butterknife.Optional;
 
 /**
- * @author Anton Rutkevich, Alexey Vitenko
+ * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
  * @since 14.05.14
  */
 public class PushSampleActivity extends Activity {
@@ -72,6 +72,7 @@ public class PushSampleActivity extends Activity {
         ButterKnife.inject(this);
 
         if (mOpenPushHelper == null) {
+            OpenPushLog.setLogEnable(true);
             mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
             mOpenPushHelper.setListener(mEventReceiver);
             Options.Builder builder = new Options.Builder();

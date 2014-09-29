@@ -17,6 +17,7 @@
 package org.onepf.openpush.adm;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -26,10 +27,15 @@ import com.amazon.device.messaging.development.ADMManifest;
 import org.onepf.openpush.BasePushProvider;
 
 /**
- * Created by Kirill Rozov on 06.09.14.
+ * Amazon Device Messaging push provider implementation.
+ *
+ * @author Kirill Rozov
+ * @see <a href="https://developer.amazon.com/appsandservices/apis/engage/device-messaging">Amazon Device Messaging</a>
+ * @since 06.09.14
  */
 public class ADMProvider extends BasePushProvider {
 
+    private static final String AMAZON_MANUFACTURER = "Amazon";
     public static final String NAME = "Amazon Device Messaging";
     private static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
 
@@ -48,7 +54,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        if (super.checkManifest() && ADMUtils.isKindleFire()) {
+        if (super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
             Context ctx = getContext();
             return super.checkManifest()
                     && checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)

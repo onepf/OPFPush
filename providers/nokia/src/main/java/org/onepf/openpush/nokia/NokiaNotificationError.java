@@ -8,7 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by krozov on 24.09.14.
+ * @author Kirill Rozov
+ * @since 24.09.14
  */
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
@@ -16,5 +17,5 @@ import java.lang.annotation.RetentionPolicy;
         PushConstants.ERROR_INVALID_SENDER,
         PushConstants.ERROR_SERVICE_NOT_AVAILABLE
 })
-public @interface NokiaError {
+@interface NokiaNotificationError {
 }

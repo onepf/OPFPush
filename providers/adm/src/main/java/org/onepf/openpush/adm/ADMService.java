@@ -28,16 +28,11 @@ import org.onepf.openpush.Error;
 /**
  * This class allows your app to receive messages sent via ADM.
  * <p/>
- * To receive messages with ADM, your app creates a service that inherits
- * from this class, as well as a broadcast receiver that inherits from
- * {@link ADMBroadcastReceiver}.
- * For an example of using this class, see
- * <a href="https://developer.amazon.com/sdk/adm/integrating-app.html">Integrating Your App with ADM</a>.
- * <p/>
  * All methods on this class are called on a background thread with a wake lock held.
  * It is safe to do long-running operations in these methods.
- * <p/>
- * Created by Kirill Rozov on 06.09.14.
+ *
+ * @author Kirill Rozov
+ * @since 06.09.14.
  */
 public class ADMService extends ADMMessageHandlerBase {
 

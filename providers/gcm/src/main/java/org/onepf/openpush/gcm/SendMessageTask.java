@@ -12,7 +12,10 @@ import static org.onepf.openpush.OpenPushLog.LOGE;
 import static org.onepf.openpush.OpenPushLog.LOGI;
 
 /**
- * Created by krozov on 22.09.14.
+ * Task for send message from client to server.
+ *
+ * @author Kirill Rozov
+ * @since 22.09.14.
  */
 class SendMessageTask extends AsyncTask<Void, Void, Void> {
     private static final String GCM_SENDER_SUFFIX = "@gcm.googleapis.com";

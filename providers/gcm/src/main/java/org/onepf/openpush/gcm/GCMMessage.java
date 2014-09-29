@@ -4,18 +4,38 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 /**
- * Created by  Kirill Rozov on 18.09.14.
+ * Represent message for send from client to server that uses in Google Cloud Messaging.
+ *
+ * @author Kirill Rozov
+ * @since 18.09.14.
  */
 public class GCMMessage {
     private String mId;
     private Bundle mData;
     private long mTimeToLeave;
 
-    public GCMMessage(String id, Bundle data) {
-       this(id, data, 0);
+    /**
+     * Create new message.
+     *
+     * @param id   Message's ID.
+     * @param data Messages' data to send.
+     */
+    public GCMMessage(@NonNull String id, @NonNull Bundle data) {
+        this(id, data, 0);
     }
 
-    public GCMMessage(String id, Bundle data, long timeToLeave) {
+    /**
+     * Create new message.
+     *
+     * @param id          Message's ID.
+     * @param data        Messages' data to send.
+     * @param timeToLeave How long message is valid. Set 0 to default value.
+     */
+    public GCMMessage(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
+        if (timeToLeave < 0) {
+            throw new IllegalArgumentException(String.format("timeToLeave='%d'." +
+                    " Time to leave must be non negative value.", timeToLeave));
+        }
         mId = id;
         mData = data;
         mTimeToLeave = timeToLeave;

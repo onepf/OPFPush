@@ -19,10 +19,14 @@ package org.onepf.openpush.adm;
 import com.amazon.device.messaging.ADMMessageReceiver;
 
 /**
- * Created by krozov on 06.09.14.
+ * Forward Amazon Device Messaging (ADM) messages to your {@link ADMService}.
+ * The ADM client on the device uses broadcast intents to dispatch messages to your app.
+ *
+ * @author Kirill Rozov
+ * @since 06.09.14.
  */
-public class ADMBroadcastReceiver extends ADMMessageReceiver {
-    public ADMBroadcastReceiver() {
+public class ADMReceiver extends ADMMessageReceiver {
+    public ADMReceiver() {
         super(ADMService.class);
     }
 }

@@ -16,44 +16,19 @@
 
 package org.onepf.openpush.gcm;
 
-import android.support.annotation.StringDef;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 /**
- * Created by krozov on 06.09.14.
+ * @author Kirill Rozov
+ * @since 06.09.14.
  */
-class GCMConstants {
-    static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
-    static final String ACTION_UNREGISTRATION = "org.onepf.openpush.gcm.unregistration";
+interface GCMConstants {
+   String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
+   String ACTION_UNREGISTRATION = "org.onepf.openpush.gcm.unregistration";
 
-    static final String EXTRA_ERROR_ID = "error_id";
-    static final String EXTRA_REGISTRATION_ID = "registration_id";
+   String EXTRA_ERROR_ID = "error_id";
+   String EXTRA_REGISTRATION_ID = "registration_id";
 
-    static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
-    static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
-
-    /**
-     * Created by krozov on 24.09.14.
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({
-            ERROR_AUTHENTICATION_FAILED,
-            ERROR_SERVICE_NOT_AVAILABLE
-    })
-    public static @interface GCMError {
-    }
-    /**
-     * Created by krozov on 24.09.14.
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({
-            GCMConstants.ACTION_REGISTRATION,
-            GCMConstants.ACTION_UNREGISTRATION
-    })
-    public static @interface GCMAction {
-    }
+   String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+   String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 }

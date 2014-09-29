@@ -26,7 +26,8 @@ import android.support.annotation.NonNull;
 import org.onepf.openpush.OpenPushHelper;
 
 /**
- * Created by krozov on 09.09.14.
+ * @author Kirill Rozov
+ * @since 09.09.14.
  */
 public class BootCompleteReceiver extends BroadcastReceiver {
 

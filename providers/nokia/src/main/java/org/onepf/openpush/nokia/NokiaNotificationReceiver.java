@@ -21,18 +21,22 @@ import android.content.Context;
 import com.nokia.push.PushBroadcastReceiver;
 
 /**
+ * BroadcastReceiver that receives Nokia Push Notification messages and delivers them to
+ * {@link NokiaNotificationService}.
+ *
  * @author Kirill Rozov
  * @since 05.09.2014
  */
-public final class NokiaPushBroadcastReceiver extends PushBroadcastReceiver {
+public final class NokiaNotificationReceiver extends PushBroadcastReceiver {
 
-    private static final String SERVICE_CLASS_NAME = NokiaPushService.class.getCanonicalName();
+    private static final String SERVICE_CLASS_NAME
+            = NokiaNotificationService.class.getCanonicalName();
 
     /**
      * Gets the class name of the intent service that will handle Push Notification messages.
      */
     @Override
-    protected String getPushIntentServiceClassName(Context context) {
+    protected final String getPushIntentServiceClassName(Context context) {
         return SERVICE_CLASS_NAME;
     }
 }

@@ -49,9 +49,16 @@ import support.AsyncTaskCompat;
 
 import static org.onepf.openpush.OpenPushLog.LOGI;
 
+/**
+ * Google Cloud Messaging push provider implementation.
+ *
+ * @author Kirill Rozov
+ * @see <a href="https://developer.android.com/google/gcm/index.html">Google Cloud Messaging for Android</a>
+ * @since 04.09.14
+ */
 public class GCMProvider extends BasePushProvider {
 
-    public static final String NAME = "com.google.android.gms.gcm.provider";
+    public static final String NAME = "Google Cloud Messaging";
 
     private static final String PREF_REGISTRATION_TOKEN = "registration_token";
     private static final String PREF_APP_VERSION = "app_version";
@@ -203,6 +210,12 @@ public class GCMProvider extends BasePushProvider {
         mPreferences.edit().clear().apply();
     }
 
+    /**
+     * Send message to server.
+     *
+     * @throws IllegalStateException If try send message when provider isn't registered.
+     * @see #send(String, GCMMessage)
+     */
     public void send(@NonNull GCMMessage msg) {
         send(mSenderIDs[0], msg);
     }
@@ -212,7 +225,17 @@ public class GCMProvider extends BasePushProvider {
         return mSenderIDs;
     }
 
+    /**
+     * Send message to server.
+     *
+     * @throws IllegalStateException If try send message when provider isn't registered.
+     * @see #send(GCMMessage)
+     */
     public void send(@NonNull String senderId, @NonNull GCMMessage msg) {
+        if (!isRegistered()) {
+            throw new IllegalStateException("Before send message you need register GCM.");
+        }
+
         final int msgId = mMsgId.incrementAndGet();
         mPreferences.edit()
                 .putInt(PREF_MESSAGE_ID, msgId)
@@ -220,7 +243,7 @@ public class GCMProvider extends BasePushProvider {
         AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
     }
 
-    public long getDelay() {
+    long getDelay() {
         return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() - 1));
     }
 

@@ -17,28 +17,23 @@
 package org.onepf.openpush.gcm;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.util.Log;
-import android.util.SparseArray;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.OpenPushLog;
 import org.onepf.openpush.gcm.util.WakefulBroadcastReceiver;
-import org.onepf.openpush.util.IntentUtils;
+import org.onepf.openpush.util.Utils;
 
-import java.util.Set;
+import static org.onepf.openpush.OpenPushLog.LOGD;
 
+/**
+ * Receiver for events from Google Cloud Messaging and {@link GCMProvider}.
+ */
 public class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        LOGD(Utils.toString(intent));
         if (!GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())
                 || intent.hasExtra(GCMConstants.EXTRA_REGISTRATION_ID)) {
             intent.setComponent(new ComponentName(context, GCMService.class));

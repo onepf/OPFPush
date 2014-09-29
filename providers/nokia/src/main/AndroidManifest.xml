@@ -28,7 +28,7 @@
 
     <application>
         <receiver
-            android:name=".NokiaPushBroadcastReceiver"
+            android:name=".NokiaNotificationReceiver"
             android:permission="com.nokia.pushnotifications.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->
@@ -38,7 +38,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".NokiaPushService"/>
+        <service android:name=".NokiaNotificationService"/>
 
     </application>
 
