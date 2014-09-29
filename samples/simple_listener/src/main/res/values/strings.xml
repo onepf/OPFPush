@@ -24,6 +24,7 @@
     <string name="registration_id_text"><![CDATA[<b>Registration id:</b><br/>%s]]></string>
     <string name="btn_copy_to_clipboard">Copy to clipboard</string>
     <string name="push_provider_text"><![CDATA[<b>Provider:<br/></b>%s]]></string>
+    <string name="no_providers_text"><![CDATA[<b>No available providers:</b>]]></string>
     <string name="unregister">Unregister</string>
     <string name="toast_registration_id_copied">Registration id copied</string>
     <string name="message">message</string>

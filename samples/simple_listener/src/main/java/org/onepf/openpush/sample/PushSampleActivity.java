@@ -16,12 +16,14 @@
 
 package org.onepf.openpush.sample;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -29,9 +31,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
-import org.onepf.openpush.gcm.GCMProvider;
+import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.OpenPushListener;
+import org.onepf.openpush.PushProvider;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -42,7 +45,7 @@ import butterknife.Optional;
  * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
  * @since 14.05.14
  */
-public class PushSampleActivity extends Activity {
+public class PushSampleActivity extends ActionBarActivity {
 
     private static final String TAG = "PushSampleActivity";
 
@@ -55,6 +58,7 @@ public class PushSampleActivity extends Activity {
     @InjectView(R.id.register_switch)
     Button mRegisterSwitchView;
 
+    @Nullable
     @Optional
     @InjectView(R.id.btn_copy_to_clipboard)
     Button mCopyToClipboardView;
@@ -80,7 +84,9 @@ public class PushSampleActivity extends Activity {
     }
 
     private void updateUI() {
-        if (mOpenPushHelper.isRegistered()) {
+        if (!mOpenPushHelper.hasAvailableProvider()) {
+           onPushUnavailable();
+        } else if (mOpenPushHelper.isRegistered()) {
             onPushRegistered();
         } else {
             onPushUnregistered();
@@ -113,6 +119,7 @@ public class PushSampleActivity extends Activity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Optional
     @OnClick(R.id.btn_copy_to_clipboard)
     void copyToClipboard() {
@@ -127,6 +134,15 @@ public class PushSampleActivity extends Activity {
         );
     }
 
+    void onPushUnavailable() {
+        mRegistrationIdView.setText(null);
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.no_providers_text)));
+        mRegisterSwitchView.setVisibility(View.GONE);
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.GONE);
+        }
+    }
+
     void onPushRegistered() {
         PushProvider provider = mOpenPushHelper.getCurrentProvider();
         String registrationId = provider == null ? "null" : String.valueOf(provider.getRegistrationId());
@@ -137,7 +153,11 @@ public class PushSampleActivity extends Activity {
 
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.unregister)));
         mRegisterSwitchView.setEnabled(true);
-        mCopyToClipboardView.setVisibility(View.VISIBLE);
+        mRegisterSwitchView.setVisibility(View.VISIBLE);
+
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.VISIBLE);
+        }
     }
 
     void onPushUnregistered() {
@@ -145,7 +165,11 @@ public class PushSampleActivity extends Activity {
         mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
         mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.register)));
         mRegisterSwitchView.setEnabled(true);
-        mCopyToClipboardView.setVisibility(View.GONE);
+        mRegisterSwitchView.setVisibility(View.VISIBLE);
+
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.GONE);
+        }
     }
 
     public final class OpenPushEventReceiver implements OpenPushListener {
@@ -211,6 +235,9 @@ public class PushSampleActivity extends Activity {
 
         @Override
         public void onNoAvailableProvider() {
+            if (mRegisterSwitchView != null) {
+                mRegisterSwitchView.setEnabled(false);
+            }
         }
 
         @Override

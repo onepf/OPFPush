@@ -21,8 +21,8 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 20
+        minSdkVersion 9
+        targetSdkVersion 19
         versionCode 2
         versionName "2.0"
 
@@ -37,6 +37,7 @@ dependencies {
     //noinspection GradleDependency
     compile 'com.google.android.gms:play-services:5.0.89'
     compile 'com.jakewharton:butterknife:5.1.2'
+    compile 'com.android.support:appcompat-v7:19.1.0'
 }
 
 afterEvaluate { project ->

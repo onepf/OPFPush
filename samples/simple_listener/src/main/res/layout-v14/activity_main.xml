@@ -55,5 +55,12 @@
             android:textAppearance="@android:style/TextAppearance.Medium"
             tools:text="APA91bG6mnXkIPYyNQs2DIIAnmlnE4"/>
 
+        <Button
+            android:id="@+id/btn_copy_to_clipboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/btn_copy_to_clipboard"/>
+
     </LinearLayout>
 </ScrollView>
