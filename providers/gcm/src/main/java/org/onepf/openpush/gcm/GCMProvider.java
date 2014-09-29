@@ -111,18 +111,19 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        Context ctx = getContext();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
-                && !checkPermission(ctx, Manifest.permission.GET_ACCOUNTS)) {
-            return false;
-        }
-
+        final Context ctx = getContext();
         return super.checkManifest()
-                && checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
+                && !checkGetAccountsPermission(ctx)
+                && checkPermission(ctx, Manifest.permission.WAKE_LOCK)
                 && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && checkPermission(ctx, PERMISSION_RECEIVE)
                 && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
+    }
+
+    private boolean checkGetAccountsPermission(Context ctx) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
+                && !checkPermission(ctx, Manifest.permission.GET_ACCOUNTS);
     }
 
     @Override
@@ -142,24 +143,23 @@ public class GCMProvider extends BasePushProvider {
         }
 
         if (super.isAvailable()) {
-            if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext())
-                    == ConnectionResult.SUCCESS) {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                        || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
-                    return true;
-                } else {
-                    // On device with version of Android less than "4.0.4"
-                    // we need to ensure that the user has at least one google account.
-                    Account[] googleAccounts = AccountManager.get(getContext())
-                            .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
-                    return googleAccounts.length != 0;
-                }
-            } else {
-                return false;
-            }
+            int conResult = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
+            return conResult == ConnectionResult.SUCCESS && isGoogleAccountExists();
         } else {
             return false;
+        }
+    }
+
+    private boolean isGoogleAccountExists() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
+            return true;
+        } else {
+            // On device with version of Android less than "4.0.4"
+            // we need to ensure that the user has at least one google account.
+            Account[] googleAccounts = AccountManager.get(getContext())
+                    .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+            return googleAccounts.length != 0;
         }
     }
 
@@ -300,7 +300,6 @@ public class GCMProvider extends BasePushProvider {
         public void run() {
             try {
                 final String registrationToken = mGoogleCloudMessaging.register(mSenderIDs);
-                LOGI("registrationToken=%s", registrationToken);
                 if (registrationToken == null) {
                     onAuthError();
                 } else {
@@ -332,6 +331,10 @@ public class GCMProvider extends BasePushProvider {
                     .putString(PREF_REGISTRATION_TOKEN, registrationToken)
                     .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
                     .apply();
+
+            //For finish registration we catch intent with action
+            //GCMConstant.ACTION_GCM_REGISTRATION in GCMReceiver.
+            //No need to send another intent.
         }
 
         private void postDelayed() {
