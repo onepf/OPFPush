@@ -85,7 +85,7 @@ public class PushSampleActivity extends ActionBarActivity {
 
     private void updateUI() {
         if (!mOpenPushHelper.hasAvailableProvider()) {
-           onPushUnavailable();
+            onPushUnavailable();
         } else if (mOpenPushHelper.isRegistered()) {
             onPushRegistered();
         } else {
@@ -218,19 +218,13 @@ public class PushSampleActivity extends ActionBarActivity {
         @Override
         public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    String.format("Registration error '%s'", error), Toast.LENGTH_LONG).show();
-            if (!error.isRecoverable()) {
-                PushSampleActivity.this.onPushUnregistered();
-            }
+                    getString(R.string.registration_error_msg, error), Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    String.format("Unregistration error '%s'", error), Toast.LENGTH_LONG).show();
-            if (!error.isRecoverable()) {
-                onPushRegistered();
-            }
+                    getString(R.string.unregistration_error_msg, error), Toast.LENGTH_LONG).show();
         }
 
         @Override
