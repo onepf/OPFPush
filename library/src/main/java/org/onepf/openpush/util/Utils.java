@@ -18,8 +18,7 @@ public final class Utils {
     /**
      * Convert intent to string.
      *
-     * @param intent Intent from what get extras.
-     * @return String representation of extras.
+     * @return String representation of intent.
      */
     @Nullable
     public static String toString(@NonNull Intent intent) {
@@ -37,6 +36,11 @@ public final class Utils {
         return b.toString();
     }
 
+    /**
+     * Convert {@code Bundle} to string.
+     *
+     * @return String representation of bundles.
+     */
     @NonNull
     public static String toString(@NonNull Bundle bundle) {
         if (bundle.isEmpty()) {
