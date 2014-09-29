@@ -27,11 +27,11 @@ import java.lang.annotation.RetentionPolicy;
  * Created by krozov on 06.09.14.
  */
 class GCMConstants {
-    static final String ACTION_REGISTRATION = "org.onepf.openpush.gcm.registration";
+    static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
     static final String ACTION_UNREGISTRATION = "org.onepf.openpush.gcm.unregistration";
 
-    static final String EXTRA_ERROR_ID = "org.onepf.openpush.gcm.error_id";
-    static final String EXTRA_TOKEN = "org.onepf.openpush.gcm.token";
+    static final String EXTRA_ERROR_ID = "error_id";
+    static final String EXTRA_REGISTRATION_ID = "registration_id";
 
     static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;

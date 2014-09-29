@@ -27,11 +27,12 @@ import org.onepf.openpush.BasePushProvider;
 public class NokiaPushProvider extends BasePushProvider {
 
     public static final String NAME = "com.nokia.push.provider"; //todo check the name
+    private static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 
     private final String[] mSendersId;
 
     public NokiaPushProvider(@NonNull Context context, @NonNull String... sendersID) {
-        super(context, NAME, "com.nokia.store");
+        super(context, NAME, NOKIA_STORE_APP_PACKAGE);
         mSendersId = sendersID;
     }
 
@@ -57,6 +58,14 @@ public class NokiaPushProvider extends BasePushProvider {
         } catch (UnsupportedOperationException exception) {
             return false;
         }
+    }
+
+    public long getRegisterOnServerLifespan() {
+        return PushRegistrar.getRegisterOnServerLifespan(getContext());
+    }
+
+    public boolean isRegisterOnServer() {
+        return PushRegistrar.isRegisteredOnServer(getContext());
     }
 
     @Override

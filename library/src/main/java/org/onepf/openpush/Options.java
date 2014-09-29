@@ -37,15 +37,14 @@ public class Options {
     private final List<PushProvider> mProviders;
 
     private final boolean mRecoverProvider;
-
-    private final boolean mSystemPushPreferred;
+    private final boolean mSelectSystemPreferred;
 
     private Options(@NonNull Collection<? extends PushProvider> providers,
                     boolean recoverProvider,
-                    boolean systemPushPreferred) {
+                    boolean selectSystemPreferred) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mRecoverProvider = recoverProvider;
-        mSystemPushPreferred = systemPushPreferred;
+        mSelectSystemPreferred = selectSystemPreferred;
     }
 
     /**
@@ -59,8 +58,8 @@ public class Options {
         return mRecoverProvider;
     }
 
-    public boolean isSystemPushPreferred() {
-        return mSystemPushPreferred;
+    public boolean isSelectSystemPreferred() {
+        return mSelectSystemPreferred;
     }
 
     /**
@@ -78,7 +77,7 @@ public class Options {
         return "Options{" +
                 "providers=" + mProviders +
                 ", recoverProvider=" + mRecoverProvider +
-                ", systemPushPreferred=" + mSystemPushPreferred +
+                ", systemPushPreferred=" + mSelectSystemPreferred +
                 '}';
     }
 
@@ -90,47 +89,61 @@ public class Options {
         @Nullable
         private Map<String, PushProvider> mProviders;
 
-        private boolean mRecoverProvider;
-
-        private boolean mSystemPushPreferred;
-
-        public Builder() {
-            mRecoverProvider = true;
-            mSystemPushPreferred = false;
-        }
+        private boolean mRecoverProvider = true;
+        private boolean mSelectSystemPreferred;
 
         /**
-         * Add the providers to the options.
+         * Mark for try select the best store for device from added providers.
+         * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
+         * If system has no preferred store or it isn't available push provider will be selected
+         * be default algorithm.
+         * <p/>
+         * By default false.
          *
-         * @param providers Providers to add.
-         * @return Current instance of builder.
-         * @throws java.lang.IllegalArgumentException If try to add already added providers.
+         * @param selectSystemPreferred Does select system preferred store.
+         * @return The current {@code Builder}.
          */
-        @NonNull
-        public Builder addProviders(@NonNull PushProvider... providers) {
-            if (providers.length == 0) {
-                return this;
-            }
-
-            return addProviders(Arrays.asList(providers));
-        }
-
-        public Builder setSystemPushPreferred(boolean systemPushPreferred) {
-            mSystemPushPreferred = systemPushPreferred;
+        public Builder setSelectSystemPreferred(boolean selectSystemPreferred) {
+            mSelectSystemPreferred = selectSystemPreferred;
             return this;
         }
 
         /**
          * Set does can the {@code OpenPushHelper} select next available provider,
-         * when current became unavailable. By default true.
+         * when current became unavailable.
+         * <p/>
+         * By default true.
          *
-         * @return The {@code Options.Builder}.
+         * @return The current {@code Builder}.
          */
         public Builder setRecoverProvider(boolean recoverProvider) {
             mRecoverProvider = recoverProvider;
             return this;
         }
 
+        /**
+         * Add the providers to the options.
+         *
+         * @param providers Providers to add.
+         * @return The current {@code Builder}.
+         * @throws java.lang.IllegalArgumentException If try to add already added providers.
+         */
+        @NonNull
+        public Builder addProviders(@NonNull PushProvider... providers) {
+            if (providers.length == 0) {
+                return this;
+            } else {
+                return addProviders(Arrays.asList(providers));
+            }
+        }
+
+        /**
+         * Add the providers to the options.
+         *
+         * @param providers Providers to add.
+         * @return The current {@code Builder}.
+         * @throws java.lang.IllegalArgumentException If try to add already added providers.
+         */
         @NonNull
         public Builder addProviders(@NonNull List<? extends PushProvider> providers) {
             if (providers.isEmpty()) {
@@ -146,7 +159,7 @@ public class Options {
                 if (mProviders.containsKey(providerName)) {
                     throw new IllegalArgumentException(
                             String.format("Provider '%s' already added.", provider));
-                } else{
+                } else {
                     mProviders.put(providerName, provider);
                 }
             }
@@ -154,9 +167,9 @@ public class Options {
         }
 
         /**
-         * Create instance of {@link org.onepf.openpush.Options} with data from the builder.
+         * Create instance of {@link Options} with data from the builder.
          *
-         * @return New options object.
+         * @return New {@link Options} object.
          * @throws java.lang.IllegalArgumentException If no one provider added.
          */
         @NonNull
@@ -164,7 +177,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders.values(), mRecoverProvider, mSystemPushPreferred);
+            return new Options(mProviders.values(), mRecoverProvider, mSelectSystemPreferred);
         }
 
         @Override
@@ -172,7 +185,7 @@ public class Options {
             return "Builder{" +
                     "providers=" + mProviders +
                     ", recoverProvider=" + mRecoverProvider +
-                    ", systemPushPreferred=" + mSystemPushPreferred +
+                    ", systemPushPreferred=" + mSelectSystemPreferred +
                     '}';
         }
     }

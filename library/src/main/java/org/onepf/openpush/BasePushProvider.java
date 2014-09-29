@@ -87,7 +87,7 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public boolean isAvailable() {
-        return PackageUtils.isInstalled(mAppContext, getHostAppPackage());
+        return PackageUtils.isInstalled(mAppContext, mHostAppPackage);
     }
 
     @Override

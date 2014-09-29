@@ -72,7 +72,7 @@ public interface PushProvider {
      *
      * @return Host application package.
      */
-    @Nullable
+    @NonNull
     String getHostAppPackage();
 
     /**

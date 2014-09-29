@@ -26,17 +26,18 @@ import com.amazon.device.messaging.development.ADMManifest;
 import org.onepf.openpush.BasePushProvider;
 
 /**
- * Created by krozov on 06.09.14.
+ * Created by Kirill Rozov on 06.09.14.
  */
 public class ADMProvider extends BasePushProvider {
 
     public static final String NAME = "Amazon Device Messaging";
+    private static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
 
     @NonNull
     private final ADM mAdm;
 
     public ADMProvider(@NonNull Context context) {
-        super(context, NAME, "com.amazon.venezia");
+        super(context, NAME, KINDLE_STORE_APP_PACKAGE);
         mAdm = new ADM(context);
     }
 

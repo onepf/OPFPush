@@ -46,7 +46,7 @@ public class GCMService extends IntentService {
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
                 onError(errorId, action);
             } else {
-                onRegistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
+                onRegistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
         } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
@@ -54,7 +54,7 @@ public class GCMService extends IntentService {
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
                 onError(errorId, action);
             } else {
-                onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_TOKEN));
+                onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
         } else if (intent.getExtras() != null) {
             String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);

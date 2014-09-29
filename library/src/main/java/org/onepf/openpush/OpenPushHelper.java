@@ -87,6 +87,11 @@ public class OpenPushHelper {
                 mAppContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
+    /**
+     * Get instance of {@code OpenPushHelper}.
+     * @param context The current context.
+     * @return Instance of {@link OpenPushHelper}.
+     */
     public static OpenPushHelper getInstance(@NonNull Context context) {
         if (sInstance == null) {
             synchronized (OpenPushHelper.class) {
@@ -102,7 +107,7 @@ public class OpenPushHelper {
      * Create new instance of {@link OpenPushHelper}.
      * <b>Use for test purposes only!!!</b>
      *
-     * @param context
+     * @param context The current context.
      * @return New instance of {@link OpenPushHelper}.
      */
     static OpenPushHelper newInstance(@NonNull Context context) {
@@ -210,7 +215,7 @@ public class OpenPushHelper {
 
                 case STATE_NONE:
                     mState.set(STATE_REGISTERING);
-                    if (mOptions.isSystemPushPreferred()
+                    if (mOptions.isSelectSystemPreferred()
                             && registerSystemPreferredProvider()) {
                         return;
                     }
@@ -599,5 +604,4 @@ public class OpenPushHelper {
                 ", registered=" + isRegistered() +
                 '}';
     }
-
 }

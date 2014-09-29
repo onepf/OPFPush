@@ -29,16 +29,23 @@ import android.util.SparseArray;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.openpush.OpenPushHelper;
+import org.onepf.openpush.OpenPushLog;
 import org.onepf.openpush.gcm.util.WakefulBroadcastReceiver;
+import org.onepf.openpush.util.IntentUtils;
+
+import java.util.Set;
 
 public class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        intent.setComponent(new ComponentName(context, GCMService.class));
-        startWakefulService(context, intent);
-        if (isOrderedBroadcast()) {
-            setResultCode(Activity.RESULT_OK);
+        if (!GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())
+                || intent.hasExtra(GCMConstants.EXTRA_REGISTRATION_ID)) {
+            intent.setComponent(new ComponentName(context, GCMService.class));
+            startWakefulService(context, intent);
+            if (isOrderedBroadcast()) {
+                setResultCode(Activity.RESULT_OK);
+            }
         }
     }
 }

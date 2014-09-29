@@ -19,7 +19,6 @@ package org.onepf.openpush.gcm;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -63,6 +62,8 @@ public class GCMProvider extends BasePushProvider {
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
     static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
+    private static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
+    private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     private final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     private volatile String mRegistrationToken;
@@ -77,7 +78,7 @@ public class GCMProvider extends BasePushProvider {
     private AtomicInteger mTryNumber = new AtomicInteger(1);
 
     public GCMProvider(@NonNull Context context, @NonNull String senderID, String... senderIDs) {
-        super(context, NAME, "com.android.vending");
+        super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
         mSenderIDs = new String[1 + senderIDs.length];
         mSenderIDs[0] = senderID;
         if (senderIDs.length > 0) {
@@ -114,7 +115,7 @@ public class GCMProvider extends BasePushProvider {
                 && checkPermission(ctx, android.Manifest.permission.WAKE_LOCK)
                 && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && checkPermission(ctx, PERMISSION_RECEIVE)
-                && checkPermission(ctx, ctx.getPackageName() + ".permission.C2D_MESSAGE");
+                && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
     @Override
@@ -197,6 +198,7 @@ public class GCMProvider extends BasePushProvider {
     }
 
     private void reset() {
+        mTryNumber.set(0);
         mRegistrationToken = null;
         mPreferences.edit().clear().apply();
     }
@@ -243,7 +245,7 @@ public class GCMProvider extends BasePushProvider {
                             GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
                     getContext().sendBroadcast(intent);
 
-                    postDelayed();
+                    postUnregisterDelayed();
                 } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(e.getMessage())) {
                     throw new OpenPushException("GCM unregister crash", e);
                 } else {
@@ -252,20 +254,20 @@ public class GCMProvider extends BasePushProvider {
             }
         }
 
-        private void postDelayed() {
+        private void postUnregisterDelayed() {
             LOGI("Post unregistration retry.");
             long delay = getDelay();
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                   unregister();
+                    unregister();
                 }
             }, delay);
         }
 
         private void onUnregistrationSuccess() {
             Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
-            intent.putExtra(GCMConstants.EXTRA_TOKEN, mOldRegistrationToken);
+            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, mOldRegistrationToken);
             getContext().sendBroadcast(intent);
         }
     }
@@ -275,11 +277,11 @@ public class GCMProvider extends BasePushProvider {
         public void run() {
             try {
                 final String registrationToken = mGoogleCloudMessaging.register(mSenderIDs);
-                LOGI(String.format("registrationToken=%s", registrationToken));
-                if (registrationToken != null) {
-                    onRegistrationSuccess(registrationToken);
-                } else {
+                LOGI("registrationToken=%s", registrationToken);
+                if (registrationToken == null) {
                     onAuthError();
+                } else {
+                    onRegistrationSuccess(registrationToken);
                 }
             } catch (IOException e) {
                 String error = e.getMessage();
@@ -298,30 +300,26 @@ public class GCMProvider extends BasePushProvider {
             }
         }
 
+        private void onRegistrationSuccess(final String registrationToken) {
+            mTryNumber.set(0);
+            mRegistrationToken = registrationToken;
+
+            mPreferences.edit()
+                    .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
+                    .putString(PREF_REGISTRATION_TOKEN, registrationToken)
+                    .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
+                    .apply();
+        }
+
         private void postDelayed() {
             LOGI("Post registration retry.");
             long delay = getDelay();
             MAIN_HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                   register();
+                    register();
                 }
             }, delay);
-        }
-
-        private void onRegistrationSuccess(final String registrationToken) {
-            mTryNumber.set(0);
-            mPreferences.edit()
-                    .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                    .putString(PREF_REGISTRATION_TOKEN, registrationToken)
-                    .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
-                    .apply();
-            mRegistrationToken = registrationToken;
-
-            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
-            intent.setComponent(new ComponentName(getContext(), GCMBroadcastReceiver.class));
-            intent.putExtra(GCMConstants.EXTRA_TOKEN, mRegistrationToken);
-            getContext().sendBroadcast(intent);
         }
 
         private void onAuthError() {
