@@ -36,7 +36,7 @@ import static org.onepf.openpush.OpenPushLog.LOGI;
 import static org.onepf.openpush.OpenPushLog.LOGW;
 
 /**
- * Helper class for manage push providers.
+ * Main class for manage push providers.
  * For get instance of this class call {@link #getInstance(android.content.Context)}.
  * <p/>
  * Before do any operations with {@code OpenPushHelper} you must call {@link #init(Options)}.

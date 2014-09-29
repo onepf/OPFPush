@@ -17,7 +17,10 @@
 package org.onepf.openpush;
 
 /**
- * Created by krozov on 05.09.14.
+ * Thrown when try work with OpenPush in wrong way.
+ *
+ * @author Kirill Rozov
+ * @since 05.09.14.
  */
 public class OpenPushException extends RuntimeException {
 

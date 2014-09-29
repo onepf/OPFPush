@@ -7,8 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
-* Created by krozov on 24.09.14.
-*/
+ * Wrapper for execute all method on main thread.
+ *
+ * @author Kirill Rozov
+ * @since 24.09.14.
+ */
 class MainThreadListenerWrapper implements OpenPushListener {
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private final OpenPushListener mListener;

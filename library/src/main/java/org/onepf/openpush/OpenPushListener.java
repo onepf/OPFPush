@@ -21,23 +21,75 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Created by krozov on 07.09.14.
+ * Interface definition for a callback to be invoked when event
+ * in {@link OpenPushHelper} is occurred.
+ *
+ * @author Kirill Rozov
+ * @since 07.09.14.
  */
 public interface OpenPushListener {
 
+    /**
+     * New message received.
+     *
+     * @param providerName Name of provider received event.
+     * @param extras       Data associated with message.
+     */
     void onMessage(@NonNull String providerName, @Nullable Bundle extras);
 
+    /**
+     * Notification about deleted messages. Not all provider send this data or not send
+     * count of deleted messages (in this case this value will be negative).
+     *
+     * @param providerName  Name of provider received event.
+     * @param messagesCount Count of messages. Negative value if no info about count.
+     */
     void onDeletedMessages(@NonNull String providerName, int messagesCount);
 
+    /**
+     * Provider registered successfully.
+     *
+     * @param providerName   Name of registered provider.
+     * @param registrationId Registration id for push notification.
+     */
     void onRegistered(@NonNull String providerName, @NonNull String registrationId);
 
+    /**
+     * Provider registration failed. Provider can continue try to register
+     * with exponential backoff (is {@code error} is recoverable) or can try to register next.
+     *
+     * @param providerName Name of provider in what error occur.
+     * @param error        Occurred error
+     */
     void onRegistrationError(@NonNull String providerName, @NonNull Error error);
 
+    /**
+     * Provider unregistration failed. Provider can continue try to unregister
+     * with exponential backoff (is {@code error} is recoverable).
+     *
+     * @param providerName Name of provider in what error occur.
+     * @param error        Occurred error
+     */
     void onUnregistrationError(@NonNull String providerName, @NonNull Error error);
 
+    /**
+     * {@code OpenPushHelper} can't find any available provider for register push.
+     */
     void onNoAvailableProvider();
 
+    /**
+     * Provider unregistered successfully.
+     *
+     * @param providerName   Name of unregistered provider.
+     * @param registrationId Old registration id for push notification.
+     */
     void onUnregistered(@NonNull String providerName, @NonNull String registrationId);
 
+    /**
+     * Provider went to unavailable state. Is most case reason ot this is removing
+     * host application of the provider.
+     *
+     * @param providerName Name of provider.
+     */
     void onProviderBecameUnavailable(@NonNull String providerName);
 }

@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Configuration object for {@link org.onepf.openpush.OpenPushHelper}.
+ * You can create instance of this class with {@link Options.Builder}.
+ *
  * @author Kirill Rozov
  * @since 04.09.2014
  */

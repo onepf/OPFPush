@@ -20,7 +20,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Created by krozov on 05.09.14.
+ * Result of registration or unregistration. Use it to communicate between provider and
+ * {@code OpenPushHelper} to notify about operations progress. For successfully ended operations
+ * create instance with {@link #success(String, String, org.onepf.openpush.Result.Type)}, for error -
+ * {@link #error(String, Error, boolean, org.onepf.openpush.Result.Type)}.
+ *
+ * @author Kirill Rozov
+ * @since 05.09.14.
  */
 public final class Result {
 
@@ -92,6 +98,10 @@ public final class Result {
         return mErrorCode == null;
     }
 
+    /**
+     * @return null for success result, otherwise - not null error.
+     * @see #isSuccess()
+     */
     @Nullable
     public Error getErrorCode() {
         return mErrorCode;
@@ -102,7 +112,13 @@ public final class Result {
         return mType;
     }
 
+    /**
+     * Type of result operation.
+     */
     public static enum Type {
+        /**
+         * Use if you don't know exactly what is result is registration or unregistration.
+         */
         UNKNOWN,
         REGISTRATION,
         UNREGISTRATION

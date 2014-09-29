@@ -26,7 +26,9 @@ package org.onepf.openpush;
  * <p/>
  * For check is error recoverable or not call {@link #isRecoverable()}.
  * <p/>
- * Created by Kirill Rozov on 09.09.14.
+ *
+ * @author Kirill Rozov
+ * @since 09.09.14.
  */
 public enum Error {
     /**
