@@ -64,7 +64,7 @@ public class GCMService extends IntentService {
                 onMessage(intent);
             }
         }
-        GCMBroadcastReceiver.completeWakefulIntent(intent);
+        GCMReceiver.completeWakefulIntent(intent);
     }
 
     protected void onDeletedMessages() {

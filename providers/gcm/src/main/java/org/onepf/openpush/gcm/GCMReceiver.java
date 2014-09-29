@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import org.onepf.openpush.gcm.util.WakefulBroadcastReceiver;
 import org.onepf.openpush.util.Utils;
@@ -29,18 +30,24 @@ import static org.onepf.openpush.OpenPushLog.LOGD;
 /**
  * Receiver for events from Google Cloud Messaging and {@link GCMProvider}.
  */
-public class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
+public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         LOGD(Utils.toString(intent));
-        if (!GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())
-                || intent.hasExtra(GCMConstants.EXTRA_REGISTRATION_ID)) {
-            intent.setComponent(new ComponentName(context, GCMService.class));
-            startWakefulService(context, intent);
-            if (isOrderedBroadcast()) {
-                setResultCode(Activity.RESULT_OK);
+        if (GCMConstants.ACTION_GCM_REGISTRATION.equals(intent.getAction())) {
+            Bundle extras = intent.getExtras();
+            if (extras.size() == 1 && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
+                intent.setAction(GCMConstants.ACTION_REGISTRATION);
+            } else {
+                return;
             }
+        }
+
+        intent.setComponent(new ComponentName(context, GCMService.class));
+        startWakefulService(context, intent);
+        if (isOrderedBroadcast()) {
+            setResultCode(Activity.RESULT_OK);
         }
     }
 }

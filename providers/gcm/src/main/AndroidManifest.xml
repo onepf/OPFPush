@@ -33,7 +33,7 @@
 
     <application>
         <receiver
-            android:name=".GCMBroadcastReceiver"
+            android:name=".GCMReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
@@ -45,9 +45,8 @@
                 <category android:name="${packageId}"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="org.onepf.openpush.gcm.registration"/>
-                <action android:name="org.onepf.openpush.gcm.unregistration"/>
-                <action android:name="org.onepf.openpush.gcm.error"/>
+                <action android:name="org.onepf.openpush.gcm.intent.UNREGISTRATION"/>
+                <action android:name="org.onepf.openpush.gcm.intent.REGISTRATION"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".BootCompleteReceiver">
