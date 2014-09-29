@@ -89,6 +89,7 @@ public class OpenPushHelper {
 
     /**
      * Get instance of {@code OpenPushHelper}.
+     *
      * @param context The current context.
      * @return Instance of {@link OpenPushHelper}.
      */
@@ -193,6 +194,15 @@ public class OpenPushHelper {
                 register();
             }
         }
+    }
+
+    public boolean hasAvailableProvider() {
+        for (PushProvider provider : mOptions.getProviders()) {
+            if (provider.isAvailable()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setListener(@Nullable OpenPushListener l) {

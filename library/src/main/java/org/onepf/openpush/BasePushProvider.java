@@ -54,7 +54,9 @@ public abstract class BasePushProvider implements PushProvider {
         mName = name;
         mHostAppPackage = hostAppPackage;
 
-        checkManifest();
+        if (isAvailable()) {
+            checkManifest();
+        }
     }
 
     /**
