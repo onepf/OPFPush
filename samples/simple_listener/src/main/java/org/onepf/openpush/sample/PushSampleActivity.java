@@ -44,7 +44,6 @@ import butterknife.Optional;
  */
 public class PushSampleActivity extends Activity {
 
-    public static final String GCM_SENDER_ID = "76325631570";
     private static final String TAG = "PushSampleActivity";
 
     @InjectView(R.id.registration_id)
@@ -67,23 +66,20 @@ public class PushSampleActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+        mOpenPushHelper.setListener(mEventReceiver);
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-
-        if (mOpenPushHelper == null) {
-            OpenPushLog.setLogEnable(true);
-            mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
-            mOpenPushHelper.setListener(mEventReceiver);
-            Options.Builder builder = new Options.Builder();
-            builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
-            mOpenPushHelper.init(builder.build());
-        }
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        updateUI();
+    }
+
+    private void updateUI() {
         if (mOpenPushHelper.isRegistered()) {
             onPushRegistered();
         } else {
@@ -94,6 +90,7 @@ public class PushSampleActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateUI();
         mOpenPushHelper.setListener(mEventReceiver);
     }
 
