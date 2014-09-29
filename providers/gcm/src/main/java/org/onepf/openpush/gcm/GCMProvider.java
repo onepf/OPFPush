@@ -333,7 +333,7 @@ public class GCMProvider extends BasePushProvider {
                     .apply();
 
             //For finish registration we catch intent with action
-            //GCMConstant.ACTION_GCM_REGISTRATION in GCMReceiver.
+            //GCMConstant.ACTION_C2DM_REGISTRATION in GCMReceiver.
             //No need to send another intent.
         }
 
