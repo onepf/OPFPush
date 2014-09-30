@@ -464,8 +464,8 @@ public class OpenPushHelper {
             if (!isRegistered() || mCurrentProvider == null) {
                 throw new OpenPushException("Can't receive message when not registered.");
             }
-            if (providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
-                throw new OpenPushException("Can't receive message for not registered provider. " +
+            if (!providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
+                throw new OpenPushException("Can't receive message from not registered provider. " +
                         "Current provider '%s', message source ='%s'",
                         mCurrentProvider.getName(), providerName);
             }
