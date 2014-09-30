@@ -236,6 +236,7 @@ public class PushSampleActivity extends ActionBarActivity {
 
         @Override
         public void onProviderBecameUnavailable(@NonNull String providerName) {
+            onPushUnregistered();
         }
     }
 }

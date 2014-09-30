@@ -64,7 +64,6 @@ public abstract class BasePushProvider implements PushProvider {
      *
      * @param ctx        Any instance of {@code Context}.
      * @param permission Permission for verify.
-     * @return
      */
     protected static boolean checkPermission(@NonNull Context ctx, @NonNull String permission) {
         switch (ctx.getPackageManager().checkPermission(permission, ctx.getPackageName())) {
@@ -79,8 +78,6 @@ public abstract class BasePushProvider implements PushProvider {
 
     /**
      * Get {@code Context} instance.
-     *
-     * @return Instance of {@link Context}.
      */
     @NonNull
     protected Context getContext() {
@@ -142,10 +139,5 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public void onAppStateChanged() {
-    }
-
-    @Override
-    public boolean isRegistered() {
-        return getRegistrationId() != null;
     }
 }

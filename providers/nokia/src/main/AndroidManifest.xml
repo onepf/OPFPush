@@ -22,13 +22,12 @@
         android:name="${packageId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="${packageId}.permission.C2D_MESSAGE"/>
     <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE"/>
 
     <application>
         <receiver
-            android:name=".NokiaNotificationReceiver"
+            android:name="org.onepf.openpush.nokia.NokiaNotificationReceiver"
             android:permission="com.nokia.pushnotifications.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->
@@ -38,7 +37,9 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".NokiaNotificationService"/>
+        <service
+            android:name="org.onepf.openpush.nokia.NokiaNotificationService"
+            android:exported="false"/>
 
     </application>
 

@@ -24,8 +24,6 @@
         android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"
         android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"/>
 
     <application>
@@ -35,11 +33,11 @@
             android:required="false"/>
 
         <service
-            android:name=".ADMService"
+            android:name="org.onepf.openpush.adm.ADMService"
             android:exported="false"/>
 
         <receiver
-            android:name=".ADMReceiver"
+            android:name="org.onepf.openpush.adm.ADMReceiver"
             android:permission="com.amazon.device.messaging.permission.SEND">
 
             <intent-filter>

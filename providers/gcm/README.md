@@ -1,26 +1,9 @@
-<!--
-  ~ Copyright 2012-2014 One Platform Foundation
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+Add changes to AndroidManifest.xml
 
-<manifest
-    package="org.onepf.openpush.gcm"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <uses-permission android:name="${packageId}.permission.C2D_MESSAGE"/>
+````xml
+    <uses-permission android:name="(your_application_package).permission.C2D_MESSAGE"/>
     <permission
-        android:name="${packageId}.permission.C2D_MESSAGE"
+        android:name="(your_application_package).permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
 
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
@@ -32,15 +15,14 @@
     <application>
         <receiver
             android:name="org.onepf.openpush.gcm.GCMReceiver"
-            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="${packageId}"/>
+                <category android:name="(your_application_package)"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
-                <category android:name="${packageId}"/>
+                <category android:name="(your_application_package)"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="org.onepf.openpush.gcm.intent.UNREGISTRATION"/>
@@ -57,5 +39,6 @@
             android:name="org.onepf.openpush.gcm.GCMService"
             android:exported="false"/>
     </application>
+````
 
-</manifest>
+Add dependency Google Play Services 3.1.59 or higher to your project.
