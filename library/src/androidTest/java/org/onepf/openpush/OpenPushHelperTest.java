@@ -274,7 +274,7 @@ public class OpenPushHelperTest {
         checkProviderRegistrationState(helper, currentProvider);
 
         Robolectric.packageManager.removePackage(currentProvider.getHostAppPackage());
-        helper.onUnavailable(currentProvider);
+        helper.getProviderCallback().onUnavailable(currentProvider);
 
         PushProvider oldCurrentProvider = currentProvider;
         currentProvider = helper.getCurrentProvider();
@@ -471,7 +471,7 @@ public class OpenPushHelperTest {
     public void testSendRegistrationResult_RegistrationRunning() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.onResult(
+        helper.getProviderCallback().onResult(
                 Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
         );
     }
@@ -480,7 +480,7 @@ public class OpenPushHelperTest {
     public void testSendResultWithNonExistenProvider_RegistrationRunning() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.onResult(
+        helper.getProviderCallback().onResult(
                 Result.success("123123123", "testId", Result.Type.REGISTRATION)
         );
     }
@@ -489,7 +489,7 @@ public class OpenPushHelperTest {
     public void testSendUnregistrationResult_RegistrationRunning() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.onResult(
+        helper.getProviderCallback().onResult(
                 Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
         );
     }
@@ -499,7 +499,7 @@ public class OpenPushHelperTest {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
         helper.register();
         helper.unregister();
-        helper.onResult(
+        helper.getProviderCallback().onResult(
                 Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
         );
     }
@@ -509,7 +509,7 @@ public class OpenPushHelperTest {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
         helper.register();
         helper.unregister();
-        helper.onResult(
+        helper.getProviderCallback().onResult(
                 Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
         );
     }
