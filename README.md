@@ -9,7 +9,7 @@ OpenPush
 Steps to integrate
 ------------------
 
-1. Create a configuration object and pass a OpenPushHelper to it
+1. Create a configuration object and pass a OpenPushHelper to it:
 
     ````java
     OpenPushHelper.getInstance().setListener(new OpenPushListener());
@@ -17,7 +17,7 @@ Steps to integrate
     OpenPushHelper.getInstance().init(builder.create());
     ````
 
-2. If you use AAR no need to do anything, but for JAR dependencies you need do additional steps:
+2. If you use AAR dependency no need to do anything, but for JAR dependencies you need do additional steps:
 
     Add to you application AndroidManifest.xml file:
 
@@ -29,3 +29,14 @@ Steps to integrate
 
     and add for each used providers specific changes that you can find in provider README.md.
    
+3. If you use AAR dependency add to your project build.gradle file:
+
+    ````groovy
+    android {
+        defaultConfig {
+            ...
+            manifestPlaceholders = [packageId: "\${applicationId}".toString()]
+            ...
+        }
+    }
+    ````
