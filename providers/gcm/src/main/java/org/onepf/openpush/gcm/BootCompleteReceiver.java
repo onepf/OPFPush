@@ -35,7 +35,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(@NonNull Context context, Intent intent) {
         if (!Settings.Secure.ANDROID_ID.equals(getLastAndroidId(context))) {
             saveAndroidId(context);
-            OpenPushHelper.getInstance(context).onNeedRetryRegister(GCMProvider.NAME);
+            OpenPushHelper.getInstance(context).getProviderCallback().onNeedRetryRegister(GCMProvider.NAME);
         }
     }
 

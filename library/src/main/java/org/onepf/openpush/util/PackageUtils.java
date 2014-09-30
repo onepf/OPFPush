@@ -107,14 +107,10 @@ public final class PackageUtils {
         context.registerReceiver(mPackageReceiver, appUpdateFilter);
 
         String hostAppPackage = provider.getHostAppPackage();
-        if (hostAppPackage != null) {
-            IntentFilter hostAppRemovedFilter
-                    = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-            hostAppRemovedFilter.addDataPath(
-                    hostAppPackage, PatternMatcher.PATTERN_LITERAL);
-            context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
-        }
+        IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+        hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+        hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
+        context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
 
         return mPackageReceiver;
     }
@@ -137,16 +133,17 @@ public final class PackageUtils {
         public void onReceive(@NonNull Context context, @NonNull Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                if (mProvider.getHostAppPackage() != null &&
-                        mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
+                if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
                     LOGI("Host app '%s' of provider '%s' removed.",
                             mProvider.getHostAppPackage(), mProvider.getName());
-                    OpenPushHelper.getInstance(context).onUnavailable(mProvider);
+                    OpenPushHelper.getInstance(context)
+                            .getProviderCallback().onUnavailable(mProvider);
                 }
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
                 if (context.getPackageName().equals(getAppPackage(intent))) {
                     LOGI("Application updated.");
-                    OpenPushHelper.getInstance(context).onNeedRetryRegister(mProvider.getName());
+                    OpenPushHelper.getInstance(context)
+                            .getProviderCallback().onNeedRetryRegister(mProvider.getName());
                 }
             }
         }
