@@ -32,12 +32,23 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(@NonNull Context context, Intent intent) {
         OpenPushHelper helper = OpenPushHelper.getInstance(context);
+        final Settings settings = new Settings(context);
         if (isGCMRegistered(helper)) {
-            final Settings settings = new Settings(context);
             final String newAndroidId = android.provider.Settings.Secure.ANDROID_ID;
             if (!newAndroidId.equals(settings.getAndroidId())) {
                 settings.saveAndroidId(newAndroidId);
                 helper.getProviderCallback().onNeedRetryRegister(GCMProvider.NAME);
+            }
+        } else {
+            switch (settings.getState()) {
+                case GCMProvider.STATE_REGISTERING:
+                    OpenPushHelper.getInstance(context)
+                            .getProviderCallback().register(GCMProvider.NAME);
+                    break;
+
+                case GCMProvider.STATE_UNREGISTERING:
+                    OpenPushHelper.getInstance(context).unregister();
+                    break;
             }
         }
     }

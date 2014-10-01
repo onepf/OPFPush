@@ -52,6 +52,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name="org.onepf.openpush.gcm.RetryBroadcastReceiver"/>
 
         <service
             android:name="org.onepf.openpush.gcm.GCMService"

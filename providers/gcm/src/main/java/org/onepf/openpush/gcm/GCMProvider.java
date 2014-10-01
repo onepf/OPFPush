@@ -22,10 +22,12 @@ import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -39,6 +41,8 @@ import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,12 +71,28 @@ public class GCMProvider extends BasePushProvider {
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
     private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
 
+    final static int STATE_NONE = 0;
+    final static int STATE_REGISTERING = 1;
+    final static int STATE_UNREGISTERING = 2;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = { STATE_NONE, STATE_REGISTERING, STATE_UNREGISTERING })
+    @interface State {
+    }
+
     private final String[] mSenderIDs;
-    private final GoogleCloudMessaging mGoogleCloudMessaging;
+
+    @NonNull
+    final GoogleCloudMessaging mGoogleCloudMessaging;
+
     private final AtomicInteger mMsgId;
+
     @Nullable
     private ExecutorService mExecutor;
-    private final Settings mSettings;
+
+    @NonNull
+    final Settings mSettings;
+
     @Nullable
     RetryManager mRetryManager;
 
@@ -90,34 +110,37 @@ public class GCMProvider extends BasePushProvider {
     }
 
     public synchronized void register() {
+        mSettings.saveState(STATE_REGISTERING);
+        executeTask(new RegisterTask());
+    }
+
+    private void executeTask(Runnable runnable) {
         if (mExecutor == null || mExecutor.isShutdown()) {
             mExecutor = Executors.newSingleThreadExecutor();
         }
-        mExecutor.execute(new RegisterTask());
+        mExecutor.execute(runnable);
     }
 
     public synchronized void unregister() {
-        if (mExecutor == null || mExecutor.isShutdown()) {
-            mExecutor = Executors.newSingleThreadExecutor();
-        }
-        mExecutor.execute(new UnregisterTask(mSettings.getRegistrationToken()));
+        mSettings.saveState(STATE_UNREGISTERING);
+        executeTask(new UnregisterTask(mSettings.getRegistrationToken()));
     }
 
     @Override
     public boolean checkManifest() {
         final Context ctx = getContext();
         return super.checkManifest()
-                && !checkGetAccountsPermission(ctx)
+                && !checkGetAccountsPermission()
                 && checkPermission(ctx, Manifest.permission.WAKE_LOCK)
                 && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && checkPermission(ctx, PERMISSION_RECEIVE)
                 && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
-    private boolean checkGetAccountsPermission(Context ctx) {
+    private boolean checkGetAccountsPermission() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
                 && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
-                && !checkPermission(ctx, Manifest.permission.GET_ACCOUNTS);
+                && !checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS);
     }
 
     @Override
@@ -151,8 +174,8 @@ public class GCMProvider extends BasePushProvider {
         } else {
             // On device with version of Android less than "4.0.4"
             // we need to ensure that the user has at least one google account.
-            Account[] googleAccounts = AccountManager.get(getContext())
-                    .getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+            Account[] googleAccounts
+                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
             return googleAccounts.length != 0;
         }
     }
@@ -170,12 +193,16 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public void close() {
-        mMsgId.set(0);
-        mGoogleCloudMessaging.close();
-
         if (mExecutor != null) {
             mExecutor.shutdownNow();
             mExecutor = null;
+        }
+
+        mGoogleCloudMessaging.close();
+
+        if (mRetryManager != null) {
+            mRetryManager.reset();
+            mRetryManager = null;
         }
     }
 
@@ -276,6 +303,7 @@ public class GCMProvider extends BasePushProvider {
         }
 
         private void onUnregistrationSuccess() {
+            mSettings.saveState(STATE_NONE);
             Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, mOldRegistrationToken);
             getContext().sendBroadcast(intent);
@@ -322,6 +350,7 @@ public class GCMProvider extends BasePushProvider {
         }
 
         private void onRegistrationSuccess(final String registrationToken) {
+            mSettings.saveState(STATE_NONE);
             mSettings.saveRegistrationToken(registrationToken);
             mSettings.saveAppVersion(PackageUtils.getAppVersion(getContext()));
             mSettings.saveAndroidId(android.provider.Settings.Secure.ANDROID_ID);
@@ -352,19 +381,12 @@ public class GCMProvider extends BasePushProvider {
     private final class RetryManager {
         private AtomicInteger mTryNumber = new AtomicInteger(0);
 
-        @Nullable
-        private BroadcastReceiver mRetryReceiver;
-
         private long getDelay() {
             return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() + 1));
         }
 
         public void reset() {
             mTryNumber.set(0);
-            if (mRetryReceiver != null) {
-                getContext().unregisterReceiver(mRetryReceiver);
-                mRetryReceiver = null;
-            }
         }
 
         void retryRegistration() {
@@ -378,34 +400,12 @@ public class GCMProvider extends BasePushProvider {
         }
 
         private synchronized void postRetry(@NonNull Intent intent) {
-            final long when = System.currentTimeMillis() + getDelay();
-
-            if (mRetryReceiver == null) {
-                mRetryReceiver = new RetryBroadcastReceiver();
-                IntentFilter filter = new IntentFilter();
-                filter.addAction(GCMConstants.ACTION_REGISTRATION_RETRY);
-                filter.addAction(GCMConstants.ACTION_UNREGISTRATION_RETRY);
-                getContext().registerReceiver(mRetryReceiver, filter);
-            }
-
+            intent.setComponent(new ComponentName(getContext(), RetryBroadcastReceiver.class));
             AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-            am.set(AlarmManager.RTC, when,
-                    PendingIntent.getBroadcast(getContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
+            am.set(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis() + getDelay(),
+                    PendingIntent.getBroadcast(getContext(), 0, intent, 0));
         }
     }
 
-    private final class RetryBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (GCMConstants.ACTION_REGISTRATION_RETRY.equals(action)) {
-                register();
-            } else if (GCMConstants.ACTION_UNREGISTRATION_RETRY.equals(action)) {
-                unregister();
-            } else {
-                throw new UnsupportedOperationException(
-                        String.format("Unknown action '%s'.", action));
-            }
-        }
-    }
 }
