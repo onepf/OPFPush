@@ -47,9 +47,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by  Kirill Rozov on 11.09.14.
- *
+ * @author Kirill Rozov
  * @see OpenPushHelper
+ * @since 11.09.14.
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -196,10 +196,7 @@ public class OpenPushHelperTest {
         assertTrue(provider.isRegistered());
         assertEquals(providerName, provider.getName());
         assertNotNull(provider.getRegistrationId());
-        testPackageChangeReceiverRegistered();
-    }
 
-    public void testPackageChangeReceiverRegistered() throws Exception {
         List<ShadowApplication.Wrapper> registeredReceivers =
                 Robolectric.getShadowApplication().getRegisteredReceivers();
         assertFalse(registeredReceivers.isEmpty());
