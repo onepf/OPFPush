@@ -590,7 +590,9 @@ public class OpenPushHelper {
         }
 
         public void register(@NonNull String providerName) {
-            registerProvider(getProviderWithException(providerName));
+            if (!isRegistered()) {
+                registerProvider(getProviderWithException(providerName));
+            }
         }
 
         private void onRegistrationResult(@NonNull Result result) {

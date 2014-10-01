@@ -24,11 +24,8 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION_RETRY.equals(action)) {
             if (new Settings(context).getState() == GCMProvider.STATE_REGISTERING) {
-                OpenPushHelper.getInstance(context).getProviderCallback().register(GCMProvider.NAME);
-            }
-        } else if (GCMConstants.ACTION_UNREGISTRATION_RETRY.equals(action)) {
-            if (new Settings(context).getState() == GCMProvider.STATE_UNREGISTERING) {
-                OpenPushHelper.getInstance(context).unregister();
+                OpenPushHelper.getInstance(context)
+                        .getProviderCallback().register(GCMProvider.NAME);
             }
         } else {
             throw new UnsupportedOperationException(

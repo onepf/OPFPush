@@ -16,12 +16,7 @@
 
 package org.onepf.openpush.gcm;
 
-import android.support.annotation.IntDef;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * @author Kirill Rozov
@@ -31,7 +26,6 @@ interface GCMConstants {
     String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
     String ACTION_REGISTRATION_CALLBACK = "org.onepf.openpush.gcm.intent.REGISTRATION";
     String ACTION_REGISTRATION_RETRY = "org.onepf.openpush.gcm.intent.REGISTRATION_RETRY";
-    String ACTION_UNREGISTRATION_RETRY = "org.onepf.openpush.gcm.intent.UNREGISTRATION_RETRY";
     String ACTION_UNREGISTRATION_CALLBACK = "org.onepf.openpush.gcm.intent.UNREGISTRATION";
 
     String EXTRA_ERROR_ID = "error_id";

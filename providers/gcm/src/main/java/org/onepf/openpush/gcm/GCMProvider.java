@@ -76,7 +76,7 @@ public class GCMProvider extends BasePushProvider {
     final static int STATE_UNREGISTERING = 2;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef(value = { STATE_NONE, STATE_REGISTERING, STATE_UNREGISTERING })
+    @IntDef(value = {STATE_NONE, STATE_REGISTERING, STATE_UNREGISTERING})
     @interface State {
     }
 
@@ -295,11 +295,6 @@ public class GCMProvider extends BasePushProvider {
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                     GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
             getContext().sendBroadcast(intent);
-
-            if (mRetryManager == null) {
-                mRetryManager = new RetryManager();
-            }
-            mRetryManager.retryUnregistration();
         }
 
         private void onUnregistrationSuccess() {
@@ -392,11 +387,6 @@ public class GCMProvider extends BasePushProvider {
         void retryRegistration() {
             LOGI("Post registration retry.");
             postRetry(new Intent(GCMConstants.ACTION_REGISTRATION_RETRY));
-        }
-
-        void retryUnregistration() {
-            LOGI("Post unregistration retry.");
-            postRetry(new Intent(GCMConstants.ACTION_UNREGISTRATION_RETRY));
         }
 
         private synchronized void postRetry(@NonNull Intent intent) {

@@ -45,10 +45,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
                     OpenPushHelper.getInstance(context)
                             .getProviderCallback().register(GCMProvider.NAME);
                     break;
-
-                case GCMProvider.STATE_UNREGISTERING:
-                    OpenPushHelper.getInstance(context).unregister();
-                    break;
             }
         }
     }
