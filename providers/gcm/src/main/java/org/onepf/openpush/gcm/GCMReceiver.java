@@ -35,10 +35,10 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         LOGD(Utils.toString(intent));
-        if (GCMConstants.ACTION_C2DM_REGISTRATION.equals(intent.getAction())) {
+        if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
             Bundle extras = intent.getExtras();
             if (extras.size() == 1 && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
-                intent.setAction(GCMConstants.ACTION_REGISTRATION);
+                intent.setAction(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             } else {
                 return;
             }

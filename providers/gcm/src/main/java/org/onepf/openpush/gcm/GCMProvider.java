@@ -19,13 +19,13 @@ package org.onepf.openpush.gcm;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -59,30 +59,22 @@ import static org.onepf.openpush.OpenPushLog.LOGI;
 public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "Google Cloud Messaging";
-
-    private static final String PREF_REGISTRATION_TOKEN = "registration_token";
-    private static final String PREF_APP_VERSION = "app_version";
-    private static final String PREF_MESSAGE_ID = "message_id";
-    static final String PREF_ANDROID_ID = "android_id";
+    private static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
 
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
-    static final String PREFERENCES_NAME = "org.onepf.openpush.gcm";
+
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
-    private static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
     private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
-    private final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
-    private volatile String mRegistrationToken;
     private final String[] mSenderIDs;
-    private final SharedPreferences mPreferences;
     private final GoogleCloudMessaging mGoogleCloudMessaging;
-
-    private ExecutorService mExecutor = Executors.newSingleThreadExecutor();
-
     private final AtomicInteger mMsgId;
-
-    private AtomicInteger mTryNumber = new AtomicInteger(1);
+    @Nullable
+    private ExecutorService mExecutor;
+    private final Settings mSettings;
+    @Nullable
+    RetryManager mRetryManager;
 
     public GCMProvider(@NonNull Context context, @NonNull String senderID, String... senderIDs) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
@@ -92,21 +84,23 @@ public class GCMProvider extends BasePushProvider {
             System.arraycopy(senderIDs, 0, mSenderIDs, 1, senderIDs.length);
         }
 
+        mSettings = new Settings(context);
         mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
-        mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
-        mRegistrationToken = mPreferences.getString(PREF_REGISTRATION_TOKEN, null);
-        mMsgId = new AtomicInteger(mPreferences.getInt(PREF_MESSAGE_ID, 0));
+        mMsgId = new AtomicInteger(mSettings.getMessageId());
     }
 
-    public void register() {
+    public synchronized void register() {
         if (mExecutor == null || mExecutor.isShutdown()) {
             mExecutor = Executors.newSingleThreadExecutor();
         }
         mExecutor.execute(new RegisterTask());
     }
 
-    public void unregister() {
-        mExecutor.execute(new UnregisterTask(mRegistrationToken));
+    public synchronized void unregister() {
+        if (mExecutor == null || mExecutor.isShutdown()) {
+            mExecutor = Executors.newSingleThreadExecutor();
+        }
+        mExecutor.execute(new UnregisterTask(mSettings.getRegistrationToken()));
     }
 
     @Override
@@ -129,7 +123,7 @@ public class GCMProvider extends BasePushProvider {
     @Override
     @Nullable
     public String getRegistrationId() {
-        return mRegistrationToken;
+        return mSettings.getRegistrationToken();
     }
 
     @Override
@@ -165,15 +159,12 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        if (TextUtils.isEmpty(mRegistrationToken)) {
+        if (TextUtils.isEmpty(mSettings.getRegistrationToken())) {
             return false;
         } else {
-            if (mPreferences.contains(PREF_APP_VERSION)) {
-                int registeredVersion = mPreferences.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
-                return registeredVersion == PackageUtils.getAppVersion(getContext());
-            } else {
-                return false;
-            }
+            final int registeredVersion = mSettings.getAppVersion();
+            return registeredVersion != Settings.NO_SAVED_APP_VERSION
+                    && registeredVersion == PackageUtils.getAppVersion(getContext());
         }
     }
 
@@ -182,15 +173,17 @@ public class GCMProvider extends BasePushProvider {
         mMsgId.set(0);
         mGoogleCloudMessaging.close();
 
-        mExecutor.shutdownNow();
-        mExecutor = null;
+        if (mExecutor != null) {
+            mExecutor.shutdownNow();
+            mExecutor = null;
+        }
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format("%s (senderId: '%s', appVersion: %d)", NAME, Arrays.toString(mSenderIDs),
-                mPreferences.getInt(PREF_APP_VERSION, -1));
+        return String.format("%s (senderId: '%s', appVersion: %d)", NAME,
+                Arrays.toString(mSenderIDs), mSettings.getAppVersion());
     }
 
     @Override
@@ -205,9 +198,10 @@ public class GCMProvider extends BasePushProvider {
     }
 
     private void reset() {
-        mTryNumber.set(0);
-        mRegistrationToken = null;
-        mPreferences.edit().clear().apply();
+        if (mRetryManager != null) {
+            mRetryManager.reset();
+        }
+        mSettings.reset();
     }
 
     /**
@@ -237,17 +231,11 @@ public class GCMProvider extends BasePushProvider {
         }
 
         final int msgId = mMsgId.incrementAndGet();
-        mPreferences.edit()
-                .putInt(PREF_MESSAGE_ID, msgId)
-                .apply();
+        mSettings.saveMessageId(msgId);
         AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
     }
 
-    long getDelay() {
-        return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() - 1));
-    }
-
-    private class UnregisterTask implements Runnable {
+    private final class UnregisterTask implements Runnable {
         private final String mOldRegistrationToken;
 
         private UnregisterTask(@NonNull String oldRegistrationToken) {
@@ -263,39 +251,43 @@ public class GCMProvider extends BasePushProvider {
                 onUnregistrationSuccess();
             } catch (IOException e) {
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
-                    Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-                    getContext().sendBroadcast(intent);
-
-                    postUnregisterDelayed();
+                    onServicesNotAvailable();
                 } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(e.getMessage())) {
-                    throw new OpenPushException("GCM unregister crash", e);
+                    throw new OpenPushException("GCM unregister crash.", e);
                 } else {
+                    if (mRetryManager != null) {
+                        mRetryManager.reset();
+                    }
                     //TODO Notify event about error.
                 }
             }
         }
 
-        private void postUnregisterDelayed() {
-            LOGI("Post unregistration retry.");
-            long delay = getDelay();
-            MAIN_HANDLER.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    unregister();
-                }
-            }, delay);
+        private void onServicesNotAvailable() {
+            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                    GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+            getContext().sendBroadcast(intent);
+
+            if (mRetryManager == null) {
+                mRetryManager = new RetryManager();
+            }
+            mRetryManager.retryUnregistration();
         }
 
         private void onUnregistrationSuccess() {
-            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION);
+            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, mOldRegistrationToken);
             getContext().sendBroadcast(intent);
+
+            if (mRetryManager != null) {
+                mRetryManager.reset();
+                mRetryManager = null;
+            }
         }
     }
 
-    private class RegisterTask implements Runnable {
+    private final class RegisterTask implements Runnable {
         @Override
         public void run() {
             try {
@@ -308,12 +300,7 @@ public class GCMProvider extends BasePushProvider {
             } catch (IOException e) {
                 String error = e.getMessage();
                 if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(error)) {
-                    Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
-                    intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                            GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-                    getContext().sendBroadcast(intent);
-
-                    postDelayed();
+                    onServicesNotAvailable();
                 } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(error)) {
                     throw new OpenPushException("GCM register crash", e);
                 } else {
@@ -322,38 +309,103 @@ public class GCMProvider extends BasePushProvider {
             }
         }
 
-        private void onRegistrationSuccess(final String registrationToken) {
-            mTryNumber.set(0);
-            mRegistrationToken = registrationToken;
+        private void onServicesNotAvailable() {
+            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
+                    GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+            getContext().sendBroadcast(intent);
 
-            mPreferences.edit()
-                    .putString(PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                    .putString(PREF_REGISTRATION_TOKEN, registrationToken)
-                    .putInt(PREF_APP_VERSION, PackageUtils.getAppVersion(getContext()))
-                    .apply();
+            if (mRetryManager == null) {
+                mRetryManager = new RetryManager();
+            }
+            mRetryManager.retryRegistration();
+        }
+
+        private void onRegistrationSuccess(final String registrationToken) {
+            mSettings.saveRegistrationToken(registrationToken);
+            mSettings.saveAppVersion(PackageUtils.getAppVersion(getContext()));
+            mSettings.saveAndroidId(android.provider.Settings.Secure.ANDROID_ID);
+
+            if (mRetryManager != null) {
+                mRetryManager.reset();
+                mRetryManager = null;
+            }
 
             //For finish registration we catch intent with action
-            //GCMConstant.ACTION_C2DM_REGISTRATION in GCMReceiver.
+            //GCMConstant.ACTION_REGISTRATION in GCMReceiver.
             //No need to send another intent.
         }
 
-        private void postDelayed() {
-            LOGI("Post registration retry.");
-            long delay = getDelay();
-            MAIN_HANDLER.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    register();
-                }
-            }, delay);
-        }
-
         private void onAuthError() {
-            mTryNumber.set(0);
-            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION);
+            if (mRetryManager != null) {
+                mRetryManager.reset();
+                mRetryManager = null;
+            }
+
+            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                     GCMConstants.ERROR_AUTHENTICATION_FAILED);
             getContext().sendBroadcast(intent);
+        }
+    }
+
+    private final class RetryManager {
+        private AtomicInteger mTryNumber = new AtomicInteger(0);
+
+        @Nullable
+        private BroadcastReceiver mRetryReceiver;
+
+        private long getDelay() {
+            return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.getAndIncrement() + 1));
+        }
+
+        public void reset() {
+            mTryNumber.set(0);
+            if (mRetryReceiver != null) {
+                getContext().unregisterReceiver(mRetryReceiver);
+                mRetryReceiver = null;
+            }
+        }
+
+        void retryRegistration() {
+            LOGI("Post registration retry.");
+            postRetry(new Intent(GCMConstants.ACTION_REGISTRATION_RETRY));
+        }
+
+        void retryUnregistration() {
+            LOGI("Post unregistration retry.");
+            postRetry(new Intent(GCMConstants.ACTION_UNREGISTRATION_RETRY));
+        }
+
+        private synchronized void postRetry(@NonNull Intent intent) {
+            final long when = System.currentTimeMillis() + getDelay();
+
+            if (mRetryReceiver == null) {
+                mRetryReceiver = new RetryBroadcastReceiver();
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(GCMConstants.ACTION_REGISTRATION_RETRY);
+                filter.addAction(GCMConstants.ACTION_UNREGISTRATION_RETRY);
+                getContext().registerReceiver(mRetryReceiver, filter);
+            }
+
+            AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+            am.set(AlarmManager.RTC, when,
+                    PendingIntent.getBroadcast(getContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
+        }
+    }
+
+    private final class RetryBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (GCMConstants.ACTION_REGISTRATION_RETRY.equals(action)) {
+                register();
+            } else if (GCMConstants.ACTION_UNREGISTRATION_RETRY.equals(action)) {
+                unregister();
+            } else {
+                throw new UnsupportedOperationException(
+                        String.format("Unknown action '%s'.", action));
+            }
         }
     }
 }

@@ -23,9 +23,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * @since 06.09.14.
  */
 interface GCMConstants {
-   String ACTION_C2DM_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
-   String ACTION_REGISTRATION = "org.onepf.openpush.gcm.intent.REGISTRATION";
-   String ACTION_UNREGISTRATION = "org.onepf.openpush.gcm.intent.UNREGISTRATION";
+   String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
+   String ACTION_REGISTRATION_CALLBACK = "org.onepf.openpush.gcm.intent.REGISTRATION";
+   String ACTION_REGISTRATION_RETRY = "org.onepf.openpush.gcm.intent.REGISTRATION_RETRY";
+   String ACTION_UNREGISTRATION_RETRY = "org.onepf.openpush.gcm.intent.UNREGISTRATION_RETRY";
+   String ACTION_UNREGISTRATION_CALLBACK = "org.onepf.openpush.gcm.intent.UNREGISTRATION";
 
    String EXTRA_ERROR_ID = "error_id";
    String EXTRA_REGISTRATION_ID = "registration_id";

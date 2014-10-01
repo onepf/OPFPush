@@ -40,7 +40,7 @@ public class GCMService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         @GCMAction String action = intent.getAction();
-        if (GCMConstants.ACTION_REGISTRATION.equals(action)) {
+        if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
                 @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
@@ -48,7 +48,7 @@ public class GCMService extends IntentService {
             } else {
                 onRegistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
-        } else if (GCMConstants.ACTION_UNREGISTRATION.equals(action)) {
+        } else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
                 @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
@@ -89,10 +89,10 @@ public class GCMService extends IntentService {
         }
 
         final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
-        if (GCMConstants.ACTION_REGISTRATION.equals(action))
+        if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action))
             OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.REGISTRATION));
-        else if (GCMConstants.ACTION_UNREGISTRATION.equals(action))
+        else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action))
             OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.UNREGISTRATION));
         else {

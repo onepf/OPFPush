@@ -19,8 +19,6 @@ package org.onepf.openpush.gcm;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 
 import org.onepf.openpush.OpenPushHelper;
@@ -33,22 +31,20 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull Context context, Intent intent) {
-        if (!Settings.Secure.ANDROID_ID.equals(getLastAndroidId(context))) {
-            saveAndroidId(context);
-            OpenPushHelper.getInstance(context).getProviderCallback().onNeedRetryRegister(GCMProvider.NAME);
+        OpenPushHelper helper = OpenPushHelper.getInstance(context);
+        if (isGCMRegistered(helper)) {
+            final Settings settings = new Settings(context);
+            final String newAndroidId = android.provider.Settings.Secure.ANDROID_ID;
+            if (!newAndroidId.equals(settings.getAndroidId())) {
+                settings.saveAndroidId(newAndroidId);
+                helper.getProviderCallback().onNeedRetryRegister(GCMProvider.NAME);
+            }
         }
     }
 
-    private static String getLastAndroidId(@NonNull Context context) {
-        SharedPreferences prefs = context.getApplicationContext()
-                .getSharedPreferences(GCMProvider.PREFERENCES_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(GCMProvider.PREF_ANDROID_ID, null);
-    }
-
-    private static void saveAndroidId(@NonNull Context context) {
-        SharedPreferences.Editor editor = context.getApplicationContext()
-                .getSharedPreferences(GCMProvider.PREFERENCES_NAME, Context.MODE_PRIVATE).edit();
-        editor.putString(GCMProvider.PREF_ANDROID_ID, Settings.Secure.ANDROID_ID)
-                .apply();
+    private static boolean isGCMRegistered(@NonNull OpenPushHelper helper) {
+        return helper.isRegistered()
+                && helper.getCurrentProvider() != null
+                && GCMProvider.NAME.equals(helper.getCurrentProvider().getName());
     }
 }

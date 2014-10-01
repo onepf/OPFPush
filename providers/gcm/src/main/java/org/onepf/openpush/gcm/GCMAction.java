@@ -11,8 +11,8 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
-        GCMConstants.ACTION_REGISTRATION,
-        GCMConstants.ACTION_UNREGISTRATION
+        GCMConstants.ACTION_REGISTRATION_CALLBACK,
+        GCMConstants.ACTION_UNREGISTRATION_CALLBACK
 })
 @interface GCMAction {
 }
