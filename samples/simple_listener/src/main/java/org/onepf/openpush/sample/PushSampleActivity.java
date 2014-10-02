@@ -25,11 +25,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import junit.framework.Assert;
 
 import org.onepf.openpush.Error;
 import org.onepf.openpush.OpenPushHelper;
@@ -71,16 +74,9 @@ public class PushSampleActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
-        mOpenPushHelper.setListener(mEventReceiver);
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        updateUI();
     }
 
     private void updateUI() {
@@ -88,7 +84,11 @@ public class PushSampleActivity extends ActionBarActivity {
             onPushUnavailable();
         } else if (mOpenPushHelper.isRegistered()) {
             onPushRegistered();
-        } else {
+        } else if (mOpenPushHelper.isRegistering()) {
+            onPushRegistering();
+        } else if (mOpenPushHelper.isUnregistering()) {
+            onPushUnregistering();
+        } else if (mOpenPushHelper.isUnregistered()) {
             onPushUnregistered();
         }
     }
@@ -109,13 +109,11 @@ public class PushSampleActivity extends ActionBarActivity {
     @OnClick(R.id.register_switch)
     void switchRegisterState() {
         if (mOpenPushHelper.isRegistered()) {
+            onPushUnregistering();
             mOpenPushHelper.unregister();
-            mRegisterSwitchView.setText(R.string.unregister_in_progress);
-            mRegisterSwitchView.setEnabled(false);
         } else {
+            onPushRegistering();
             mOpenPushHelper.register();
-            mRegisterSwitchView.setText(R.string.register_in_progress);
-            mRegisterSwitchView.setEnabled(false);
         }
     }
 
@@ -134,6 +132,38 @@ public class PushSampleActivity extends ActionBarActivity {
         );
     }
 
+    private void onPushRegistering() {
+        mRegistrationIdView.setText(null);
+        mRegisterSwitchView.setText(R.string.register_in_progress);
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, "None")));
+        mRegisterSwitchView.setEnabled(false);
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.GONE);
+        }
+    }
+
+    private void onPushUnregistering() {
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.VISIBLE);
+        }
+
+        PushProvider provider = mOpenPushHelper.getCurrentProvider();
+        String registrationId = provider == null ?
+                "null" : String.valueOf(provider.getRegistrationId());
+        mRegistrationIdView.setText(
+                Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
+
+        updateProviderName(provider);
+
+        mRegisterSwitchView.setText(R.string.unregister_in_progress);
+        mRegisterSwitchView.setEnabled(false);
+        mRegisterSwitchView.setVisibility(View.VISIBLE);
+
+        if (mCopyToClipboardView != null) {
+            mCopyToClipboardView.setVisibility(View.VISIBLE);
+        }
+    }
+
     void onPushUnavailable() {
         mRegistrationIdView.setText(null);
         mProviderNameView.setText(Html.fromHtml(getString(R.string.no_providers_text)));
@@ -148,16 +178,20 @@ public class PushSampleActivity extends ActionBarActivity {
         String registrationId = provider == null ? "null" : String.valueOf(provider.getRegistrationId());
         mRegistrationIdView.setText(Html.fromHtml(getString(R.string.registration_id_text, registrationId)));
 
-        String name = provider == null ? "null" : provider.getName();
-        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, name)));
+        updateProviderName(provider);
 
-        mRegisterSwitchView.setText(Html.fromHtml(getString(R.string.unregister)));
+        mRegisterSwitchView.setText(R.string.unregister);
         mRegisterSwitchView.setEnabled(true);
         mRegisterSwitchView.setVisibility(View.VISIBLE);
 
         if (mCopyToClipboardView != null) {
             mCopyToClipboardView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void updateProviderName(PushProvider provider) {
+        String name = provider == null ? "null" : provider.getName();
+        mProviderNameView.setText(Html.fromHtml(getString(R.string.push_provider_text, name)));
     }
 
     void onPushUnregistered() {
@@ -218,13 +252,14 @@ public class PushSampleActivity extends ActionBarActivity {
         @Override
         public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    getString(R.string.registration_error_msg, error), Toast.LENGTH_SHORT).show();
+                    getString(R.string.registration_error_msg, error), Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    getString(R.string.unregistration_error_msg, error), Toast.LENGTH_SHORT).show();
+                    getString(R.string.unregistration_error_msg, error), Toast.LENGTH_LONG).show();
+            onPushRegistered();
         }
 
         @Override

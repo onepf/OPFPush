@@ -59,8 +59,12 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onError(@NonNull Context appContext, String errorId) {
-        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.error(NokiaNotificationProvider.NAME, convertError(errorId), false, Result.Type.UNKNOWN));
+        OpenPushHelper.getInstance(this).getProviderCallback()
+                .onResult(
+                        Result.error(NokiaNotificationProvider.NAME,
+                                convertError(errorId),
+                                Result.Type.UNKNOWN)
+                );
     }
 
     /**
@@ -89,8 +93,12 @@ public class NokiaNotificationService extends PushBaseIntentService {
     protected boolean onRecoverableError(@NonNull Context appContext,
                                          @NonNull @NokiaNotificationError String errorId) {
         Error error = convertError(errorId);
-        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.error(NokiaNotificationProvider.NAME, error, true, Result.Type.REGISTRATION));
+        OpenPushHelper.getInstance(this).getProviderCallback()
+                .onResult(
+                        Result.error(NokiaNotificationProvider.NAME,
+                                error,
+                                Result.Type.REGISTRATION)
+                );
         return false;
     }
 

@@ -23,9 +23,6 @@ package org.onepf.openpush;
  * <b>Recoverable</b> error means that service in this moment can't handle registration
  * or unregistration and after some period of time you can try register on unregister again.
  * <b>Not recoverable</b> error means that error is fatal and you can't register this provider.
- * <p/>
- * For check is error recoverable or not call {@link #isRecoverable()}.
- * <p/>
  *
  * @author Kirill Rozov
  * @since 09.09.14.
@@ -37,36 +34,26 @@ public enum Error {
      * <p/>
      * Recoverable error.
      */
-    SERVICE_NOT_AVAILABLE(true),
+    SERVICE_NOT_AVAILABLE,
 
     /**
      * Invalid params send to register provider.
      * <p/>
      * Non recoverable error.
      */
-    INVALID_PARAMETERS(false),
+    INVALID_PARAMETERS,
 
     /**
      * Invalid sender ID.
      * <p/>
      * Non recoverable error.
      */
-    INVALID_SENDER(false),
+    INVALID_SENDER,
 
     /**
      * Credential that you use for registration is not valid.
      * <p/>
      * Non recoverable error.
      */
-    AUTHENTICATION_FAILED(false);
-
-    private boolean mRecoverable;
-
-    private Error(boolean recoverable) {
-        mRecoverable = recoverable;
-    }
-
-    public boolean isRecoverable() {
-        return mRecoverable;
-    }
+    AUTHENTICATION_FAILED
 }

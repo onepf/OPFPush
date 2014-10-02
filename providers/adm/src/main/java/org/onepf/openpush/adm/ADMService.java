@@ -92,8 +92,13 @@ public class ADMService extends IntentService {
      *                {@link ADMConstants#ERROR_SERVICE_NOT_AVAILABLE}.
      */
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
-        OpenPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.error(ADMProvider.NAME, convertError(errorId), false, Result.Type.REGISTRATION));
+        Error error = convertError(errorId);
+        OpenPushHelper.getInstance(this).getProviderCallback()
+                .onResult(
+                        Result.error(ADMProvider.NAME,
+                                error,
+                                Result.Type.REGISTRATION)
+                );
     }
 
     @NonNull

@@ -357,6 +357,11 @@ public class OpenPushHelper {
                 LOGD("Try register %s.", provider);
                 provider.register();
             } else {
+                mProviderCallback.onRegistrationError(
+                        Result.error(provider.getName(),
+                                Error.SERVICE_NOT_AVAILABLE,
+                                Result.Type.REGISTRATION)
+                );
                 postRetryRegister(provider.getName());
             }
             return true;
@@ -629,11 +634,11 @@ public class OpenPushHelper {
                     mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
                 }
             } else if (mListener != null) {
-                Assert.assertNotNull(result.getErrorCode());
+                mSettings.saveState(STATE_WORKING);
+                Assert.assertNotNull(result.getError());
 
                 LOGI("Error unregister provider '%s'.", result.getProviderName());
-                PushProvider provider = getProviderWithException(result.getProviderName());
-                mListener.onUnregistrationError(provider.getName(), result.getErrorCode());
+                mListener.onUnregistrationError(result.getProviderName(), result.getError());
             }
         }
 
@@ -646,16 +651,17 @@ public class OpenPushHelper {
         }
 
         private void onRegistrationError(@NonNull Result result) {
-            Assert.assertNotNull(result.getErrorCode());
+            Assert.assertNotNull(result.getError());
 
             LOGI("Error register provider '%s'.", result.getProviderName());
             PushProvider provider = getProviderWithException(result.getProviderName());
             if (mListener != null) {
-                mListener.onRegistrationError(provider.getName(), result.getErrorCode());
+                mListener.onRegistrationError(provider.getName(), result.getError());
             }
 
             final Backoff backoff = mOptions.getBackoff();
-            if (backoff != null && backoff.hasTries()) {
+            if (result.getError() == Error.SERVICE_NOT_AVAILABLE
+                    && backoff != null && backoff.hasTries()) {
                 postRetryRegister(provider.getName());
             } else {
                 if (backoff != null) {

@@ -88,13 +88,16 @@ public class GCMService extends IntentService {
             throw new OpenPushException(String.format("Unknown error '%s'.", errorId));
         }
 
-        final boolean recoverableError = GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId);
         if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action))
             OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                    Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.REGISTRATION));
+                    Result.error(GCMProvider.NAME,
+                            error,
+                            Result.Type.REGISTRATION)
+            );
         else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action))
             OpenPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                    Result.error(GCMProvider.NAME, error, recoverableError, Result.Type.UNREGISTRATION));
+                    Result.error(GCMProvider.NAME, error, Result.Type.UNREGISTRATION)
+            );
         else {
             throw new OpenPushException(String.format("Unknown action '%s'.", action));
         }

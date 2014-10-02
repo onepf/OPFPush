@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
  * Result of registration or unregistration. Use it to communicate between provider and
  * {@code OpenPushHelper} to notify about operations progress. For successfully ended operations
  * create instance with {@link #success(String, String, org.onepf.openpush.Result.Type)}, for error -
- * {@link #error(String, Error, boolean, org.onepf.openpush.Result.Type)}.
+ * {@link #error(String, Error, org.onepf.openpush.Result.Type)}.
  *
  * @author Kirill Rozov
  * @since 05.09.14.
@@ -33,33 +33,29 @@ public final class Result {
     @NonNull
     private final String mProviderName;
     private final String mRegistrationId;
-    private final Error mErrorCode;
-    private final boolean mRecoverableError;
+    private final Error mErrorCode;;
     private final Type mType;
 
     private Result(@NonNull String providerName,
                    @Nullable String registrationId,
                    @Nullable Error error,
-                   boolean recoverableError,
                    Type type) {
         mProviderName = providerName;
         mRegistrationId = registrationId;
         mErrorCode = error;
-        mRecoverableError = recoverableError;
         mType = type;
     }
 
     public static Result success(@NonNull String providerName,
                                  @NonNull String registrationId,
                                  @NonNull Type type) {
-        return new Result(providerName, registrationId, null, false, type);
+        return new Result(providerName, registrationId, null, type);
     }
 
     public static Result error(@NonNull String providerName,
                                @NonNull Error error,
-                               boolean recoverableError,
                                @NonNull Type type) {
-        return new Result(providerName, null, error, recoverableError, type);
+        return new Result(providerName, null, error, type);
     }
 
     @Override
@@ -74,14 +70,9 @@ public final class Result {
             return "Error{" +
                     "providerName='" + mProviderName + '\'' +
                     ", errorCode='" + mErrorCode + '\'' +
-                    ", recoverableError='" + mRecoverableError + '\'' +
                     ", type=" + mType + '\'' +
                     '}';
         }
-    }
-
-    public boolean isRecoverableError() {
-        return mRecoverableError;
     }
 
     @Nullable
@@ -103,7 +94,7 @@ public final class Result {
      * @see #isSuccess()
      */
     @Nullable
-    public Error getErrorCode() {
+    public Error getError() {
         return mErrorCode;
     }
 
