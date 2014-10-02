@@ -22,8 +22,8 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 
-import static org.onepf.openpush.OpenPushLog.LOGI;
 import static org.onepf.openpush.OpenPushLog.LOGD;
+import static org.onepf.openpush.OpenPushLog.LOGI;
 
 /**
  * @author Kirill Rozov
@@ -35,7 +35,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(@NonNull Context context, Intent intent) {
         LOGD("OpenPush receive boot complete.");
         final OpenPushHelper helper = OpenPushHelper.getInstance(context);
-        if (isAndroidIdChanged(context)) {
+        if (helper.isRegistered() && isAndroidIDChanged(context)) {
             LOGI("Android ID changed.");
             helper.getProviderCallback().onNeedRetryRegister();
         } else if (helper.isRegistering()) {
@@ -44,9 +44,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         }
     }
 
-    public static boolean isAndroidIdChanged(@NonNull Context context) {
-        final OpenPushSettings settings = new OpenPushSettings(context);
-        String lastAndroidId = settings.getLastAndroidId();
-        return lastAndroidId != null && !Settings.Secure.ANDROID_ID.equals(lastAndroidId);
+    public static boolean isAndroidIDChanged(@NonNull Context context) {
+        return !Settings.Secure.ANDROID_ID.equals(new OpenPushSettings(context).getLastAndroidId());
     }
 }

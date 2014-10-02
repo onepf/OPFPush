@@ -540,23 +540,20 @@ public class OpenPushHelper {
 
         /**
          * Call this method when device state changed and need retry registration.
+         * May be call only when the helper in registered state.
          *
          * @throws OpenPushException When call this method when registration not done
          *                           or {@code providerName} isn't current registered provider.
          */
         public void onNeedRetryRegister() {
             LOGD("onNeedRetryRegister(providerName = %s).", mCurrentProvider);
-            if (isRegistered()) {
-                Assert.assertNotNull(mCurrentProvider);
+            Assert.assertNotNull(mCurrentProvider);
 
-                mSettings.clear();
-                mCurrentProvider.onAppStateChanged();
-                mSettings.saveState(STATE_REGISTERING);
-                if (!register(mCurrentProvider)) {
-                    mSettings.saveState(STATE_UNREGISTERED);
-                }
-            } else {
-                //TODO Retry register when registration in progress.
+            mSettings.clear();
+            mCurrentProvider.onAppStateChanged();
+            mSettings.saveState(STATE_REGISTERING);
+            if (!register(mCurrentProvider)) {
+                mSettings.saveState(STATE_UNREGISTERED);
             }
         }
 
