@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.openpush.adm;
-
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
+package org.onepf.openpush;
 
 /**
- * Forward Amazon Device Messaging (ADM) messages to your {@link ADMService}.
- * The ADM client on the device uses broadcast intents to dispatch messages to your app.
- *
  * @author Kirill Rozov
- * @since 06.09.14.
+ * @since 05.09.14.
  */
-public class ADMReceiver extends BroadcastReceiver {
+public interface Backoff {
+    /**
+     * Maximum number of try to register push provider.
+     * Zero value means that will be no retry.
+     */
+    int getTryCount();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        intent.setComponent(new ComponentName(context, ADMService.class));
-        context.startService(intent);
-    }
+    /**
+     * Get delay before next attempt to register push provider.
+     *
+     * @param tryNumber Number of try. Always positive value, than no greater that {@code tryCount()}.
+     * @return Period in milliseconds to wait before next try ro register.
+     */
+    long getDelay(int tryNumber);
 }

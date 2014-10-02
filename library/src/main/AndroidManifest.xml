@@ -26,6 +26,13 @@
         android:name="android.permission.BROADCAST_PACKAGE_REMOVED"
         tools:ignore="ProtectedPermissions"/>
 
-    <application/>
+    <application>
+        <receiver android:name="org.onepf.openpush.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name="org.onepf.openpush.RetryBroadcastReceiver"/>
+    </application>
 
 </manifest>

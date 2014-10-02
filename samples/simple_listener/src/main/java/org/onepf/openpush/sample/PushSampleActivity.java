@@ -218,13 +218,13 @@ public class PushSampleActivity extends ActionBarActivity {
         @Override
         public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    getString(R.string.registration_error_msg, error), Toast.LENGTH_LONG).show();
+                    getString(R.string.registration_error_msg, error), Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
             Toast.makeText(PushSampleActivity.this,
-                    getString(R.string.unregistration_error_msg, error), Toast.LENGTH_LONG).show();
+                    getString(R.string.unregistration_error_msg, error), Toast.LENGTH_SHORT).show();
         }
 
         @Override

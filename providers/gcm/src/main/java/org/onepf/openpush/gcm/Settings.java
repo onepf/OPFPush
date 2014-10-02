@@ -14,12 +14,10 @@ class Settings {
     private static final String KEY_REGISTRATION_TOKEN = "registration_token";
     private static final String KEY_APP_VERSION = "app_version";
     private static final String KEY_MESSAGE_ID = "message_id";
-    private static final String KEY_ANDROID_ID = "android_id";
-    private static final String KEY_STATE = "state";
 
     private static final String PREFS_NAME = "org.onepf.openpush.gcm";
 
-    public static final int NO_SAVED_APP_VERSION = 1;
+    public static final int NO_SAVED_APP_VERSION = -1;
 
     private SharedPreferences mPrefs;
 
@@ -53,27 +51,6 @@ class Settings {
 
     public void saveMessageId(int msgId) {
         mPrefs.edit().putInt(KEY_MESSAGE_ID, msgId).apply();
-    }
-
-    public String getAndroidId() {
-        return mPrefs.getString(KEY_ANDROID_ID, null);
-    }
-
-    public void saveAndroidId(@Nullable String androidId) {
-        if (androidId == null) {
-            mPrefs.edit().remove(KEY_ANDROID_ID).apply();
-        } else {
-            mPrefs.edit().putString(KEY_ANDROID_ID, androidId).apply();
-        }
-    }
-
-    @GCMProvider.State
-    public int getState() {
-        return mPrefs.getInt(KEY_STATE, GCMProvider.STATE_NONE);
-    }
-
-    public void saveState(@GCMProvider.State int state) {
-        mPrefs.edit().putInt(KEY_STATE, state).apply();
     }
 
     public void reset() {

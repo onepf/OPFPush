@@ -66,6 +66,11 @@ public class ADMProvider extends BasePushProvider {
     }
 
     @Override
+    public boolean isRegistered() {
+        return mAdm.getRegistrationId() != null;
+    }
+
+    @Override
     public void unregister() {
         mAdm.startUnregister();
     }

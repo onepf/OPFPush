@@ -91,7 +91,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
         Error error = convertError(errorId);
         OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.error(NokiaNotificationProvider.NAME, error, true, Result.Type.REGISTRATION));
-        return true;
+        return false;
     }
 
     @NonNull

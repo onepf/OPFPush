@@ -2,6 +2,7 @@ package org.onepf.openpush.sample;
 
 import android.app.Application;
 
+import org.onepf.openpush.ExponentialBackoff;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.OpenPushLog;
 import org.onepf.openpush.Options;
@@ -23,6 +24,7 @@ public class PushSampleApplication extends Application {
         OpenPushHelper openPushHelper = OpenPushHelper.getInstance(this);
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
+        builder.setBackoff(new ExponentialBackoff(Integer.MAX_VALUE));
         openPushHelper.init(builder.build());
     }
 }

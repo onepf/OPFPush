@@ -16,11 +16,11 @@
 
 package org.onepf.openpush.adm;
 
+import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.amazon.device.messaging.ADMConstants;
-import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.openpush.*;
 import org.onepf.openpush.Error;
@@ -34,10 +34,36 @@ import org.onepf.openpush.Error;
  * @author Kirill Rozov
  * @since 06.09.14.
  */
-public class ADMService extends ADMMessageHandlerBase {
+public class ADMService extends IntentService {
+
+    private static String mLastRegistrationId;
 
     public ADMService() {
         super("ADMService");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        final String action = intent.getAction();
+        if (ADMConstants.LowLevel.ACTION_RECEIVE_ADM_MESSAGE.equals(action)) {
+            onMessage(intent);
+        } else if (ADMConstants.LowLevel.ACTION_APP_REGISTRATION_EVENT.equals(action)) {
+            if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_ERROR)) {
+                @ADMError String errorId = intent.getStringExtra(ADMConstants.LowLevel.EXTRA_ERROR);
+                onRegistrationError(errorId);
+            } else if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_UNREGISTERED)) {
+                if (mLastRegistrationId != null) {
+                    onUnregistered(mLastRegistrationId);
+                } else {
+                    throw new OpenPushException("Not registered.");
+                }
+            } else if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_REGISTRATION_ID)) {
+                mLastRegistrationId = intent.getStringExtra(ADMConstants.LowLevel.EXTRA_REGISTRATION_ID);
+                onRegistered(mLastRegistrationId);
+            } else {
+                onRegistrationError(ADMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+            }
+        }
     }
 
     /**
@@ -49,9 +75,9 @@ public class ADMService extends ADMMessageHandlerBase {
      *               For an example of defining the behavior of the onMessage() callback,
      *               see SampleADMMessageHandler.java in the ADMMessenger sample app.
      */
-    @Override
     protected void onMessage(@NonNull Intent intent) {
-        OpenPushHelper.getInstance(this).getProviderCallback().onMessage(ADMProvider.NAME, intent.getExtras());
+        OpenPushHelper.getInstance(this)
+                .getProviderCallback().onMessage(ADMProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -65,7 +91,6 @@ public class ADMService extends ADMMessageHandlerBase {
      *                {@link ADMConstants#ERROR_INVALID_SENDER},
      *                {@link ADMConstants#ERROR_SERVICE_NOT_AVAILABLE}.
      */
-    @Override
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
         OpenPushHelper.getInstance(this).getProviderCallback().onResult(
                 Result.error(ADMProvider.NAME, convertError(errorId), false, Result.Type.REGISTRATION));
@@ -96,7 +121,6 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       The {@link com.amazon.device.messaging.ADM#getRegistrationId()}
      *                       method also obtains the registration ID for an instance of your app.
      */
-    @Override
     protected void onRegistered(@NonNull String registrationId) {
         //TODO Send registration id.
         OpenPushHelper.getInstance(this).getProviderCallback()
@@ -115,7 +139,6 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
      *                       will show the registration ID for an unregistered app as {@code null}.
      */
-    @Override
     protected void onUnregistered(@NonNull String registrationId) {
         OpenPushHelper.getInstance(this).getProviderCallback()
                 .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.UNREGISTRATION));

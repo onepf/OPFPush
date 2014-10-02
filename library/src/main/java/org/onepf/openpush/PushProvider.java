@@ -76,12 +76,6 @@ public interface PushProvider {
     String getHostAppPackage();
 
     /**
-     * Must be called when your application is done using PushProvider, to release internal resources.
-     * {@link OpenPushHelper} call it after successfully unregister.
-     */
-    void close();
-
-    /**
      * Verify does application manifest contains all needed permissions.
      *
      * @return {@code true} if all required permissions described in manifest, else {@code false}.

@@ -143,7 +143,7 @@ public final class PackageUtils {
                 if (context.getPackageName().equals(getAppPackage(intent))) {
                     LOGI("Application updated.");
                     OpenPushHelper.getInstance(context)
-                            .getProviderCallback().onNeedRetryRegister(mProvider.getName());
+                            .getProviderCallback().onNeedRetryRegister();
                 }
             }
         }

@@ -33,7 +33,7 @@ For work this module doe next things:
                 <action android:name="org.onepf.openpush.gcm.intent.REGISTRATION"/>
             </intent-filter>
         </receiver>
-        <receiver android:name="org.onepf.openpush.gcm.BootCompleteReceiver">
+        <receiver android:name="org.onepf.openpush.BootCompleteReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

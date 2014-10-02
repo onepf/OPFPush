@@ -16,8 +16,6 @@
 
 package org.onepf.openpush;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -359,9 +357,8 @@ public class OpenPushHelperTest {
     public void testRestoreLastProvider() throws Exception {
         MockPushProvider provider = initWithMockProvider();
 
-        SharedPreferences prefs =
-                Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE);
-        String lastProviderName = prefs.getString(OpenPushHelper.KEY_LAST_PROVIDER_NAME, null);
+        OpenPushSettings settings = new OpenPushSettings(Robolectric.application);
+        final String lastProviderName = settings.getLastProviderName();
         assertNotNull(lastProviderName);
         assertEquals(provider.getName(), lastProviderName);
 
@@ -389,10 +386,9 @@ public class OpenPushHelperTest {
         MockPushProvider provider = initWithMockProvider();
         provider.setAvailable(false);
 
-        SharedPreferences prefs =
-                Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE);
-        assertTrue(prefs.contains(OpenPushHelper.KEY_LAST_PROVIDER_NAME));
-        String lastProviderName = prefs.getString(OpenPushHelper.KEY_LAST_PROVIDER_NAME, null);
+        OpenPushSettings settings = new OpenPushSettings(Robolectric.application);
+        String lastProviderName = settings.getLastProviderName();
+        assertNotNull(lastProviderName);
         assertFalse(TextUtils.isEmpty(lastProviderName));
         assertEquals(provider.getName(), lastProviderName);
 
@@ -400,7 +396,7 @@ public class OpenPushHelperTest {
         helper.init(new Options.Builder().addProviders(provider).build());
         assertNull(helper.getCurrentProvider());
         assertFalse(helper.isRegistered());
-        assertFalse(prefs.contains(OpenPushHelper.KEY_LAST_PROVIDER_NAME));
+        assertFalse(settings.getLastProviderName() != null);
     }
 
     @Test
@@ -513,9 +509,7 @@ public class OpenPushHelperTest {
 
     @After
     public void tearDown() {
-        Robolectric.application.getSharedPreferences(OpenPushHelper.PREF_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .clear();
+        new OpenPushSettings(Robolectric.application).clear();
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 }

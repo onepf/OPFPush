@@ -42,12 +42,17 @@ public class Options {
     private final boolean mRecoverProvider;
     private final boolean mSelectSystemPreferred;
 
+    @Nullable
+    private final Backoff mBackoff;
+
     private Options(@NonNull Collection<? extends PushProvider> providers,
+                    @Nullable Backoff backoff,
                     boolean recoverProvider,
                     boolean selectSystemPreferred) {
         mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         mRecoverProvider = recoverProvider;
         mSelectSystemPreferred = selectSystemPreferred;
+        mBackoff = backoff;
     }
 
     /**
@@ -75,6 +80,11 @@ public class Options {
         return mProviders;
     }
 
+    @Nullable
+    public Backoff getBackoff() {
+        return mBackoff;
+    }
+
     @Override
     public String toString() {
         return "Options{" +
@@ -94,6 +104,9 @@ public class Options {
 
         private boolean mRecoverProvider = true;
         private boolean mSelectSystemPreferred;
+
+        @Nullable
+        private Backoff mBackoff = new ExponentialBackoff();
 
         /**
          * Mark for try select the best store for device from added providers.
@@ -169,6 +182,10 @@ public class Options {
             return this;
         }
 
+        public void setBackoff(@Nullable Backoff backoff) {
+            mBackoff = backoff;
+        }
+
         /**
          * Create instance of {@link Options} with data from the builder.
          *
@@ -180,7 +197,7 @@ public class Options {
             if (mProviders == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders.values(), mRecoverProvider, mSelectSystemPreferred);
+            return new Options(mProviders.values(), mBackoff, mRecoverProvider, mSelectSystemPreferred);
         }
 
         @Override
