@@ -19,15 +19,9 @@ package org.onepf.openpush.gcm;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -41,12 +35,9 @@ import org.onepf.openpush.OpenPushException;
 import org.onepf.openpush.util.PackageUtils;
 
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import support.AsyncTaskCompat;
@@ -147,13 +138,13 @@ public class GCMProvider extends BasePushProvider {
 
         if (super.isAvailable()) {
             int conResult = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
-            return conResult == ConnectionResult.SUCCESS && isGoogleAccountExists();
+            return conResult == ConnectionResult.SUCCESS && checkGoogleAccount();
         } else {
             return false;
         }
     }
 
-    private boolean isGoogleAccountExists() {
+    private boolean checkGoogleAccount() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
             return true;
