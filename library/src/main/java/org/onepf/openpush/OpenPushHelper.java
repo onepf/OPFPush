@@ -591,35 +591,26 @@ public class OpenPushHelper {
          */
         public void onResult(@NonNull Result result) {
             synchronized (mRegistrationLock) {
+                @State final int state = mSettings.getState();
                 if (result.getType() == Result.Type.REGISTRATION) {
-                    if (mSettings.getState() == STATE_REGISTERING) {
+                    if (state == STATE_REGISTERING) {
                         onRegistrationResult(result);
-                    } else {
-                        throw new OpenPushException("Registration result can be" +
-                                " handled only when registration is running.");
+                        return;
                     }
                 } else if (result.getType() == Result.Type.UNREGISTRATION) {
-                    if (mSettings.getState() == STATE_UNREGISTERING) {
+                    if (state == STATE_UNREGISTERING) {
                         onUnregistrationResult(result);
-                    } else {
-                        throw new OpenPushException("Unregistration result can be" +
-                                " handled only when unregistration is running.");
+                        return;
                     }
-                } else {
-                    switch (mSettings.getState()) {
-                        case STATE_REGISTERING:
-                            onRegistrationResult(result);
-                            return;
-
-                        case STATE_UNREGISTERING:
-                            onUnregistrationResult(result);
-                            break;
-
-                        default:
-                            throw new OpenPushException("Result of unknown type can be" +
-                                    " handled only when registration or unregistration is running.");
-                    }
+                } else if (state == STATE_REGISTERING) {
+                    onRegistrationResult(result);
+                    return;
+                } else if (state == STATE_UNREGISTERING) {
+                    onUnregistrationResult(result);
+                    return;
                 }
+
+                throw new IllegalStateException("Result can't be handle.");
             }
         }
 
