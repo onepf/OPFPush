@@ -1,6 +1,9 @@
 package org.onepf.openpush.util;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -58,6 +61,13 @@ public final class Utils {
         builder.setLength(builder.length() - ITEM_DIVIDER.length());
         builder.append(']');
         return builder.toString();
+    }
+
+    public static boolean isNetworkConnected(@NonNull Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private Utils() {

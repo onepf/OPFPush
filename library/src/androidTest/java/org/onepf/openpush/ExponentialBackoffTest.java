@@ -1,10 +1,13 @@
 package org.onepf.openpush;
 
-import org.junit.Before;
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,25 +21,28 @@ public class ExponentialBackoffTest {
 
     @Test
     public void testDelay() throws Exception {
-        ExponentialBackoff mBackoff = new ExponentialBackoff(6);
-        assertEquals(6, mBackoff.getTryCount());
-        for (int tryNumber = 1, expectedDelay = 2000;
-             tryNumber <= mBackoff.getTryCount();
-             tryNumber++, expectedDelay *= 2) {
-            assertEquals(expectedDelay, mBackoff.getDelay(tryNumber));
+        final int backoffTryCount = 6;
+        ExponentialBackoff backoff = new ExponentialBackoff(backoffTryCount);
+        int tryCount = 0;
+        for (int expectedDelay = 2000; backoff.hasTries(); expectedDelay *= 2) {
+            tryCount++;
+            assertEquals(expectedDelay, backoff.getTryDelay());
         }
+        Assert.assertEquals(backoffTryCount, tryCount);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetDelayForZeroTryNumber() throws Exception {
-        ExponentialBackoff mBackoff = new ExponentialBackoff(6);
-        mBackoff.getDelay(0);
+    public void testCreateWithZeroTryCount() throws Exception {
+        new ExponentialBackoff(0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetDelayForTryNumberBiggerThanTryCount() throws Exception {
-        ExponentialBackoff mBackoff = new ExponentialBackoff(6);
-        assertEquals(6, mBackoff.getTryCount());
-        mBackoff.getDelay(7);
+    @Test(expected = NoSuchElementException.class)
+    public void test() throws Exception {
+        int tryCount = 1;
+        ExponentialBackoff backoff = new ExponentialBackoff(tryCount);
+        for (int i = 0; i <= tryCount; i++) {
+            backoff.hasTries();
+            backoff.getTryDelay();
+        }
     }
 }

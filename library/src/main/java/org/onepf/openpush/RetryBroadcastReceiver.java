@@ -10,13 +10,16 @@ import android.content.Intent;
  */
 public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String EXTRA_PROVIDER_NAME = "provider_name";
-
     @Override
     public void onReceive(Context context, Intent intent) {
         final OpenPushHelper helper = OpenPushHelper.getInstance(context);
-        if (helper.isInitDone() && intent.hasExtra(EXTRA_PROVIDER_NAME)) {
-            helper.retryRegister(intent.getStringExtra(EXTRA_PROVIDER_NAME));
+        if (helper.isInitDone()) {
+            final String action = intent.getAction();
+            if (OpenPushConstants.ACTION_REGISTER.equals(action)) {
+                helper.register(intent.getStringExtra(OpenPushConstants.EXTRA_PROVIDER_NAME));
+            } else {
+                throw new OpenPushException("Unknown action '%s'.", action);
+            }
         }
     }
 }

@@ -25,13 +25,15 @@ public interface Backoff {
      * Maximum number of try to register push provider.
      * Zero value means that will be no retry.
      */
-    int getTryCount();
+    boolean hasTries();
 
     /**
      * Get delay before next attempt to register push provider.
      *
-     * @param tryNumber Number of try. Always positive value, than no greater that {@code tryCount()}.
      * @return Period in milliseconds to wait before next try ro register.
+     * @throws {@link java.util.NoSuchElementException} if there are no more elements.
      */
-    long getDelay(int tryNumber);
+    long getTryDelay();
+
+    void reset();
 }

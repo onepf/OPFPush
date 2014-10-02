@@ -16,7 +16,11 @@
 
 package org.onepf.openpush;
 
+import android.support.annotation.NonNull;
+
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Kirill Rozov
@@ -24,6 +28,9 @@ import java.util.concurrent.TimeUnit;
  */
 public final class ExponentialBackoff implements Backoff {
     private final int mTryCount;
+
+    @NonNull
+    private final AtomicInteger mTryNumber = new AtomicInteger(0);
 
     public ExponentialBackoff(int tryCount) {
         if (tryCount < 1) {
@@ -37,18 +44,20 @@ public final class ExponentialBackoff implements Backoff {
     }
 
     @Override
-    public int getTryCount() {
-        return mTryCount;
+    public long getTryDelay() {
+        if (mTryNumber.get() > mTryCount) {
+            throw new NoSuchElementException();
+        }
+        return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.get() - 1));
     }
 
     @Override
-    public long getDelay(int tryNumber) {
-        if (tryNumber < 1) {
-            throw new IllegalArgumentException("Try number can't less than 1.");
-        }
-        if (tryNumber > mTryCount) {
-            throw new IllegalArgumentException("Try number can't more than tryCount().");
-        }
-        return TimeUnit.SECONDS.toMillis(2 << (tryNumber - 1));
+    public void reset() {
+        mTryNumber.set(0);
+    }
+
+    @Override
+    public boolean hasTries() {
+        return mTryNumber.getAndIncrement() < mTryCount;
     }
 }

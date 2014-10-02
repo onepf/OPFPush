@@ -478,7 +478,7 @@ public class OpenPushHelperTest {
         );
     }
 
-    @Test(expected = OpenPushException.class)
+    @Test(expected = IllegalStateException.class)
     public void testSendUnregistrationResult_RegistrationRunning() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
@@ -487,7 +487,7 @@ public class OpenPushHelperTest {
         );
     }
 
-    @Test(expected = OpenPushException.class)
+    @Test(expected = IllegalStateException.class)
     public void testSendRegistrationResult_UnregistrationRunning() throws Exception {
         OpenPushHelper helper = createHelperWithInfinityUnregisterProvider();
         helper.register();
