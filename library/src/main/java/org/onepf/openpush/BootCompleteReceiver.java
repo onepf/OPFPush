@@ -40,7 +40,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             helper.getProviderCallback().onNeedRetryRegister();
         } else if (helper.isRegistering()) {
             LOGI("Retry register after reboot.");
-            helper.restartRegister();
+            helper.restartRegisterOnBoot();
         }
     }
 

@@ -59,7 +59,7 @@ public class OpenPushHelper {
 
     static final int STATE_UNREGISTERED = 0;
     static final int STATE_REGISTERING = 1;
-    static final int STATE_WORKING = 2;
+    static final int STATE_REGISTERED = 2;
     static final int STATE_UNREGISTERING = 3;
 
     @Retention(RetentionPolicy.SOURCE)
@@ -67,7 +67,7 @@ public class OpenPushHelper {
             STATE_UNREGISTERED,
             STATE_UNREGISTERING,
             STATE_REGISTERING,
-            STATE_WORKING
+            STATE_REGISTERED
     })
     @interface State {
     }
@@ -86,6 +86,9 @@ public class OpenPushHelper {
 
     @Nullable
     private PushProvider mCurrentProvider;
+
+    @Nullable
+    private AlarmManager mAlarmManager;
 
     private Options mOptions;
 
@@ -153,13 +156,12 @@ public class OpenPushHelper {
      * @return True if push registered, else - false.
      */
     public boolean isRegistered() {
-        int state = mSettings.getState();
-        return mCurrentProvider != null
-                && (state == STATE_WORKING || state == STATE_UNREGISTERING);
+        final int state = mSettings.getState();
+        return state == STATE_REGISTERED || state == STATE_UNREGISTERING;
     }
 
     public boolean isUnregistered() {
-        return mCurrentProvider == null && mSettings.getState() == STATE_UNREGISTERED;
+        return mSettings.getState() == STATE_UNREGISTERED;
     }
 
     public boolean isRegistering() {
@@ -199,6 +201,7 @@ public class OpenPushHelper {
     private void initLastProvider() {
         final PushProvider lastProvider = getLastProvider();
         if (lastProvider == null) {
+            LOGI("No last provider.");
             return;
         }
 
@@ -208,26 +211,22 @@ public class OpenPushHelper {
             if (lastProvider.isRegistered()) {
                 LOGI("Last provider running.");
                 mCurrentProvider = lastProvider;
-                mSettings.saveState(STATE_WORKING);
+                mSettings.saveState(STATE_REGISTERED);
             } else {
                 LOGI("Last provider need register.");
-                mSettings.saveState(STATE_REGISTERING);
                 if (!register(lastProvider)) {
                     mSettings.saveState(STATE_UNREGISTERED);
                     mSettings.saveLastProvider(null);
                 }
             }
         } else {
-            lastProvider.onUnavailable();
-            LOGI("Last provider isn't available.");
-            mSettings.clear();
-            if (mOptions.isRecoverProvider()) {
-                LOGI("Try register any available provider.");
-                register();
-            }
+            mProviderCallback.onUnavailable(lastProvider);
         }
     }
 
+    /**
+     * Check if at least one provider available.
+     */
     public boolean hasAvailableProvider() {
         for (PushProvider provider : mOptions.getProviders()) {
             if (provider.isAvailable()) {
@@ -241,28 +240,10 @@ public class OpenPushHelper {
         mListener = l == null ? null : new MainThreadListenerWrapper(l);
     }
 
-    void restartRegister() {
+    void restartRegisterOnBoot() {
         checkInitDone();
-
-        synchronized (mRegistrationLock) {
-            switch (mSettings.getState()) {
-                case STATE_REGISTERING:
-                case STATE_UNREGISTERED:
-                    mSettings.saveState(STATE_REGISTERING);
-                    if (mOptions.isSelectSystemPreferred()
-                            && registerSystemPreferredProvider()) {
-                        return;
-                    }
-                    registerNextProvider(null);
-                    break;
-
-                case STATE_UNREGISTERING:
-                    throw new OpenPushException("Can't register while unregistration is running.");
-
-                case STATE_WORKING:
-                    throw new OpenPushException("Attempt to register twice!");
-            }
-        }
+        mSettings.clear();
+        register();
     }
 
     /**
@@ -291,7 +272,7 @@ public class OpenPushHelper {
                 case STATE_UNREGISTERING:
                     throw new OpenPushException("Can't register while unregistration is running.");
 
-                case STATE_WORKING:
+                case STATE_REGISTERED:
                     throw new OpenPushException("Attempt to register twice!");
             }
         }
@@ -341,12 +322,11 @@ public class OpenPushHelper {
     }
 
     boolean register(@NonNull String providerName) {
-        PushProvider provider = getProviderWithException(providerName);
-        return register(provider);
+        return register(getProviderWithException(providerName));
     }
 
     /**
-     * Start registerWithNext provider.
+     * Start register provider.
      *
      * @param provider Provider for registration.
      * @return If provider available and can start registration return true, otherwise - false.
@@ -362,7 +342,6 @@ public class OpenPushHelper {
                                 Error.SERVICE_NOT_AVAILABLE,
                                 Result.Type.REGISTRATION)
                 );
-                postRetryRegister(provider.getName());
             }
             return true;
         }
@@ -379,14 +358,10 @@ public class OpenPushHelper {
         checkInitDone();
 
         synchronized (mRegistrationLock) {
-            if (!isRegistered()) {
-                throw new OpenPushException("No one provider is registered!");
-            }
-
             Assert.assertNotNull(mCurrentProvider);
 
             switch (mSettings.getState()) {
-                case STATE_WORKING:
+                case STATE_REGISTERED:
                     mSettings.saveState(STATE_UNREGISTERING);
                     unregisterPackageChangeReceiver();
                     mCurrentProvider.unregister();
@@ -452,13 +427,12 @@ public class OpenPushHelper {
     @Nullable
     private PushProvider getLastProvider() {
         String storedProviderName = mSettings.getLastProviderName();
-        if (storedProviderName != null) {
-            if (!TextUtils.isEmpty(storedProviderName)) {
-                PushProvider provider = getProvider(storedProviderName);
-                if (provider != null) {
-                    return provider;
-                }
+        if (!TextUtils.isEmpty(storedProviderName)) {
+            PushProvider provider = getProvider(storedProviderName);
+            if (provider != null) {
+                return provider;
             }
+
             mSettings.saveLastProvider(null);
         }
         return null;
@@ -486,8 +460,14 @@ public class OpenPushHelper {
         intent.setAction(OpenPushConstants.ACTION_REGISTER);
         intent.putExtra(OpenPushConstants.EXTRA_PROVIDER_NAME, providerName);
 
-        AlarmManager am = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC, when, PendingIntent.getBroadcast(mAppContext, 0, intent, 0));
+        if (mAlarmManager == null) {
+            mAlarmManager = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
+        }
+        if (mAlarmManager != null) {
+            mAlarmManager.set(
+                    AlarmManager.RTC, when, PendingIntent.getBroadcast(mAppContext, 0, intent, 0)
+            );
+        }
     }
 
     static boolean canHandleResult(@NonNull Result result, @State int state) {
@@ -526,10 +506,11 @@ public class OpenPushHelper {
         }
 
         private void checkProviderWorking(String providerName) {
-            if (!isRegistered() || mCurrentProvider == null) {
+            if (!isRegistered()) {
                 throw new OpenPushException("Can't receive message when not registered.");
             }
-            if (!providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
+            if (mCurrentProvider != null &&
+                    !providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
                 throw new OpenPushException("Can't receive message from not registered provider. " +
                         "Current provider '%s', message source ='%s'",
                         mCurrentProvider.getName(), providerName);
@@ -561,8 +542,8 @@ public class OpenPushHelper {
          *                           or {@code providerName} isn't current registered provider.
          */
         public void onNeedRetryRegister() {
-            LOGD("onNeedRetryRegister(providerName = %s).", mCurrentProvider);
             Assert.assertNotNull(mCurrentProvider);
+            LOGD("onNeedRetryRegister(providerName = %s).", mCurrentProvider);
 
             mSettings.clear();
             mCurrentProvider.onAppStateChanged();
@@ -608,16 +589,28 @@ public class OpenPushHelper {
             synchronized (mRegistrationLock) {
                 final int state = mSettings.getState();
                 if (canHandleResult(result, state)) {
-                    final Result.Type type = result.getType();
-                    if (type == Result.Type.REGISTRATION) {
-                        onRegistrationResult(result);
-                    } else if (type == Result.Type.UNREGISTRATION) {
-                        onUnregistrationResult(result);
-                    } else if (state == STATE_REGISTERING) {
-                        onRegistrationResult(result);
-                    } else if (state == STATE_UNREGISTERING) {
-                        onUnregistrationResult(result);
+                    switch (result.getType()) {
+                        case REGISTRATION:
+                            onRegistrationResult(result);
+                            return;
+
+                        case UNREGISTRATION:
+                            onUnregistrationResult(result);
+                            return;
+
+                        case UNKNOWN:
+                            switch (state) {
+                                case STATE_REGISTERING:
+                                    onRegistrationResult(result);
+                                    return;
+
+                                case STATE_UNREGISTERING:
+                                    onUnregistrationResult(result);
+                                    return;
+                            }
+                            throw new OpenPushException("Result not handled.");
                     }
+
                 } else {
                     throw new IllegalStateException("Result can't be handle.");
                 }
@@ -634,7 +627,7 @@ public class OpenPushHelper {
                     mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
                 }
             } else if (mListener != null) {
-                mSettings.saveState(STATE_WORKING);
+                mSettings.saveState(STATE_REGISTERED);
                 Assert.assertNotNull(result.getError());
 
                 LOGI("Error unregister provider '%s'.", result.getProviderName());
@@ -679,7 +672,7 @@ public class OpenPushHelper {
 
             LOGI("Successfully register provider '%s'.", result.getProviderName());
             LOGI("Register id '%s'.", result.getRegistrationId());
-            mSettings.saveState(STATE_WORKING);
+            mSettings.saveState(STATE_REGISTERED);
             mSettings.saveLastAndroidId(android.provider.Settings.Secure.ANDROID_ID);
 
             mCurrentProvider = getProviderWithException(result.getProviderName());
