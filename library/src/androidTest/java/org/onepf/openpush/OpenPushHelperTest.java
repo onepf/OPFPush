@@ -126,7 +126,6 @@ public class OpenPushHelperTest {
     }
 
     private static void restoreUnavailableProvider_RecoverDisable(PushProvider... providers) {
-
         Options.Builder builder = new Options.Builder();
         builder.setRecoverProvider(false);
         builder.addProviders(providers);
@@ -383,8 +382,7 @@ public class OpenPushHelperTest {
 
     @Test
     public void testRestoreUnavailableProvider() throws Exception {
-        MockPushProvider provider = initWithMockProvider();
-        provider.setAvailable(false);
+        final MockPushProvider provider = initWithMockProvider();
 
         OpenPushSettings settings = new OpenPushSettings(Robolectric.application);
         String lastProviderName = settings.getLastProviderName();
@@ -392,11 +390,13 @@ public class OpenPushHelperTest {
         assertFalse(TextUtils.isEmpty(lastProviderName));
         assertEquals(provider.getName(), lastProviderName);
 
+        provider.setAvailable(false);
+
         OpenPushHelper helper = OpenPushHelper.newInstance(Robolectric.application);
         helper.init(new Options.Builder().addProviders(provider).build());
         assertNull(helper.getCurrentProvider());
         assertFalse(helper.isRegistered());
-        assertFalse(settings.getLastProviderName() != null);
+        assertNull(settings.getLastProviderName());
     }
 
     @Test
@@ -417,9 +417,7 @@ public class OpenPushHelperTest {
 
         final PushProvider currentProvider = helper.getCurrentProvider();
         assertNotNull(currentProvider);
-        checkProviderRegistrationState(
-                helper, currentProvider
-        );
+        checkProviderRegistrationState(helper, currentProvider);
     }
 
     @Test

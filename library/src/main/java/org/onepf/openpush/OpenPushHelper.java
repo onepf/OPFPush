@@ -36,6 +36,7 @@ import org.onepf.openpush.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.security.Provider;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -215,11 +216,13 @@ public class OpenPushHelper {
             } else {
                 LOGI("Last provider need register.");
                 if (!register(lastProvider)) {
-                    mSettings.saveState(STATE_UNREGISTERED);
                     mSettings.saveLastProvider(null);
                 }
             }
         } else {
+            mSettings.saveLastProvider(null);
+            mSettings.saveState(STATE_UNREGISTERED);
+
             mProviderCallback.onUnavailable(lastProvider);
         }
     }
@@ -358,10 +361,10 @@ public class OpenPushHelper {
         checkInitDone();
 
         synchronized (mRegistrationLock) {
-            Assert.assertNotNull(mCurrentProvider);
-
             switch (mSettings.getState()) {
                 case STATE_REGISTERED:
+                    Assert.assertNotNull(mCurrentProvider);
+
                     mSettings.saveState(STATE_UNREGISTERING);
                     unregisterPackageChangeReceiver();
                     mCurrentProvider.unregister();
@@ -554,27 +557,27 @@ public class OpenPushHelper {
         }
 
         /**
-         * Call this method when current provider become unavailable.
+         * Call this method when provider become unavailable.
          *
          * @param provider Provider that become unavailable.
          * @throws OpenPushException When call this method when registration not done
          *                           or {@code providerName} isn't current registered provider.
          */
         public void onUnavailable(@NonNull PushProvider provider) {
-            checkProviderWorking(provider.getName());
-
             LOGD("onUnavailable(provider = %s).", provider);
-            if (mCurrentProvider != null && mCurrentProvider.equals(provider)) {
-                mSettings.clear();
-                mCurrentProvider.onUnavailable();
-                mCurrentProvider = null;
-                if (mListener != null) {
-                    mListener.onProviderBecameUnavailable(provider.getName());
-                }
 
-                if (mOptions.isRecoverProvider()) {
-                    OpenPushHelper.this.register(); //Restart registration
-                }
+            if (mCurrentProvider != null && provider.equals(mCurrentProvider)) {
+                mCurrentProvider = null;
+                mSettings.saveState(STATE_UNREGISTERED);
+            }
+
+            provider.onUnavailable();
+            if (mListener != null) {
+                mListener.onProviderBecameUnavailable(provider.getName());
+            }
+
+            if (mOptions.isRecoverProvider()) {
+                OpenPushHelper.this.register(); //Restart registration
             }
         }
 

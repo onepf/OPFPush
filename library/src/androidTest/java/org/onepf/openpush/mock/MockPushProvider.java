@@ -29,7 +29,8 @@ import org.robolectric.Robolectric;
 import java.util.UUID;
 
 /**
- * Created by  Kirill Rozov on 11.09.14.
+ * @author Kirill Rozov
+ * @since 11.09.14.
  */
 public class MockPushProvider extends BasePushProvider {
 
