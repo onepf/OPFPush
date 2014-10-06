@@ -106,7 +106,29 @@ You can enable logging by call (by default it off):
     OpenPushLog.setLogEnable(true);
     ```
 
+Create Custom Push Provider
+---------------------------
 
+For create custom Push Provider you must create class that implement `PushProvider` interface.
+Common functionality contains in `BasePushProvider` class, and we recommend subclass this class.
+
+All provider has <i>Host Application</i>.Host application this is application that provider
+push service work, such contains services, describe permission ant etc.
+Usually this is store application, like Google Play Store for Google Cloud Messaging.
+
+Requirements for custom Push Provider:
+1. `register()` and `unregister()` method must execute asynchronously.
+2. `isAvailable()` method must check device state for that provider has possibility to register,
+    but this no mean that it registration can finish successfully.
+3. `getRegistrationId()` method must return not null string only when it registered.
+    In all other cases this method must return `null`.
+4. `getName()` method must always return unique not null string for all using providers.
+5. `getHostAppPackage()` method must return not null string with package of host application
+    of push service.
+6. `checkManifest()` method must check that all needed permissions, data and
+    components described in manifests.
+7. When `onRegistrationInvalid()` or `onUnavailable` method called
+    you must reset all data about registration.
 
 Implemented Push Services
 -----------------------
