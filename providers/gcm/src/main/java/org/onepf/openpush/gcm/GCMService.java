@@ -69,7 +69,7 @@ public class GCMService extends IntentService {
 
     protected void onDeletedMessages() {
         OpenPushHelper.getInstance(GCMService.this).getProviderCallback()
-                .onDeletedMessages(GCMProvider.NAME, 1);
+                .onDeletedMessages(GCMProvider.NAME, OpenPushHelper.MESSAGES_COUNT_UNKNOWN);
     }
 
     private void onMessage(final Intent intent) {

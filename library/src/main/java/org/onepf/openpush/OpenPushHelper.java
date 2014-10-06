@@ -56,6 +56,12 @@ import static org.onepf.openpush.OpenPushLog.LOGW;
  */
 public class OpenPushHelper {
 
+    /**
+     * Use for {@code messagesCount} argument in
+     * {@link ProviderCallback#onDeletedMessages(String, int)} when messages count is unknown.
+     */
+    public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
+
     static final int STATE_UNREGISTERED = 0;
     static final int STATE_REGISTERING = 1;
     static final int STATE_REGISTERED = 2;
@@ -532,6 +538,9 @@ public class OpenPushHelper {
     }
 
     public class ProviderCallback {
+
+        ProviderCallback() {
+        }
 
         /**
          * Provider must call this method when new message received.
