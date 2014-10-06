@@ -102,9 +102,9 @@ You can setup `OpenPushHelper` following steps:
 
 You can enable logging by call (by default it off):
 
-    ```java
-    OpenPushLog.setLogEnable(true);
-    ```
+```java
+OpenPushLog.setLogEnable(true);
+```
 
 Create Custom Push Provider
 ---------------------------
