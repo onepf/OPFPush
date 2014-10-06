@@ -117,6 +117,7 @@ push service work, such contains services, describe permission ant etc.
 Usually this is store application, like Google Play Store for Google Cloud Messaging.
 
 Requirements for custom Push Provider:
+
 1. `register()` and `unregister()` method must execute asynchronously.
 2. `isAvailable()` method must check device state for that provider has possibility to register,
     but this no mean that it registration can finish successfully.
@@ -126,9 +127,9 @@ Requirements for custom Push Provider:
 5. `getHostAppPackage()` method must return not null string with package of host application
     of push service.
 6. `checkManifest()` method must check that all needed permissions, data and
-    components described in manifests.
+   components described in manifests.
 7. When `onRegistrationInvalid()` or `onUnavailable` method called
-    you must reset all data about registration.
+   you must reset all data about registration.
 
 Implemented Push Services
 -----------------------
