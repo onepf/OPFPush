@@ -92,7 +92,7 @@ public interface PushProvider {
      * and you need reset all saved registration data.
      */
     //TODO Think about method name.
-    void onAppStateChanged();
+    void onRegistrationInvalid();
 
     /**
      * Callback method for notify that the provider become unavailable.

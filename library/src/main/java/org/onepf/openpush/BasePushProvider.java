@@ -134,6 +134,6 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
-    public void onAppStateChanged() {
+    public void onRegistrationInvalid() {
     }
 }

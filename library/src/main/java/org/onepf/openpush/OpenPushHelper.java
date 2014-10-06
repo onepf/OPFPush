@@ -36,7 +36,6 @@ import org.onepf.openpush.util.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.security.Provider;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -549,7 +548,7 @@ public class OpenPushHelper {
             LOGD("onNeedRetryRegister(providerName = %s).", mCurrentProvider);
 
             mSettings.clear();
-            mCurrentProvider.onAppStateChanged();
+            mCurrentProvider.onRegistrationInvalid();
             mSettings.saveState(STATE_REGISTERING);
             if (!register(mCurrentProvider)) {
                 mSettings.saveState(STATE_UNREGISTERED);

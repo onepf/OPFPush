@@ -88,7 +88,7 @@ public class MockPushProvider extends BasePushProvider {
     }
 
     @Override
-    public void onAppStateChanged() {
+    public void onRegistrationInvalid() {
         mRegistrationId = null;
     }
 

@@ -185,7 +185,7 @@ public class GCMProvider extends BasePushProvider {
     }
 
     @Override
-    public void onAppStateChanged() {
+    public void onRegistrationInvalid() {
         reset();
     }
 
