@@ -45,9 +45,10 @@ for JAR dependency:
 How To Use
 ----------
 
+Before setup `OpenPushHelper` you must setup your project files.
 If you use [Android New Build System AAR][7] and AAR dependencies:
 
-1. Add to build.gradle file in your app module:
+0. Add to build.gradle file in your app module:
 
        ```groovy
        android {
@@ -61,7 +62,7 @@ If you use [Android New Build System AAR][7] and AAR dependencies:
 
 If you use JAR dependencies:
 
-1. Add to AndroidManifest.xml file of your app:
+0. Add to AndroidManifest.xml file of your app:
 
       ```xml
       <uses-permission android:name="android.permission.INTERNET"/>
@@ -72,9 +73,9 @@ If you use JAR dependencies:
       and add for each used providers specific changes that you can find in provider README.md file.
       See section `Implemented Push Services`.
 
-Next steps common for both kind of dependencies.
+You can setup `OpenPushHelper` following steps:
 
-2. Create `Options` object:
+1. Create `Options` object:
 
     ```java
     Options.Builder builder = new Options.Builder();
@@ -85,7 +86,7 @@ Next steps common for both kind of dependencies.
     Options options = builder.build();
     ```
 
-3. Init `OpenPushHelper` using created `Options` object:
+2. Init `OpenPushHelper` using created `Options` object:
 
     ```java
     OpenPushHelper.getInstance(this).init(options);
@@ -93,7 +94,7 @@ Next steps common for both kind of dependencies.
 
     Preferred place to init OpenPushHelper is the `Application` class of your app.
 
-4. Add listener for `OpenPushHelper` events:
+3. Add listener for `OpenPushHelper` events:
 
     ```java
     OpenPushHelper.getInstance(this).setListener(new OpenPushListener());
@@ -141,6 +142,6 @@ License
 [5]: https://github.com/onepf/OpenPush/tree/readme/providers/adm
 [6]: https://github.com/onepf/OpenPush/tree/readme/providers/nokia
 [7]: http://tools.android.com/tech-docs/new-build-system
-[8]: LINK TO the latest JAR.
+[8]: http://LINK_TO_the_latest_JAR.
 [9]: http://www.onepf.org/openpush/
-[10]: LINK TO the latest AAR.
+[10]: http://LINK_TO_the_latest_AAR.
