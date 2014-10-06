@@ -268,7 +268,7 @@ public class OpenPushHelperTest {
         checkProviderRegistrationState(helper, currentProvider);
 
         Robolectric.packageManager.removePackage(currentProvider.getHostAppPackage());
-        helper.getProviderCallback().onUnavailable(currentProvider);
+        helper.onProviderUnavailable(currentProvider);
 
         PushProvider oldCurrentProvider = currentProvider;
         currentProvider = helper.getCurrentProvider();
