@@ -91,7 +91,6 @@ public interface PushProvider {
      * When this method call you registration is invalid
      * and you need reset all saved registration data.
      */
-    //TODO Think about method name.
     void onRegistrationInvalid();
 
     /**
