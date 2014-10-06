@@ -35,5 +35,8 @@ public interface Backoff {
      */
     long getTryDelay();
 
+    /**
+     * Reset all tries to initial state.
+     */
     void reset();
 }

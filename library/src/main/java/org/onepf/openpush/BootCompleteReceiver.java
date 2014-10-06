@@ -35,9 +35,11 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(@NonNull Context context, Intent intent) {
         LOGD("OpenPush receive boot complete.");
         final OpenPushHelper helper = OpenPushHelper.getInstance(context);
-        if (helper.isRegistered() && isAndroidIDChanged(context)) {
-            LOGI("Android ID changed.");
-            helper.getProviderCallback().onNeedRetryRegister();
+        if (helper.isRegistered()) {
+            if (isAndroidIDChanged(context)) {
+                LOGI("Android ID changed.");
+                helper.getProviderCallback().onNeedRetryRegister();
+            }
         } else if (helper.isRegistering()) {
             LOGI("Retry register after reboot.");
             helper.restartRegisterOnBoot();

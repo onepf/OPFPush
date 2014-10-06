@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 05.09.14.
  */
 public final class ExponentialBackoff implements Backoff {
+    public static final int DEFAULT_TRY_COUNT = 4;
     private final int mTryCount;
 
     @NonNull
@@ -40,7 +41,18 @@ public final class ExponentialBackoff implements Backoff {
     }
 
     public ExponentialBackoff() {
-        mTryCount = 4;
+        mTryCount = DEFAULT_TRY_COUNT;
+    }
+
+    /**
+     * Compute summary delay for all tries.
+     */
+    public int summaryDelay() {
+        int summaryDelay = 0;
+        for (int tryNumber = 1; tryNumber <= mTryCount; tryNumber++) {
+            summaryDelay += getTryDelay(tryNumber);
+        }
+        return summaryDelay;
     }
 
     @Override
@@ -48,7 +60,11 @@ public final class ExponentialBackoff implements Backoff {
         if (mTryNumber.get() > mTryCount) {
             throw new NoSuchElementException();
         }
-        return TimeUnit.SECONDS.toMillis(2 << (mTryNumber.get() - 1));
+        return getTryDelay(mTryNumber.get());
+    }
+
+    private long getTryDelay(int tryNumber) {
+        return TimeUnit.SECONDS.toMillis((int) Math.pow(2, tryNumber));
     }
 
     @Override

@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
  * @author Kirill Rozov
  * @since 01.10.14.
  */
-public class OpenPushSettings {
+class OpenPushSettings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
@@ -26,7 +26,8 @@ public class OpenPushSettings {
 
     @OpenPushHelper.State
     public int getState() {
-        @OpenPushHelper.State int state = mPreferences.getInt(KEY_STATE, OpenPushHelper.STATE_UNREGISTERED);
+        @OpenPushHelper.State int state =
+                mPreferences.getInt(KEY_STATE, OpenPushHelper.STATE_UNREGISTERED);
         return state;
     }
 
@@ -34,7 +35,7 @@ public class OpenPushSettings {
         mPreferences.edit().putInt(KEY_STATE, state).apply();
     }
 
-    public void clear(){
+    public void clear() {
         mPreferences.edit().clear().apply();
     }
 
@@ -44,11 +45,13 @@ public class OpenPushSettings {
     }
 
     public void saveLastProvider(@Nullable PushProvider provider) {
+        SharedPreferences.Editor editor = mPreferences.edit();
         if (provider == null) {
-            mPreferences.edit().remove(KEY_LAST_PROVIDER_NAME).apply();
+            editor.remove(KEY_LAST_PROVIDER_NAME);
         } else {
-            mPreferences.edit().putString(KEY_LAST_PROVIDER_NAME, provider.getName()).apply();
+            editor.putString(KEY_LAST_PROVIDER_NAME, provider.getName());
         }
+        editor.apply();
     }
 
     @Nullable
@@ -57,10 +60,12 @@ public class OpenPushSettings {
     }
 
     public void saveLastAndroidId(@Nullable String androidId) {
+        SharedPreferences.Editor editor = mPreferences.edit();
         if (androidId == null) {
-            mPreferences.edit().remove(KEY_LAST_ANDROID_ID).apply();
+            editor.remove(KEY_LAST_ANDROID_ID);
         } else {
-            mPreferences.edit().putString(KEY_LAST_ANDROID_ID, androidId).apply();
+            editor.putString(KEY_LAST_ANDROID_ID, androidId);
         }
+        editor.apply();
     }
 }
