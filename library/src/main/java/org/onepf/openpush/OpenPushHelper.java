@@ -95,7 +95,7 @@ public class OpenPushHelper {
     private final Object mRegistrationLock = new Object();
     private final Object mInitLock = new Object();
 
-    private ProviderCallback mProviderCallback = new ProviderCallback();
+    private final ProviderCallback mProviderCallback = new ProviderCallback();
     private final OpenPushSettings mSettings;
 
     private OpenPushHelper(@NonNull Context context) {
