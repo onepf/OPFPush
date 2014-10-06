@@ -112,7 +112,7 @@ Create Custom Push Provider
 For create custom Push Provider you must create class that implement `PushProvider` interface.
 Common functionality contains in `BasePushProvider` class, and we recommend subclass this class.
 
-All provider has <i>Host Application</i>.Host application this is application that provider
+All provider has <i>Host Application</i>. Host application this is application that provider
 push service work, such contains services, describe permission ant etc.
 Usually this is store application, like Google Play Store for Google Cloud Messaging.
 
