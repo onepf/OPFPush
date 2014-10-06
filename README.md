@@ -46,7 +46,7 @@ How To Use
 ----------
 
 Before setup `OpenPushHelper` you must setup your project files.
-If you use [Android New Build System AAR][7] and AAR dependencies:
+If you use [Android New Build System][7] and [AAR][11] dependencies:
 
 0. Add to build.gradle file in your app module:
 
@@ -131,6 +131,20 @@ Requirements for custom Push Provider:
 7. When `onRegistrationInvalid()` or `onUnavailable` method called
    you must reset all data about registration.
 
+Provider notify `OpenPushHelper` about registration, or unregistration, or about other events by
+call methods in `ProviderCallback` class. You can get `ProviderCallback` object with call
+`OpenPushHelper.getProviderCallback()`.
+
+For notify about registration or unregistration result you must call `ProviderCallback.onResult()`
+with argument of `Result` class. `Result` class always contains provider name and optionally can
+contains information about error(when failed) and token (when successfully).
+
+For notify about receive new message call `ProviderCallback.onMessage()`.
+
+Some provider can notify about deleted messages with call `ProviderCallback.onDeletedMessages()`.
+Not all provider that can notify about this event can provider count. For unknown count pass
+value `OpenPushHelper.MESSAGES_COUNT_UNKNOWN` in argument `messagesCount`.
+
 Implemented Push Services
 -----------------------
 
@@ -168,3 +182,4 @@ License
 [8]: http://LINK_TO_the_latest_JAR.
 [9]: http://www.onepf.org/openpush/
 [10]: http://LINK_TO_the_latest_AAR.
+[11]: http://tools.android.com/tech-docs/new-build-system/aar-format
