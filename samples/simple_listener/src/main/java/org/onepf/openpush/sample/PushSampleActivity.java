@@ -73,7 +73,7 @@ public class PushSampleActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOpenPushHelper = OpenPushHelper.getInstance(PushSampleActivity.this);
+        mOpenPushHelper = OpenPushHelper.getInstance(this);
 
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);

@@ -21,10 +21,14 @@ public class PushSampleApplication extends Application {
         super.onCreate();
 
         OpenPushLog.setLogEnable(true);
-        OpenPushHelper openPushHelper = OpenPushHelper.getInstance(this);
+
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
-        builder.setBackoff(new ExponentialBackoff(Integer.MAX_VALUE));
-        openPushHelper.init(builder.build());
+        builder.addProviders(new GCMProvider(this, GCM_SENDER_ID))
+                .setRecoverProvider(true)
+                .setSelectSystemPreferred(true)
+                .setBackoff(new ExponentialBackoff(Integer.MAX_VALUE));
+        Options options = builder.build();
+
+        OpenPushHelper.getInstance(this).init(options);
     }
 }

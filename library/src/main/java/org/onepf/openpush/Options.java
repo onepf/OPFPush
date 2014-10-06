@@ -182,8 +182,9 @@ public class Options {
             return this;
         }
 
-        public void setBackoff(@Nullable Backoff backoff) {
+        public Builder setBackoff(@Nullable Backoff backoff) {
             mBackoff = backoff;
+            return this;
         }
 
         /**
