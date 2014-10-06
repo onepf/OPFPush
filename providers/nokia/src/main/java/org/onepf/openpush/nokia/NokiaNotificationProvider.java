@@ -122,10 +122,6 @@ public class NokiaNotificationProvider extends BasePushProvider {
     @Override
     public void unregister() {
         PushRegistrar.unregister(getContext());
-    }
-
-    @Override
-    public void close() {
         PushRegistrar.onDestroy(getContext());
     }
 
