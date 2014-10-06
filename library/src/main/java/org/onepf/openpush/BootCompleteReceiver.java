@@ -38,7 +38,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         if (helper.isRegistered()) {
             if (isAndroidIDChanged(context)) {
                 LOGI("Android ID changed.");
-                helper.getProviderCallback().onNeedRetryRegister();
+                helper.onNeedRetryRegister();
             }
         } else if (helper.isRegistering()) {
             LOGI("Retry register after reboot.");

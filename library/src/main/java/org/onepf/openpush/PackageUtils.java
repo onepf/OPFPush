@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.openpush.util;
+package org.onepf.openpush;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,9 +26,6 @@ import android.content.pm.PackageManager;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import org.onepf.openpush.OpenPushHelper;
-import org.onepf.openpush.PushProvider;
 
 import static org.onepf.openpush.OpenPushLog.LOGI;
 
@@ -136,14 +133,12 @@ public final class PackageUtils {
                 if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
                     LOGI("Host app '%s' of provider '%s' removed.",
                             mProvider.getHostAppPackage(), mProvider.getName());
-                    OpenPushHelper.getInstance(context)
-                            .getProviderCallback().onUnavailable(mProvider);
+                    OpenPushHelper.getInstance(context).onProviderUnavailable(mProvider);
                 }
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
                 if (context.getPackageName().equals(getAppPackage(intent))) {
                     LOGI("Application updated.");
-                    OpenPushHelper.getInstance(context)
-                            .getProviderCallback().onNeedRetryRegister();
+                    OpenPushHelper.getInstance(context).onNeedRetryRegister();
                 }
             }
         }

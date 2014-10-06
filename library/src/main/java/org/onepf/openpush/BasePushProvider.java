@@ -20,8 +20,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
-import org.onepf.openpush.util.PackageUtils;
-
 /**
  * Base class for create {@code PushProvider}.
  *

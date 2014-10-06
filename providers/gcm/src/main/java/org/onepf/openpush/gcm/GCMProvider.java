@@ -32,7 +32,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushException;
-import org.onepf.openpush.util.PackageUtils;
+import org.onepf.openpush.PackageUtils;
 
 import java.io.IOException;
 import java.util.Arrays;

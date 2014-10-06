@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import org.onepf.openpush.BasePushProvider;
 import org.onepf.openpush.OpenPushHelper;
 import org.onepf.openpush.Result;
-import org.onepf.openpush.util.PackageUtils;
+import org.onepf.openpush.PackageUtils;
 import org.robolectric.Robolectric;
 
 import java.util.UUID;
