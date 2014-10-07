@@ -10,8 +10,11 @@ For more information see [the website][9].
 
 ## Contents
 
-* auto-gen TOC:
-{:toc}
+- [Download](#user-content-download)
+- [How To Use](#user-content-how-to-use)
+- [Create Custom Push Provider](#user-content-create-custom-push-provider)
+- [Implemented Push Services](#user-content-implemented-push-services)
+- [License](#user-content-license)
 
 ## Download
 
