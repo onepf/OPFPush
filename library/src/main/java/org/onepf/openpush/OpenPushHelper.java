@@ -560,6 +560,8 @@ public class OpenPushHelper {
         }
 
         private void checkProviderWorking(String providerName) {
+            checkInitDone();
+
             if (!isRegistered()) {
                 throw new OpenPushException("Can't receive message when not registered.");
             }
