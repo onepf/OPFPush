@@ -53,8 +53,7 @@
             android:exported="false">
             <intent-filter>
                 <!-- Receives the actual messages. -->
-                <action android:name="org.onepf.opfpush.MESSAGE_RECEIVE"/>
-                <action android:name="org.onepf.opfpush.MESSAGED_DELETED"/>
+                <action android:name="org.onepf.opfpush.intent.RECEIVE"/>
             </intent-filter>
         </receiver>
         <service android:name=".OPFPushIntentService"/>

@@ -48,9 +48,6 @@ public class DemoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPushHelper = OPFPushHelper.getInstance(this);
-        mPushHelper.setListener(new EventListener());
-
         setContentView(R.layout.main);
         mDisplay = (TextView) findViewById(R.id.display);
         findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
@@ -60,6 +57,9 @@ public class DemoActivity extends Activity {
             }
         });
 
+
+        mPushHelper = OPFPushHelper.getInstance(this);
+        mPushHelper.setListener(new EventListener());
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
         if (checkPlayServices()) {
             if (!mPushHelper.isRegistered()) {
