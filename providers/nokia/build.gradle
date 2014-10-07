@@ -30,6 +30,10 @@ android {
 
         manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
