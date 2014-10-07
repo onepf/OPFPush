@@ -26,7 +26,7 @@ android {
         versionCode 2
         versionName "2.0"
 
-        applicationId 'org.onepf.openpush.sample'
+        applicationId 'org.onepf.opfpush.sample'
 
         manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }

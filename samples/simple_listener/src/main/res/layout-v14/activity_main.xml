@@ -25,7 +25,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:overScrollMode="ifContentScrolls"
-    tools:context="org.onepf.openpush.sample.PushSampleActivity">
+    tools:context="org.onepf.opfpush.sample.PushSampleActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

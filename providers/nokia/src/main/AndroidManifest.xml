@@ -15,7 +15,7 @@
   -->
 
 <manifest
-    package="org.onepf.openpush.nokia"
+    package="org.onepf.opfpush.nokia"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <permission
@@ -27,7 +27,7 @@
 
     <application>
         <receiver
-            android:name="org.onepf.openpush.nokia.NokiaNotificationReceiver"
+            android:name="org.onepf.opfpush.nokia.NokiaNotificationReceiver"
             android:permission="com.nokia.pushnotifications.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->
@@ -38,7 +38,7 @@
         </receiver>
 
         <service
-            android:name="org.onepf.openpush.nokia.NokiaNotificationService"
+            android:name="org.onepf.opfpush.nokia.NokiaNotificationService"
             android:exported="false"/>
 
     </application>

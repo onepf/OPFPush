@@ -15,7 +15,7 @@
   -->
 
 <manifest
-    package="org.onepf.openpush.adm"
+    package="org.onepf.opfpush.adm"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:amazon="http://schemas.amazon.com/apk/res/android">
 
@@ -33,11 +33,11 @@
             android:required="false"/>
 
         <service
-            android:name="org.onepf.openpush.adm.ADMService"
+            android:name="org.onepf.opfpush.adm.ADMService"
             android:exported="false"/>
 
         <receiver
-            android:name="org.onepf.openpush.adm.ADMReceiver"
+            android:name="org.onepf.opfpush.adm.ADMReceiver"
             android:permission="com.amazon.device.messaging.permission.SEND">
 
             <intent-filter>

@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
+package org.onepf.opfpush;
 
-android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
+/**
+ * @author Kirill Rozov
+ * @since 05.09.14.
+ */
+public interface Backoff {
+    /**
+     * Maximum number of try to register push provider.
+     * Zero value means that will be no retry.
+     */
+    boolean hasTries();
 
-    defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 19
-        versionCode 2
-        versionName "2.0"
+    /**
+     * Get delay before next attempt to register push provider.
+     *
+     * @return Period in milliseconds to wait before next try ro register.
+     * @throws {@link java.util.NoSuchElementException} if there are no more elements.
+     */
+    long getTryDelay();
 
-        applicationId 'org.onepf.opfpush.gcm'
-
-        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
-    }
-}
-
-dependencies {
-    compile project(':library')
-    provided 'com.google.android.gms:play-services:4.2.42'
+    /**
+     * Reset all tries to initial state.
+     */
+    void reset();
 }

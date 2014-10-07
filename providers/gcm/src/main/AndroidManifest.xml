@@ -15,7 +15,7 @@
   -->
 
 <manifest
-    package="org.onepf.openpush.gcm"
+    package="org.onepf.opfpush.gcm"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="${packageId}.permission.C2D_MESSAGE"/>
@@ -31,7 +31,7 @@
 
     <application>
         <receiver
-            android:name="org.onepf.openpush.gcm.GCMReceiver"
+            android:name="org.onepf.opfpush.gcm.GCMReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
@@ -49,7 +49,7 @@
         </receiver>
 
         <service
-            android:name="org.onepf.openpush.gcm.GCMService"
+            android:name="org.onepf.opfpush.gcm.GCMService"
             android:exported="false"/>
     </application>
 

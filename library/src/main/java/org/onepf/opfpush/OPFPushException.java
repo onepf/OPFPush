@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
+package org.onepf.opfpush;
 
-android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
+/**
+ * Thrown when try work with OpenPush in wrong way.
+ *
+ * @author Kirill Rozov
+ * @since 05.09.14.
+ */
+public class OPFPushException extends RuntimeException {
 
-    defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 19
-        versionCode 2
-        versionName "2.0"
-
-        applicationId 'org.onepf.opfpush.gcm'
-
-        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
+    public OPFPushException(String detailMessage) {
+        super(detailMessage);
     }
-}
 
-dependencies {
-    compile project(':library')
-    provided 'com.google.android.gms:play-services:4.2.42'
+    public OPFPushException(String messageFormat, Object... args) {
+        super(String.format(messageFormat, args));
+    }
+
+    public OPFPushException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
+    }
 }

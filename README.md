@@ -1,4 +1,4 @@
-# OpenPush
+# OPFPush
 
 The project is under development.
 Releases will be announced later.
@@ -27,18 +27,18 @@ For more information see [the website][9].
 
 Download [the latest AAR][10] or [the latest JAR][8]. Also you can grab it via Gradle
 ```groovy
-compile 'org.onepf:openpush:2.0'
+compile 'org.onepf:opfpush:2.0'
 ```
 for JAR dependency:
 ```groovy
-compile 'org.onepf:openpush:2.0@jar'
+compile 'org.onepf:opfpush:2.0@jar'
 ```
 
 or Maven:
 ```xml
 <dependency>
     <groupId>org.onepf</groupId>
-    <artifactId>openpush</artifactId>
+    <artifactId>opfpush</artifactId>
     <version>2.0</version>
 </dependency>
 ```
@@ -46,7 +46,7 @@ for JAR dependency:
 ```xml
 <dependency>
     <groupId>org.onepf</groupId>
-    <artifactId>openpush</artifactId>
+    <artifactId>opfpush</artifactId>
     <version>2.0</version>
     <type>jar</type>
 </dependency>

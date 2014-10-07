@@ -16,7 +16,7 @@
   -->
 
 <manifest
-    package="org.onepf.openpush"
+    package="org.onepf.opfpush"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -28,12 +28,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application>
-        <receiver android:name="org.onepf.openpush.BootCompleteReceiver">
+        <receiver android:name="org.onepf.opfpush.BootCompleteReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name="org.onepf.openpush.RetryBroadcastReceiver"/>
+        <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
     </application>
 
 </manifest>
