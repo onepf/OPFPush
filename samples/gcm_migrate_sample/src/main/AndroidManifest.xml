@@ -49,14 +49,14 @@
           so only GCM services can send data messages for the app.
         -->
         <receiver
-            android:name=".OPFPushBroadcastReceiver"
+            android:name=".GCMBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <!-- Receives the actual messages. -->
                 <action android:name="org.onepf.opfpush.intent.RECEIVE"/>
             </intent-filter>
         </receiver>
-        <service android:name=".OPFPushIntentService"/>
+        <service android:name=".GCMIntentService"/>
     </application>
 
 </manifest>

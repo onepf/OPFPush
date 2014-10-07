@@ -31,11 +31,11 @@ import android.support.v4.content.WakefulBroadcastReceiver;
  * release the wake lock.
  */
 
-public class OPFPushBroadcastReceiver extends WakefulBroadcastReceiver {
+public class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        intent.setComponent(new ComponentName(context, OPFPushIntentService.class));
+        intent.setComponent(new ComponentName(context, GCMIntentService.class));
         startWakefulService(context, intent);
         setResultCode(Activity.RESULT_OK);
     }

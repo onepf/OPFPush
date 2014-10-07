@@ -35,10 +35,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * service is finished, it calls {@code completeWakefulIntent()} to release the
  * wake lock.
  */
-public class OPFPushIntentService extends IntentService {
+public class GCMIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
 
-    public OPFPushIntentService() {
+    public GCMIntentService() {
         super("GcmIntentService");
     }
 
@@ -74,7 +74,7 @@ public class OPFPushIntentService extends IntentService {
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        OPFPushBroadcastReceiver.completeWakefulIntent(intent);
+        GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     // Put the message into a notification and post it.
