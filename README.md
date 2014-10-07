@@ -19,6 +19,7 @@ For more information see [the website][9].
     - [Google Cloud Messaging][4]
     - [Amazon Device Messaging][5]
     - [Nokia Notification][6]
+- [Porting Google Cloud Messaging to OPFPush](#user-content-porting-google-cloud-messaging-to-opfpush)
 - [License](#user-content-license)
 
 
@@ -117,6 +118,8 @@ You can enable logging by call (by default it off):
 OPFPushLog.setLogEnable(true);
 ```
 
+
+
 ## Create Custom Push Provider
 
 For create custom Push Provider you must create class that implement `PushProvider` interface.
@@ -155,6 +158,98 @@ Some provider can notify about deleted messages with call `ProviderCallback.onDe
 Not all providers that can notify about this event can provide delete messages count.
 For unknown count pass value `OPFPushHelper.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
 
+
+
+## Porting Google Cloud Messaging to OPFPush
+
+For porting Google Cloud Messaging (GCM) to OPFPush you need do the next steps:
+
+1. Add initialization of OPFPush in `Application` class of you app:
+
+    ````java
+    Options.Builder builder = new Options.Builder();
+    builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
+    Options options = builder.build();
+    ````
+
+2. Set message events listener:
+
+    ````java
+    OPFPushHelper pushHelper = OPFPushHelper.getInstance(this);
+    pushHelper.setMessageListener(new BroadcastMessageListener(this));
+    pushHelper.init(options);
+    ````
+
+    [BroadcastMessageListener.java][12] class redirect message events
+    from OPFPush message events listener to existing BroadcastReceiver, that you use for GCM.
+    You must add this class to your source for work with it.
+
+3. Change intent filter for BroadcastReceiver, that you use for GCM from:
+
+    ````xml
+    <receiver
+        android:name=".GcmBroadcastReceiver"
+        android:permission="com.google.android.c2dm.permission.SEND" >
+        <intent-filter>
+            <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            <category android:name="com.google.android.gcm.demo.app" />
+        </intent-filter>
+    </receiver>
+    ````
+
+    to
+
+    ````xml
+    <receiver android:name=".GcmBroadcastReceiver">
+        <intent-filter>
+            <action android:name="org.onepf.opfpush.intent.RECEIVE" />
+        </intent-filter>
+    </receiver>
+    ````
+
+4. Change registration in activity from:
+
+    ````java
+    if (checkPlayServices()) {
+        gcm = GoogleCloudMessaging.getInstance(this);
+        String regid = getRegistrationId(context);
+        if (regid.isEmpty()) {
+            registerInBackground();
+        }
+    }
+    ````
+
+    to:
+
+    ````java
+    mPushHelper = OPFPushHelper.getInstance(this);
+    mPushHelper.setListener(new EventListener());
+    if (checkPlayServices()) {
+        if (!mPushHelper.isRegistered()) {
+            mPushHelper.register();
+        }
+    }
+    ````
+
+5. Change get message type from intent in `onHandleIntent()` method of your service
+   that handling GCM messages from:
+
+    ````java
+    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+    String messageType = gcm.getMessageType(intent);
+    ````
+
+    to
+
+    ````java
+    String messageType = BroadcastMessageListener.getMessageType(intent);
+    ````
+
+That's all. You don't need handle registration in `AsyncTask` , handle error and
+retry registration on fail. OPFPush already include this features for you.
+
+
+
 ## Implemented Push Services
 
 1. [Google Cloud Messaging][1]. See [gcm-provider][4].
@@ -180,9 +275,9 @@ For unknown count pass value `OPFPushHelper.MESSAGES_COUNT_UNKNOWN` as argument 
     limitations under the License.
 
 
-[1]: https://developer.android.com/google/gcm/index.html
+[1]: https://developer.android.com/google/gcm
 [2]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
-[3]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
+[3]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
 [4]: ./providers/gcm
 [5]: ./providers/adm
 [6]: ./providers/nokia
@@ -191,3 +286,4 @@ For unknown count pass value `OPFPushHelper.MESSAGES_COUNT_UNKNOWN` as argument 
 [9]: http://www.onepf.org/openpush/
 [10]: http://LINK_TO_the_latest_AAR.
 [11]: http://tools.android.com/tech-docs/new-build-system/aar-format
+[12]: /samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
