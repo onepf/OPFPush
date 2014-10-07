@@ -84,7 +84,10 @@ public class OPFPushHelper {
     private final Context mAppContext;
 
     @Nullable
-    private OPFPushListener mListener;
+    private EventListener mListener;
+
+    @Nullable
+    private MessageListener mMessageListener;
 
     @Nullable
     private BroadcastReceiver mPackageReceiver;
@@ -243,8 +246,12 @@ public class OPFPushHelper {
         return false;
     }
 
-    public void setListener(@Nullable OPFPushListener l) {
-        mListener = l == null ? null : new MainThreadListenerWrapper(l);
+    public void setListener(@Nullable EventListener l) {
+        mListener = l == null ? null : new EventListenerWrapper(l);
+    }
+
+    public void setMessageListener(@Nullable MessageListener l) {
+        mMessageListener = l;
     }
 
     void restartRegisterOnBoot() {
@@ -553,9 +560,9 @@ public class OPFPushHelper {
         public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
             checkProviderWorking(providerName);
 
-            LOGD("onMessage(providerName = %s).", providerName);
-            if (mListener != null) {
-                mListener.onMessage(providerName, extras);
+            LOGD("onMessageReceive(providerName = %s).", providerName);
+            if (mMessageListener != null) {
+                mMessageListener.onMessageReceive(providerName, extras);
             }
         }
 
@@ -585,8 +592,8 @@ public class OPFPushHelper {
             checkProviderWorking(providerName);
 
             LOGD("onDeletedMessages(providerName = %s, messagesCount = %d).", providerName, messagesCount);
-            if (mListener != null) {
-                mListener.onDeletedMessages(providerName, messagesCount);
+            if (mMessageListener != null) {
+                mMessageListener.onDeletedMessages(providerName, messagesCount);
             }
         }
 
@@ -705,33 +712,12 @@ public class OPFPushHelper {
      * @author Kirill Rozov
      * @since 24.09.14.
      */
-    private static class MainThreadListenerWrapper implements OPFPushListener {
+    private static class EventListenerWrapper implements EventListener {
         private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-        private final OPFPushListener mListener;
+        private final EventListener mListener;
 
-        MainThreadListenerWrapper(OPFPushListener listener) {
+        EventListenerWrapper(EventListener listener) {
             mListener = listener;
-        }
-
-        @Override
-        public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onMessage(providerName, extras);
-                }
-            });
-        }
-
-        @Override
-        public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onDeletedMessages(providerName, messagesCount);
-                }
-            });
-
         }
 
         @Override

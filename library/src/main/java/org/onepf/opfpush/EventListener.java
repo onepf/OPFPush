@@ -16,9 +16,7 @@
 
 package org.onepf.opfpush;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * Interface definition for a callback to be invoked when event
@@ -27,24 +25,7 @@ import android.support.annotation.Nullable;
  * @author Kirill Rozov
  * @since 07.09.14.
  */
-public interface OPFPushListener {
-
-    /**
-     * New message received.
-     *
-     * @param providerName Name of provider received event.
-     * @param extras       Data associated with message.
-     */
-    void onMessage(@NonNull String providerName, @Nullable Bundle extras);
-
-    /**
-     * Notification about deleted messages. Not all provider send this data or not send
-     * count of deleted messages (in this case this value will be negative).
-     *
-     * @param providerName  Name of provider received event.
-     * @param messagesCount Count of messages. Negative value if no info about count.
-     */
-    void onDeletedMessages(@NonNull String providerName, int messagesCount);
+public interface EventListener {
 
     /**
      * Provider registered successfully.

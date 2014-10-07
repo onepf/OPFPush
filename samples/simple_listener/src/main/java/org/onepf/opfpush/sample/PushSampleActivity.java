@@ -32,8 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.onepf.opfpush.Error;
+import org.onepf.opfpush.EventListener;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.OPFPushListener;
 import org.onepf.opfpush.PushProvider;
 
 import butterknife.ButterKnife;
@@ -64,8 +64,8 @@ public class PushSampleActivity extends ActionBarActivity {
     Button mCopyToClipboardView;
 
     private static OPFPushHelper sMOPFPushHelper;
-    private OPFPushEventReceiver mEventReceiver
-            = new OPFPushEventReceiver();
+    private EventEventReceiver mEventReceiver
+            = new EventEventReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,9 +203,9 @@ public class PushSampleActivity extends ActionBarActivity {
         }
     }
 
-    public final class OPFPushEventReceiver implements OPFPushListener {
+    public final class EventEventReceiver implements EventListener {
 
-        public OPFPushEventReceiver() {
+        public EventEventReceiver() {
         }
 
         @Override
@@ -236,14 +236,6 @@ public class PushSampleActivity extends ActionBarActivity {
             Log.i(TAG, String.format("onUnregistered(providerName = %s, oldRegistrationId = %s)"
                     , providerName, oldRegistrationId));
             PushSampleActivity.this.onPushUnregistered();
-        }
-
-        @Override
-        public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        }
-
-        @Override
-        public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
         }
 
         @Override
