@@ -15,4 +15,4 @@
  */
 
 include ':library', ':providers:gcm', ':providers:nokia',':providers:adm'
-include ':samples:simple_listener'
+include ':samples:simple_listener', ':samples:gcm_migrate_sample'
