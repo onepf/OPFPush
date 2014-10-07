@@ -248,6 +248,8 @@ For porting Google Cloud Messaging (GCM) to OPFPush you need do the next steps:
 That's all. You don't need handle registration in `AsyncTask` , handle error and
 retry registration on fail. OPFPush already include this features for you.
 
+You can see migrated from GCM sample code in [GCM Migrate Sample][./samples/gcm_migrate_sample].
+
 
 
 ## Implemented Push Services
@@ -286,4 +288,4 @@ retry registration on fail. OPFPush already include this features for you.
 [9]: http://www.onepf.org/openpush/
 [10]: http://LINK_TO_the_latest_AAR.
 [11]: http://tools.android.com/tech-docs/new-build-system/aar-format
-[12]: /samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
+[12]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
