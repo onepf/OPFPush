@@ -10,7 +10,7 @@ For more information see [the website][9].
 
 
 
-## Contents
+## Table Of Contents
 
 - [Download](#user-content-download)
 - [How To Use](#user-content-how-to-use)
