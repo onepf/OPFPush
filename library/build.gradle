@@ -15,9 +15,9 @@
  */
 
 
-
 apply plugin: 'com.android.library'
 apply plugin: 'robolectric'
+apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion

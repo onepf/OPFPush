@@ -48,9 +48,7 @@ afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
-                if (isReleaseBuild()) {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                }
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 pom.artifactId = POM_ARTIFACT_ID
 
@@ -95,7 +93,7 @@ afterEvaluate { project ->
     }
 
     signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        required { isReleaseBuild()}
         sign configurations.archives
     }
 
