@@ -1,5 +1,5 @@
-OpenPush
-========
+# OpenPush
+
 The project is under development.
 Releases will be announced later.
 
@@ -8,10 +8,12 @@ Android Device Messaging and has possibility to integrate new push service.
 
 For more information see [the website][9].
 
+## Contents
 
+* auto-gen TOC:
+{:toc}
 
-Download
---------
+## Download
 
 Download [the latest AAR][10] or [the latest JAR][8]. Also you can grab it via Gradle
 ```groovy
@@ -42,8 +44,7 @@ for JAR dependency:
 
 
 
-How To Use
-----------
+## How To Use
 
 Before setup `OpenPushHelper` you must setup your project files.
 If you use [Android New Build System][7] and [AAR][11] dependencies:
@@ -106,8 +107,7 @@ You can enable logging by call (by default it off):
 OpenPushLog.setLogEnable(true);
 ```
 
-Create Custom Push Provider
----------------------------
+## Create Custom Push Provider
 
 For create custom Push Provider you must create class that implement `PushProvider` interface.
 Common functionality contains in `BasePushProvider` class, and we recommend subclass this class.
@@ -145,8 +145,7 @@ Some provider can notify about deleted messages with call `ProviderCallback.onDe
 Not all provider that can notify about this event can provider count. For unknown count pass
 value `OpenPushHelper.MESSAGES_COUNT_UNKNOWN` in argument `messagesCount`.
 
-Implemented Push Services
------------------------
+## Implemented Push Services
 
 1. [Google Cloud Messaging][1]. See [gcm-provider][4].
 2. [Amazon Device Messaging][2]. See [adm-provider][5].
@@ -154,8 +153,7 @@ Implemented Push Services
 
 
 
-License
---------
+## License
 
     Copyright 2012-2014 One Platform Foundation
 
