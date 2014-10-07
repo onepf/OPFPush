@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
+ * Listener for push events about messages.
+ *
  * @author Kirill Rozov
  * @since 10/7/14.
  */

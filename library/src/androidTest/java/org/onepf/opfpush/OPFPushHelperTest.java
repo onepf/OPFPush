@@ -147,21 +147,21 @@ public class OPFPushHelperTest {
     public void testInit() throws Exception {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
-        OPFPushHelper OPFPushHelper = OPFPushHelper.newInstance(Robolectric.application);
-        assertFalse(OPFPushHelper.isInitDone());
-        OPFPushHelper.init(builder.build());
-        assertTrue(OPFPushHelper.isInitDone());
+        OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
+        assertFalse(opfPushHelper.isInitDone());
+        opfPushHelper.init(builder.build());
+        assertTrue(opfPushHelper.isInitDone());
     }
 
     @Test(expected = OPFPushException.class)
     public void testInitTwice() throws Exception {
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider(Robolectric.application));
-        OPFPushHelper OPFPushHelper = OPFPushHelper.newInstance(Robolectric.application);
-        assertFalse(OPFPushHelper.isInitDone());
-        OPFPushHelper.init(builder.build());
-        assertTrue(OPFPushHelper.isInitDone());
-        OPFPushHelper.init(builder.build());
+        OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
+        assertFalse(opfPushHelper.isInitDone());
+        opfPushHelper.init(builder.build());
+        assertTrue(opfPushHelper.isInitDone());
+        opfPushHelper.init(builder.build());
     }
 
     @Test(expected = OPFPushException.class)
@@ -356,7 +356,7 @@ public class OPFPushHelperTest {
     public void testRestoreLastProvider() throws Exception {
         MockPushProvider provider = initWithMockProvider();
 
-        OPFPushSettings settings = new OPFPushSettings(Robolectric.application);
+        Settings settings = new Settings(Robolectric.application);
         final String lastProviderName = settings.getLastProviderName();
         assertNotNull(lastProviderName);
         assertEquals(provider.getName(), lastProviderName);
@@ -384,7 +384,7 @@ public class OPFPushHelperTest {
     public void testRestoreUnavailableProvider() throws Exception {
         final MockPushProvider provider = initWithMockProvider();
 
-        OPFPushSettings settings = new OPFPushSettings(Robolectric.application);
+        Settings settings = new Settings(Robolectric.application);
         String lastProviderName = settings.getLastProviderName();
         assertNotNull(lastProviderName);
         assertFalse(TextUtils.isEmpty(lastProviderName));
@@ -507,7 +507,7 @@ public class OPFPushHelperTest {
 
     @After
     public void tearDown() {
-        new OPFPushSettings(Robolectric.application).clear();
+        new Settings(Robolectric.application).clear();
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
     }
 }

@@ -19,7 +19,6 @@ package org.onepf.opfpush;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 
 import static org.onepf.opfpush.OPFPushLog.LOGD;
@@ -47,6 +46,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     }
 
     public static boolean isAndroidIDChanged(@NonNull Context context) {
-        return !Settings.Secure.ANDROID_ID.equals(new OPFPushSettings(context).getLastAndroidId());
+        return !android.provider.Settings.Secure.ANDROID_ID.equals(new Settings(context).getLastAndroidId());
     }
 }

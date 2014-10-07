@@ -104,11 +104,14 @@ public class OPFPushHelper {
     private final Object mInitLock = new Object();
 
     private final ProviderCallback mProviderCallback = new ProviderCallback();
-    private final OPFPushSettings mSettings;
+    private final Settings mSettings;
 
-    private OPFPushHelper(@NonNull Context context) {
+    /**
+     * <b>Use for test purposes only!!!</b>
+     */
+    OPFPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
-        mSettings = new OPFPushSettings(context);
+        mSettings = new Settings(context);
     }
 
     /**
@@ -128,13 +131,6 @@ public class OPFPushHelper {
         return sInstance;
     }
 
-    /**
-     * Create new instance of {@link OPFPushHelper}.
-     * <b>Use for test purposes only!!!</b>
-     *
-     * @param context The current context.
-     * @return New instance of {@link OPFPushHelper}.
-     */
     static OPFPushHelper newInstance(@NonNull Context context) {
         synchronized (OPFPushHelper.class) {
             sInstance = new OPFPushHelper(context);
@@ -471,8 +467,8 @@ public class OPFPushHelper {
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
         Intent intent = new Intent(mAppContext, RetryBroadcastReceiver.class);
-        intent.setAction(OPFPushConstants.ACTION_REGISTER);
-        intent.putExtra(OPFPushConstants.EXTRA_PROVIDER_NAME, providerName);
+        intent.setAction(Constants.ACTION_REGISTER);
+        intent.putExtra(Constants.EXTRA_PROVIDER_NAME, providerName);
 
         if (mAlarmManager == null) {
             mAlarmManager = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
