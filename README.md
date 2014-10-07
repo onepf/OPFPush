@@ -183,9 +183,9 @@ value `OpenPushHelper.MESSAGES_COUNT_UNKNOWN` in argument `messagesCount`.
 [1]: https://developer.android.com/google/gcm/index.html
 [2]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [3]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
-[4]: https://github.com/onepf/OpenPush/tree/readme/providers/gcm
-[5]: https://github.com/onepf/OpenPush/tree/readme/providers/adm
-[6]: https://github.com/onepf/OpenPush/tree/readme/providers/nokia
+[4]: https://github.com/onepf/OpenPush/tree/dev/providers/gcm
+[5]: https://github.com/onepf/OpenPush/tree/dev/providers/adm
+[6]: https://github.com/onepf/OpenPush/tree/dev/providers/nokia
 [7]: http://tools.android.com/tech-docs/new-build-system
 [8]: http://LINK_TO_the_latest_JAR.
 [9]: http://www.onepf.org/openpush/
