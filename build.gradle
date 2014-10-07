@@ -29,7 +29,17 @@ buildscript {
     }
 }
 
+def isReleaseBuild() {
+    return !VERSION_NAME.endsWith("SNAPSHOT")
+}
+
+def useTestRepo() {
+    return true
+}
+
 allprojects {
+    group = GROUP
+
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         jcenter()

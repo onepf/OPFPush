@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'com.android.library'
+apply from: '../../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -24,7 +25,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 19
         versionCode 2
-        versionName "2.0"
+        versionName VERSION_NAME
 
         applicationId 'org.onepf.opfpush.adm'
 
