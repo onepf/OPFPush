@@ -1,7 +1,7 @@
 [Google Cloud Messaging][1] implementation for Open Push.
 
 For work this module doe next things:
-1. Add Google Play Services 3.1.59 or higher dependency to your project.
+1. Add Google Play Services 4.0.30 or higher dependency to your project.
 
 2. If you don't use AAR dependency add to your AndroidManifest.xml application:
     ````xml
