@@ -3,7 +3,7 @@
 The project is under development.
 Releases will be announced later.
 
-Currently OpenPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
+Currently OPFPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
 Android Device Messaging and has possibility to integrate new push service.
 
 For more information see [the website][9].
@@ -56,7 +56,7 @@ for JAR dependency:
 
 ## How To Use
 
-Before setup `OpenPushHelper` you must setup your project files.
+Before setup `OPFPushHelper` you must setup your project files.
 If you use [Android New Build System][7] and [AAR][11] dependencies:
 
 0. Add to build.gradle file in your app module:
@@ -84,7 +84,7 @@ If you use JAR dependencies:
       and add for each used providers specific changes that you can find in provider README.md file.
       See section `Implemented Push Services`.
 
-You can setup `OpenPushHelper` following steps:
+You can setup `OPFPushHelper` following steps:
 
 1. Create `Options` object:
 
@@ -97,24 +97,24 @@ You can setup `OpenPushHelper` following steps:
     Options options = builder.build();
     ```
 
-2. Init `OpenPushHelper` using created `Options` object:
+2. Init `OPFPushHelper` using created `Options` object:
 
     ```java
-    OpenPushHelper.getInstance(this).init(options);
+    OPFPushHelper.getInstance(this).init(options);
     ```
 
-    Preferred place to init OpenPushHelper is the `Application` class of your app.
+    Preferred place to init OPFPushHelper is the `Application` class of your app.
 
-3. Add listener for `OpenPushHelper` events:
+3. Add listener for `OPFPushHelper` events:
 
     ```java
-    OpenPushHelper.getInstance(this).setListener(new OpenPushListener());
+    OPFPushHelper.getInstance(this).setListener(new OPFPushListener());
     ```
 
 You can enable logging by call (by default it off):
 
 ```java
-OpenPushLog.setLogEnable(true);
+OPFPushLog.setLogEnable(true);
 ```
 
 ## Create Custom Push Provider
@@ -141,9 +141,9 @@ Requirements for custom Push Provider:
 7. When `onRegistrationInvalid()` or `onUnavailable` method called
    you must reset all data about registration.
 
-Provider notify `OpenPushHelper` about registration, or unregistration, or other events by
+Provider notify `OPFPushHelper` about registration, or unregistration, or other events by
 call methods in `ProviderCallback` class, such `onResult()` or `onMessage`.
-You can get `ProviderCallback` object with call `OpenPushHelper.getProviderCallback()`.
+You can get `ProviderCallback` object with call `OPFPushHelper.getProviderCallback()`.
 
 For notify about registration or unregistration result you must call `ProviderCallback.onResult()`
 with argument of `Result` class. `Result` class always contains provider name and optionally can
@@ -153,7 +153,7 @@ For notify about receive new message call `ProviderCallback.onMessage()`.
 
 Some provider can notify about deleted messages with call `ProviderCallback.onDeletedMessages()`.
 Not all providers that can notify about this event can provide delete messages count.
-For unknown count pass value `OpenPushHelper.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
+For unknown count pass value `OPFPushHelper.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
 
 ## Implemented Push Services
 
