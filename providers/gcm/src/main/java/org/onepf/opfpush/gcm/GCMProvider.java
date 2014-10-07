@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import support.AsyncTaskCompat;
 
 import static org.onepf.opfpush.OPFPushLog.LOGI;
+import static org.onepf.opfpush.OPFPushLog.LOGW;
 
 /**
  * Google Cloud Messaging push provider implementation.
@@ -61,11 +62,10 @@ public class GCMProvider extends BasePushProvider {
 
     private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
     private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
+    public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
+            = "com.google.android.gms.gcm.GoogleCloudMessaging";
 
     private final String[] mSenderIDs;
-
-    @NonNull
-    final GoogleCloudMessaging mGoogleCloudMessaging;
 
     private final AtomicInteger mMsgId;
 
@@ -84,7 +84,6 @@ public class GCMProvider extends BasePushProvider {
         }
 
         mSettings = new Settings(context);
-        mGoogleCloudMessaging = GoogleCloudMessaging.getInstance(context);
         mMsgId = new AtomicInteger(mSettings.getMessageId());
     }
 
@@ -130,18 +129,23 @@ public class GCMProvider extends BasePushProvider {
     public boolean isAvailable() {
         //Need verify that GCM classes present, because dependency provided.
         try {
-            Class.forName("com.google.android.gms.gcm.GoogleCloudMessaging");
+            Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return false;
         }
 
         if (super.isAvailable()) {
-            int conResult = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
-            return conResult == ConnectionResult.SUCCESS && checkGoogleAccount();
-        } else {
-            return false;
+            final int conResult =
+                    GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
+            if (conResult == ConnectionResult.SUCCESS) {
+                return checkGoogleAccount();
+            } else {
+                LOGW("Google Play Services ont available. Reason: '%s'",
+                        GooglePlayServicesUtil.getErrorString(conResult));
+            }
         }
+        return false;
     }
 
     private boolean checkGoogleAccount() {
@@ -174,7 +178,7 @@ public class GCMProvider extends BasePushProvider {
             mExecutor = null;
         }
 
-        mGoogleCloudMessaging.close();
+        GoogleCloudMessaging.getInstance(getContext()).close();
     }
 
     @NonNull
@@ -273,7 +277,8 @@ public class GCMProvider extends BasePushProvider {
         @Override
         public void run() {
             try {
-                final String registrationToken = mGoogleCloudMessaging.register(mSenderIDs);
+                final String registrationToken =
+                        GoogleCloudMessaging.getInstance(getContext()).register(mSenderIDs);
                 if (registrationToken == null) {
                     onAuthError();
                 } else {

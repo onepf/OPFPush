@@ -97,6 +97,12 @@ public final class OPFPushLog {
         }
     }
 
+    public static void LOGW(String message, Object... args) {
+        if (sLogEnable) {
+            Log.w(TAG, String.format(message, args));
+        }
+    }
+
     public static void LOGE(String message) {
         if (sLogEnable) {
             Log.e(TAG, message);

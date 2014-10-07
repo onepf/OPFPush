@@ -34,5 +34,5 @@ android {
 
 dependencies {
     compile project(':library')
-    provided 'com.google.android.gms:play-services:4.2.42'
+    provided 'com.google.android.gms:play-services:4.0.30'
 }
