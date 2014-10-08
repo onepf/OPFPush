@@ -1,6 +1,7 @@
 # Google Cloud Messaging provider for OPFPush
 
 [Google Cloud Messaging][1] implementation for Open Push.
+See [guide how to porting GCM to OPFPUsh](../../README.md#user-content-porting-google-cloud-messaging-to-opfpush)
 
 
 ## Integrate in application
