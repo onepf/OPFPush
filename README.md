@@ -62,28 +62,28 @@ If you use [Android New Build System][7] and [AAR][11] dependencies:
 
 0. Add to build.gradle file in your app module:
 
-       ```groovy
-       android {
-           defaultConfig {
-               ...
-               manifestPlaceholders = [packageId : "\${applicationId}".toString()]
-               ...
-           }
+    ```groovy
+    android {
+       defaultConfig {
+           ...
+           manifestPlaceholders = [packageId : "\${applicationId}".toString()]
+           ...
        }
-       ```
+    }
+    ```
 
 If you use JAR dependencies:
 
 0. Add to AndroidManifest.xml file of your app:
 
-      ```xml
-      <uses-permission android:name="android.permission.INTERNET"/>
-      <uses-permission android:name="android.permission.WAKE_LOCK"/>
-      <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
-      ```
+    ```xml
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
+    ```
 
-      and add for each used providers specific changes that you can find in provider README.md file.
-      See section `Implemented Push Services`.
+    and add for each used providers specific changes that you can find in provider README.md file.
+    See section `Implemented Push Services`.
 
 You can setup `OPFPushHelper` following steps:
 

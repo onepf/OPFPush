@@ -10,6 +10,7 @@ For work this module doe next things:
 1. Add Google Play Services 4.0.30 or higher dependency to your project.
 
 2. If you use JAR dependency add to AndroidManifest.xml of your application:
+
     ````xml
     <uses-permission android:name="(your_application_package).permission.C2D_MESSAGE"/>
     <permission
