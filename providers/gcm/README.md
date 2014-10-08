@@ -7,7 +7,7 @@ See [guide how to porting GCM to OPFPUsh](../../README.md#user-content-porting-g
 ## Integrate in application
 
 For work this module doe next things:
-1. Add Google Play Services 4.0.30 or higher dependency to your project.
+1. Add Google Play Services 4.0.30 or higher dependency to your application.
 
 2. If you use JAR dependency add to AndroidManifest.xml of your application:
 
@@ -67,6 +67,7 @@ task stripPlayServices << {
     def playServiceRootFolder = new File(rootProject.buildDir, "intermediates/exploded-aar/com.google.android.gms/play-services/")
     playServiceRootFolder.list().each { versionName ->
         def versionFolder = new File(playServiceRootFolder, versionName)
+
         copy {
             from (file(new File(versionFolder, "classes.jar")))
             into (file(versionFolder))
@@ -74,6 +75,7 @@ task stripPlayServices << {
                 fileName = "classes_orig.jar"
             }
         }
+
         tasks.create(name: "strip" + versionName, type: Jar) {
             destinationDir = versionFolder
             archiveName = "classes.jar"
@@ -90,6 +92,7 @@ task stripPlayServices << {
                 exclude "com/google/android/gms/wearable/**"
             }
         }.execute()
+
         delete {
             delete (file(new File(versionFolder, "classes_orig.jar")))
         }
