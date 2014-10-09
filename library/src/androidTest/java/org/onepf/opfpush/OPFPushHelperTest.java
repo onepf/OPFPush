@@ -16,6 +16,7 @@
 
 package org.onepf.opfpush;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -24,9 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfpush.mock.MockInfinityRegisterPushProvider;
-import org.onepf.opfpush.mock.MockInfinityUnregisterPushProvider;
-import org.onepf.opfpush.mock.MockPushProvider;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -116,7 +114,7 @@ public class OPFPushHelperTest {
     private static MockPushProvider initWithMockProvider() {
         Options.Builder builder = new Options.Builder();
         MockPushProvider provider
-                = new MockPushProvider(Robolectric.application, "providerForPref");
+                = new MockPushProvider("providerForPref");
         builder.addProviders(provider);
 
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
@@ -146,7 +144,7 @@ public class OPFPushHelperTest {
     @Test
     public void testInit() throws Exception {
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
         OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
         assertFalse(opfPushHelper.isInitDone());
         opfPushHelper.init(builder.build());
@@ -156,7 +154,7 @@ public class OPFPushHelperTest {
     @Test(expected = OPFPushException.class)
     public void testInitTwice() throws Exception {
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
         OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
         assertFalse(opfPushHelper.isInitDone());
         opfPushHelper.init(builder.build());
@@ -169,7 +167,7 @@ public class OPFPushHelperTest {
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
 
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
         Options options = builder.build();
         helper.init(options);
 
@@ -182,7 +180,7 @@ public class OPFPushHelperTest {
 
         Options.Builder builder = new Options.Builder();
         final String providerName = "providerName";
-        builder.addProviders(new MockPushProvider(Robolectric.application, providerName));
+        builder.addProviders(new MockPushProvider(providerName));
         Options options = builder.build();
         helper.init(options);
         assertTrue(helper.isInitDone());
@@ -226,8 +224,8 @@ public class OPFPushHelperTest {
 
         Options.Builder builder = new Options.Builder();
         builder.addProviders(
-                new MockPushProvider(Robolectric.application, "providerName1", false),
-                new MockPushProvider(Robolectric.application, "providerName2")
+                new MockPushProvider("providerName1", false),
+                new MockPushProvider("providerName2")
         );
         helper.init(builder.build());
 
@@ -249,8 +247,8 @@ public class OPFPushHelperTest {
 
         Options.Builder builder = new Options.Builder();
         final PushProvider[] providers = {
-                new MockPushProvider(Robolectric.application, "provider1", "org.openpf.store1"),
-                new MockPushProvider(Robolectric.application, "provider2", "org.openpf.store2")
+                new MockPushProvider("provider1", "org.openpf.store1"),
+                new MockPushProvider("provider2", "org.openpf.store2")
         };
         builder.addProviders(providers);
         helper.init(builder.build());
@@ -289,7 +287,7 @@ public class OPFPushHelperTest {
 
         Options.Builder builder = new Options.Builder();
         final String providerName = "providerName";
-        builder.addProviders(new MockPushProvider(Robolectric.application, providerName));
+        builder.addProviders(new MockPushProvider(providerName));
         Options options = builder.build();
         helper.init(options);
         assertTrue(helper.isInitDone());
@@ -310,7 +308,7 @@ public class OPFPushHelperTest {
     public void testRegisterTwice() throws Exception {
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
         Options options = builder.build();
         helper.init(options);
 
@@ -390,7 +388,7 @@ public class OPFPushHelperTest {
         assertFalse(TextUtils.isEmpty(lastProviderName));
         assertEquals(provider.getName(), lastProviderName);
 
-        provider.setAvailable(false);
+        provider.setCheckAvailability(false);
 
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         helper.init(new Options.Builder().addProviders(provider).build());
@@ -402,9 +400,9 @@ public class OPFPushHelperTest {
     @Test
     public void testRestoreUnavailableProvider_RecoverEnable() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
-        lastProvider.setAvailable(false);
+        lastProvider.setCheckAvailability(false);
 
-        PushProvider nextProvider = new MockPushProvider(Robolectric.application);
+        PushProvider nextProvider = new MockPushProvider();
 
         Options.Builder builder = new Options.Builder();
         builder.setRecoverProvider(true);
@@ -423,18 +421,18 @@ public class OPFPushHelperTest {
     @Test
     public void testRestoreUnavailableProvider_RecoverDisable() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
-        lastProvider.setAvailable(false);
+        lastProvider.setCheckAvailability(false);
 
         restoreUnavailableProvider_RecoverDisable(
-                lastProvider, new MockPushProvider(Robolectric.application));
+                lastProvider, new MockPushProvider());
     }
 
     @Test
     public void testRestoreUnavailableProvider_RecoverDisable2() throws Exception {
         MockPushProvider lastProvider = initWithMockProvider();
-        lastProvider.setAvailable(false);
+        lastProvider.setCheckAvailability(false);
         restoreUnavailableProvider_RecoverDisable(
-                new MockPushProvider(Robolectric.application), lastProvider);
+                new MockPushProvider(), lastProvider);
     }
 
     @Test
@@ -442,12 +440,12 @@ public class OPFPushHelperTest {
             throws Exception {
 
         MockPushProvider lastProvider = initWithMockProvider();
-        lastProvider.setAvailable(false);
+        lastProvider.setCheckAvailability(false);
 
         Options.Builder builder = new Options.Builder();
         builder.setRecoverProvider(true);
         PushProvider[] providers = {
-                new MockPushProvider(Robolectric.application, false),
+                new MockPushProvider(false),
                 lastProvider
         };
         builder.addProviders(providers);
@@ -509,5 +507,57 @@ public class OPFPushHelperTest {
     public void tearDown() {
         new Settings(Robolectric.application).clear();
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
+    }
+
+    private static class MockInfinityRegisterPushProvider extends MockPushProvider {
+        public MockInfinityRegisterPushProvider(@NonNull Context context) {
+            super();
+        }
+
+        public MockInfinityRegisterPushProvider(@NonNull Context context, String name) {
+            super(name);
+        }
+
+        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
+            super(name, available);
+        }
+
+        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, @NonNull String hotAppPackage) {
+            super(name, hotAppPackage);
+        }
+
+        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, boolean available, @NonNull String hotAppPackage) {
+            super(name, hotAppPackage, available);
+        }
+
+        @Override
+        public void register() {
+        }
+    }
+
+    private static class MockInfinityUnregisterPushProvider extends MockPushProvider {
+        public MockInfinityUnregisterPushProvider(@NonNull Context context) {
+            super();
+        }
+
+        public MockInfinityUnregisterPushProvider(@NonNull Context context, String name) {
+            super(name);
+        }
+
+        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
+            super(name, available);
+        }
+
+        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, @NonNull String hotAppPackage) {
+            super(name, hotAppPackage);
+        }
+
+        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, boolean available, @NonNull String hotAppPackage) {
+            super(name, hotAppPackage, available);
+        }
+
+        @Override
+        public void unregister() {
+        }
     }
 }

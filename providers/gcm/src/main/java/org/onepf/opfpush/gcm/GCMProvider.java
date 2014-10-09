@@ -55,13 +55,13 @@ import static org.onepf.opfpush.OPFPushLog.LOGW;
 public class GCMProvider extends BasePushProvider {
 
     public static final String NAME = "Google Cloud Messaging";
-    private static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
+    public static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
 
-    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
+    static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+    static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
 
-    private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
-    private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
+    static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
+    static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
 
@@ -139,7 +139,7 @@ public class GCMProvider extends BasePushProvider {
             final int conResult =
                     GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
-                return checkGoogleAccount();
+                return checkGoogleAccount(getContext());
             } else {
                 LOGW("Google Play Services ont available. Reason: '%s'",
                         GooglePlayServicesUtil.getErrorString(conResult));
@@ -148,7 +148,7 @@ public class GCMProvider extends BasePushProvider {
         return false;
     }
 
-    private boolean checkGoogleAccount() {
+    private static boolean checkGoogleAccount(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
             return true;
@@ -156,7 +156,7 @@ public class GCMProvider extends BasePushProvider {
             // On device with version of Android less than "4.0.4"
             // we need to ensure that the user has at least one google account.
             Account[] googleAccounts
-                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+                    = AccountManager.get(context).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
             return googleAccounts.length != 0;
         }
     }
@@ -229,8 +229,7 @@ public class GCMProvider extends BasePushProvider {
             throw new IllegalStateException("Before send message you need register GCM.");
         }
 
-        final int msgId = mMsgId.incrementAndGet();
-        mSettings.saveMessageId(msgId);
+        mSettings.saveMessageId(mMsgId.incrementAndGet());
         AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
     }
 

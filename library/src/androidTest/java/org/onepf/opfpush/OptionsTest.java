@@ -20,7 +20,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfpush.mock.MockPushProvider;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -38,7 +37,7 @@ public class OptionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderTwiceAddProvider() {
         Options.Builder builder = new Options.Builder();
-        PushProvider provider = new MockPushProvider(Robolectric.application);
+        PushProvider provider = new MockPushProvider();
         builder.addProviders(provider);
         builder.addProviders(provider);
     }
@@ -46,17 +45,17 @@ public class OptionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderAddProviderWithSameName() {
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
+        builder.addProviders(new MockPushProvider());
     }
 
     public void testBuilderProviderOrder() {
         Options.Builder builder = new Options.Builder();
         PushProvider[] providers = {
-                new MockPushProvider(Robolectric.application, "provider1"),
-                new MockPushProvider(Robolectric.application, "provider2"),
-                new MockPushProvider(Robolectric.application, "provider3"),
-                new MockPushProvider(Robolectric.application, "provider4")
+                new MockPushProvider("provider1"),
+                new MockPushProvider("provider2"),
+                new MockPushProvider("provider3"),
+                new MockPushProvider("provider4")
         };
         builder.addProviders(providers);
         Options options = builder.build();
@@ -79,7 +78,7 @@ public class OptionsTest {
     @Test
     public void testOptionsBuild() {
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider(Robolectric.application));
+        builder.addProviders(new MockPushProvider());
 
         Options options = builder.build();
         Assert.assertEquals(1, options.getProviders().size());
@@ -90,7 +89,7 @@ public class OptionsTest {
     public void testUnmodifiableProviders() {
         Options.Builder builder = new Options.Builder();
         ArrayList<PushProvider> providers = new ArrayList<PushProvider>(1);
-        final MockPushProvider mockPushProvider = new MockPushProvider(Robolectric.application);
+        final MockPushProvider mockPushProvider = new MockPushProvider();
         providers.add(mockPushProvider);
         builder.addProviders(providers);
 
