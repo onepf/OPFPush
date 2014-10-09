@@ -20,6 +20,7 @@ import android.os.Build;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.gcm.shadow.ShadowGooglePlayServiceUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
@@ -44,7 +45,8 @@ public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
     @Test
     public void testCheckAvailable_LastGMSInstalled_NoGoogleAccount() throws Exception {
         addLatestGMSServiceApp();
-        assertFalse(new GCMProvider(Robolectric.application, SENDER_ID).isAvailable());
+        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        assertFalse(provider.isAvailable());
         removeGMCServiceApp();
     }
 
@@ -52,22 +54,23 @@ public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
     public void testCheckAvailable_LastGMSInstalled_WithGoogleAccount() throws Exception {
         addLatestGMSServiceApp();
         addGoogleAccount();
-        assertTrue(new GCMProvider(Robolectric.application, SENDER_ID).isAvailable());
+        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        assertTrue(provider.isAvailable());
         removeGoogleAccount();
         removeGMCServiceApp();
     }
 
     @Test
     public void testCheckAvailable_NoGMSInstalled_NoGoogleAccount() throws Exception {
-        addLatestGMSServiceApp();
-        assertFalse(new GCMProvider(Robolectric.application, SENDER_ID).isAvailable());
-        removeGMCServiceApp();
+        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        assertFalse(provider.isAvailable());
     }
 
     @Test
     public void testCheckAvailable_NoGMSInstalled_WithGoogleAccount() throws Exception {
         addGoogleAccount();
-        assertFalse(new GCMProvider(Robolectric.application, SENDER_ID).isAvailable());
+        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        assertFalse(provider.isAvailable());
         removeGoogleAccount();
     }
 }

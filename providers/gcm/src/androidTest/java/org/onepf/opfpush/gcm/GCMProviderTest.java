@@ -22,11 +22,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.gcm.shadow.ShadowGooglePlayServiceUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Arrays;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -42,39 +47,35 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class GCMProviderTest extends GCMProviderTestBase {
 
-    private GCMProvider mGCMProvider;
-
-    @Before
-    public void createProvider() {
-        mGCMProvider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
-    }
-
-    public GCMProvider getGCMProvider() {
-        return mGCMProvider;
-    }
-
     @Config(reportSdk = Build.VERSION_CODES.JELLY_BEAN)
     @Test
     public void testCheckAvailable_LastGMSInstalled() throws Exception {
         addLatestGMSServiceApp();
-        assertTrue(mGCMProvider.isAvailable());
+        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
+        assertTrue(provider.isAvailable());
         removeGMCServiceApp();
     }
 
     @Test
     public void testCheckAvailable_NoGMS() throws Exception {
-        assertFalse(mGCMProvider.isAvailable());
+        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
+        assertFalse(provider.isAvailable());
     }
 
     @Test
     public void testCheckAvailable_OldGMSInstalled() {
         addGMSServiceApp("3.0.55", 3055000);
-        assertFalse(mGCMProvider.isAvailable());
+        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
+        assertFalse(provider.isAvailable());
         removeGMCServiceApp();
     }
 
-    @After
-    public void destroyProvider() {
-        mGCMProvider = null;
+    @Test
+    public void testMultiSenderIDsCreate() {
+        String[] sendersId = {"s1", "s2", "s3"};
+        GCMProvider provider
+                = new GCMProvider(Robolectric.application,
+                sendersId[0], Arrays.copyOfRange(sendersId, 1, sendersId.length));
+        assertArrayEquals(sendersId, provider.getSenderIDs());
     }
 }
