@@ -106,17 +106,16 @@ public class GCMProvider extends BasePushProvider {
     public boolean checkManifest() {
         final Context ctx = getContext();
         return super.checkManifest()
-                && !checkGetAccountsPermission()
+                && (needGoogleAccounts() || checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
                 && checkPermission(ctx, Manifest.permission.WAKE_LOCK)
                 && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && checkPermission(ctx, PERMISSION_RECEIVE)
                 && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
-    private boolean checkGetAccountsPermission() {
+    private boolean needGoogleAccounts() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)
-                && !checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS);
+                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4);
     }
 
     @Override
@@ -139,7 +138,7 @@ public class GCMProvider extends BasePushProvider {
             final int conResult =
                     GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
-                return checkGoogleAccount(getContext());
+                return !needGoogleAccounts() || checkGoogleAccount();
             } else {
                 LOGW("Google Play Services ont available. Reason: '%s'",
                         GooglePlayServicesUtil.getErrorString(conResult));
@@ -148,16 +147,15 @@ public class GCMProvider extends BasePushProvider {
         return false;
     }
 
-    private static boolean checkGoogleAccount(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                || Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4)) {
-            return true;
-        } else {
+    private boolean checkGoogleAccount() {
+        if (needGoogleAccounts()) {
             // On device with version of Android less than "4.0.4"
             // we need to ensure that the user has at least one google account.
             Account[] googleAccounts
-                    = AccountManager.get(context).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
             return googleAccounts.length != 0;
+        } else {
+            return true;
         }
     }
 
@@ -203,16 +201,6 @@ public class GCMProvider extends BasePushProvider {
         mSettings.reset();
     }
 
-    /**
-     * Send message to server.
-     *
-     * @throws IllegalStateException If try send message when provider isn't registered.
-     * @see #send(String, GCMMessage)
-     */
-    public void send(@NonNull GCMMessage msg) {
-        send(mSenderIDs[0], msg);
-    }
-
     @NonNull
     public String[] getSenderIDs() {
         return mSenderIDs;
@@ -222,7 +210,6 @@ public class GCMProvider extends BasePushProvider {
      * Send message to server.
      *
      * @throws IllegalStateException If try send message when provider isn't registered.
-     * @see #send(GCMMessage)
      */
     public void send(@NonNull String senderId, @NonNull GCMMessage msg) {
         if (!isRegistered()) {
@@ -231,6 +218,17 @@ public class GCMProvider extends BasePushProvider {
 
         mSettings.saveMessageId(mMsgId.incrementAndGet());
         AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
+    }
+
+    private void checkSenderId(@NonNull String senderId) {
+        for (String s : mSenderIDs) {
+            if (senderId.equals(s)) {
+                return;
+            }
+        }
+
+        throw new OPFPushException("Invalid sender '%s' id. Must be one of '%s'.",
+                senderId, Arrays.toString(mSenderIDs));
     }
 
     private final class UnregisterTask implements Runnable {
@@ -253,7 +251,7 @@ public class GCMProvider extends BasePushProvider {
                 } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(e.getMessage())) {
                     throw new OPFPushException("GCM unregister crash.", e);
                 } else {
-                    //TODO Notify event about error.
+                    throw new OPFPushException("Unknown exception occur.", e);
                 }
             }
         }
