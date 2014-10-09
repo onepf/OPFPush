@@ -14,59 +14,52 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.mock;
+package org.onepf.opfpush;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.Result;
-import org.onepf.opfpush.PackageUtils;
 import org.robolectric.Robolectric;
 
 import java.util.UUID;
 
 /**
- * @author Kirill Rozov
- * @since 11.09.14.
- */
+* @author Kirill Rozov
+* @since 10/9/14.
+*/
 public class MockPushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
     public static final String DEFAULT_NAME = MockPushProvider.class.getName();
     private String mRegistrationId;
-    private boolean mAvailable;
+    private boolean mCheckAvailability = true;
 
-    public MockPushProvider(@NonNull Context context) {
-        this(context, DEFAULT_NAME);
+    public MockPushProvider() {
+        this(DEFAULT_NAME);
     }
 
-    public MockPushProvider(@NonNull Context context, String name) {
-        this(context, name, true);
+    public MockPushProvider(String name) {
+        this(name, true);
     }
 
-    public MockPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
-        this(context, name, available, DEFAULT_HOST_APP_PACKAGE);
+    public MockPushProvider(@NonNull String name, boolean checkAvailability) {
+        this(name, DEFAULT_HOST_APP_PACKAGE, checkAvailability);
     }
 
-    public MockPushProvider(@NonNull Context context, boolean available) {
-        this(context, DEFAULT_NAME, available, DEFAULT_HOST_APP_PACKAGE);
+    public MockPushProvider(boolean checkAvailability) {
+        this(DEFAULT_NAME, DEFAULT_HOST_APP_PACKAGE, checkAvailability);
     }
 
-    public MockPushProvider(@NonNull Context context,
-                            @NonNull String name,
+    public MockPushProvider(@NonNull String name,
                             @NonNull String hotAppPackage) {
-        this(context, name, true, hotAppPackage);
+        this(name, hotAppPackage, true);
     }
 
-    public MockPushProvider(@NonNull Context context,
-                     @NonNull String name,
-                     boolean available,
-                     @NonNull String hotAppPackage) {
-        super(context, name, hotAppPackage);
-        mAvailable = available;
+    public MockPushProvider(@NonNull String name,
+                            @NonNull String hotAppPackage,
+                            boolean checkAvailability) {
+        super(Robolectric.application, name, hotAppPackage);
+        mCheckAvailability = checkAvailability;
     }
 
     @Override
@@ -78,13 +71,18 @@ public class MockPushProvider extends BasePushProvider {
 
     @Override
     public void unregister() {
+        final String oldRegistrationId = mRegistrationId;
         mRegistrationId = null;
         OPFPushHelper.getInstance(getContext()).getProviderCallback()
-                .onResult(Result.success(getName(), mRegistrationId, Result.Type.UNREGISTRATION));
+                .onResult(Result.success(getName(), oldRegistrationId, Result.Type.UNREGISTRATION));
     }
 
-    public void setAvailable(boolean available) {
-        mAvailable = available;
+    /**
+     * Set need to check availability of provider.
+     * If availability don't check {@link #isAvailable()} always return {@code false}.
+     */
+    public void setCheckAvailability(boolean checkAvailability) {
+        mCheckAvailability = checkAvailability;
     }
 
     @Override
@@ -99,7 +97,7 @@ public class MockPushProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        return mAvailable && PackageUtils.isInstalled(Robolectric.application, getHostAppPackage());
+        return mCheckAvailability && super.isAvailable();
     }
 
     @Override

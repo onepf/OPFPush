@@ -17,6 +17,7 @@
 
 
 apply plugin: 'com.android.library'
+apply plugin: 'robolectric'
 apply from: '../../maven_push.gradle'
 
 android {
@@ -39,7 +40,23 @@ android {
     }
 }
 
+robolectric {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+
+    // configure max heap size of the test JVM
+    maxHeapSize = '2048m'
+
+    // configure whether failing tests should fail the build
+    ignoreFailures true
+}
+
 dependencies {
+    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'com.google.android.gms:play-services:4.0.30'
+
     compile project(':library')
     provided 'com.google.android.gms:play-services:4.0.30'
 }
