@@ -106,7 +106,7 @@ public class GCMProvider extends BasePushProvider {
     public boolean checkManifest() {
         final Context ctx = getContext();
         return super.checkManifest()
-                && (needGoogleAccounts() || checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
+                && (!needGoogleAccounts() || checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
                 && checkPermission(ctx, Manifest.permission.WAKE_LOCK)
                 && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
                 && checkPermission(ctx, PERMISSION_RECEIVE)
