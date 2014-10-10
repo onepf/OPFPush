@@ -53,8 +53,8 @@ robolectric {
 dependencies {
     androidTestCompile 'org.robolectric:robolectric:2.3'
     androidTestCompile 'junit:junit:4.11'
-    androidTestCompile 'com.google.android.gms:play-services:4.0.30'
+    androidTestCompile 'com.google.android.gms:play-services:3.1.36'
 
     compile project(':library')
-    provided 'com.google.android.gms:play-services:4.0.30'
+    provided 'com.google.android.gms:play-services:3.1.36'
 }
