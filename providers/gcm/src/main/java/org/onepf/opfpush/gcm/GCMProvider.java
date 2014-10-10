@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import support.AsyncTaskCompat;
 
+import static org.onepf.opfpush.OPFPushLog.LOGE;
 import static org.onepf.opfpush.OPFPushLog.LOGI;
 import static org.onepf.opfpush.OPFPushLog.LOGW;
 
@@ -94,7 +95,7 @@ public class GCMProvider extends BasePushProvider {
         executeTask(new RegisterTask());
     }
 
-    void executeTask(Runnable runnable) {
+    private void executeTask(Runnable runnable) {
         if (mExecutor == null || mExecutor.isShutdown()) {
             mExecutor = Executors.newSingleThreadExecutor();
         }
@@ -133,7 +134,7 @@ public class GCMProvider extends BasePushProvider {
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            LOGE("Can't find Google Cloud Messaging classes.");
             return false;
         }
 
@@ -143,7 +144,7 @@ public class GCMProvider extends BasePushProvider {
             if (conResult == ConnectionResult.SUCCESS) {
                 return !needGoogleAccounts() || checkGoogleAccount();
             } else {
-                LOGW("Google Play Services ont available. Reason: '%s'",
+                LOGW("Google Play Services ont available. Reason: '%s'.",
                         GooglePlayServicesUtil.getErrorString(conResult));
             }
         }
@@ -174,6 +175,7 @@ public class GCMProvider extends BasePushProvider {
     }
 
     public void close() {
+        mSettings.reset();
         if (mExecutor != null) {
             mExecutor.shutdownNow();
             mExecutor = null;
@@ -191,17 +193,13 @@ public class GCMProvider extends BasePushProvider {
 
     @Override
     public void onRegistrationInvalid() {
-        reset();
+        mSettings.saveRegistrationToken(null);
+        mSettings.removeAppVersion();
     }
 
     @Override
     public void onUnavailable() {
-        reset();
         close();
-    }
-
-    private void reset() {
-        mSettings.reset();
     }
 
     @NonNull
@@ -245,7 +243,7 @@ public class GCMProvider extends BasePushProvider {
         public void run() {
             try {
                 GoogleCloudMessaging.getInstance(getContext()).unregister();
-                reset();
+                close();
 
                 onUnregistrationSuccess();
             } catch (IOException e) {

@@ -61,6 +61,10 @@ class Settings {
         mPrefs.edit().putInt(KEY_APP_VERSION, appVersion).apply();
     }
 
+    public void removeAppVersion() {
+        mPrefs.edit().remove(KEY_APP_VERSION).apply();
+    }
+
     public int getMessageId() {
         return mPrefs.getInt(KEY_MESSAGE_ID, 1);
     }
