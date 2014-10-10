@@ -7,7 +7,7 @@ See [guide how to porting GCM to OPFPUsh](../../README.md#user-content-porting-g
 ## Integrate in application
 
 For work this module doe next things:
-1. Add Google Play Services 4.0.30 or higher dependency to your application.
+1. Add Google Play Services 3.1.36 or higher dependency to your application.
 
 2. If you use JAR dependency add to AndroidManifest.xml of your application:
 
