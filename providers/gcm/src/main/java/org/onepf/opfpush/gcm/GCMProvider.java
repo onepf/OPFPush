@@ -75,12 +75,15 @@ public class GCMProvider extends BasePushProvider {
     @NonNull
     final Settings mSettings;
 
-    public GCMProvider(@NonNull Context context, @NonNull String senderID, String... senderIDs) {
+    public GCMProvider(@NonNull Context context, @NonNull String senderID, String... moreSenderIDs) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
-        mSenderIDs = new String[1 + senderIDs.length];
-        mSenderIDs[0] = senderID;
-        if (senderIDs.length > 0) {
-            System.arraycopy(senderIDs, 0, mSenderIDs, 1, senderIDs.length);
+
+        if (moreSenderIDs.length > 0) {
+            mSenderIDs = new String[1 + moreSenderIDs.length];
+            mSenderIDs[0] = senderID;
+            System.arraycopy(moreSenderIDs, 0, mSenderIDs, 1, moreSenderIDs.length);
+        } else {
+            mSenderIDs = new String[]{senderID};
         }
 
         mSettings = new Settings(context);
@@ -91,7 +94,7 @@ public class GCMProvider extends BasePushProvider {
         executeTask(new RegisterTask());
     }
 
-    private void executeTask(Runnable runnable) {
+    void executeTask(Runnable runnable) {
         if (mExecutor == null || mExecutor.isShutdown()) {
             mExecutor = Executors.newSingleThreadExecutor();
         }

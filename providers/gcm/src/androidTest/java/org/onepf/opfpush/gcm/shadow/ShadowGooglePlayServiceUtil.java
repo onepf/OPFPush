@@ -37,9 +37,6 @@ import org.robolectric.annotation.RealObject;
 @Implements(GooglePlayServicesUtil.class)
 public class ShadowGooglePlayServiceUtil {
 
-    @RealObject
-    GooglePlayServicesUtil mGooglePlayServicesUtil;
-
     @Implementation
     public static int isGooglePlayServicesAvailable(Context context) {
         try {

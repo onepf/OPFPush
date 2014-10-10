@@ -30,8 +30,6 @@ android {
         versionCode 2
         versionName "2.0"
 
-        applicationId 'org.onepf.opfpush.gcm'
-
         manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 
