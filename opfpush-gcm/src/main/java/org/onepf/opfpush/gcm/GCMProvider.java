@@ -63,7 +63,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
-    private static final String TO_SUFFIX = "@gcm.googleapis.com";
+    private static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 
     private final String mSenderID;
 
@@ -207,7 +207,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         Intent intent = new Intent(getContext(), SendMessageService.class);
         intent.putExtra(SendMessageService.EXTRA_MESSAGE, msg);
-        intent.putExtra(SendMessageService.EXTRA_TO, mSenderID + TO_SUFFIX);
+        intent.putExtra(SendMessageService.EXTRA_TO, mSenderID + MESSAGES_TO_SUFFIX);
         getContext().startService(intent);
     }
 
