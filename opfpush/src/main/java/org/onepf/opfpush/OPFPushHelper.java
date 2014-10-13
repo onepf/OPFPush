@@ -154,6 +154,21 @@ public class OPFPushHelper {
         }
     }
 
+    public boolean canSendMessages() {
+        return mCurrentProvider instanceof SenderPushProvider;
+    }
+
+    public void sendMessage(Message message) {
+        if (mCurrentProvider instanceof SenderPushProvider) {
+            ((SenderPushProvider) mCurrentProvider).send(message);
+        } else if (isRegistered()) {
+            throw new OPFPushException(
+                    "Current provider '%s' not support send messages.", mCurrentProvider);
+        } else {
+            throw new OPFPushException("Provider not registered.");
+        }
+    }
+
     /**
      * Is push registered.
      *

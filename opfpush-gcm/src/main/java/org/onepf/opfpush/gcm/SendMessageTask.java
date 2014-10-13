@@ -22,6 +22,8 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.onepf.opfpush.Message;
+
 import java.io.IOException;
 
 import static org.onepf.opfpush.OPFPushLog.LOGE;
@@ -37,12 +39,12 @@ class SendMessageTask extends AsyncTask<Void, Void, Void> {
     private static final String GCM_SENDER_SUFFIX = "@gcm.googleapis.com";
 
     private final String mTo;
-    private final GCMMessage mMessage;
+    private final Message mMessage;
     private final Context mContext;
 
     SendMessageTask(@NonNull Context context,
                     @NonNull String senderId,
-                    @NonNull GCMMessage message) {
+                    @NonNull Message message) {
         mTo = senderId + GCM_SENDER_SUFFIX;
         mMessage = message;
         mContext = context.getApplicationContext();

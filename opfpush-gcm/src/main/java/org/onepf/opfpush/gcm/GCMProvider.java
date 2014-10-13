@@ -32,6 +32,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.SenderPushProvider;
+import org.onepf.opfpush.Message;
 import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.PackageUtils;
 
@@ -54,7 +56,7 @@ import static org.onepf.opfpush.OPFPushLog.LOGW;
  * @see <a href="https://developer.android.com/google/gcm/index.html">Google Cloud Messaging for Android</a>
  * @since 04.09.14
  */
-public class GCMProvider extends BasePushProvider {
+public class GCMProvider extends BasePushProvider implements SenderPushProvider {
 
     public static final String NAME = "Google Cloud Messaging";
     public static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
@@ -67,9 +69,7 @@ public class GCMProvider extends BasePushProvider {
     public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
 
-    private final String[] mSenderIDs;
-
-    private final AtomicInteger mMsgId;
+    private final String mSenderID;
 
     @Nullable
     private ExecutorService mExecutor;
@@ -77,19 +77,11 @@ public class GCMProvider extends BasePushProvider {
     @NonNull
     final Settings mSettings;
 
-    public GCMProvider(@NonNull Context context, @NonNull String senderID, String... moreSenderIDs) {
+    public GCMProvider(@NonNull Context context, @NonNull String senderID) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
 
-        if (moreSenderIDs.length > 0) {
-            mSenderIDs = new String[1 + moreSenderIDs.length];
-            mSenderIDs[0] = senderID;
-            System.arraycopy(moreSenderIDs, 0, mSenderIDs, 1, moreSenderIDs.length);
-        } else {
-            mSenderIDs = new String[]{senderID};
-        }
-
+        mSenderID = senderID;
         mSettings = new Settings(context);
-        mMsgId = new AtomicInteger(mSettings.getMessageId());
     }
 
     public synchronized void register() {
@@ -196,8 +188,8 @@ public class GCMProvider extends BasePushProvider {
     @NonNull
     @Override
     public String toString() {
-        return String.format("%s (senderId: '%s', appVersion: %d)", NAME,
-                Arrays.toString(mSenderIDs), mSettings.getAppVersion());
+        return String.format("%s (senderId: '%s', appVersion: %d)",
+                NAME, mSenderID, mSettings.getAppVersion());
     }
 
     @Override
@@ -211,34 +203,17 @@ public class GCMProvider extends BasePushProvider {
         close();
     }
 
-    @NonNull
-    public String[] getSenderIDs() {
-        return mSenderIDs;
+    public String getSenderID() {
+        return mSenderID;
     }
 
-    /**
-     * Send message to server.
-     *
-     * @throws IllegalStateException If try send message when provider isn't registered.
-     */
-    public void send(@NonNull String senderId, @NonNull GCMMessage msg) {
+    @Override
+    public void send(@NonNull Message msg) {
         if (!isRegistered()) {
             throw new IllegalStateException("Before send message you need register GCM.");
         }
 
-        mSettings.saveMessageId(mMsgId.incrementAndGet());
-        AsyncTaskCompat.execute(new SendMessageTask(getContext(), senderId, msg));
-    }
-
-    private void checkSenderId(@NonNull String senderId) {
-        for (String s : mSenderIDs) {
-            if (senderId.equals(s)) {
-                return;
-            }
-        }
-
-        throw new OPFPushException("Invalid sender '%s' id. Must be one of '%s'.",
-                senderId, Arrays.toString(mSenderIDs));
+        AsyncTaskCompat.execute(new SendMessageTask(getContext(), mSenderID, msg));
     }
 
     private final class UnregisterTask implements Runnable {
@@ -285,7 +260,7 @@ public class GCMProvider extends BasePushProvider {
         public void run() {
             try {
                 final String registrationToken =
-                        GoogleCloudMessaging.getInstance(getContext()).register(mSenderIDs);
+                        GoogleCloudMessaging.getInstance(getContext()).register(mSenderID);
                 if (registrationToken == null) {
                     onAuthError();
                 } else {

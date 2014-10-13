@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
+package org.onepf.opfpush;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
  * @author Kirill Rozov
  * @since 18.09.14.
  */
-public class GCMMessage {
+public class Message {
     private String mId;
     private Bundle mData;
     private long mTimeToLeave;
@@ -36,7 +36,7 @@ public class GCMMessage {
      * @param id   Message's ID.
      * @param data Messages' data to send.
      */
-    public GCMMessage(@NonNull String id, @NonNull Bundle data) {
+    public Message(@NonNull String id, @NonNull Bundle data) {
         this(id, data, 0);
     }
 
@@ -47,7 +47,7 @@ public class GCMMessage {
      * @param data        Messages' data to send.
      * @param timeToLeave How long message is valid. Set 0 to default value.
      */
-    public GCMMessage(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
+    public Message(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
         if (timeToLeave < 0) {
             throw new IllegalArgumentException(String.format("timeToLeave='%d'." +
                     " Time to leave must be non negative value.", timeToLeave));
