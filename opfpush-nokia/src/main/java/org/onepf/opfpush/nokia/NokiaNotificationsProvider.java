@@ -31,7 +31,7 @@ import org.onepf.opfpush.BasePushProvider;
  * @see <a href="http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html">Nokia Notification</a>
  * @since 06.09.14
  */
-public class NokiaNotificationProvider extends BasePushProvider {
+public class NokiaNotificationsProvider extends BasePushProvider {
 
     private static final String NOKIA_MANUFACTURER = "Nokia";
     public static final String NAME = "Nokia Push"; //todo check the name
@@ -39,7 +39,7 @@ public class NokiaNotificationProvider extends BasePushProvider {
 
     private final String[] mSendersId;
 
-    public NokiaNotificationProvider(@NonNull Context context, @NonNull String... sendersID) {
+    public NokiaNotificationsProvider(@NonNull Context context, @NonNull String... sendersID) {
         super(context, NAME, NOKIA_STORE_APP_PACKAGE);
         mSendersId = sendersID;
     }

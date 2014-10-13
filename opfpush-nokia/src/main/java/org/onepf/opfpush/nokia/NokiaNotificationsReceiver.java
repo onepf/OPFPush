@@ -27,7 +27,7 @@ import com.nokia.push.PushBroadcastReceiver;
  * @author Kirill Rozov
  * @since 05.09.2014
  */
-public final class NokiaNotificationReceiver extends PushBroadcastReceiver {
+public final class NokiaNotificationsReceiver extends PushBroadcastReceiver {
 
     private static final String SERVICE_CLASS_NAME
             = NokiaNotificationService.class.getCanonicalName();
