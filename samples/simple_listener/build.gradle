@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    compile project(':providers:gcm')
+    compile project(':opfpush-gcm')
     //noinspection GradleDependency
     compile 'com.google.android.gms:play-services:5.0.89'
     compile 'com.jakewharton:butterknife:5.1.2'
