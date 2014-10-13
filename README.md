@@ -6,7 +6,7 @@ Releases will be announced later.
 Currently OPFPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
 Android Device Messaging and has possibility to integrate new push service.
 
-For more information see [the website][9].
+For more information see [the website][openpush-site].
 
 
 
@@ -16,9 +16,6 @@ For more information see [the website][9].
 - [How To Use](#user-content-how-to-use)
 - [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Implemented Push Services](#user-content-implemented-push-services)
-    - [Google Cloud Messaging][4]
-    - [Amazon Device Messaging][5]
-    - [Nokia Notification][6]
 - [Porting Google Cloud Messaging to OPFPush](#user-content-porting-google-cloud-messaging-to-opfpush)
 - [License](#user-content-license)
 
@@ -26,7 +23,7 @@ For more information see [the website][9].
 
 ## Download
 
-Download [the latest AAR][10] or [the latest JAR][8]. Also you can grab it via Gradle
+Download [the latest AAR][opfpush-latest-aar] or [the latest JAR][opfpush-latest-jar]. Also you can grab it via Gradle
 ```groovy
 compile 'org.onepf:opfpush:2.0'
 ```
@@ -58,7 +55,7 @@ for JAR dependency:
 ## How To Use
 
 Before setup `OPFPushHelper` you must setup your project files.
-If you use [Android New Build System][7] and [AAR][11] dependencies:
+If you use [Android New Build System][new-build-system] and [AAR][aar-format-docs] dependencies:
 
 0. Add to build.gradle file in your app module:
 
@@ -180,7 +177,7 @@ For porting Google Cloud Messaging (GCM) to OPFPush you need do the next steps:
     pushHelper.init(options);
     ````
 
-    [BroadcastMessageListener.java][12] class redirect message events
+    [BroadcastMessageListener.java][BroadcastMessageListener.java] class redirect message events
     from OPFPush message events listener to existing BroadcastReceiver, that you use for GCM.
     You must add this class to your source for work with it.
 
@@ -254,9 +251,9 @@ You can see migrated from GCM sample code in [GCM Migrate Sample](./samples/gcm_
 
 ## Implemented Push Services
 
-1. [Google Cloud Messaging][1]. See [gcm-provider][4].
-2. [Amazon Device Messaging][2]. See [adm-provider][5].
-3. [Nokia Notification][3]. See [nokia-provider][6].
+1. [Google Cloud Messaging][google-cloud-messaging]. See [GCM provider][opfpush-gcm].
+2. [Amazon Device Messaging][amazon-device-messaging]. See [ADM provider][opfpush-adm].
+3. [Nokia Notifications][nokia-notifications]. See [Nokia Notifications provider][opfpush-nokia].
 
 
 
@@ -277,15 +274,15 @@ You can see migrated from GCM sample code in [GCM Migrate Sample](./samples/gcm_
     limitations under the License.
 
 
-[1]: https://developer.android.com/google/gcm
-[2]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
-[3]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
-[4]: ./providers/gcm
-[5]: ./providers/adm
-[6]: ./providers/nokia
-[7]: http://tools.android.com/tech-docs/new-build-system
-[8]: http://LINK_TO_the_latest_JAR.
-[9]: http://www.onepf.org/openpush/
-[10]: http://LINK_TO_the_latest_AAR.
-[11]: http://tools.android.com/tech-docs/new-build-system/aar-format
-[12]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
+[google-cloud-messaging]: https://developer.android.com/google/gcm
+[amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
+[nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
+[opfpush-gcm]: ./providers/gcm
+[opfpush-adm]: ./providers/adm
+[opfpush-nokia]: ./providers/nokia
+[new-build-system]: http://tools.android.com/tech-docs/new-build-system
+[opfpush-latest-jar]: http://LINK_TO_the_latest_JAR.
+[openpush-site]: http://www.onepf.org/openpush/
+[opfpush-latest-aar]: http://LINK_TO_the_latest_AAR.
+[aar-format-docs]: http://tools.android.com/tech-docs/new-build-system/aar-format
+[BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
