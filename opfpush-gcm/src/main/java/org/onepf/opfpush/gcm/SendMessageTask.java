@@ -35,7 +35,7 @@ import static org.onepf.opfpush.OPFPushLog.LOGI;
  * @author Kirill Rozov
  * @since 22.09.14.
  */
-class SendMessageTask extends AsyncTask<Void, Void, Void> {
+class SendMessageTask implements Runnable {
     private static final String GCM_SENDER_SUFFIX = "@gcm.googleapis.com";
 
     private final String mTo;
@@ -50,16 +50,14 @@ class SendMessageTask extends AsyncTask<Void, Void, Void> {
         mContext = context.getApplicationContext();
     }
 
-    protected Void doInBackground(Void... params) {
+    @Override
+    public void run() {
         try {
-            if (!isCancelled()) {
-                GoogleCloudMessaging.getInstance(mContext)
-                        .send(mTo, mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
-                LOGI(String.format("Message '%s' has sent.", mMessage));
-            }
+            GoogleCloudMessaging.getInstance(mContext)
+                    .send(mTo, mMessage.getId(), mMessage.getTimeToLeave(), mMessage.getData());
+            LOGI(String.format("Message '%s' has sent.", mMessage));
         } catch (IOException ex) {
             LOGE(String.format("Error while send Message '%s'.", mMessage), ex);
         }
-        return null;
     }
 }

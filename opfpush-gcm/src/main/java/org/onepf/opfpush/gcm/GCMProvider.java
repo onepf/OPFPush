@@ -41,10 +41,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import support.AsyncTaskCompat;
-
 import static org.onepf.opfpush.OPFPushLog.LOGE;
-import static org.onepf.opfpush.OPFPushLog.LOGI;
 import static org.onepf.opfpush.OPFPushLog.LOGW;
 
 /**
@@ -71,6 +68,9 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Nullable
     private ExecutorService mRegistrationExecutor;
+
+    @Nullable
+    private ExecutorService mMsgSendExecutor;
 
     @NonNull
     final Settings mSettings;
@@ -201,17 +201,16 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         close();
     }
 
-    public String getSenderID() {
-        return mSenderID;
-    }
-
     @Override
     public void send(@NonNull Message msg) {
         if (!isRegistered()) {
             throw new IllegalStateException("Before send message you need register GCM.");
         }
 
-        AsyncTaskCompat.execute(new SendMessageTask(getContext(), mSenderID, msg));
+        if (mMsgSendExecutor == null) {
+            mMsgSendExecutor = Executors.newSingleThreadExecutor();
+        }
+        mMsgSendExecutor.execute(new SendMessageTask(getContext(), mSenderID, msg));
     }
 
     private final class UnregisterTask implements Runnable {
