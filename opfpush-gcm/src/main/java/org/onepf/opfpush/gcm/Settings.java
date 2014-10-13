@@ -29,7 +29,6 @@ class Settings {
 
     private static final String KEY_REGISTRATION_TOKEN = "registration_token";
     private static final String KEY_APP_VERSION = "app_version";
-    private static final String KEY_MESSAGE_ID = "message_id";
 
     private static final String PREFS_NAME = "org.onepf.openpush.gcm";
 
@@ -63,14 +62,6 @@ class Settings {
 
     public void removeAppVersion() {
         mPrefs.edit().remove(KEY_APP_VERSION).apply();
-    }
-
-    public int getMessageId() {
-        return mPrefs.getInt(KEY_MESSAGE_ID, 1);
-    }
-
-    public void saveMessageId(int msgId) {
-        mPrefs.edit().putInt(KEY_MESSAGE_ID, msgId).apply();
     }
 
     public void reset() {
