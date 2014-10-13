@@ -41,7 +41,7 @@ android {
 }
 ```
 
-Tou use `NokiaNotificationsProvider` simple add it to `Options` when building new instance, like this:
+To use `NokiaNotificationsProvider` simple add it to `Options` when building new instance, like this:
 
 ```java
 Options.Builder builder = new Options.Builder();
