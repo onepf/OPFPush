@@ -61,7 +61,7 @@ public abstract class GCMProviderTestBase {
 
     protected static void addLatestGMSServiceApp() {
         Resources resources = Robolectric.application.getResources();
-        addGMSServiceApp("4.0.30", resources.getInteger(R.integer.google_play_services_version));
+        addGMSServiceApp("4.0.30", 4030000);
     }
 
     @Before
