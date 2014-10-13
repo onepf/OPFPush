@@ -391,7 +391,8 @@ public class OPFPushHelperTest {
         provider.setCheckAvailability(false);
 
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        helper.init(new Options.Builder().addProviders(provider).build());
+        Options options = new Options.Builder().addProviders(provider).build();
+        helper.init(options);
         assertNull(helper.getCurrentProvider());
         assertFalse(helper.isRegistered());
         assertNull(settings.getLastProviderName());

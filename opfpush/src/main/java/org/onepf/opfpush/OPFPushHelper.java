@@ -188,8 +188,8 @@ public class OPFPushHelper {
      * @param options Instance of {@code Options}.
      */
     public void init(@NonNull Options options) {
-        if (!isUnregistered()) {
-            throw new OPFPushException("You can init OpenPushHelper only when it is unregistered.");
+        if (isInitDone()) {
+            throw new OPFPushException("You can init OpenPushHelper only one time.");
         }
 
         if (mOptions == null) {
@@ -205,30 +205,32 @@ public class OPFPushHelper {
     }
 
     private void initLastProvider() {
-        final PushProvider lastProvider = getLastProvider();
-        if (lastProvider == null) {
-            LOGI("No last provider.");
-            return;
-        }
-
-        LOGI("Try restore last provider '%s'.", lastProvider);
-
-        if (lastProvider.isAvailable()) {
-            if (lastProvider.isRegistered()) {
-                LOGI("Last provider running.");
-                mCurrentProvider = lastProvider;
-                mSettings.saveState(STATE_REGISTERED);
-            } else {
-                LOGI("Last provider need register.");
-                if (!register(lastProvider)) {
-                    mSettings.saveLastProvider(null);
-                }
+        synchronized (mRegistrationLock) {
+            final PushProvider lastProvider = getLastProvider();
+            if (lastProvider == null) {
+                LOGI("No last provider.");
+                return;
             }
-        } else {
-            mSettings.saveLastProvider(null);
-            mSettings.saveState(STATE_UNREGISTERED);
 
-            onProviderUnavailable(lastProvider);
+            LOGI("Try restore last provider '%s'.", lastProvider);
+
+            if (lastProvider.isAvailable()) {
+                if (lastProvider.isRegistered()) {
+                    LOGI("Last provider running.");
+                    mCurrentProvider = lastProvider;
+                    mSettings.saveState(STATE_REGISTERED);
+                } else {
+                    LOGI("Last provider need register.");
+                    if (!register(lastProvider)) {
+                        mSettings.saveLastProvider(null);
+                    }
+                }
+            } else {
+                mSettings.saveLastProvider(null);
+                mSettings.saveState(STATE_UNREGISTERED);
+
+                onProviderUnavailable(lastProvider);
+            }
         }
     }
 

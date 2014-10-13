@@ -40,14 +40,8 @@ public class ShadowGooglePlayServiceUtil {
     @Implementation
     public static int isGooglePlayServicesAvailable(Context context) {
         try {
-            PackageInfo packageInfo =
-                    Robolectric.packageManager.getPackageInfo(TestConstants.GOOGLE_PLAY_SERVICES_PACKAGE, 0);
-            if (packageInfo.versionCode >=
-                    context.getResources().getInteger(R.integer.google_play_services_version)) {
-                return ConnectionResult.SUCCESS;
-            } else {
-                return ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED;
-            }
+            Robolectric.packageManager.getPackageInfo(TestConstants.GOOGLE_PLAY_SERVICES_PACKAGE, 0);
+            return ConnectionResult.SUCCESS;
         } catch (PackageManager.NameNotFoundException e) {
             return ConnectionResult.SERVICE_MISSING;
         }

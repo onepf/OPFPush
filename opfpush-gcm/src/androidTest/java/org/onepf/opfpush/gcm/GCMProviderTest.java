@@ -60,14 +60,6 @@ public class GCMProviderTest extends GCMProviderTestBase {
     }
 
     @Test
-    public void testCheckAvailable_OldGMSInstalled() throws Exception {
-        addGMSServiceApp("3.0.55", 3055000);
-        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
-        assertFalse(provider.isAvailable());
-        removeGMCServiceApp();
-    }
-
-    @Test
     public void testMultiSenderIDsCreate() throws Exception {
         String[] sendersId = {"s1", "s2", "s3"};
         GCMProvider provider
