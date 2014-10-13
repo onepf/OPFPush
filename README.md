@@ -277,12 +277,12 @@ You can see migrated from GCM sample code in [GCM Migrate Sample](./samples/gcm_
 [google-cloud-messaging]: https://developer.android.com/google/gcm
 [amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
-[opfpush-gcm]: ./providers/gcm
-[opfpush-adm]: ./providers/adm
-[opfpush-nokia]: ./providers/nokia
+[opfpush-gcm]: ./opfpush-gcm
+[opfpush-adm]: ./opfpush-adm
+[opfpush-nokia]: ./opfpush-nokia
 [new-build-system]: http://tools.android.com/tech-docs/new-build-system
 [opfpush-latest-jar]: http://LINK_TO_the_latest_JAR.
 [openpush-site]: http://www.onepf.org/openpush/
 [opfpush-latest-aar]: http://LINK_TO_the_latest_AAR.
 [aar-format-docs]: http://tools.android.com/tech-docs/new-build-system/aar-format
-[BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush.gcm_migrate_sample/BroadcastMessageListener.java
+[BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush/gcm_migrate_sample/BroadcastMessageListener.java
