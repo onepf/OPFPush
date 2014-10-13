@@ -18,27 +18,37 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-def mavenRepositoryUrl
-if (isReleaseBuild()) {
-    println "${project.name} RELEASE BUILD"
-    mavenRepositoryUrl = RELEASE_REPOSITORY_URL
-} else if (useTestRepo()) {
-    println "${project.name} LOCAL BUILD"
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    def localrepo = properties.getProperty('localrepo')
-
-    if (localrepo == null || localrepo == "") {
-        localrepo = System.getProperty('user.home') + "/onepf-repo"
+uploadArchives.doFirst {
+    print '------------------  ' + project.name.toUpperCase() + ' '
+    if (isReleaseBuild()) {
+        print "RELEASE BUILD"
+    } else if (useTestRepo()) {
+        print "LOCAL BUILD"
+    } else {
+        print "SNAPSHOT BUILD"
     }
+    println '  ------------------'
+}
 
-    if (!localrepo.startsWith("file:///")) {
-        localrepo = "file:///" + localrepo
+def getMavenRepositoryUrl() {
+    if (isReleaseBuild()) {
+        return RELEASE_REPOSITORY_URL
+    } else if (useTestRepo()) {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def localRepo = properties.getProperty('localrepo')
+
+        if (localRepo == null || localRepo == "") {
+            localRepo = System.getProperty('user.home') + "/onepf-test-repo"
+        }
+
+        if (!localRepo.startsWith("file:///")) {
+            localRepo = "file:///" + localRepo
+        }
+        return localRepo
+    } else {
+        return SNAPSHOT_REPOSITORY_URL
     }
-    mavenRepositoryUrl = localrepo
-} else {
-    println "${project.name} SNAPSHOT BUILD"
-    mavenRepositoryUrl = SNAPSHOT_REPOSITORY_URL
 }
 
 afterEvaluate { project ->
@@ -50,9 +60,9 @@ afterEvaluate { project ->
                 pom.artifactId = POM_ARTIFACT_ID
 
                 if (useTestRepo()) {
-                    repository(url: mavenRepositoryUrl)
+                    repository(url: getMavenRepositoryUrl())
                 } else {
-                    repository(url: mavenRepositoryUrl) {
+                    repository(url: getMavenRepositoryUrl()) {
                         authentication(userName: nexusUsername, password: nexusPassword)
                     }
                 }
