@@ -27,7 +27,7 @@
 
     <application>
         <receiver
-            android:name="org.onepf.opfpush.nokia.NokiaNotificationReceiver"
+            android:name=".NokiaNotificationsReceiver"
             android:permission="com.nokia.pushnotifications.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->

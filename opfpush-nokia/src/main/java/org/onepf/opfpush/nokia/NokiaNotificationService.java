@@ -48,7 +48,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onMessage(@NonNull Context appContext, Intent intent) {
-        OPFPushHelper.getInstance(this).getProviderCallback().onMessage(NokiaNotificationProvider.NAME, intent.getExtras());
+        OPFPushHelper.getInstance(this).getProviderCallback().onMessage(NokiaNotificationsProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -61,7 +61,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     protected void onError(@NonNull Context appContext, String errorId) {
         OPFPushHelper.getInstance(this).getProviderCallback()
                 .onResult(
-                        Result.error(NokiaNotificationProvider.NAME,
+                        Result.error(NokiaNotificationsProvider.NAME,
                                 convertError(errorId),
                                 Result.Type.UNKNOWN)
                 );
@@ -77,7 +77,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onDeletedMessages(@NonNull Context appContext, int total) {
         OPFPushHelper.getInstance(this).getProviderCallback()
-                .onDeletedMessages(NokiaNotificationProvider.NAME, total);
+                .onDeletedMessages(NokiaNotificationsProvider.NAME, total);
     }
 
     /**
@@ -91,11 +91,11 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected boolean onRecoverableError(@NonNull Context appContext,
-                                         @NonNull @NokiaNotificationError String errorId) {
+                                         @NonNull @NokiaNotificationsError String errorId) {
         Error error = convertError(errorId);
         OPFPushHelper.getInstance(this).getProviderCallback()
                 .onResult(
-                        Result.error(NokiaNotificationProvider.NAME,
+                        Result.error(NokiaNotificationsProvider.NAME,
                                 error,
                                 Result.Type.REGISTRATION)
                 );
@@ -103,7 +103,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     }
 
     @NonNull
-    private static Error convertError(@NonNull @NokiaNotificationError String errorId) {
+    private static Error convertError(@NonNull @NokiaNotificationsError String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
             return Error.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
@@ -125,7 +125,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     protected void onRegistered(@NonNull Context appContext,
                                 @NonNull String registrationToken) {
         OPFPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.success(NokiaNotificationProvider.NAME, registrationToken, Result.Type.REGISTRATION));
+                Result.success(NokiaNotificationsProvider.NAME, registrationToken, Result.Type.REGISTRATION));
     }
 
     /**
@@ -138,6 +138,6 @@ public class NokiaNotificationService extends PushBaseIntentService {
     protected void onUnregistered(@NonNull Context appContext,
                                   @NonNull String oldRegistrationToken) {
         OPFPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.success(NokiaNotificationProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
+                Result.success(NokiaNotificationsProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 }

@@ -33,5 +33,5 @@ import java.lang.annotation.RetentionPolicy;
         PushConstants.ERROR_INVALID_SENDER,
         PushConstants.ERROR_SERVICE_NOT_AVAILABLE
 })
-@interface NokiaNotificationError {
+@interface NokiaNotificationsError {
 }
