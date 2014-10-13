@@ -17,7 +17,8 @@
 
 
 apply plugin: 'com.android.library'
-apply from: '../../maven_push.gradle'
+apply plugin: 'robolectric'
+apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -29,8 +30,6 @@ android {
         versionCode 2
         versionName "2.0"
 
-        applicationId 'org.onepf.opfpush.nokia'
-
         manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 
@@ -39,7 +38,23 @@ android {
     }
 }
 
+robolectric {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+
+    // configure max heap size of the test JVM
+    maxHeapSize = '2048m'
+
+    // configure whether failing tests should fail the build
+    ignoreFailures true
+}
+
 dependencies {
-    compile project(':library')
-    compile files('libs/push.jar')
+    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'com.google.android.gms:play-services:3.1.36'
+
+    compile project(':opfpush')
+    provided 'com.google.android.gms:play-services:3.1.36'
 }
