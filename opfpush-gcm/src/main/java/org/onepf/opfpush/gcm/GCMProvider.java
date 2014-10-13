@@ -38,10 +38,8 @@ import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.PackageUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import support.AsyncTaskCompat;
 
@@ -72,7 +70,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private final String mSenderID;
 
     @Nullable
-    private ExecutorService mExecutor;
+    private ExecutorService mRegistrationExecutor;
 
     @NonNull
     final Settings mSettings;
@@ -89,10 +87,10 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private void executeTask(Runnable runnable) {
-        if (mExecutor == null || mExecutor.isShutdown()) {
-            mExecutor = Executors.newSingleThreadExecutor();
+        if (mRegistrationExecutor == null || mRegistrationExecutor.isShutdown()) {
+            mRegistrationExecutor = Executors.newSingleThreadExecutor();
         }
-        mExecutor.execute(runnable);
+        mRegistrationExecutor.execute(runnable);
     }
 
     public synchronized void unregister() {
@@ -177,9 +175,9 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     public void close() {
         mSettings.reset();
-        if (mExecutor != null) {
-            mExecutor.shutdownNow();
-            mExecutor = null;
+        if (mRegistrationExecutor != null) {
+            mRegistrationExecutor.shutdownNow();
+            mRegistrationExecutor = null;
         }
 
         GoogleCloudMessaging.getInstance(getContext()).close();
