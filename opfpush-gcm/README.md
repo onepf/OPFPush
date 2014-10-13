@@ -49,6 +49,10 @@ For work this module do the following steps:
         <service
             android:name="org.onepf.openpush.gcm.GCMService"
             android:exported="false"/>
+
+        <service
+            android:name="org.onepf.opfpush.gcm.SendMessageService"
+            android:exported="false"/>
     </application>
     ````
 
