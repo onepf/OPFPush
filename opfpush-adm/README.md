@@ -1,8 +1,10 @@
-Implementation of [Amazon Device Messaging][1] for Open Push.
+Implementation of [Amazon Device Messaging][1] for OPFPush.
 
-If you not use AAR dependency add to your AndroidManifest.xml applications:
+## How To Use
 
-````xml
+If you use JAR dependency, you must to add to your application AndroidManifest.xml file following:
+
+```xml
 <manifest xmlns:amazon="http://schemas.amazon.com/apk/res/android">
     <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
     <permission
@@ -33,6 +35,25 @@ If you not use AAR dependency add to your AndroidManifest.xml applications:
         </receiver>
     </application>
 </manifest>
-````
+```
+
+If you use AAR dependency and NBS add the next code:
+
+```groovy
+android {
+  defaultConfig {
+    ...
+    manifestPlaceholders = [packageId : "\${applicationId}".toString()]
+    ...
+  }
+}
+```
+
+To use `ADMProvider` simple add it to `Options` when building new instance, like this:
+
+```java
+Options.Builder builder = new Options.Builder();
+builder.addProviders(new ADMProvider(this))
+```
 
 [1]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
