@@ -18,6 +18,7 @@ For more information see [the website][openpush-site].
 - [Implemented Push Services](#user-content-implemented-push-services)
 - [Porting Google Cloud Messaging to OPFPush](#user-content-porting-google-cloud-messaging-to-opfpush)
 - [License](#user-content-license)
+- [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
 
 
 
@@ -49,7 +50,6 @@ for JAR dependency:
     <type>jar</type>
 </dependency>
 ```
-
 
 
 ## How To Use
@@ -254,6 +254,20 @@ You can see migrated from GCM sample code in [GCM Migrate Sample](./samples/gcm_
 1. [Google Cloud Messaging][google-cloud-messaging]. See [GCM provider][opfpush-gcm].
 2. [Amazon Device Messaging][amazon-device-messaging]. See [ADM provider][opfpush-adm].
 3. [Nokia Notifications][nokia-notifications]. See [Nokia Notifications provider][opfpush-nokia].
+
+
+
+## Comparison of most popular push services
+
+| Criteria                            | GCM   | ADM   | Nokia Notifications | OPFPush     |
+| :---------------------------------- | :---: | :---: | :-----------------: | :---------: |
+| Receive messages                    |   +   |   +   |          +          |      +      |
+| Send messages                       |   +   |   -   |          -          | Only in GCM |
+| Retry register on fail              |   -   |   +   |          +          |      +      |
+| Configurable retry mechanism        |   -   |   -   |        ON/OFF       |      +      |
+| Retry register on fail after reboot |   -   |   -   |          -          |      +      |
+| Retry unregister on fail            |   -   |   -   |          -          |      +      |
+| Check is registration valid on boot |   -   |   -   |          -          |      +      |
 
 
 
