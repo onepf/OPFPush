@@ -1,8 +1,10 @@
-[Nokia Notification][1] implementation for Open Push.
+[Nokia Notifications][Nokia Notifications Page] implementation for OPFPush.
 
-If you don't use dependency AAR add to your AndroidManifest.xml application:
+## How To Use
 
-````xml
+If you use JAR dependency, you must to add to your application AndroidManifest.xml file following:
+
+```xml
 <permission
        android:name="(your_application_package).permission.C2D_MESSAGE"
        android:protectionLevel="signature"/>
@@ -25,6 +27,25 @@ If you don't use dependency AAR add to your AndroidManifest.xml application:
        android:exported="false"/>
 
 </application>
-````
+```
 
-[1]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
+If you use AAR dependency and NBS add the next code:
+
+```groovy
+android {
+  defaultConfig {
+    ...
+    manifestPlaceholders = [packageId : "\${applicationId}".toString()]
+    ...
+  }
+}
+```
+
+Tou use `NokiaNotificationsProvider` simple add it to `Options` when building new instance, like this:
+
+```java
+Options.Builder builder = new Options.Builder();
+builder.addProviders(new NokiaNotificationsProvider(this, NOKIA_NOTIFICATION_SENDER_ID))
+```
+
+[Nokia Notifications Page]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
