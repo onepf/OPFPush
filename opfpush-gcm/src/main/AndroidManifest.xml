@@ -51,6 +51,10 @@
         <service
             android:name="org.onepf.opfpush.gcm.GCMService"
             android:exported="false"/>
+
+        <service
+            android:name="org.onepf.opfpush.gcm.SendMessageService"
+            android:exported="false"/>
     </application>
 
 </manifest>

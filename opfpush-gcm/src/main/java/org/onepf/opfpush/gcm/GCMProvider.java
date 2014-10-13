@@ -63,14 +63,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
+    private static final String TO_SUFFIX = "@gcm.googleapis.com";
 
     private final String mSenderID;
 
     @Nullable
     private ExecutorService mRegistrationExecutor;
-
-    @Nullable
-    private ExecutorService mMsgSendExecutor;
 
     @NonNull
     final Settings mSettings;
@@ -207,10 +205,10 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             throw new IllegalStateException("Before send message you need register GCM.");
         }
 
-        if (mMsgSendExecutor == null) {
-            mMsgSendExecutor = Executors.newSingleThreadExecutor();
-        }
-        mMsgSendExecutor.execute(new SendMessageTask(getContext(), mSenderID, msg));
+        Intent intent = new Intent(getContext(), SendMessageService.class);
+        intent.putExtra(SendMessageService.EXTRA_MESSAGE, msg);
+        intent.putExtra(SendMessageService.EXTRA_TO, mSenderID + TO_SUFFIX);
+        getContext().startService(intent);
     }
 
     private final class UnregisterTask implements Runnable {

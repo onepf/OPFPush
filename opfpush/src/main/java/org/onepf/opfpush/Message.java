@@ -17,6 +17,8 @@
 package org.onepf.opfpush;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 /**
@@ -25,7 +27,7 @@ import android.support.annotation.NonNull;
  * @author Kirill Rozov
  * @since 18.09.14.
  */
-public class Message {
+public class Message implements Parcelable {
     private String mId;
     private Bundle mData;
     private long mTimeToLeave;
@@ -57,6 +59,24 @@ public class Message {
         mTimeToLeave = timeToLeave;
     }
 
+    private Message(Parcel parcel) {
+        mId = parcel.readString();
+        mTimeToLeave = parcel.readLong();
+        mData = parcel.readBundle();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeLong(mTimeToLeave);
+        dest.writeBundle(mData);
+    }
+
     @NonNull
     public String getId() {
         return mId;
@@ -80,4 +100,16 @@ public class Message {
                 ", TTL=" + mTimeToLeave +
                 '}';
     }
+
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+        @Override
+        public Message createFromParcel(Parcel source) {
+            return new Message(source);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
 }
