@@ -20,7 +20,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 
 /**
- * Created by  Kirill Rozov on 18.09.14.
+ * @author Kirill Rozov
+ * @since 18.09.14
  */
 public final class AsyncTaskCompat {
     public static <PARAM, PROGRESS, RESULT> AsyncTask<PARAM, PROGRESS, RESULT> execute(
