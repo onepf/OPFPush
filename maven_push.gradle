@@ -15,9 +15,6 @@
  */
 
 
-
-
-
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -81,6 +78,14 @@ afterEvaluate { project ->
                         }
                     }
 
+                    repositories {
+                        repository {
+                            id 'onepf-repo'
+                            name 'OnePF Repository'
+                            url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/'
+                        }
+                    }
+
                     developers {
                         developer {
                             id POM_DEVELOPER_ID
@@ -93,7 +98,7 @@ afterEvaluate { project ->
     }
 
     signing {
-        required { isReleaseBuild()}
+        required { isReleaseBuild() }
         sign configurations.archives
     }
 
