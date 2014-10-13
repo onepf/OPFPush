@@ -41,5 +41,5 @@ android {
 
 dependencies {
     compile project(':library')
-    compile files('libs/amazon-device-messaging-1.0.1.jar')
+    compile 'com.amazon:amazon-device-messaging:1.0.1'
 }
