@@ -43,6 +43,7 @@ allprojects {
     group = GROUP
 
     repositories {
+        maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         jcenter()
     }

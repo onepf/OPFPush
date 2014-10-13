@@ -21,6 +21,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -170,7 +171,15 @@ public class GCMProvider extends BasePushProvider {
         } else {
             final int registeredVersion = mSettings.getAppVersion();
             return registeredVersion != Settings.NO_SAVED_APP_VERSION
-                    && registeredVersion == PackageUtils.getAppVersion(getContext());
+                    && registeredVersion == getAppVersion();
+        }
+    }
+
+    int getAppVersion() {
+        try {
+            return PackageUtils.getAppVersion(getContext());
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new OPFPushException("Application not found", e);
         }
     }
 
@@ -303,7 +312,7 @@ public class GCMProvider extends BasePushProvider {
 
         private void onRegistrationSuccess(final String registrationToken) {
             mSettings.saveRegistrationToken(registrationToken);
-            mSettings.saveAppVersion(PackageUtils.getAppVersion(getContext()));
+            mSettings.saveAppVersion(getAppVersion());
 
             //For finish registration we catch intent with action
             //GCMConstant.ACTION_REGISTRATION in GCMReceiver.

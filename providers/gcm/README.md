@@ -1,12 +1,12 @@
 # Google Cloud Messaging provider for OPFPush
 
 [Google Cloud Messaging][1] implementation for Open Push.
-See [guide how to porting GCM to OPFPUsh](../../README.md#user-content-porting-google-cloud-messaging-to-opfpush)
+See [guide how to porting GCM to OPFPUsh][2]
 
 
 ## Integrate in application
 
-For work this module doe next things:
+For work this module do the following steps:
 1. Add Google Play Services 3.1.36 or higher dependency to your application.
 
 2. If you use JAR dependency add to AndroidManifest.xml of your application:
@@ -101,3 +101,4 @@ task stripPlayServices << {
 ````
 
 [1]: https://developer.android.com/google/gcm/index.html
+[2]: ../../README.md#user-content-porting-google-cloud-messaging-to-opfpush

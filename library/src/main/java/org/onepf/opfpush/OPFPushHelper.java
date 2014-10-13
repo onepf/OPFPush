@@ -188,14 +188,16 @@ public class OPFPushHelper {
      * @param options Instance of {@code Options}.
      */
     public void init(@NonNull Options options) {
+        if (!isUnregistered()) {
+            throw new OPFPushException("You can init OpenPushHelper only when it is unregistered.");
+        }
+
         if (mOptions == null) {
             synchronized (mInitLock) {
                 if (mOptions == null) {
                     mOptions = options;
                 }
             }
-        } else {
-            throw new OPFPushException("Attempt to init twice.");
         }
 
         initLastProvider();
@@ -256,8 +258,12 @@ public class OPFPushHelper {
         register();
     }
 
+
     /**
-     * Start registration process async.
+     * Start select push provider and registered it.
+     * <p/>
+     * If you want to modify current registered provider, you must call unregister() first.
+     * <p/>
      *
      * @throws OPFPushException When try call this method while init not done,
      *                          unregistration process in progress or already registered.
@@ -359,7 +365,12 @@ public class OPFPushHelper {
     }
 
     /**
-     * Start unregistration process async.
+     * Unregister the application. Calling unregister() stops any messages from the server.
+     * This is a not blocking call. You should rarely (if ever) need to call this method.
+     * Not only is it expensive in terms of resources, but it invalidates your registration ID,
+     * which you should never change unnecessarily.
+     * A better approach is to simply have your server stop sending messages.
+     * Only use unregister if you want to change your sender ID.
      *
      * @throws OPFPushException When try call this method while init not done,
      *                          registration process in progress or registration not done.

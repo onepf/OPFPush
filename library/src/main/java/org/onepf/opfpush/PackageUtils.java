@@ -43,15 +43,14 @@ public final class PackageUtils {
      *
      * @return If find app - return it's version code, else {@link Integer#MIN_VALUE}.
      */
-    public static int getAppVersion(@NonNull Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo == null ? Integer.MIN_VALUE : packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            return Integer.MIN_VALUE;
+    public static int getAppVersion(@NonNull Context context)
+            throws PackageManager.NameNotFoundException {
+        PackageInfo packageInfo = context.getPackageManager()
+                .getPackageInfo(context.getPackageName(), 0);
+        if (packageInfo == null) {
+            throw new PackageManager.NameNotFoundException(context.getPackageName());
         }
+        return packageInfo.versionCode;
     }
 
     /**
