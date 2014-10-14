@@ -20,7 +20,7 @@ public class SendMessageService extends IntentService {
 
     public static final String ACTION_SEND_MESSAGE = "org.onepf.opfpush.gcm.SEND_MSG";
     public static final String EXTRA_MESSAGE = "msg";
-    public static final String EXTRA_TO = "to";
+    public static final String EXTRA_MESSAGES_TO = "to";
 
     public SendMessageService() {
         super("SendMessageService");
@@ -30,7 +30,7 @@ public class SendMessageService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             Message msg = intent.getParcelableExtra(EXTRA_MESSAGE);
-            String to = intent.getStringExtra(EXTRA_TO);
+            String to = intent.getStringExtra(EXTRA_MESSAGES_TO);
             try {
                 GoogleCloudMessaging.getInstance(this)
                         .send(to, msg.getId(), msg.getTimeToLeave(), msg.getData());

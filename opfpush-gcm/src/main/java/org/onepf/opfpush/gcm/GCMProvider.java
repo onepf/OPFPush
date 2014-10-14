@@ -207,7 +207,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         Intent intent = new Intent(getContext(), SendMessageService.class);
         intent.putExtra(SendMessageService.EXTRA_MESSAGE, msg);
-        intent.putExtra(SendMessageService.EXTRA_TO, mSenderID + MESSAGES_TO_SUFFIX);
+        intent.putExtra(SendMessageService.EXTRA_MESSAGES_TO, mSenderID + MESSAGES_TO_SUFFIX);
         getContext().startService(intent);
     }
 
