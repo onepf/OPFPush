@@ -99,7 +99,7 @@ public class OPFPushHelperTest {
     private static OPFPushHelper createHelperWithInfinityRegisterProvider() {
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityRegisterPushProvider(Robolectric.application));
+        builder.addProviders(new MockInfinityRegisterPushProvider());
         helper.init(builder.build());
         return helper;
     }
@@ -107,7 +107,7 @@ public class OPFPushHelperTest {
     private static OPFPushHelper createHelperWithInfinityUnregisterProvider() {
         OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockInfinityUnregisterPushProvider(Robolectric.application));
+        builder.addProviders(new MockInfinityUnregisterPushProvider());
         helper.init(builder.build());
         return helper;
     }
@@ -565,24 +565,8 @@ public class OPFPushHelperTest {
     }
 
     private static class MockInfinityRegisterPushProvider extends MockPushProvider {
-        public MockInfinityRegisterPushProvider(@NonNull Context context) {
+        public MockInfinityRegisterPushProvider() {
             super();
-        }
-
-        public MockInfinityRegisterPushProvider(@NonNull Context context, String name) {
-            super(name);
-        }
-
-        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
-            super(name, available);
-        }
-
-        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, @NonNull String hotAppPackage) {
-            super(name, hotAppPackage);
-        }
-
-        public MockInfinityRegisterPushProvider(@NonNull Context context, @NonNull String name, boolean available, @NonNull String hotAppPackage) {
-            super(name, hotAppPackage, available);
         }
 
         @Override
@@ -591,24 +575,8 @@ public class OPFPushHelperTest {
     }
 
     private static class MockInfinityUnregisterPushProvider extends MockPushProvider {
-        public MockInfinityUnregisterPushProvider(@NonNull Context context) {
+        public MockInfinityUnregisterPushProvider() {
             super();
-        }
-
-        public MockInfinityUnregisterPushProvider(@NonNull Context context, String name) {
-            super(name);
-        }
-
-        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, boolean available) {
-            super(name, available);
-        }
-
-        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, @NonNull String hotAppPackage) {
-            super(name, hotAppPackage);
-        }
-
-        public MockInfinityUnregisterPushProvider(@NonNull Context context, @NonNull String name, boolean available, @NonNull String hotAppPackage) {
-            super(name, hotAppPackage, available);
         }
 
         @Override
