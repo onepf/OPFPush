@@ -163,7 +163,8 @@ public class OPFPushHelper {
     }
 
     /**
-     * Send message to server.
+     * Send message to server. Before send message check that you can send messages with \
+     * {@link #canSendMessages()} method.
      *
      * @param message Message to send.
      * @throws OPFPushException When try send message when any provider isn't registered or it isn't
