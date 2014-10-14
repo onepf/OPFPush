@@ -98,15 +98,21 @@ You can setup `OPFPushHelper` following steps:
 2. Init `OPFPushHelper` using created `Options` object:
 
     ```java
+    //Register messages listener.
+    OPFPushHelper.getInstance(this).setMessageListener(new MessageListener());
+    //Init OPFPushHelper provider.
     OPFPushHelper.getInstance(this).init(options);
     ```
 
     Preferred place to init OPFPushHelper is the `Application` class of your app.
 
-3. Add listener for `OPFPushHelper` events:
+4. Register `OPFPushHelper`:
 
     ```java
+    //Register registration/unregistration listener.
     OPFPushHelper.getInstance(this).setListener(new OPFPushListener());
+    //Start registration.
+    OPFPushHelper.getInstance(this).register();
     ```
 
 You can enable logging by call (by default it off):
