@@ -262,7 +262,7 @@ You can see migrated from GCM sample code in [GCM Migrate Sample](./samples/gcm_
 | Criteria                            | GCM   | ADM   | Nokia Notifications | OPFPush     |
 | :---------------------------------- | :---: | :---: | :-----------------: | :---------: |
 | Receive messages                    |   +   |   +   |          +          |      +      |
-| Send messages                       |   +   |   -   |          -          | Only in GCM |
+| Send messages                       |   +   |   -   |          -          |      +      |
 | Retry register on fail              |   -   |   +   |          +          |      +      |
 | Configurable retry mechanism        |   -   |   -   |        ON/OFF       |      +      |
 | Retry register on fail after reboot |   -   |   -   |          -          |      +      |
