@@ -106,9 +106,6 @@ public class OPFPushHelper {
     private final ProviderCallback mProviderCallback = new ProviderCallback();
     private final Settings mSettings;
 
-    /**
-     * <b>Use for test purposes only!!!</b>
-     */
     private OPFPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mSettings = new Settings(context);
