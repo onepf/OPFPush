@@ -154,18 +154,31 @@ public class OPFPushHelper {
         }
     }
 
+    /**
+     * Check can you send message in current time. This method return only if provider is registered
+     * and it is implement {@link SenderPushProvider} interface.
+     */
     public boolean canSendMessages() {
         return mCurrentProvider instanceof SenderPushProvider;
     }
 
-    public void sendMessage(Message message) {
-        if (mCurrentProvider instanceof SenderPushProvider) {
-            ((SenderPushProvider) mCurrentProvider).send(message);
-        } else if (isRegistered()) {
-            throw new OPFPushException(
-                    "Current provider '%s' not support send messages.", mCurrentProvider);
-        } else {
-            throw new OPFPushException("Provider not registered.");
+    /**
+     * Send message to server.
+     *
+     * @param message Message to send.
+     * @throws OPFPushException When try send message when any provider isn't registered or it isn't
+     *                          implement {@link SenderPushProvider} interface.
+     */
+    public void sendMessage(@NonNull Message message) {
+        synchronized (mRegistrationLock) {
+            if (mCurrentProvider instanceof SenderPushProvider) {
+                ((SenderPushProvider) mCurrentProvider).send(message);
+            } else if (isRegistered()) {
+                throw new OPFPushException(
+                        "Current provider '%s' not support send messages.", mCurrentProvider);
+            } else {
+                throw new OPFPushException("Provider not registered.");
+            }
         }
     }
 
