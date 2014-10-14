@@ -17,6 +17,7 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -111,7 +112,7 @@ public class OPFPushHelperTest {
         return helper;
     }
 
-    private static MockPushProvider initWithMockProvider() {
+    private static MockPushProvider createHelperAndRegisterWithMockProvider() {
         Options.Builder builder = new Options.Builder();
         MockPushProvider provider
                 = new MockPushProvider("providerForPref");
@@ -134,6 +135,17 @@ public class OPFPushHelperTest {
         assertNull(helper.getCurrentProvider());
 
         checkProviderRegistrationState(helper, null);
+    }
+
+    private static OPFPushHelper createHelperWithMockSenderPushProvider() {
+        Options.Builder builder = new Options.Builder();
+        PushProvider provider
+                = new MockSenderProvider();
+        builder.addProviders(provider);
+
+        OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
+        helper.init(builder.build());
+        return helper;
     }
 
     @Before
@@ -352,7 +364,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testRestoreLastProvider() throws Exception {
-        MockPushProvider provider = initWithMockProvider();
+        MockPushProvider provider = createHelperAndRegisterWithMockProvider();
 
         Settings settings = new Settings(Robolectric.application);
         final String lastProviderName = settings.getLastProviderName();
@@ -380,7 +392,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testRestoreUnavailableProvider() throws Exception {
-        final MockPushProvider provider = initWithMockProvider();
+        final MockPushProvider provider = createHelperAndRegisterWithMockProvider();
 
         Settings settings = new Settings(Robolectric.application);
         String lastProviderName = settings.getLastProviderName();
@@ -400,7 +412,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testRestoreUnavailableProvider_RecoverEnable() throws Exception {
-        MockPushProvider lastProvider = initWithMockProvider();
+        MockPushProvider lastProvider = createHelperAndRegisterWithMockProvider();
         lastProvider.setCheckAvailability(false);
 
         PushProvider nextProvider = new MockPushProvider();
@@ -421,7 +433,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testRestoreUnavailableProvider_RecoverDisable() throws Exception {
-        MockPushProvider lastProvider = initWithMockProvider();
+        MockPushProvider lastProvider = createHelperAndRegisterWithMockProvider();
         lastProvider.setCheckAvailability(false);
 
         restoreUnavailableProvider_RecoverDisable(
@@ -430,7 +442,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testRestoreUnavailableProvider_RecoverDisable2() throws Exception {
-        MockPushProvider lastProvider = initWithMockProvider();
+        MockPushProvider lastProvider = createHelperAndRegisterWithMockProvider();
         lastProvider.setCheckAvailability(false);
         restoreUnavailableProvider_RecoverDisable(
                 new MockPushProvider(), lastProvider);
@@ -440,7 +452,7 @@ public class OPFPushHelperTest {
     public void testRestoreUnavailableProvider_RecoverEnable_AllProvidersUnavailable()
             throws Exception {
 
-        MockPushProvider lastProvider = initWithMockProvider();
+        MockPushProvider lastProvider = createHelperAndRegisterWithMockProvider();
         lastProvider.setCheckAvailability(false);
 
         Options.Builder builder = new Options.Builder();
@@ -504,10 +516,52 @@ public class OPFPushHelperTest {
         );
     }
 
+    @Test(expected = OPFPushException.class)
+    public void testSendMessageWithNotSendSupportProvider() throws Exception {
+        createHelperAndRegisterWithMockProvider();
+        OPFPushHelper helper = OPFPushHelper.getInstance(Robolectric.application);
+        assertFalse(helper.canSendMessages());
+        helper.sendMessage(new Message("1", new Bundle(0)));
+    }
+
+    @Test
+    public void testSendMessage() throws Exception {
+        OPFPushHelper helper = createHelperWithMockSenderPushProvider();
+        helper.register();
+        assertTrue(helper.canSendMessages());
+        helper.sendMessage(new Message("1", new Bundle(0)));
+    }
+
+    @Test(expected = OPFPushException.class)
+    public void testSendMessageWhenNotRegistered() throws Exception {
+        OPFPushHelper helper = createHelperWithMockSenderPushProvider();
+        assertFalse(helper.canSendMessages());
+        helper.sendMessage(new Message("1", new Bundle(0)));
+    }
+
+    @Test(expected = OPFPushException.class)
+    public void testSendMessageWhenNotRegisteredWithNotSendSupportProvider() throws Exception {
+        Options.Builder builder = new Options.Builder();
+        MockPushProvider provider
+                = new MockPushProvider("providerForPref");
+        builder.addProviders(provider);
+
+        OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
+        helper.init(builder.build());
+        assertFalse(helper.canSendMessages());
+        helper.sendMessage(new Message("1", new Bundle(0)));
+    }
+
     @After
     public void tearDown() {
         new Settings(Robolectric.application).clear();
         Robolectric.packageManager.removePackage(MockPushProvider.DEFAULT_HOST_APP_PACKAGE);
+    }
+
+    private static class MockSenderProvider extends MockPushProvider implements SenderPushProvider {
+        @Override
+        public void send(@NonNull Message msg) {
+        }
     }
 
     private static class MockInfinityRegisterPushProvider extends MockPushProvider {
