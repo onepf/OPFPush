@@ -58,20 +58,4 @@ public class GCMProviderTest extends GCMProviderTestBase {
         PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
         assertFalse(provider.isAvailable());
     }
-
-    @Test
-    public void testMultiSenderIDsCreate() throws Exception {
-        String[] sendersId = {"s1", "s2", "s3"};
-        GCMProvider provider
-                = new GCMProvider(Robolectric.application,
-                sendersId[0], Arrays.copyOfRange(sendersId, 1, sendersId.length));
-        assertArrayEquals(sendersId, provider.getSenderIDs());
-    }
-
-    @Test
-    public void testSingleSenderIDsCreate() throws Exception {
-        String senderId = "s1";
-        GCMProvider provider = new GCMProvider(Robolectric.application, senderId);
-        assertArrayEquals(new String[]{senderId}, provider.getSenderIDs());
-    }
 }
