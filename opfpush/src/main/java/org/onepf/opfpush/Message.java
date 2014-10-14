@@ -21,6 +21,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Represent message for send from client to server that uses in Google Cloud Messaging.
  *
@@ -28,9 +30,9 @@ import android.support.annotation.NonNull;
  * @since 18.09.14.
  */
 public class Message implements Parcelable {
-    private String mId;
-    private Bundle mData;
-    private long mTimeToLeave;
+    private final String mId;
+    private final Bundle mData;
+    private final long mTimeToLeave;
 
     /**
      * Create new message.
@@ -48,6 +50,7 @@ public class Message implements Parcelable {
      * @param id          Message's ID.
      * @param data        Messages' data to send.
      * @param timeToLeave How long message is valid. Set 0 to default value.
+     * @throws java.lang.IllegalArgumentException If {@code timeToLeave} is negative.
      */
     public Message(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
         if (timeToLeave < 0) {
@@ -94,10 +97,10 @@ public class Message implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return "GCMMessage{" +
+        return "Message{" +
                 "messageId='" + mId + '\'' +
-                ", data=" + mData +
-                ", TTL=" + mTimeToLeave +
+                ", data='" + mData + '\'' +
+                ", TTL='" + mTimeToLeave + '\'' +
                 '}';
     }
 
