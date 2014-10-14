@@ -21,6 +21,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.util.Utils;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -99,7 +101,7 @@ public class Message implements Parcelable {
     public String toString() {
         return "Message{" +
                 "messageId='" + mId + '\'' +
-                ", data='" + mData + '\'' +
+                ", data='" + Utils.toString(mData) + '\'' +
                 ", TTL='" + mTimeToLeave + '\'' +
                 '}';
     }
