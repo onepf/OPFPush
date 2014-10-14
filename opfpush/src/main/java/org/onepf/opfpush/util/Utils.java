@@ -61,7 +61,11 @@ public final class Utils {
      * @return String representation of bundles.
      */
     @NonNull
-    public static String toString(@NonNull Bundle bundle) {
+    public static String toString(Bundle bundle) {
+        if (bundle == null) {
+            return "null";
+        }
+
         if (bundle.isEmpty()) {
             return "";
         }
