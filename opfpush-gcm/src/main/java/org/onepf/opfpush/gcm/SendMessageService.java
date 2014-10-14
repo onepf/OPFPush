@@ -5,12 +5,15 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import junit.framework.Assert;
+
 import org.onepf.opfpush.Message;
 
 import java.io.IOException;
 
 import static org.onepf.opfpush.OPFPushLog.LOGE;
 import static org.onepf.opfpush.OPFPushLog.LOGI;
+import static org.onepf.opfpush.OPFPushLog.LOGW;
 
 /**
  * @author Kirill Rozov
@@ -30,14 +33,19 @@ public class SendMessageService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             Message msg = intent.getParcelableExtra(EXTRA_MESSAGE);
-            String to = intent.getStringExtra(EXTRA_MESSAGES_TO);
+            Assert.assertNotNull(msg);
+            String msgTo = intent.getStringExtra(EXTRA_MESSAGES_TO);
+            Assert.assertNotNull(msgTo);
+
             try {
                 GoogleCloudMessaging.getInstance(this)
-                        .send(to, msg.getId(), msg.getTimeToLeave(), msg.getData());
-                LOGI(String.format("Message '%s' has sent.", msg));
+                        .send(msgTo, msg.getId(), msg.getTimeToLeave(), msg.getData());
+                LOGI("Message '%s' has sent.", msg);
             } catch (IOException ex) {
                 LOGE(String.format("Error while send Message '%s'.", msg), ex);
             }
+        } else {
+            LOGW("Unknown action '%s'.", intent.getAction());
         }
     }
 }
