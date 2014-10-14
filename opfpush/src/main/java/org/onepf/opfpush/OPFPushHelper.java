@@ -163,7 +163,7 @@ public class OPFPushHelper {
     }
 
     /**
-     * Send message to server. Before send message check that you can send messages with \
+     * Send message to server. Before send message check that you can send messages with
      * {@link #canSendMessages()} method.
      *
      * @param message Message to send.
