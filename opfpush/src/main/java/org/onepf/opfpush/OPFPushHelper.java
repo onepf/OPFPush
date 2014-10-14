@@ -109,7 +109,7 @@ public class OPFPushHelper {
     /**
      * <b>Use for test purposes only!!!</b>
      */
-    OPFPushHelper(@NonNull Context context) {
+    private OPFPushHelper(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mSettings = new Settings(context);
     }
