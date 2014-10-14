@@ -167,8 +167,8 @@ public class OPFPushHelper {
      * {@link #canSendMessages()} method.
      *
      * @param message Message to send.
-     * @throws OPFPushException When try send message when any provider isn't registered or it isn't
-     *                          implement {@link SenderPushProvider} interface.
+     * @throws OPFPushException When try send message when any provider isn't registered
+     *                          or registered provider doesn't support send messages.
      */
     public void sendMessage(@NonNull Message message) {
         synchronized (mRegistrationLock) {
