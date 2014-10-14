@@ -161,6 +161,9 @@ Some provider can notify about deleted messages with call `ProviderCallback.onDe
 Not all providers that can notify about this event can provide delete messages count.
 For unknown count pass value `OPFPushHelper.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
 
+If you wanna implement provider that can send message to server you must implement
+`SenderPushProvider` interface that extends `PushProvider` interface. `SenderPushProvider` interface
+contains method `send(Message)` that send message to server asynchronous.
 
 
 ## Porting Google Cloud Messaging to OPFPush
