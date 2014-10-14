@@ -39,5 +39,5 @@ android {
 
 dependencies {
     compile project(':opfpush')
-    compile files('libs/push.jar')
+    compile 'com.nokia:push:1.0'
 }
