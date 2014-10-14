@@ -51,6 +51,21 @@ def getMavenRepositoryUrl() {
     }
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def id = properties.getProperty('signing.keyId')
+        def file = properties.getProperty('signing.secretKeyRingFile')
+        def password = properties.getProperty('signing.password')
+
+        allprojects { ext."signing.keyId" = id }
+        allprojects { ext."signing.secretKeyRingFile" = file }
+        allprojects { ext."signing.password" = password }
+    }
+}
+
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
@@ -62,8 +77,15 @@ afterEvaluate { project ->
                 if (useTestRepo()) {
                     repository(url: getMavenRepositoryUrl())
                 } else {
+
+                    Properties properties = new Properties()
+                    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
                     repository(url: getMavenRepositoryUrl()) {
-                        authentication(userName: nexusUsername, password: nexusPassword)
+                        authentication(
+                                userName: properties.getProperty('nexusUsername'),
+                                password: properties.getProperty('nexusPassword')
+                        )
                     }
                 }
 
