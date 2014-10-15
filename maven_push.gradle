@@ -18,6 +18,11 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+Properties defaultProperties = new Properties();
+defaultProperties.put('localrepo', System.getProperty('user.home') + "/onepf-mvn")
+Properties localProperties = new Properties(defaultProperties)
+localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 uploadArchives.doFirst {
     print '------------------  ' + project.name + ' '
     if (isReleaseBuild()) {
@@ -36,13 +41,7 @@ def getMavenRepositoryUrl() {
     } else if (!useTestRepo()) {
         return SNAPSHOT_REPOSITORY_URL
     } else {
-        Properties defaultProperties = new Properties();
-        defaultProperties.put('localrepo', System.getProperty('user.home') + "/onepf-mvn")
-
-        Properties properties = new Properties(defaultProperties);
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-        def localRepositoryUrl = properties.getProperty('localrepo');
+        def localRepositoryUrl = localProperties.getProperty('localrepo');
 
         if (!localRepositoryUrl.startsWith("file:///")) {
             localRepositoryUrl = "file:///" + localRepositoryUrl
@@ -52,8 +51,6 @@ def getMavenRepositoryUrl() {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    Properties localProperties = new Properties()
-    localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
     if (taskGraph.allTasks.any { it instanceof Sign }) {
         allprojects {
             ext."signing.keyId" = localProperties.getProperty('signing.keyId')
@@ -64,92 +61,92 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+if (localProperties.contains("signing.secretKeyRingFile")) {
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                pom.artifactId = POM_ARTIFACT_ID
+                    pom.artifactId = POM_ARTIFACT_ID
 
-                if (useTestRepo()) {
-                    repository(url: getMavenRepositoryUrl())
-                } else {
+                    if (useTestRepo()) {
+                        repository(url: getMavenRepositoryUrl())
+                    } else {
 
-                    Properties localProperties = new Properties()
-                    localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
-                    repository(url: getMavenRepositoryUrl()) {
-                        authentication(
-                                userName: localProperties.getProperty('nexusUsername'),
-                                password: localProperties.getProperty('nexusPassword')
-                        )
-                    }
-                }
-
-                pom.project {
-                    name POM_NAME
-                    packaging POM_PACKAGING
-                    description POM_DESCRIPTION
-                    version VERSION_NAME
-                    url POM_URL
-
-                    scm {
-                        url POM_SCM_URL
-                        connection POM_SCM_CONNECTION
-                        developerConnection POM_SCM_DEV_CONNECTION
-                    }
-
-                    licenses {
-                        license {
-                            name POM_LICENCE_NAME
-                            url POM_LICENCE_URL
-                            distribution POM_LICENCE_DIST
+                        repository(url: getMavenRepositoryUrl()) {
+                            authentication(
+                                    userName: localProperties.getProperty('nexusUsername'),
+                                    password: localProperties.getProperty('nexusPassword')
+                            )
                         }
                     }
 
-                    repositories {
-                        repository {
-                            id 'onepf-repo'
-                            name 'OnePF Repository'
-                            url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/'
-                        }
-                    }
+                    pom.project {
+                        name POM_NAME
+                        packaging POM_PACKAGING
+                        description POM_DESCRIPTION
+                        version VERSION_NAME
+                        url POM_URL
 
-                    developers {
-                        developer {
-                            id POM_DEVELOPER_ID
-                            name POM_DEVELOPER_NAME
+                        scm {
+                            url POM_SCM_URL
+                            connection POM_SCM_CONNECTION
+                            developerConnection POM_SCM_DEV_CONNECTION
+                        }
+
+                        licenses {
+                            license {
+                                name POM_LICENCE_NAME
+                                url POM_LICENCE_URL
+                                distribution POM_LICENCE_DIST
+                            }
+                        }
+
+                        repositories {
+                            repository {
+                                id 'onepf-repo'
+                                name 'OnePF Repository'
+                                url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id POM_DEVELOPER_ID
+                                name POM_DEVELOPER_NAME
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    signing {
-        required { isReleaseBuild() }
-        sign configurations.archives
-    }
+        signing {
+            required { isReleaseBuild() }
+            sign configurations.archives
+        }
 
-    task androidJavadocs(type: Javadoc) {
-        source = android.sourceSets.main.java.sourceFiles
-    }
+        task androidJavadocs(type: Javadoc) {
+            source = android.sourceSets.main.java.sourceFiles
+        }
 
-    task androidJavadocsJar(type: Jar) {
-        classifier = 'javadoc'
-        //basename = artifact_id
-        from androidJavadocs.destinationDir
-    }
+        task androidJavadocsJar(type: Jar) {
+            classifier = 'javadoc'
+            //basename = artifact_id
+            from androidJavadocs.destinationDir
+        }
 
-    task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
-        //basename = artifact_id
-        from android.sourceSets.main.java.sourceFiles
-    }
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            //basename = artifact_id
+            from android.sourceSets.main.java.sourceFiles
+        }
 
-    artifacts {
-        archives packageReleaseJar
-        archives androidSourcesJar
-        archives androidJavadocsJar
+        artifacts {
+            archives packageReleaseJar
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        }
     }
 }
