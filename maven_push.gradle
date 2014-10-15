@@ -61,7 +61,13 @@ gradle.taskGraph.whenReady { taskGraph ->
 }
 
 
-if (localProperties.contains("signing.secretKeyRingFile")) {
+def canUploadToMaven() {
+    localProperties.contains("signing.secretKeyRingFile") &&
+            localProperties.contains("signing.password") &&
+            localProperties.contains("signing.keyId")
+}
+
+if (canUploadToMaven()) {
     afterEvaluate { project ->
         uploadArchives {
             repositories {
