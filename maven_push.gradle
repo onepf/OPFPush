@@ -20,8 +20,10 @@ apply plugin: 'signing'
 
 Properties defaultProperties = new Properties();
 defaultProperties.put('localrepo', System.getProperty('user.home') + "/onepf-mvn")
-Properties localProperties = new Properties(defaultProperties)
-localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+ext {
+    localProperties = new Properties(defaultProperties)
+    localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 
 uploadArchives.doFirst {
     print '------------------  ' + project.name + ' '
@@ -62,9 +64,9 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 
 def canUploadToMaven() {
-    localProperties.contains("signing.secretKeyRingFile") &&
-            localProperties.contains("signing.password") &&
-            localProperties.contains("signing.keyId")
+    ext.localProperties.contains("signing.secretKeyRingFile") &&
+            ext.localProperties.contains("signing.password") &&
+            ext.localProperties.contains("signing.keyId")
 }
 
 if (canUploadToMaven()) {
