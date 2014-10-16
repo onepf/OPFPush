@@ -14,7 +14,30 @@
  * limitations under the License.
  */
 
+apply plugin: 'com.android.library'
+apply from: '../maven_push.gradle'
 
+android {
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
-include ':opfpush', ':opfpush-gcm', ':opfpush-nokia', ':opfpush-adm', ':opfpush-baidu'
-include ':samples:simple_listener', ':samples:gcm_migrate_sample'
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+        versionCode 2
+        versionName VERSION_NAME
+
+        applicationId 'org.onepf.opfpush.baidu'
+
+        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile project(':opfpush')
+    compile files('libs/pushservice-4.2.0.63.jar')
+}
