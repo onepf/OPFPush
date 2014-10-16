@@ -19,6 +19,7 @@ package org.onepf.opfpush;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Base class for create {@code PushProvider}.
@@ -34,7 +35,6 @@ public abstract class BasePushProvider implements PushProvider {
     @NonNull
     private final String mName;
 
-    @NonNull
     private final String mHostAppPackage;
 
     /**
@@ -47,7 +47,7 @@ public abstract class BasePushProvider implements PushProvider {
      */
     protected BasePushProvider(@NonNull Context context,
                                @NonNull String name,
-                               @NonNull String hostAppPackage) {
+                               String hostAppPackage) {
         mAppContext = context.getApplicationContext();
         mName = name;
         mHostAppPackage = hostAppPackage;
@@ -121,7 +121,7 @@ public abstract class BasePushProvider implements PushProvider {
     public void onUnavailable() {
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getHostAppPackage() {
         return mHostAppPackage;
