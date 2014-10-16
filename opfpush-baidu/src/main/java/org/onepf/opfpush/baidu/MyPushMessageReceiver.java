@@ -1,12 +1,17 @@
 package org.onepf.opfpush.baidu;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Bundle;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.frontia.api.FrontiaPushMessageReceiver;
 
+import org.json.JSONException;
+import org.onepf.opfpush.OPFPushHelper;
+
 import java.util.List;
+
+import static org.onepf.opfpush.OPFPushLog.LOGE;
 
 /**
  * Push messaging receiver. Please write your callback function needs, in general:
@@ -71,7 +76,16 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
     @Override
     public void onMessage(Context context, String message,
                           String customContentString) {
+        try {
+            Bundle bundle = Utils.messageToBundle(message);
+            bundle.putString(BaiduConstants.EXTRA_CUSTOM_CONTENT_STRING, customContentString);
+            OPFPushHelper.getInstance(context)
+                    .getProviderCallback().onMessage(BaiduPushProvider.NAME, bundle);
+        } catch (JSONException e) {
+            LOGE("Error parse message '" + message + "'.", e);
+        }
     }
+
 
     /**
      * Click function of the received notification. Note:

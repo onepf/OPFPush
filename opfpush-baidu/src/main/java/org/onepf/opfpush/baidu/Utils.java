@@ -6,7 +6,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -51,5 +56,148 @@ public final class Utils {
     }
 
     private Utils() {
+    }
+
+    public static Bundle messageToBundle(String message) throws JSONException {
+        return toBundle(new JSONObject(message));
+    }
+
+
+    public static void toBundle(Bundle to, String key, JSONArray jsonArray) {
+        Object o = toBundleInner(jsonArray);
+        if (o instanceof Bundle[]) {
+            to.putParcelableArray(key, (Bundle[]) o);
+        } else if (o instanceof boolean[]) {
+            to.putBooleanArray(key, (boolean[]) o);
+        } else if (o instanceof int[]) {
+            to.putIntArray(key, (int[]) o);
+        } else if (o instanceof long[]) {
+            to.putLongArray(key, (long[]) o);
+        } else if (o instanceof double[]) {
+            to.putDoubleArray(key, (double[]) o);
+        } else if (o instanceof String[]) {
+            to.putStringArray(key, (String[]) o);
+        }
+    }
+
+    public static Object toBundleInner(JSONArray jsonArray) {
+        int length = jsonArray.length();
+
+        try {
+            JSONObject firstObject = jsonArray.getJSONObject(0);
+            Bundle[] values = new Bundle[length];
+            values[0] = toBundle(firstObject);
+            for (int i = 1; i < length; i++) {
+                values[i] = toBundle(jsonArray.getJSONObject(i));
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            return toBundleInner(jsonArray.getJSONArray(0));
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            boolean firstBoolean = jsonArray.getBoolean(0);
+            boolean[] values = new boolean[length];
+            values[0] = firstBoolean;
+            for (int i = 1; i < length; i++) {
+                values[i] = jsonArray.getBoolean(i);
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            int firstInt = jsonArray.getInt(0);
+            int[] values = new int[length];
+            values[0] = firstInt;
+            for (int i = 1; i < length; i++) {
+                values[i] = jsonArray.getInt(i);
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            long firstLong = jsonArray.getLong(0);
+            long[] values = new long[length];
+            values[0] = firstLong;
+            for (int i = 1; i < length; i++) {
+                values[i] = jsonArray.getLong(i);
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            double firstDouble = jsonArray.getDouble(0);
+            double[] values = new double[length];
+            values[0] = firstDouble;
+            for (int i = 1; i < length; i++) {
+                values[i] = jsonArray.getDouble(i);
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            String firstString = jsonArray.getString(0);
+            String[] values = new String[length];
+            values[0] = firstString;
+            for (int i = 1; i < length; i++) {
+                values[i] = jsonArray.getString(i);
+            }
+            return values;
+        } catch (JSONException ignored) {
+        }
+
+        return null;
+    }
+
+    public static Bundle toBundle(JSONObject json) {
+        Bundle bundle = new Bundle(json.length());
+        Iterator keys = json.keys();
+        while (keys.hasNext()) {
+            String key = keys.next().toString();
+
+            try {
+                bundle.putBundle(key, toBundle(json.getJSONObject(key)));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                toBundle(bundle, key, json.getJSONArray(key));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                bundle.putBoolean(key, json.getBoolean(key));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                bundle.putInt(key, json.getInt(key));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                bundle.putLong(key, json.getLong(key));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                bundle.putDouble(key, json.getDouble(key));
+            } catch (JSONException ignored) {
+            }
+
+            try {
+                bundle.putString(key, json.getString(key));
+            } catch (JSONException ignored) {
+            }
+        }
+        return bundle;
     }
 }
