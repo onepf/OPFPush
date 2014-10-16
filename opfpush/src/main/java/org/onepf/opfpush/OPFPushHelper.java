@@ -324,9 +324,12 @@ public class OPFPushHelper {
 
     private boolean registerSystemPreferredProvider() {
         for (PushProvider provider : mOptions.getProviders()) {
-            if (PackageUtils.isSystemApp(mAppContext, provider.getHostAppPackage())
-                    && register(provider)) {
-                return true;
+            String hostAppPackage = provider.getHostAppPackage();
+            if (hostAppPackage != null) {
+                if (PackageUtils.isSystemApp(mAppContext, hostAppPackage)
+                        && register(provider)) {
+                    return true;
+                }
             }
         }
         return false;

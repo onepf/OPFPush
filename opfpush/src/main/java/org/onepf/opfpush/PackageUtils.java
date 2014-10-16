@@ -27,6 +27,8 @@ import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import junit.framework.Assert;
+
 import static org.onepf.opfpush.OPFPushLog.LOGI;
 
 /**
@@ -103,10 +105,12 @@ public final class PackageUtils {
         context.registerReceiver(mPackageReceiver, appUpdateFilter);
 
         String hostAppPackage = provider.getHostAppPackage();
-        IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-        hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
-        hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
-        context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
+        if (hostAppPackage != null) {
+            IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+            hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
+            context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
+        }
 
         return mPackageReceiver;
     }
@@ -129,9 +133,11 @@ public final class PackageUtils {
         public void onReceive(@NonNull Context context, @NonNull Intent intent) {
             final String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                if (mProvider.getHostAppPackage().equals(getAppPackage(intent))) {
+                String hostAppPackage = mProvider.getHostAppPackage();
+                Assert.assertNotNull(hostAppPackage);
+                if (hostAppPackage.equals(getAppPackage(intent))) {
                     LOGI("Host app '%s' of provider '%s' removed.",
-                            mProvider.getHostAppPackage(), mProvider.getName());
+                            hostAppPackage, mProvider.getName());
                     OPFPushHelper.getInstance(context).onProviderUnavailable(mProvider);
                 }
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
