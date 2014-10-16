@@ -16,6 +16,7 @@
 
 apply plugin: 'com.android.library'
 apply from: '../maven_push.gradle'
+apply plugin: 'robolectric'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -37,7 +38,22 @@ android {
     }
 }
 
+robolectric {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+
+    // configure max heap size of the test JVM
+    maxHeapSize = '2048m'
+
+    // configure whether failing tests should fail the build
+    ignoreFailures true
+}
+
 dependencies {
+    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'junit:junit:4.11'
+
     compile project(':opfpush')
     compile files('libs/pushservice-4.2.0.63.jar')
 }

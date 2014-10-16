@@ -11,6 +11,7 @@ import org.onepf.opfpush.BasePushProvider;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import static com.baidu.android.pushservice.PushConstants.LOGIN_TYPE_API_KEY;
 import static com.baidu.android.pushservice.PushConstants.LOGIN_TYPE_ACCESS_TOKEN;
@@ -29,7 +30,7 @@ public class BaiduPushProvider extends BasePushProvider {
     private String mApiKey;
 
     @LoginType
-    private int mLoginType = -1;
+    private int mLoginType = LOGIN_TYPE_UNKNOWN;
 
     public BaiduPushProvider(@NonNull Context context, @LoginType int loginType, String apiKey) {
         super(context, NAME, null);
@@ -39,11 +40,7 @@ public class BaiduPushProvider extends BasePushProvider {
 
     @Override
     public void register() {
-        if (mLoginType != -1) {
-            PushManager.startWork(getContext(), mLoginType, mApiKey);
-        } else {
-//            PushManager.startWork(getContext(), null, null);
-        }
+        PushManager.startWork(getContext(), mLoginType, mApiKey);
     }
 
     @Override
@@ -61,6 +58,18 @@ public class BaiduPushProvider extends BasePushProvider {
         return PushManager.isConnected(getContext());
     }
 
+    public void delTags(List<String> tags) {
+        PushManager.delTags(getContext(), tags);
+    }
+
+    public void setTags(List<String> tags) {
+        PushManager.setTags(getContext(), tags);
+    }
+
+    public void getTags() {
+        PushManager.listTags(getContext());
+    }
+
     @Nullable
     @Override
     public String getRegistrationId() {
@@ -73,8 +82,7 @@ public class BaiduPushProvider extends BasePushProvider {
             LOGIN_TYPE_API_KEY,
             LOGIN_TYPE_BDUSS,
             LOGIN_TYPE_LIGHT_APP_API_KEY,
-            LOGIN_TYPE_UNKNOWN,
-            -1
+            LOGIN_TYPE_UNKNOWN
     })
     public @interface LoginType {
     }

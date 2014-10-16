@@ -165,36 +165,42 @@ public final class Utils {
 
             try {
                 bundle.putBundle(key, toBundle(json.getJSONObject(key)));
+                continue;
             } catch (JSONException ignored) {
             }
 
             try {
                 toBundle(bundle, key, json.getJSONArray(key));
+                continue;
             } catch (JSONException ignored) {
             }
 
             try {
                 bundle.putBoolean(key, json.getBoolean(key));
+                continue;
             } catch (JSONException ignored) {
             }
 
             try {
-                bundle.putInt(key, json.getInt(key));
-            } catch (JSONException ignored) {
-            }
-
-            try {
-                bundle.putLong(key, json.getLong(key));
+                long value = json.getLong(key);
+                if (Integer.MIN_VALUE <= value && value <= Integer.MAX_VALUE) {
+                    bundle.putInt(key, (int) value);
+                } else {
+                    bundle.putLong(key, value);
+                }
+                continue;
             } catch (JSONException ignored) {
             }
 
             try {
                 bundle.putDouble(key, json.getDouble(key));
+                continue;
             } catch (JSONException ignored) {
             }
 
             try {
                 bundle.putString(key, json.getString(key));
+                continue;
             } catch (JSONException ignored) {
             }
         }

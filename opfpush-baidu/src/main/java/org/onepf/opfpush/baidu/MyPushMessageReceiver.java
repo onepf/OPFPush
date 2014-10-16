@@ -2,6 +2,8 @@ package org.onepf.opfpush.baidu;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.frontia.api.FrontiaPushMessageReceiver;
@@ -38,10 +40,6 @@ import static org.onepf.opfpush.OPFPushLog.LOGE;
  * please return value with the same request and errorCode requestId Contact us track down the problem
  */
 public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
-    /**
-     * TAG to Log
-     */
-    public static final String TAG = MyPushMessageReceiver.class.getSimpleName();
 
     /**
      * After calling PushManager.startWork, sdk will push
@@ -52,15 +50,19 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
      * and then call the server interface with the channel id and user id to a single mobile phone or the user push.
      *
      * @param context   BroadcastReceiver execution Context
-     * @param errorCode Binding interface return value, 0 - success
-     * @param appid     Application id. errorCode non 0 to null
-     * @param userId    Application user id. errorCode non 0 to null
-     * @param channelId Application channel id. errorCode non 0  to null
+     * @param errorCode Binding interface return value, {@link PushConstants#ERROR_SUCCESS} - success
+     * @param appid     Application id. Null when not success
+     * @param userId    Application user id. Null when not success
+     * @param channelId Application channel id. Null when not success
      * @param requestId Initiated the request to the server id. Useful in tracing the problem;
      */
     @Override
-    public void onBind(Context context, int errorCode, String appid,
-                       String userId, String channelId, String requestId) {
+    public void onBind(@NonNull Context context,
+                       @ErrorCode int errorCode,
+                       @Nullable String appid,
+                       @Nullable String userId,
+                       @Nullable String channelId,
+                       @NonNull String requestId) {
         // Binding is successful, set bound flag, can effectively reduce unnecessary binding request
         if (errorCode == PushConstants.ERROR_SUCCESS) {
             new Settings(context).saveBind(true);
@@ -74,7 +76,8 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
      * @param customContentString Custom content, or json string is empty
      */
     @Override
-    public void onMessage(Context context, String message,
+    public void onMessage(@NonNull Context context,
+                          @NonNull String message,
                           String customContentString) {
         try {
             Bundle bundle = Utils.messageToBundle(message);
@@ -104,8 +107,8 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
     /**
      * setTags() callback function
      *
-     * @param errorCode   Error code. 0 indicates that some tag has been set successfully;
-     *                    non 0 means that all tag settings have failed.
+     * @param errorCode   Error code. {@link PushConstants#ERROR_SUCCESS}  indicates that some tag has been set successfully;
+     *                    another values means that all tag settings have failed.
      * @param successTags Set successful tag
      * @param failTags    Set failed tag
      * @param requestId   Assigned to the request for cloud push id
@@ -125,29 +128,29 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
      * @param requestId   Assigned to the request for cloud push id
      */
     @Override
-    public void onDelTags(Context context, int errorCode,
+    public void onDelTags(Context context, @ErrorCode int errorCode,
                           List<String> successTags, List<String> failTags, String requestId) {
     }
 
     /**
      * listTags() callback function.
      *
-     * @param errorCode Error code. 0 indicates a successful tag list; non-zero indicates failure.
+     * @param errorCode Error code. {@link PushConstants#ERROR_SUCCESS} indicates a successful tag list; non-zero indicates failure.
      * @param tags      All tag current application settings.
      * @param requestId Assigned to the request for cloud push id
      */
     @Override
-    public void onListTags(Context context, int errorCode, List<String> tags, String requestId) {
+    public void onListTags(Context context, @ErrorCode int errorCode, List<String> tags, String requestId) {
     }
 
     /**
      * PushManager.stopWork() back to the letter.
      *
-     * @param errorCode Error code. 0 indicates success from the cloud push unbinding; non-zero indicates failure.
+     * @param errorCode Error code. {@link PushConstants#ERROR_SUCCESS}  indicates success from the cloud push unbinding; non-zero indicates failure.
      * @param requestId Assigned to the request for cloud push id
      */
     @Override
-    public void onUnbind(Context context, int errorCode, String requestId) {
+    public void onUnbind(Context context, @ErrorCode int errorCode, String requestId) {
         // Unbinding success, setting unbound flag,
         if (errorCode == PushConstants.ERROR_SUCCESS) {
             new Settings(context).saveBind(false);
