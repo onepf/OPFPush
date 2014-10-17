@@ -21,6 +21,13 @@
     <application
         android:name=".BaiduApplication">
 
+        <receiver android:name=".BaiduMessageReceiver">
+            <intent-filter>
+                <action android:name="com.baidu.android.pushservice.action.MESSAGE"/>
+                <action android:name="com.baidu.android.pushservice.action.RECEIVE"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

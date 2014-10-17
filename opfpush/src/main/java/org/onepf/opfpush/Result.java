@@ -33,7 +33,7 @@ public final class Result {
     @NonNull
     private final String mProviderName;
     private final String mRegistrationId;
-    private final Error mErrorCode;;
+    private final Error mErrorCode;
     private final Type mType;
 
     private Result(@NonNull String providerName,
@@ -47,7 +47,7 @@ public final class Result {
     }
 
     public static Result success(@NonNull String providerName,
-                                 @NonNull String registrationId,
+                                 @Nullable String registrationId,
                                  @NonNull Type type) {
         return new Result(providerName, registrationId, null, type);
     }

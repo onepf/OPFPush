@@ -55,5 +55,7 @@ public enum Error {
      * <p/>
      * Non recoverable error.
      */
-    AUTHENTICATION_FAILED
+    AUTHENTICATION_FAILED,
+
+    UNKNOWN
 }

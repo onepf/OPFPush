@@ -9,9 +9,11 @@ import com.baidu.android.pushservice.PushConstants;
 import com.baidu.frontia.api.FrontiaPushMessageReceiver;
 
 import org.json.JSONException;
-import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.*;
 
 import java.util.List;
+
+import org.onepf.opfpush.Error;
 
 import static org.onepf.opfpush.OPFPushLog.LOGE;
 
@@ -39,7 +41,7 @@ import static org.onepf.opfpush.OPFPushLog.LOGE;
  * When you encounter the above error is returned, if you can not explain your problem,
  * please return value with the same request and errorCode requestId Contact us track down the problem
  */
-public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
+public class BaiduMessageReceiver extends FrontiaPushMessageReceiver {
 
     /**
      * After calling PushManager.startWork, sdk will push
@@ -64,8 +66,38 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
                        @Nullable String channelId,
                        @NonNull String requestId) {
         // Binding is successful, set bound flag, can effectively reduce unnecessary binding request
+        final Result result;
         if (errorCode == PushConstants.ERROR_SUCCESS) {
             new Settings(context).saveBind(true);
+            result = Result.success(BaiduPushProvider.NAME, null, Result.Type.REGISTRATION);
+        } else {
+            result = Result.error(BaiduPushProvider.NAME,
+                    convertError(errorCode), Result.Type.REGISTRATION);
+        }
+        OPFPushHelper.getInstance(context).getProviderCallback().onResult(result);
+    }
+
+    private static Error convertError(@ErrorCode int error) {
+        switch (error) {
+            case PushConstants.ERROR_AUTHENTICATION_FAILED:
+                return Error.AUTHENTICATION_FAILED;
+
+            case PushConstants.ERROR_NETWORK_ERROR:
+            case PushConstants.ERROR_TIME_EXPIRES:
+            case PushConstants.ERROR_CHANNEL_TOKEN_TIMEOUT:
+            case PushConstants.ERROR_SERVICE_NOT_AVAILABLE:
+            case PushConstants.ERROR_SERVICE_NOT_AVAILABLE_TEMP:
+                return Error.SERVICE_NOT_AVAILABLE;
+
+            case PushConstants.ERROR_METHOD_ERROR:
+            case PushConstants.ERROR_PARAMS_ERROR:
+                return Error.INVALID_PARAMETERS;
+
+            case PushConstants.ERROR_SUCCESS:
+                return null;
+
+            default:
+                return Error.UNKNOWN;
         }
     }
 
@@ -152,8 +184,14 @@ public class MyPushMessageReceiver extends FrontiaPushMessageReceiver {
     @Override
     public void onUnbind(Context context, @ErrorCode int errorCode, String requestId) {
         // Unbinding success, setting unbound flag,
+        final Result result;
         if (errorCode == PushConstants.ERROR_SUCCESS) {
             new Settings(context).saveBind(false);
+            result = Result.success(BaiduPushProvider.NAME, null, Result.Type.UNREGISTRATION);
+        } else {
+            result = Result.error(BaiduPushProvider.NAME,
+                    convertError(errorCode), Result.Type.UNREGISTRATION);
         }
+        OPFPushHelper.getInstance(context).getProviderCallback().onResult(result);
     }
 }

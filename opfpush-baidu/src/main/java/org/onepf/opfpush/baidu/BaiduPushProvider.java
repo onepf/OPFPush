@@ -29,10 +29,11 @@ public class BaiduPushProvider extends BasePushProvider {
 
     private String mApiKey;
 
-    @LoginType
     private int mLoginType = LOGIN_TYPE_UNKNOWN;
 
-    public BaiduPushProvider(@NonNull Context context, @LoginType int loginType, String apiKey) {
+    public BaiduPushProvider(@NonNull Context context,
+                             @LoginType int loginType,
+                             @NonNull String apiKey) {
         super(context, NAME, null);
         mApiKey = apiKey;
         mLoginType = loginType;
@@ -51,6 +52,16 @@ public class BaiduPushProvider extends BasePushProvider {
     @Override
     public boolean isAvailable() {
         return super.isAvailable() && PushManager.isPushEnabled(getContext());
+    }
+
+    @LoginType
+    public int getLoginType() {
+        return mLoginType;
+    }
+
+    @NonNull
+    public String getApiKey() {
+        return mApiKey;
     }
 
     @Override

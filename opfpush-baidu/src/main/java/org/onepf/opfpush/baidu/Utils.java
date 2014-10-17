@@ -55,15 +55,11 @@ public final class Utils {
         return apiKey;
     }
 
-    private Utils() {
-    }
-
     public static Bundle messageToBundle(String message) throws JSONException {
         return toBundle(new JSONObject(message));
     }
 
-
-    public static void toBundle(Bundle to, String key, JSONArray jsonArray) {
+    private static void toBundle(Bundle to, String key, JSONArray jsonArray) {
         Object o = toBundleInner(jsonArray);
         if (o instanceof Bundle[]) {
             to.putParcelableArray(key, (Bundle[]) o);
@@ -161,7 +157,7 @@ public final class Utils {
         Bundle bundle = new Bundle(json.length());
         Iterator keys = json.keys();
         while (keys.hasNext()) {
-            String key = keys.next().toString();
+            final String key = keys.next().toString();
 
             try {
                 bundle.putBundle(key, toBundle(json.getJSONObject(key)));
@@ -200,10 +196,12 @@ public final class Utils {
 
             try {
                 bundle.putString(key, json.getString(key));
-                continue;
             } catch (JSONException ignored) {
             }
         }
         return bundle;
+    }
+
+    private Utils() {
     }
 }
