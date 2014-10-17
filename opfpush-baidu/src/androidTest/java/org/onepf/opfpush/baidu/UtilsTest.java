@@ -1,3 +1,5 @@
+package org.onepf.opfpush.baidu;
+
 import android.os.Bundle;
 
 import org.json.JSONArray;
