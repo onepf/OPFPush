@@ -17,43 +17,43 @@
 package org.onepf.opfpush;
 
 /**
- * Error of registration or unregistration.
- * Divided on two categories: <b>recoverable</b> and <b>non recoverable</b>.
+ * Error in registration or unregistration.
+ * Divided into two categories: <b>recoverable</b> and <b>nonrecoverable</b>.
  * <p/>
- * <b>Recoverable</b> error means that service in this moment can't handle registration
- * or unregistration and after some period of time you can try register on unregister again.
- * <b>Not recoverable</b> error means that error is fatal and you can't register this provider.
+ * <b>Recoverable</b> error: service can't handle registration
+ * or unregistration, you can try register on unregister later again.
+ * <p/>
+ * <b>Not recoverable</b> error: error is fatal, you can't register this provider.
  *
  * @author Kirill Rozov
  * @since 09.09.14.
  */
 public enum Error {
     /**
-     * Service not available at this moment. Most popular reason of this error that no internet
-     * connection available.
+     * Service not available. E.g. no internet connections.
      * <p/>
      * Recoverable error.
      */
     SERVICE_NOT_AVAILABLE,
 
     /**
-     * Invalid params send to register provider.
+     * Invalid params were sent to a register provider.
      * <p/>
-     * Non recoverable error.
+     * Nonrecoverable error.
      */
     INVALID_PARAMETERS,
 
     /**
      * Invalid sender ID.
      * <p/>
-     * Non recoverable error.
+     * Nonrecoverable error.
      */
     INVALID_SENDER,
 
     /**
-     * Credential that you use for registration is not valid.
+     * Credentials for registration are not valid.
      * <p/>
-     * Non recoverable error.
+     * Nonrecoverable error.
      */
     AUTHENTICATION_FAILED
 }
