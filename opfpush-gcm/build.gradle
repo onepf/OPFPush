@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-
-
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'robolectric'
 apply from: '../maven_push.gradle'
