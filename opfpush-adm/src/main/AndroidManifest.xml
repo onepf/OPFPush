@@ -20,11 +20,6 @@
     xmlns:amazon="http://schemas.amazon.com/apk/res/android">
 
     <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
-    <permission
-        android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"
-        android:protectionLevel="signature"/>
-
-    <uses-permission android:name="${packageId}.permission.RECEIVE_ADM_MESSAGE"/>
 
     <application>
 
@@ -35,17 +30,5 @@
         <service
             android:name="org.onepf.opfpush.adm.ADMService"
             android:exported="false"/>
-
-        <receiver
-            android:name="org.onepf.opfpush.adm.ADMReceiver"
-            android:permission="com.amazon.device.messaging.permission.SEND">
-
-            <intent-filter>
-                <action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>
-                <action android:name="com.amazon.device.messaging.intent.RECEIVE"/>
-
-                <category android:name="${packageId}"/>
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

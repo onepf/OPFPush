@@ -18,11 +18,6 @@
     package="org.onepf.opfpush.nokia"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <permission
-        android:name="${packageId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
-
-    <uses-permission android:name="${packageId}.permission.C2D_MESSAGE"/>
     <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE"/>
 
     <application>
@@ -40,7 +35,5 @@
         <service
             android:name="org.onepf.opfpush.nokia.NokiaNotificationService"
             android:exported="false"/>
-
     </application>
-
 </manifest>

@@ -23,13 +23,11 @@ android {
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 2
         versionName VERSION_NAME
 
         applicationId 'org.onepf.opfpush.adm'
-
-        manifestPlaceholders = [packageId: "\${applicationId}".toString()]
     }
 
     lintOptions {

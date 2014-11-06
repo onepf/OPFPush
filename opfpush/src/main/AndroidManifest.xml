@@ -35,5 +35,4 @@
         </receiver>
         <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
     </application>
-
 </manifest>

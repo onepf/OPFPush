@@ -19,12 +19,29 @@
     package="org.onepf.opfpush.sample"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--adm-->
+    <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>
+    <uses-permission
+        android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <!--gcm-->
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <!--nokia--> <!--Same as gcm-->
+    <!--<uses-permission android:name="${packageId}.permission.C2D_MESSAGE"/>-->
+    <!--<permission-->
+        <!--android:name="${applicationId}.permission.C2D_MESSAGE"-->
+        <!--android:protectionLevel="signature"/>-->
+
     <application
         android:name="org.onepf.opfpush.sample.PushSampleApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:label="@string/app_name">
 
         <activity
             android:name="org.onepf.opfpush.sample.PushSampleActivity"
@@ -39,6 +56,37 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
-    </application>
 
+        <!--adm-->
+        <receiver
+            android:name="org.onepf.opfpush.adm.ADMReceiver"
+            android:permission="com.amazon.device.messaging.permission.SEND">
+
+            <intent-filter>
+                <action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>
+                <action android:name="com.amazon.device.messaging.intent.RECEIVE"/>
+
+                <category android:name="${applicationId}"/>
+            </intent-filter>
+        </receiver>
+
+        <!--gcm-->
+        <receiver
+            android:name="org.onepf.opfpush.gcm.GCMReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="${applicationId}"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <category android:name="${applicationId}"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.onepf.openpush.gcm.intent.UNREGISTRATION"/>
+                <action android:name="org.onepf.openpush.gcm.intent.REGISTRATION"/>
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>
