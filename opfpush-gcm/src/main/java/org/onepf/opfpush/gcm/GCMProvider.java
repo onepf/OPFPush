@@ -38,6 +38,7 @@ import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.PackageUtils;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -184,7 +185,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     @Override
     public String toString() {
-        return String.format("%s (senderId: '%s', appVersion: %d)",
+        return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
                 NAME, mSenderID, mSettings.getAppVersion());
     }
 
