@@ -21,6 +21,11 @@
 
     <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
 
+    <!--<uses-permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>-->
+    <!--<permission-->
+        <!--android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"-->
+        <!--android:protectionLevel="signature"/>-->
+
     <application>
 
         <amazon:enable-feature
@@ -30,5 +35,17 @@
         <service
             android:name="org.onepf.opfpush.adm.ADMService"
             android:exported="false"/>
+
+        <!--<receiver-->
+            <!--android:name="org.onepf.opfpush.adm.ADMReceiver"-->
+            <!--android:permission="com.amazon.device.messaging.permission.SEND">-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>-->
+                <!--<action android:name="com.amazon.device.messaging.intent.RECEIVE"/>-->
+
+                <!--<category android:name="${applicationId}"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 </manifest>
