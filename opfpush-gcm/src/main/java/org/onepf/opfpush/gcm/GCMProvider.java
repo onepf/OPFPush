@@ -72,7 +72,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private ExecutorService mRegistrationExecutor;
 
     @NonNull
-    final Settings mSettings;
+    private final Settings mSettings;
 
     public GCMProvider(@NonNull Context context, @NonNull String senderID) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);

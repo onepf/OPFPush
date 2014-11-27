@@ -59,6 +59,7 @@ public class GCMIntentService extends IntentService {
                 // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // This loop represents the service doing some work.
+                //CHECKSTYLE:OFF
                 for (int i = 0; i < 5; i++) {
                     Log.i(TAG, "Working... " + (i + 1)
                             + "/5 @ " + SystemClock.elapsedRealtime());
@@ -67,6 +68,7 @@ public class GCMIntentService extends IntentService {
                     } catch (InterruptedException ignored) {
                     }
                 }
+                //CHECKSTYLE:ON
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
                 sendNotification("Received: " + extras.toString());

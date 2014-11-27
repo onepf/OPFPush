@@ -18,6 +18,7 @@ package org.onepf.opfpush;
 
 import android.util.Log;
 
+//CHECKSTYLE:OFF
 public final class OPFPushLog {
 
     private static final String TAG = "OpenPush";
@@ -118,3 +119,5 @@ public final class OPFPushLog {
     private OPFPushLog() {
     }
 }
+//CHECKSTYLE:ON
+

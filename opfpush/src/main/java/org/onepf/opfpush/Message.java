@@ -23,8 +23,6 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.util.Utils;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Represent message for send from client to server that uses in Google Cloud Messaging.
  *
@@ -56,8 +54,8 @@ public class Message implements Parcelable {
      */
     public Message(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
         if (timeToLeave < 0) {
-            throw new IllegalArgumentException(String.format("timeToLeave='%d'." +
-                    " Time to leave must be non negative value.", timeToLeave));
+            throw new IllegalArgumentException(String.format("timeToLeave='%d'."
+                    + " Time to leave must be non negative value.", timeToLeave));
         }
         mId = id;
         mData = data;
@@ -99,11 +97,12 @@ public class Message implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return "Message{" +
-                "messageId='" + mId + '\'' +
-                ", data='" + Utils.toString(mData) + '\'' +
-                ", TTL='" + mTimeToLeave + '\'' +
-                '}';
+        return "Message{"
+                + "messageId='" + mId + '\''
+                + ", data='" + Utils.toString(mData)
+                + '\''
+                + ", TTL='" + mTimeToLeave + '\''
+                + '}';
     }
 
     public static final Creator<Message> CREATOR = new Creator<Message>() {

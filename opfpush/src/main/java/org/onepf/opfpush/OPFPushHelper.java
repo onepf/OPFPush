@@ -39,6 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.OPFPushLog.LOGI;
 import static org.onepf.opfpush.OPFPushLog.LOGW;
@@ -54,7 +56,7 @@ import static org.onepf.opfpush.OPFPushLog.LOGW;
  * @author Kirill Rozov
  * @since 04.09.2014
  */
-public class OPFPushHelper {
+public final class OPFPushHelper {
 
     /**
      * Use for {@code messagesCount} argument in
@@ -98,7 +100,7 @@ public class OPFPushHelper {
     @Nullable
     private AlarmManager mAlarmManager;
 
-    private Options mOptions;
+    private volatile Options mOptions;
 
     private final Object mRegistrationLock = new Object();
     private final Object mInitLock = new Object();
@@ -117,6 +119,7 @@ public class OPFPushHelper {
      * @param context The current context.
      * @return Instance of {@link OPFPushHelper}.
      */
+    @SuppressFBWarnings({"DC_DOUBLECHECK"})
     public static OPFPushHelper getInstance(@NonNull Context context) {
         if (sInstance == null) {
             synchronized (OPFPushHelper.class) {
@@ -213,6 +216,7 @@ public class OPFPushHelper {
      *
      * @param options Instance of {@code Options}.
      */
+    @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
     public void init(@NonNull Options options) {
         if (isInitDone()) {
             throw new OPFPushException("You can init OpenPushHelper only one time.");
@@ -492,12 +496,16 @@ public class OPFPushHelper {
 
     @Override
     public String toString() {
-        return "OpenPushHelper{" +
-                "options=" + mOptions +
-                ", currentProvider=" + mCurrentProvider +
-                ", initDone=" + isInitDone() +
-                ", registered=" + isRegistered() +
-                '}';
+        return "OpenPushHelper{"
+                + "options="
+                + mOptions
+                + ", currentProvider="
+                + mCurrentProvider
+                + ", initDone="
+                + isInitDone()
+                + ", registered="
+                + isRegistered()
+                + '}';
     }
 
     void postRetryRegister(@NonNull String providerName) {
@@ -610,10 +618,10 @@ public class OPFPushHelper {
             if (!isRegistered()) {
                 throw new OPFPushException("Can't receive message when not registered.");
             }
-            if (mCurrentProvider != null &&
-                    !providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
-                throw new OPFPushException("Can't receive message from not registered provider. " +
-                        "Current provider '%s', message source ='%s'",
+            if (mCurrentProvider != null
+                    && !providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
+                throw new OPFPushException("Can't receive message from not registered provider. "
+                        + "Current provider '%s', message source ='%s'",
                         mCurrentProvider.getName(), providerName);
             }
         }

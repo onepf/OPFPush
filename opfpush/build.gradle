@@ -34,7 +34,7 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
@@ -54,8 +54,9 @@ robolectric {
 }
 
 dependencies {
-    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
     androidTestCompile 'junit:junit:4.11'
 
     compile 'com.android.support:support-annotations:19.1.0'
+    compile 'com.google.code.findbugs:annotations:3.0.0'
 }

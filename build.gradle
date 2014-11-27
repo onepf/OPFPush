@@ -26,6 +26,7 @@ buildscript {
     }
 
     dependencies {
+        //noinspection GradleDependency
         classpath 'com.android.tools.build:gradle:0.14.0'
         classpath 'org.robolectric:robolectric-gradle-plugin:0.13.2'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'

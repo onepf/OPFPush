@@ -41,8 +41,8 @@ public class DemoActivity extends Activity {
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    TextView mDisplay;
-    OPFPushHelper mPushHelper;
+    private TextView mDisplay;
+    private OPFPushHelper mPushHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

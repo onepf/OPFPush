@@ -61,17 +61,29 @@ public final class Result {
     @Override
     public String toString() {
         if (mErrorCode == null) {
-            return "Success{" +
-                    "providerName='" + mProviderName + '\'' +
-                    ", registrationId='" + mRegistrationId + '\'' +
-                    ", type=" + mType + '\'' +
-                    '}';
+            return "Success{"
+                    + "providerName='"
+                    + mProviderName
+                    + '\''
+                    + ", registrationId='"
+                    + mRegistrationId
+                    + '\''
+                    + ", type="
+                    + mType
+                    + '\''
+                    + '}';
         } else {
-            return "Error{" +
-                    "providerName='" + mProviderName + '\'' +
-                    ", errorCode='" + mErrorCode + '\'' +
-                    ", type=" + mType + '\'' +
-                    '}';
+            return "Error{"
+                    + "providerName='"
+                    + mProviderName
+                    + '\''
+                    + ", errorCode='"
+                    + mErrorCode
+                    + '\''
+                    + ", type="
+                    + mType
+                    + '\''
+                    + '}';
         }
     }
 

@@ -65,8 +65,8 @@ public final class PackageUtils {
     public static boolean isSystemApp(@NonNull Context context, @NonNull String appPackage) {
         try {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
-            return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
-                    (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+            return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0
+                    || (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
@@ -151,8 +151,8 @@ public final class PackageUtils {
         @Nullable
         private static String getAppPackage(Intent intent) {
             final String data = intent.getDataString();
-            return data.startsWith(PACKAGE_URI_PREFIX) ?
-                    data.replaceFirst(PACKAGE_URI_PREFIX, "") : null;
+            return data.startsWith(PACKAGE_URI_PREFIX)
+                    ? data.replaceFirst(PACKAGE_URI_PREFIX, "") : null;
         }
     }
 }

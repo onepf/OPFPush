@@ -33,7 +33,7 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
@@ -53,7 +53,7 @@ robolectric {
 }
 
 dependencies {
-    androidTestCompile 'org.robolectric:robolectric:2.3'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
     androidTestCompile 'junit:junit:4.11'
 
     compile project(':opfpush')

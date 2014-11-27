@@ -21,8 +21,10 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import org.onepf.opfpush.*;
 import org.onepf.opfpush.Error;
+import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.Result;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -88,17 +90,17 @@ public class GCMService extends IntentService {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
 
-        if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action))
+        if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
             OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME,
                             error,
                             Result.Type.REGISTRATION)
             );
-        else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action))
+        } else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action)) {
             OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
                     Result.error(GCMProvider.NAME, error, Result.Type.UNREGISTRATION)
             );
-        else {
+        } else {
             throw new OPFPushException(String.format("Unknown action '%s'.", action));
         }
     }

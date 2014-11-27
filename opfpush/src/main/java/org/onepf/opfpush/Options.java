@@ -35,7 +35,7 @@ import java.util.Map;
  * @author Kirill Rozov
  * @since 04.09.2014
  */
-public class Options {
+public final class Options {
     @NonNull
     private final List<PushProvider> mProviders;
 
@@ -87,11 +87,14 @@ public class Options {
 
     @Override
     public String toString() {
-        return "Options{" +
-                "providers=" + mProviders +
-                ", recoverProvider=" + mRecoverProvider +
-                ", systemPushPreferred=" + mSelectSystemPreferred +
-                '}';
+        return "Options{"
+                + "providers="
+                + mProviders
+                + ", recoverProvider="
+                + mRecoverProvider
+                + ", systemPushPreferred="
+                + mSelectSystemPreferred
+                + '}';
     }
 
     /**
@@ -209,11 +212,14 @@ public class Options {
 
         @Override
         public String toString() {
-            return "Builder{" +
-                    "providers=" + mProviders +
-                    ", recoverProvider=" + mRecoverProvider +
-                    ", systemPushPreferred=" + mSelectSystemPreferred +
-                    '}';
+            return "Builder{"
+                    + "providers="
+                    + mProviders
+                    + ", recoverProvider="
+                    + mRecoverProvider
+                    + ", systemPushPreferred="
+                    + mSelectSystemPreferred
+                    + '}';
         }
     }
 }

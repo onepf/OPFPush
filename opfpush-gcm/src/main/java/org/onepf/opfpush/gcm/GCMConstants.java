@@ -22,6 +22,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * @author Kirill Rozov
  * @since 06.09.14.
  */
+//CHECKSTYLE:OFF
 interface GCMConstants {
     String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
     String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
@@ -33,3 +34,4 @@ interface GCMConstants {
     String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 }
+//CHECKSTYLE:ON

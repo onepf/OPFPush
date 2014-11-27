@@ -27,7 +27,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
 
     private static final String EXTRA_WAKE_LOCK_ID = "android.support.content.wakelockid";
 
-    private static final SparseArray<PowerManager.WakeLock> mActiveWakeLocks
+    private static final SparseArray<PowerManager.WakeLock> WAKE_LOCK_SPARSE_ARRAY
             = new SparseArray<PowerManager.WakeLock>();
     private static int mNextId = 1;
 
@@ -46,7 +46,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
      *                Context.startService}.
      */
     public static ComponentName startWakefulService(Context context, Intent intent) {
-        synchronized (mActiveWakeLocks) {
+        synchronized (WAKE_LOCK_SPARSE_ARRAY) {
             int id = mNextId;
             mNextId++;
             if (mNextId <= 0) {
@@ -64,7 +64,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
                     "wake:" + comp.flattenToShortString());
             wl.setReferenceCounted(false);
             wl.acquire(60 * 1000);
-            mActiveWakeLocks.put(id, wl);
+            WAKE_LOCK_SPARSE_ARRAY.put(id, wl);
             return comp;
         }
     }
@@ -82,11 +82,11 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
         if (id == 0) {
             return false;
         }
-        synchronized (mActiveWakeLocks) {
-            PowerManager.WakeLock wl = mActiveWakeLocks.get(id);
+        synchronized (WAKE_LOCK_SPARSE_ARRAY) {
+            PowerManager.WakeLock wl = WAKE_LOCK_SPARSE_ARRAY.get(id);
             if (wl != null) {
                 wl.release();
-                mActiveWakeLocks.remove(id);
+                WAKE_LOCK_SPARSE_ARRAY.remove(id);
                 return true;
             }
             return true;

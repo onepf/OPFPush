@@ -36,7 +36,7 @@ public final class NokiaNotificationsReceiver extends PushBroadcastReceiver {
      * Gets the class name of the intent service that will handle Push Notification messages.
      */
     @Override
-    protected final String getPushIntentServiceClassName(Context context) {
+    protected String getPushIntentServiceClassName(Context context) {
         return SERVICE_CLASS_NAME;
     }
 }

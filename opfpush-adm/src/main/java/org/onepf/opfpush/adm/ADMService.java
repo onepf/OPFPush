@@ -22,8 +22,10 @@ import android.support.annotation.NonNull;
 
 import com.amazon.device.messaging.ADMConstants;
 
-import org.onepf.opfpush.*;
 import org.onepf.opfpush.Error;
+import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.Result;
 
 /**
  * This class allows your app to receive messages sent via ADM.

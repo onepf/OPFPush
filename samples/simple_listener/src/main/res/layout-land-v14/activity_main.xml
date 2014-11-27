@@ -14,37 +14,38 @@
   ~ limitations under the License.
   -->
 
-<GridLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:columnCount="2"
     android:orientation="horizontal"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:columnCount="2"
-    tools:context="org.onepf.opfpush.sample.PushSampleActivity">
+    tools:context="org.onepf.opfpush.sample.PushSampleActivity"
+    tools:ignore="RtlHardcoded">
 
     <Button
         android:id="@+id/register_switch"
         android:layout_marginRight="8dp"
-        android:text="@string/register"/>
+        android:text="@string/register" />
 
     <TextView
         android:id="@+id/push_provider_name"
         android:textAppearance="@android:style/TextAppearance.Medium"
-        tools:text="Gcm"/>
+        tools:text="Gcm" />
 
     <Button
         android:id="@+id/btn_copy_to_clipboard"
         android:layout_marginRight="8dp"
-        android:text="@string/btn_copy_to_clipboard"/>
+        android:text="@string/btn_copy_to_clipboard"
+        tools:ignore="InconsistentLayout" />
 
     <TextView
         android:id="@+id/registration_id"
         android:textAppearance="@android:style/TextAppearance.Medium"
-        tools:text="APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4"/>
+        tools:text="APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4APA91bG6mnXkIPYyNQs2DIIAnmlnE4" />
 
 </GridLayout>

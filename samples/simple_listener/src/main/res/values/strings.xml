@@ -29,6 +29,5 @@
     <string name="unregistration_error_msg">Unregistration error \'%s\'</string>
     <string name="unregister">Unregister</string>
     <string name="toast_registration_id_copied">Registration id copied</string>
-    <string name="message">message</string>
 
 </resources>
