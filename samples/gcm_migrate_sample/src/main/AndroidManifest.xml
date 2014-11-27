@@ -18,12 +18,19 @@
     package="org.onepf.opfpush.gcm_migrate_sample"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--gcm-->
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
     <!-- Main activity. -->
     <application
         android:name=".DemoApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        android:theme="@style/Theme.AppCompat">
         <!-- Required for applications which use Google Play Services. -->
         <meta-data
             android:name="com.google.android.gms.version"
