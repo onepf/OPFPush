@@ -30,6 +30,7 @@ import org.onepf.opfpush.BasePushProvider;
  * Amazon Device Messaging push provider implementation.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @see <a href="https://developer.amazon.com/appsandservices/apis/engage/device-messaging">Amazon Device Messaging</a>
  * @since 06.09.14
  */
@@ -40,20 +41,23 @@ public class ADMProvider extends BasePushProvider {
     private static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
 
     @NonNull
-    private final ADM mAdm;
+    private final ADM adm;
 
     public ADMProvider(@NonNull Context context) {
         super(context, NAME, KINDLE_STORE_APP_PACKAGE);
-        mAdm = new ADM(context);
+        adm = new ADM(context);
     }
 
     @Override
     public void register() {
-        mAdm.startRegister();
+        if (!isRegistered()) {
+            adm.startRegister();
+        }
     }
 
     @Override
     public boolean checkManifest() {
+        //TODO Maybe better use ADMManifest.checkManifestAuthoredProperly(getContext())?
         if (super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
             Context ctx = getContext();
             return super.checkManifest()
@@ -67,22 +71,22 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        return mAdm.getRegistrationId() != null;
+        return adm.getRegistrationId() != null;
     }
 
     @Override
     public void unregister() {
-        mAdm.startUnregister();
+        adm.startUnregister();
     }
 
     @Override
     public boolean isAvailable() {
-        return super.isAvailable() && mAdm.isSupported();
+        return super.isAvailable() && adm.isSupported();
     }
 
     @Override
     @Nullable
     public String getRegistrationId() {
-        return mAdm.getRegistrationId();
+        return adm.getRegistrationId();
     }
 }

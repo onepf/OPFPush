@@ -16,11 +16,11 @@
 
 package org.onepf.opfpush.adm;
 
-import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.amazon.device.messaging.ADMConstants;
+import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.Error;
 import org.onepf.opfpush.OPFPushException;
@@ -34,38 +34,13 @@ import org.onepf.opfpush.Result;
  * It is safe to do long-running operations in these methods.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 06.09.14.
  */
-public class ADMService extends IntentService {
-
-    private static String mLastRegistrationId;
+public class ADMService extends ADMMessageHandlerBase {
 
     public ADMService() {
         super("ADMService");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        final String action = intent.getAction();
-        if (ADMConstants.LowLevel.ACTION_RECEIVE_ADM_MESSAGE.equals(action)) {
-            onMessage(intent);
-        } else if (ADMConstants.LowLevel.ACTION_APP_REGISTRATION_EVENT.equals(action)) {
-            if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_ERROR)) {
-                @ADMError String errorId = intent.getStringExtra(ADMConstants.LowLevel.EXTRA_ERROR);
-                onRegistrationError(errorId);
-            } else if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_UNREGISTERED)) {
-                if (mLastRegistrationId != null) {
-                    onUnregistered(mLastRegistrationId);
-                } else {
-                    throw new OPFPushException("Not registered.");
-                }
-            } else if (intent.hasExtra(ADMConstants.LowLevel.EXTRA_REGISTRATION_ID)) {
-                mLastRegistrationId = intent.getStringExtra(ADMConstants.LowLevel.EXTRA_REGISTRATION_ID);
-                onRegistered(mLastRegistrationId);
-            } else {
-                onRegistrationError(ADMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-            }
-        }
     }
 
     /**
@@ -77,9 +52,27 @@ public class ADMService extends IntentService {
      *               For an example of defining the behavior of the onMessage() callback,
      *               see SampleADMMessageHandler.java in the ADMMessenger sample app.
      */
+    @Override
     protected void onMessage(@NonNull Intent intent) {
         OPFPushHelper.getInstance(this)
                 .getProviderCallback().onMessage(ADMProvider.NAME, intent.getExtras());
+    }
+
+    /**
+     * Called when a registration request succeeds.
+     * ADM may call this message in response to your app calling startRegister()
+     * or if ADM has updated the registration ID for this app instance.
+     *
+     * @param registrationId The new registration ID for the instance of your app.
+     *                       Pass this value to your components that are using ADM to send messages.
+     *                       The {@link com.amazon.device.messaging.ADM#getRegistrationId()}
+     *                       method also obtains the registration ID for an instance of your app.
+     */
+    @Override
+    protected void onRegistered(@NonNull String registrationId) {
+        //TODO Send registration id.
+        OPFPushHelper.getInstance(this).getProviderCallback()
+                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.REGISTRATION));
     }
 
     /**
@@ -93,45 +86,15 @@ public class ADMService extends IntentService {
      *                {@link ADMConstants#ERROR_INVALID_SENDER},
      *                {@link ADMConstants#ERROR_SERVICE_NOT_AVAILABLE}.
      */
+    @Override
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
-        Error error = convertError(errorId);
+        final Error error = convertError(errorId);
         OPFPushHelper.getInstance(this).getProviderCallback()
                 .onResult(
                         Result.error(ADMProvider.NAME,
                                 error,
                                 Result.Type.REGISTRATION)
                 );
-    }
-
-    @NonNull
-    private Error convertError(@NonNull @ADMError String errorId) {
-        Error error;
-        if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = Error.SERVICE_NOT_AVAILABLE;
-        } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
-            error = Error.INVALID_SENDER;
-        } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = Error.AUTHENTICATION_FAILED;
-        } else {
-            throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
-        }
-        return error;
-    }
-
-    /**
-     * Called when a registration request succeeds.
-     * ADM may call this message in response to your app calling startRegister()
-     * or if ADM has updated the registration ID for this app instance.
-     *
-     * @param registrationId The new registration ID for the instance of your app.
-     *                       Pass this value to your components that are using ADM to send messages.
-     *                       The {@link com.amazon.device.messaging.ADM#getRegistrationId()}
-     *                       method also obtains the registration ID for an instance of your app.
-     */
-    protected void onRegistered(@NonNull String registrationId) {
-        //TODO Send registration id.
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.REGISTRATION));
     }
 
     /**
@@ -146,8 +109,24 @@ public class ADMService extends IntentService {
      *                       Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
      *                       will show the registration ID for an unregistered app as {@code null}.
      */
+    @Override
     protected void onUnregistered(@NonNull String registrationId) {
         OPFPushHelper.getInstance(this).getProviderCallback()
                 .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.UNREGISTRATION));
+    }
+
+    @NonNull
+    private Error convertError(@NonNull @ADMError String errorId) {
+        final Error error;
+        if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
+            error = Error.SERVICE_NOT_AVAILABLE;
+        } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
+            error = Error.INVALID_SENDER;
+        } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
+            error = Error.AUTHENTICATION_FAILED;
+        } else {
+            throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+        }
+        return error;
     }
 }

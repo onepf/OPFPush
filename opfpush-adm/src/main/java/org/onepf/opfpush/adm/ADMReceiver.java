@@ -16,23 +16,19 @@
 
 package org.onepf.opfpush.adm;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
+import com.amazon.device.messaging.ADMMessageReceiver;
 
 /**
  * Forward Amazon Device Messaging (ADM) messages to your {@link ADMService}.
  * The ADM client on the device uses broadcast intents to dispatch messages to your app.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 06.09.14.
  */
-public class ADMReceiver extends BroadcastReceiver {
+public class ADMReceiver extends ADMMessageReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        intent.setComponent(new ComponentName(context, ADMService.class));
-        context.startService(intent);
+    public ADMReceiver() {
+        super(ADMService.class);
     }
 }
