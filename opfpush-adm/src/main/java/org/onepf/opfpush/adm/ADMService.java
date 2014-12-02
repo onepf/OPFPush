@@ -75,7 +75,7 @@ public class ADMService extends ADMMessageHandlerBase {
     }
 
     /**
-     * Called ç. This method may be called in response to your app
+     * Called on successful unregistration. This method may be called in response to your app
      * calling startUnregister() or if ADM has unregistered the app for some reason (typically
      * because the device has lost its association with a user's Amazon account).
      * If this message is called, your app should notify your components that are using ADM

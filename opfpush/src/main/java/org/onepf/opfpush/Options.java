@@ -88,7 +88,7 @@ public final class Options {
     }
 
     /**
-     * Get the {@code EventListener}.\
+     * Get the {@code EventListener}.
      *
      * @return event listener of push providers.
      */
