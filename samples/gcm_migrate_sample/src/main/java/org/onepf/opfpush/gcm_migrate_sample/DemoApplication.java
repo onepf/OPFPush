@@ -40,13 +40,13 @@ public class DemoApplication extends Application {
 
         Options.Builder builder = new Options.Builder();
         builder.addProviders(new GCMProvider(this, GCM_SENDER_ID))
+                .setEventListener(new DemoEventListener())
                 .setRecoverProvider(true)
                 .setSelectSystemPreferred(true)
                 .setBackoff(new ExponentialBackoff(Integer.MAX_VALUE));
         Options options = builder.build();
 
         OPFPushHelper pushHelper = OPFPushHelper.getInstance(this);
-        pushHelper.setMessageListener(new BroadcastMessageListener(this));
         pushHelper.init(options);
     }
 }

@@ -33,26 +33,33 @@ import java.util.Map;
  * You can create instance of this class with {@link Options.Builder}.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 04.09.2014
  */
 public final class Options {
-    @NonNull
-    private final List<PushProvider> mProviders;
 
-    private final boolean mRecoverProvider;
-    private final boolean mSelectSystemPreferred;
+    @NonNull
+    private final List<PushProvider> providers;
+
+    @NonNull
+    private final EventListener eventListener;
+
+    private final boolean isRecoverProvider;
+    private final boolean isSelectSystemPreferred;
 
     @Nullable
-    private final Backoff mBackoff;
+    private final Backoff backoff;
 
     private Options(@NonNull Collection<? extends PushProvider> providers,
+                    @NonNull EventListener eventListener,
                     @Nullable Backoff backoff,
-                    boolean recoverProvider,
+                    boolean isRecoverProvider,
                     boolean selectSystemPreferred) {
-        mProviders = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
-        mRecoverProvider = recoverProvider;
-        mSelectSystemPreferred = selectSystemPreferred;
-        mBackoff = backoff;
+        this.providers = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
+        this.eventListener = eventListener;
+        this.isRecoverProvider = isRecoverProvider;
+        this.isSelectSystemPreferred = selectSystemPreferred;
+        this.backoff = backoff;
     }
 
     /**
@@ -63,11 +70,11 @@ public final class Options {
      */
     //TODO Find better name for this logic.
     public boolean isRecoverProvider() {
-        return mRecoverProvider;
+        return isRecoverProvider;
     }
 
     public boolean isSelectSystemPreferred() {
-        return mSelectSystemPreferred;
+        return isSelectSystemPreferred;
     }
 
     /**
@@ -77,23 +84,33 @@ public final class Options {
      */
     @NonNull
     public List<PushProvider> getProviders() {
-        return mProviders;
+        return providers;
+    }
+
+    /**
+     * Get the {@code EventListener}.\
+     *
+     * @return event listener of push providers.
+     */
+    @NonNull
+    public EventListener getEventListener() {
+        return eventListener;
     }
 
     @Nullable
     public Backoff getBackoff() {
-        return mBackoff;
+        return backoff;
     }
 
     @Override
     public String toString() {
         return "Options{"
                 + "providers="
-                + mProviders
-                + ", recoverProvider="
-                + mRecoverProvider
-                + ", systemPushPreferred="
-                + mSelectSystemPreferred
+                + providers
+                + ", isRecoverProvider="
+                + isRecoverProvider
+                + ", isSelectSystemPreferred="
+                + isSelectSystemPreferred
                 + '}';
     }
 
@@ -102,14 +119,18 @@ public final class Options {
      */
     public static class Builder {
         public static final int PROVIDERS_CAPACITY = 4;
-        @Nullable
-        private Map<String, PushProvider> mProviders;
-
-        private boolean mRecoverProvider = true;
-        private boolean mSelectSystemPreferred;
 
         @Nullable
-        private Backoff mBackoff = new ExponentialBackoff();
+        private Map<String, PushProvider> providers;
+
+        @Nullable
+        private EventListener eventListener;
+
+        private boolean isRecoverProvider = true;
+        private boolean isSelectSystemPreferred;
+
+        @Nullable
+        private Backoff backoff = new ExponentialBackoff();
 
         /**
          * Mark for try select the best store for device from added providers.
@@ -123,7 +144,7 @@ public final class Options {
          * @return The current {@code Builder}.
          */
         public Builder setSelectSystemPreferred(boolean selectSystemPreferred) {
-            mSelectSystemPreferred = selectSystemPreferred;
+            isSelectSystemPreferred = selectSystemPreferred;
             return this;
         }
 
@@ -136,7 +157,7 @@ public final class Options {
          * @return The current {@code Builder}.
          */
         public Builder setRecoverProvider(boolean recoverProvider) {
-            mRecoverProvider = recoverProvider;
+            isRecoverProvider = recoverProvider;
             return this;
         }
 
@@ -154,6 +175,12 @@ public final class Options {
             } else {
                 return addProviders(Arrays.asList(providers));
             }
+        }
+
+        @NonNull
+        public Builder setEventListener(@NonNull EventListener eventListener) {
+            this.eventListener = eventListener;
+            return this;
         }
 
         /**
@@ -175,24 +202,24 @@ public final class Options {
                 }
             }
 
-            if (mProviders == null) {
-                mProviders = new LinkedHashMap<String, PushProvider>(PROVIDERS_CAPACITY);
+            if (this.providers == null) {
+                this.providers = new LinkedHashMap<String, PushProvider>(PROVIDERS_CAPACITY);
             }
 
             for (PushProvider provider : providers) {
                 final String providerName = provider.getName();
-                if (mProviders.containsKey(providerName)) {
+                if (this.providers.containsKey(providerName)) {
                     throw new IllegalArgumentException(
                             String.format("Provider '%s' already added.", provider));
                 } else {
-                    mProviders.put(providerName, provider);
+                    this.providers.put(providerName, provider);
                 }
             }
             return this;
         }
 
         public Builder setBackoff(@Nullable Backoff backoff) {
-            mBackoff = backoff;
+            this.backoff = backoff;
             return this;
         }
 
@@ -204,21 +231,31 @@ public final class Options {
          */
         @NonNull
         public Options build() {
-            if (mProviders == null) {
+            if (providers == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
-            return new Options(mProviders.values(), mBackoff, mRecoverProvider, mSelectSystemPreferred);
+            if (eventListener == null) {
+                throw new IllegalArgumentException("Need to add event listener.");
+            }
+
+            return new Options(
+                    providers.values(),
+                    eventListener,
+                    backoff,
+                    isRecoverProvider,
+                    isSelectSystemPreferred
+            );
         }
 
         @Override
         public String toString() {
             return "Builder{"
                     + "providers="
-                    + mProviders
-                    + ", recoverProvider="
-                    + mRecoverProvider
+                    + providers
+                    + ", isRecoverProvider="
+                    + isRecoverProvider
                     + ", systemPushPreferred="
-                    + mSelectSystemPreferred
+                    + isSelectSystemPreferred
                     + '}';
         }
     }

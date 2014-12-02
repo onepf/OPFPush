@@ -16,16 +16,36 @@
 
 package org.onepf.opfpush;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Interface definition for a callback to be invoked when event
  * in {@link OPFPushHelper} is occurred.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 07.09.14.
  */
 public interface EventListener {
+
+    /**
+     * New message received.
+     *
+     * @param providerName Name of provider received event.
+     * @param extras       Data associated with message.
+     */
+    void onMessage(@NonNull String providerName, @Nullable Bundle extras);
+
+    /**
+     * Notification about deleted messages. Not all provider send this data or not send
+     * count of deleted messages (in this case this value will be negative).
+     *
+     * @param providerName  Name of provider received event.
+     * @param messagesCount Count of messages. Negative value if no info about count.
+     */
+    void onDeletedMessages(@NonNull String providerName, int messagesCount);
 
     /**
      * Provider registered successfully.
@@ -34,6 +54,14 @@ public interface EventListener {
      * @param registrationId Registration id for push notification.
      */
     void onRegistered(@NonNull String providerName, @NonNull String registrationId);
+
+    /**
+     * Provider unregistered successfully.
+     *
+     * @param providerName   Name of unregistered provider.
+     * @param registrationId Old registration id for push notification.
+     */
+    void onUnregistered(@NonNull String providerName, @NonNull String registrationId);
 
     /**
      * Provider registration failed. Provider can continue try to register
@@ -57,14 +85,6 @@ public interface EventListener {
      * {@code OpenPushHelper} can't find any available provider for register push.
      */
     void onNoAvailableProvider();
-
-    /**
-     * Provider unregistered successfully.
-     *
-     * @param providerName   Name of unregistered provider.
-     * @param registrationId Old registration id for push notification.
-     */
-    void onUnregistered(@NonNull String providerName, @NonNull String registrationId);
 
     /**
      * Provider went to unavailable state. Is most case reason ot this is removing

@@ -41,6 +41,7 @@ import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static android.provider.Settings.Secure.ANDROID_ID;
 import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.OPFPushLog.LOGI;
 import static org.onepf.opfpush.OPFPushLog.LOGW;
@@ -54,13 +55,14 @@ import static org.onepf.opfpush.OPFPushLog.LOGW;
  * For start select provider for registerWithNext call {@link #register()}.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 04.09.2014
  */
 public final class OPFPushHelper {
 
     /**
      * Use for {@code messagesCount} argument in
-     * {@link ProviderCallback#onDeletedMessages(String, int)} when messages count is unknown.
+     * {@link ReceivedMessageHandler#onDeletedMessages(String, int)} when messages count is unknown.
      */
     public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
 
@@ -80,37 +82,34 @@ public final class OPFPushHelper {
     }
 
     @Nullable
-    private static OPFPushHelper sInstance;
+    private static OPFPushHelper instance;
 
     @NonNull
-    private final Context mAppContext;
+    private EventListenerWrapper eventListener;
+
+    @NonNull
+    private final Context appContext;
 
     @Nullable
-    private EventListener mListener;
+    private BroadcastReceiver packageReceiver;
 
     @Nullable
-    private MessageListener mMessageListener;
+    private PushProvider currentProvider;
 
     @Nullable
-    private BroadcastReceiver mPackageReceiver;
+    private AlarmManager alarmManager;
 
-    @Nullable
-    private PushProvider mCurrentProvider;
+    private volatile Options options;
 
-    @Nullable
-    private AlarmManager mAlarmManager;
+    private final Object registrationLock = new Object();
+    private final Object initLock = new Object();
 
-    private volatile Options mOptions;
-
-    private final Object mRegistrationLock = new Object();
-    private final Object mInitLock = new Object();
-
-    private final ProviderCallback mProviderCallback = new ProviderCallback();
-    private final Settings mSettings;
+    private final ReceivedMessageHandler receivedMessageHandler = new ReceivedMessageHandler();
+    private final Settings settings;
 
     private OPFPushHelper(@NonNull Context context) {
-        mAppContext = context.getApplicationContext();
-        mSettings = new Settings(context);
+        appContext = context.getApplicationContext();
+        settings = new Settings(context);
     }
 
     /**
@@ -121,26 +120,26 @@ public final class OPFPushHelper {
      */
     @SuppressFBWarnings({"DC_DOUBLECHECK"})
     public static OPFPushHelper getInstance(@NonNull Context context) {
-        if (sInstance == null) {
+        if (instance == null) {
             synchronized (OPFPushHelper.class) {
-                if (sInstance == null) {
-                    sInstance = new OPFPushHelper(context);
+                if (instance == null) {
+                    instance = new OPFPushHelper(context);
                 }
             }
         }
-        return sInstance;
+        return instance;
     }
 
     static OPFPushHelper newInstance(@NonNull Context context) {
         synchronized (OPFPushHelper.class) {
-            sInstance = new OPFPushHelper(context);
+            instance = new OPFPushHelper(context);
         }
-        return sInstance;
+        return instance;
     }
 
-    public ProviderCallback getProviderCallback() {
+    public ReceivedMessageHandler getReceivedMessageHandler() {
         checkInitDone();
-        return mProviderCallback;
+        return receivedMessageHandler;
     }
 
     /**
@@ -149,8 +148,8 @@ public final class OPFPushHelper {
      * @return True if init is done, else - false.
      */
     public boolean isInitDone() {
-        synchronized (mInitLock) {
-            return mOptions != null;
+        synchronized (initLock) {
+            return options != null;
         }
     }
 
@@ -159,7 +158,7 @@ public final class OPFPushHelper {
      * and it is implement {@link SenderPushProvider} interface.
      */
     public boolean canSendMessages() {
-        return mCurrentProvider instanceof SenderPushProvider;
+        return currentProvider instanceof SenderPushProvider;
     }
 
     /**
@@ -171,12 +170,12 @@ public final class OPFPushHelper {
      *                          or registered provider doesn't support send messages.
      */
     public void sendMessage(@NonNull Message message) {
-        synchronized (mRegistrationLock) {
-            if (mCurrentProvider instanceof SenderPushProvider) {
-                ((SenderPushProvider) mCurrentProvider).send(message);
+        synchronized (registrationLock) {
+            if (currentProvider instanceof SenderPushProvider) {
+                ((SenderPushProvider) currentProvider).send(message);
             } else if (isRegistered()) {
                 throw new OPFPushException(
-                        "Current provider '%s' not support send messages.", mCurrentProvider);
+                        "Current provider '%s' not support send messages.", currentProvider);
             } else {
                 throw new OPFPushException("Provider not registered.");
             }
@@ -189,20 +188,20 @@ public final class OPFPushHelper {
      * @return True if push registered, else - false.
      */
     public boolean isRegistered() {
-        final int state = mSettings.getState();
+        final int state = settings.getState();
         return state == STATE_REGISTERED || state == STATE_UNREGISTERING;
     }
 
     public boolean isUnregistered() {
-        return mSettings.getState() == STATE_UNREGISTERED;
+        return settings.getState() == STATE_UNREGISTERED;
     }
 
     public boolean isRegistering() {
-        return mSettings.getState() == STATE_REGISTERING;
+        return settings.getState() == STATE_REGISTERING;
     }
 
     public boolean isUnregistering() {
-        return mSettings.getState() == STATE_UNREGISTERING;
+        return settings.getState() == STATE_UNREGISTERING;
     }
 
     private void checkInitDone() {
@@ -214,28 +213,29 @@ public final class OPFPushHelper {
     /**
      * Init {@code OpenPushHelper}. You must call this method before do any operation.
      *
-     * @param options Instance of {@code Options}.
+     * @param initialOptions Instance of {@code Options}.
      */
     @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
-    public void init(@NonNull Options options) {
+    public void init(@NonNull Options initialOptions) {
         if (isInitDone()) {
             throw new OPFPushException("You can init OpenPushHelper only one time.");
         }
 
-        if (mOptions == null) {
-            synchronized (mInitLock) {
-                if (mOptions == null) {
-                    mOptions = options;
+        if (this.options == null) {
+            synchronized (initLock) {
+                if (this.options == null) {
+                    this.options = initialOptions;
                 }
             }
         }
 
+        this.eventListener = new EventListenerWrapper(options.getEventListener());
         initLastProvider();
         LOGI("Init done.");
     }
 
     private void initLastProvider() {
-        synchronized (mRegistrationLock) {
+        synchronized (registrationLock) {
             final PushProvider lastProvider = getLastProvider();
             if (lastProvider == null) {
                 LOGI("No last provider.");
@@ -247,17 +247,17 @@ public final class OPFPushHelper {
             if (lastProvider.isAvailable()) {
                 if (lastProvider.isRegistered()) {
                     LOGI("Last provider running.");
-                    mCurrentProvider = lastProvider;
-                    mSettings.saveState(STATE_REGISTERED);
+                    currentProvider = lastProvider;
+                    settings.saveState(STATE_REGISTERED);
                 } else {
                     LOGI("Last provider need register.");
                     if (!register(lastProvider)) {
-                        mSettings.saveLastProvider(null);
+                        settings.saveLastProvider(null);
                     }
                 }
             } else {
-                mSettings.saveLastProvider(null);
-                mSettings.saveState(STATE_UNREGISTERED);
+                settings.saveLastProvider(null);
+                settings.saveState(STATE_UNREGISTERED);
 
                 onProviderUnavailable(lastProvider);
             }
@@ -268,7 +268,7 @@ public final class OPFPushHelper {
      * Check if at least one provider available.
      */
     public boolean hasAvailableProvider() {
-        for (PushProvider provider : mOptions.getProviders()) {
+        for (PushProvider provider : options.getProviders()) {
             if (provider.isAvailable()) {
                 return true;
             }
@@ -276,17 +276,9 @@ public final class OPFPushHelper {
         return false;
     }
 
-    public void setListener(@Nullable EventListener l) {
-        mListener = l == null ? null : new EventListenerWrapper(l);
-    }
-
-    public void setMessageListener(@Nullable MessageListener l) {
-        mMessageListener = l;
-    }
-
     void restartRegisterOnBoot() {
         checkInitDone();
-        mSettings.clear();
+        settings.clear();
         register();
     }
 
@@ -303,14 +295,14 @@ public final class OPFPushHelper {
     public void register() {
         checkInitDone();
 
-        synchronized (mRegistrationLock) {
-            switch (mSettings.getState()) {
+        synchronized (registrationLock) {
+            switch (settings.getState()) {
                 case STATE_REGISTERING:
                     break;
 
                 case STATE_UNREGISTERED:
-                    mSettings.saveState(STATE_REGISTERING);
-                    if (mOptions.isSelectSystemPreferred()
+                    settings.saveState(STATE_REGISTERING);
+                    if (options.isSelectSystemPreferred()
                             && registerSystemPreferredProvider()) {
                         return;
                     }
@@ -327,10 +319,10 @@ public final class OPFPushHelper {
     }
 
     private boolean registerSystemPreferredProvider() {
-        for (PushProvider provider : mOptions.getProviders()) {
+        for (PushProvider provider : options.getProviders()) {
             String hostAppPackage = provider.getHostAppPackage();
             if (hostAppPackage != null) {
-                if (PackageUtils.isSystemApp(mAppContext, hostAppPackage)
+                if (PackageUtils.isSystemApp(appContext, hostAppPackage)
                         && register(provider)) {
                     return true;
                 }
@@ -348,7 +340,7 @@ public final class OPFPushHelper {
      */
     private boolean registerNextProvider(@Nullable PushProvider lastProvider) {
         int nextProviderIndex = 0;
-        final List<PushProvider> providers = mOptions.getProviders();
+        final List<PushProvider> providers = options.getProviders();
         if (lastProvider != null) {
             int lastProviderIndex = providers.indexOf(lastProvider);
             if (lastProviderIndex != -1) {
@@ -364,11 +356,9 @@ public final class OPFPushHelper {
             }
         }
 
-        mSettings.saveState(STATE_UNREGISTERED);
+        settings.saveState(STATE_UNREGISTERED);
         LOGW("No more available providers.");
-        if (mListener != null) {
-            mListener.onNoAvailableProvider();
-        }
+        eventListener.onNoAvailableProvider();
         return false;
     }
 
@@ -384,15 +374,11 @@ public final class OPFPushHelper {
      */
     private boolean register(@NonNull PushProvider provider) {
         if (provider.isAvailable()) {
-            if (Utils.isNetworkConnected(mAppContext)) {
+            if (Utils.isNetworkConnected(appContext)) {
                 LOGD("Try register %s.", provider);
                 provider.register();
             } else {
-                mProviderCallback.onRegistrationError(
-                        Result.error(provider.getName(),
-                                Error.SERVICE_NOT_AVAILABLE,
-                                Result.Type.REGISTRATION)
-                );
+                receivedMessageHandler.onRegistrationError(provider.getName(), Error.SERVICE_NOT_AVAILABLE);
             }
             return true;
         }
@@ -413,14 +399,14 @@ public final class OPFPushHelper {
     public void unregister() {
         checkInitDone();
 
-        synchronized (mRegistrationLock) {
-            switch (mSettings.getState()) {
+        synchronized (registrationLock) {
+            switch (settings.getState()) {
                 case STATE_REGISTERED:
-                    Assert.assertNotNull(mCurrentProvider);
+                    Assert.assertNotNull(currentProvider);
 
-                    mSettings.saveState(STATE_UNREGISTERING);
+                    settings.saveState(STATE_UNREGISTERING);
                     unregisterPackageChangeReceiver();
-                    mCurrentProvider.unregister();
+                    currentProvider.unregister();
                     break;
 
                 case STATE_UNREGISTERING:
@@ -436,15 +422,15 @@ public final class OPFPushHelper {
     }
 
     private void unregisterPackageChangeReceiver() {
-        if (mPackageReceiver != null) {
-            mAppContext.unregisterReceiver(mPackageReceiver);
-            mPackageReceiver = null;
+        if (packageReceiver != null) {
+            appContext.unregisterReceiver(packageReceiver);
+            packageReceiver = null;
         }
     }
 
     @Nullable
     public PushProvider getCurrentProvider() {
-        return mCurrentProvider;
+        return currentProvider;
     }
 
     /**
@@ -456,7 +442,7 @@ public final class OPFPushHelper {
      */
     @Nullable
     private PushProvider getProvider(@NonNull String providerName) {
-        for (PushProvider provider : mOptions.getProviders()) {
+        for (PushProvider provider : options.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
             }
@@ -482,14 +468,14 @@ public final class OPFPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
-        String storedProviderName = mSettings.getLastProviderName();
+        String storedProviderName = settings.getLastProviderName();
         if (!TextUtils.isEmpty(storedProviderName)) {
             PushProvider provider = getProvider(storedProviderName);
             if (provider != null) {
                 return provider;
             }
 
-            mSettings.saveLastProvider(null);
+            settings.saveLastProvider(null);
         }
         return null;
     }
@@ -498,9 +484,9 @@ public final class OPFPushHelper {
     public String toString() {
         return "OpenPushHelper{"
                 + "options="
-                + mOptions
+                + options
                 + ", currentProvider="
-                + mCurrentProvider
+                + currentProvider
                 + ", initDone="
                 + isInitDone()
                 + ", registered="
@@ -509,40 +495,24 @@ public final class OPFPushHelper {
     }
 
     void postRetryRegister(@NonNull String providerName) {
-        Assert.assertNotNull(mOptions.getBackoff());
+        Assert.assertNotNull(options.getBackoff());
 
-        final long when = System.currentTimeMillis() + mOptions.getBackoff().getTryDelay();
+        final long when = System.currentTimeMillis() + options.getBackoff().getTryDelay();
 
         LOGI("Post retry register provider '%s' at %s", providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
-        Intent intent = new Intent(mAppContext, RetryBroadcastReceiver.class);
-        intent.setAction(Constants.ACTION_REGISTER);
-        intent.putExtra(Constants.EXTRA_PROVIDER_NAME, providerName);
+        Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
+        intent.setAction(OPFConstants.ACTION_REGISTER);
+        intent.putExtra(OPFConstants.EXTRA_PROVIDER_NAME, providerName);
 
-        if (mAlarmManager == null) {
-            mAlarmManager = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) {
+            alarmManager = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
         }
-        if (mAlarmManager != null) {
-            mAlarmManager.set(
-                    AlarmManager.RTC, when, PendingIntent.getBroadcast(mAppContext, 0, intent, 0)
+        if (alarmManager != null) {
+            alarmManager.set(
+                    AlarmManager.RTC, when, PendingIntent.getBroadcast(appContext, 0, intent, 0)
             );
-        }
-    }
-
-    static boolean canHandleResult(@NonNull Result result, @State int state) {
-        switch (result.getType()) {
-            case UNKNOWN:
-                return state == STATE_REGISTERING || state == STATE_UNREGISTERING;
-
-            case REGISTRATION:
-                return state == STATE_REGISTERING;
-
-            case UNREGISTRATION:
-                return state == STATE_UNREGISTERING;
-
-            default:
-                return false;
         }
     }
 
@@ -554,14 +524,14 @@ public final class OPFPushHelper {
      *                          or {@code providerName} isn't current registered provider.
      */
     void onNeedRetryRegister() {
-        Assert.assertNotNull(mCurrentProvider);
-        LOGD("onNeedRetryRegister(providerName = %s).", mCurrentProvider);
+        Assert.assertNotNull(currentProvider);
+        LOGD("onNeedRetryRegister(providerName = %s).", currentProvider);
 
-        mSettings.clear();
-        mCurrentProvider.onRegistrationInvalid();
-        mSettings.saveState(STATE_REGISTERING);
-        if (!register(mCurrentProvider)) {
-            mSettings.saveState(STATE_UNREGISTERED);
+        settings.clear();
+        currentProvider.onRegistrationInvalid();
+        settings.saveState(STATE_REGISTERING);
+        if (!register(currentProvider)) {
+            settings.saveState(STATE_UNREGISTERED);
         }
     }
 
@@ -575,195 +545,225 @@ public final class OPFPushHelper {
     void onProviderUnavailable(@NonNull PushProvider provider) {
         LOGD("onProviderUnavailable(provider = %s).", provider);
 
-        if (mCurrentProvider != null && provider.equals(mCurrentProvider)) {
-            mCurrentProvider = null;
-            mSettings.saveState(STATE_UNREGISTERED);
+        if (currentProvider != null && provider.equals(currentProvider)) {
+            currentProvider = null;
+            settings.saveState(STATE_UNREGISTERED);
         }
 
         provider.onUnavailable();
-        if (mListener != null) {
-            mListener.onProviderBecameUnavailable(provider.getName());
-        }
+        eventListener.onProviderBecameUnavailable(provider.getName());
 
-        if (mOptions.isRecoverProvider()) {
+        if (options.isRecoverProvider()) {
             OPFPushHelper.this.register(); //Restart registration
         }
     }
 
-    public class ProviderCallback {
+    /**
+     * Is used for handle received messages by broadcast receivers of concrete providers.
+     */
+    public class ReceivedMessageHandler {
 
-        ProviderCallback() {
+        ReceivedMessageHandler() {
         }
 
         /**
-         * Provider must call this method when new message received.
+         * Receiver must call this method when new message received.
          *
          * @param providerName Name of provider from what message received.
          * @param extras       Message extras.
          * @throws OPFPushException When call this method when registration not done
          *                          or {@code providerName} isn't current registered provider.
          */
-        public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
+        public void onMessage(@NonNull final String providerName,
+                              @Nullable final Bundle extras) {
             checkProviderWorking(providerName);
 
-            LOGD("onMessageReceive(providerName = %s).", providerName);
-            if (mMessageListener != null) {
-                mMessageListener.onMessageReceive(providerName, extras);
-            }
-        }
-
-        private void checkProviderWorking(String providerName) {
-            checkInitDone();
-
-            if (!isRegistered()) {
-                throw new OPFPushException("Can't receive message when not registered.");
-            }
-            if (mCurrentProvider != null
-                    && !providerName.equalsIgnoreCase(mCurrentProvider.getName())) {
-                throw new OPFPushException("Can't receive message from not registered provider. "
-                        + "Current provider '%s', message source ='%s'",
-                        mCurrentProvider.getName(), providerName);
-            }
+            LOGD("onMessage(providerName = %s).", providerName);
+            eventListener.onMessage(providerName, extras);
         }
 
         /**
-         * Provider must call this method when new message deleted.
+         * Receiver must call this method when new message deleted.
          *
          * @param providerName  Name of provider from what message deleted.
          * @param messagesCount Deleted messages count. If messages count is unknown pass -1.
          * @throws OPFPushException When call this method when registration not done
          *                          or {@code providerName} isn't current registered provider.
          */
-        public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
+        public void onDeletedMessages(@NonNull final String providerName,
+                                      final int messagesCount) {
             checkProviderWorking(providerName);
 
             LOGD("onDeletedMessages(providerName = %s, messagesCount = %d).", providerName, messagesCount);
-            if (mMessageListener != null) {
-                mMessageListener.onDeletedMessages(providerName, messagesCount);
+            eventListener.onDeletedMessages(providerName, messagesCount);
+        }
+
+        /**
+         * Receiver must call this method when a registration request succeeds.
+         *
+         * @param providerName   Name of provider that was registered.
+         * @param registrationId The new registration ID for the instance of your app.
+         */
+        public void onRegistered(@NonNull final String providerName,
+                                 @NonNull final String registrationId) {
+            synchronized (registrationLock) {
+                final Backoff backoff = options.getBackoff();
+                if (backoff != null) {
+                    backoff.reset();
+                }
+
+                LOGI("Successfully register provider '%s'.", providerName);
+                LOGI("Register id '%s'.", registrationId);
+                settings.saveState(STATE_REGISTERED);
+                settings.saveLastAndroidId(ANDROID_ID);
+
+                currentProvider = getProviderWithException(providerName);
+                settings.saveLastProvider(currentProvider);
+
+                Assert.assertNotNull(registrationId);
+                eventListener.onRegistered(providerName, registrationId);
+
+                packageReceiver =
+                        PackageUtils.registerPackageChangeReceiver(appContext, currentProvider);
             }
         }
 
         /**
-         * Call this method on new registration or unregistration result.
+         * Receiver must call this method on successful unregistration.
          *
-         * @param result Registration or unregistration result.
-         * @throws OPFPushException When result type can't be handle
-         *                          in current state of {@code OpenPushHelper}.
+         * @param providerName      Name of provider that was unregistered.
+         * @param oldRegistrationId The registration ID for the instance of your app that is now unregistered.
          */
-        public void onResult(@NonNull Result result) {
-            synchronized (mRegistrationLock) {
-                final int state = mSettings.getState();
-                if (canHandleResult(result, state)) {
-                    switch (result.getType()) {
-                        case REGISTRATION:
-                            onRegistrationResult(result);
-                            return;
+        public void onUnregistered(@NonNull final String providerName,
+                                   @Nullable final String oldRegistrationId) {
+            synchronized (registrationLock) {
+                LOGI("Successfully unregister provider '%s'.", providerName);
+                settings.clear();
+                currentProvider = null;
+                Assert.assertNotNull(oldRegistrationId);
+                eventListener.onUnregistered(providerName, oldRegistrationId);
+            }
+        }
 
-                        case UNREGISTRATION:
-                            onUnregistrationResult(result);
-                            return;
+        /**
+         * Receiver must call this method when a registration request fails.
+         *
+         * @param providerName Name of provider the registration of which caused the error.
+         * @param error        Instance of occurred error.
+         */
+        public void onRegistrationError(@NonNull final String providerName,
+                                        @NonNull final Error error) {
+            synchronized (registrationLock) {
+                Assert.assertNotNull(error);
 
-                        case UNKNOWN:
-                            switch (state) {
-                                case STATE_REGISTERING:
-                                    onRegistrationResult(result);
-                                    return;
+                LOGI("Error register provider '%s'.", providerName);
+                final PushProvider provider = getProviderWithException(providerName);
 
-                                case STATE_UNREGISTERING:
-                                    onUnregistrationResult(result);
-                                    return;
-                            }
-                            throw new OPFPushException("Result not handled.");
-                    }
-
+                final Backoff backoff = options.getBackoff();
+                if (error == Error.SERVICE_NOT_AVAILABLE
+                        && backoff != null && backoff.hasTries()) {
+                    postRetryRegister(providerName);
                 } else {
-                    throw new IllegalStateException("Result can't be handle.");
+                    if (backoff != null) {
+                        backoff.reset();
+                    }
+                    registerNextProvider(provider);
+                }
+
+                eventListener.onRegistrationError(providerName, error);
+            }
+        }
+
+        /**
+         * Receiver must call this method when a unregistration request fails.
+         *
+         * @param providerName Name of provider the unregistration of which caused the error.
+         * @param error        Instance of occurred error.
+         */
+        public void onUnregistrationError(@NonNull final String providerName,
+                                          @NonNull final Error error) {
+            synchronized (registrationLock) {
+                settings.saveState(STATE_REGISTERED);
+                Assert.assertNotNull(error);
+
+                LOGI("Error unregister provider '%s'.", providerName);
+                eventListener.onUnregistrationError(providerName, error);
+            }
+        }
+
+        /**
+         * Receiver must call this method when the error occurred by unknown reason.
+         *
+         * @param providerName Name of provider the registration or unregistration of which caused the error.
+         * @param error        Instance of occurred error.
+         */
+        public void onError(@NonNull final String providerName, @NonNull final Error error) {
+            synchronized (registrationLock) {
+                final int state = settings.getState();
+                switch (state) {
+                    case STATE_REGISTERING:
+                        onRegistrationError(providerName, error);
+                        return;
+
+                    case STATE_UNREGISTERING:
+                        onUnregistrationError(providerName, error);
+                        return;
+
+                    default:
+                        throw new IllegalStateException("Result can't be handle.");
                 }
             }
         }
 
-        private void onUnregistrationResult(@NonNull Result result) {
-            if (result.isSuccess()) {
-                LOGI("Successfully unregister provider '%s'.", result.getProviderName());
-                mSettings.clear();
-                mCurrentProvider = null;
-                if (mListener != null) {
-                    Assert.assertNotNull(result.getRegistrationId());
-                    mListener.onUnregistered(result.getProviderName(), result.getRegistrationId());
-                }
-            } else if (mListener != null) {
-                mSettings.saveState(STATE_REGISTERED);
-                Assert.assertNotNull(result.getError());
+        private void checkProviderWorking(final String providerName) {
+            checkInitDone();
 
-                LOGI("Error unregister provider '%s'.", result.getProviderName());
-                mListener.onUnregistrationError(result.getProviderName(), result.getError());
+            if (!isRegistered()) {
+                throw new OPFPushException("Can't receive message when not registered.");
             }
-        }
-
-        private void onRegistrationResult(@NonNull Result result) {
-            if (result.isSuccess()) {
-                onRegistrationSuccess(result);
-            } else {
-                onRegistrationError(result);
+            if (currentProvider != null
+                    && !providerName.equalsIgnoreCase(currentProvider.getName())) {
+                throw new OPFPushException("Can't receive message from not registered provider. "
+                        + "Current provider '%s', message source ='%s'",
+                        currentProvider.getName(), providerName);
             }
-        }
-
-        private void onRegistrationError(@NonNull Result result) {
-            Assert.assertNotNull(result.getError());
-
-            LOGI("Error register provider '%s'.", result.getProviderName());
-            PushProvider provider = getProviderWithException(result.getProviderName());
-            if (mListener != null) {
-                mListener.onRegistrationError(provider.getName(), result.getError());
-            }
-
-            final Backoff backoff = mOptions.getBackoff();
-            if (result.getError() == Error.SERVICE_NOT_AVAILABLE
-                    && backoff != null && backoff.hasTries()) {
-                postRetryRegister(provider.getName());
-            } else {
-                if (backoff != null) {
-                    backoff.reset();
-                }
-                registerNextProvider(provider);
-            }
-        }
-
-        private void onRegistrationSuccess(Result result) {
-            final Backoff backoff = mOptions.getBackoff();
-            if (backoff != null) {
-                backoff.reset();
-            }
-
-            LOGI("Successfully register provider '%s'.", result.getProviderName());
-            LOGI("Register id '%s'.", result.getRegistrationId());
-            mSettings.saveState(STATE_REGISTERED);
-            mSettings.saveLastAndroidId(android.provider.Settings.Secure.ANDROID_ID);
-
-            mCurrentProvider = getProviderWithException(result.getProviderName());
-            mSettings.saveLastProvider(mCurrentProvider);
-            Assert.assertNotNull(result.getRegistrationId());
-            if (mListener != null) {
-                mListener.onRegistered(result.getProviderName(), result.getRegistrationId());
-            }
-
-            mPackageReceiver =
-                    PackageUtils.registerPackageChangeReceiver(mAppContext, mCurrentProvider);
         }
     }
+
 
     /**
      * Wrapper for execute all method on main thread.
      *
      * @author Kirill Rozov
+     * @author Roman Savin
      * @since 24.09.14.
      */
     private static class EventListenerWrapper implements EventListener {
         private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-        private final EventListener mListener;
+        private final EventListener listener;
 
         EventListenerWrapper(EventListener listener) {
-            mListener = listener;
+            this.listener = listener;
+        }
+
+        @Override
+        public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onMessage(providerName, extras);
+                }
+            });
+        }
+
+        @Override
+        public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onDeletedMessages(providerName, messagesCount);
+                }
+            });
         }
 
         @Override
@@ -772,7 +772,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onRegistered(providerName, registrationId);
+                    listener.onRegistered(providerName, registrationId);
                 }
             });
 
@@ -783,7 +783,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onRegistrationError(providerName, error);
+                    listener.onRegistrationError(providerName, error);
                 }
             });
 
@@ -795,7 +795,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onUnregistrationError(providerName, error);
+                    listener.onUnregistrationError(providerName, error);
                 }
             });
         }
@@ -805,7 +805,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onNoAvailableProvider();
+                    listener.onNoAvailableProvider();
                 }
             });
         }
@@ -816,7 +816,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onUnregistered(providerName, registrationId);
+                    listener.onUnregistered(providerName, registrationId);
                 }
             });
         }
@@ -826,7 +826,7 @@ public final class OPFPushHelper {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
-                    mListener.onProviderBecameUnavailable(providerName);
+                    listener.onProviderBecameUnavailable(providerName);
                 }
             });
         }

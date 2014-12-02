@@ -16,7 +16,6 @@
 
 package org.onepf.opfpush;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -473,27 +472,21 @@ public class OPFPushHelperTest {
     public void testSendRegistrationResult_RegistrationRunning() throws Exception {
         OPFPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.getProviderCallback().onResult(
-                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
-        );
+        helper.getReceivedMessageHandler().onRegistered(MockPushProvider.DEFAULT_NAME, "testId");
     }
 
     @Test(expected = OPFPushException.class)
     public void testSendResultWithNonExistenProvider_RegistrationRunning() throws Exception {
         OPFPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.getProviderCallback().onResult(
-                Result.success("123123123", "testId", Result.Type.REGISTRATION)
-        );
+        helper.getReceivedMessageHandler().onRegistered("123123123", "testId");
     }
 
     @Test(expected = IllegalStateException.class)
     public void testSendUnregistrationResult_RegistrationRunning() throws Exception {
         OPFPushHelper helper = createHelperWithInfinityRegisterProvider();
         helper.register();
-        helper.getProviderCallback().onResult(
-                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
-        );
+        helper.getReceivedMessageHandler().onUnregistered(MockPushProvider.DEFAULT_NAME, "testId");
     }
 
     @Test(expected = IllegalStateException.class)
@@ -501,9 +494,7 @@ public class OPFPushHelperTest {
         OPFPushHelper helper = createHelperWithInfinityUnregisterProvider();
         helper.register();
         helper.unregister();
-        helper.getProviderCallback().onResult(
-                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.REGISTRATION)
-        );
+        helper.getReceivedMessageHandler().onRegistered(MockPushProvider.DEFAULT_NAME, "testId");
     }
 
     @Test
@@ -511,9 +502,7 @@ public class OPFPushHelperTest {
         OPFPushHelper helper = createHelperWithInfinityUnregisterProvider();
         helper.register();
         helper.unregister();
-        helper.getProviderCallback().onResult(
-                Result.success(MockPushProvider.DEFAULT_NAME, "testId", Result.Type.UNREGISTRATION)
-        );
+        helper.getReceivedMessageHandler().onUnregistered(MockPushProvider.DEFAULT_NAME, "testId");
     }
 
     @Test(expected = OPFPushException.class)

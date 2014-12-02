@@ -25,7 +25,6 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 import org.onepf.opfpush.Error;
 import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.Result;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -55,7 +54,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onMessage(@NonNull Intent intent) {
         OPFPushHelper.getInstance(this)
-                .getProviderCallback().onMessage(ADMProvider.NAME, intent.getExtras());
+                .getReceivedMessageHandler().onMessage(ADMProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -71,8 +70,26 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull String registrationId) {
         //TODO Send registration id.
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.REGISTRATION));
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistered(ADMProvider.NAME, registrationId);
+    }
+
+    /**
+     * Called ç. This method may be called in response to your app
+     * calling startUnregister() or if ADM has unregistered the app for some reason (typically
+     * because the device has lost its association with a user's Amazon account).
+     * If this message is called, your app should notify your components that are using ADM
+     * to send messages, so that they know this instance of your app is no longer a valid recipient.
+     *
+     * @param registrationId The registration ID for the instance of your app that is now unregistered.
+     *                       This ID is no longer a valid destination for messages.
+     *                       Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
+     *                       will show the registration ID for an unregistered app as {@code null}.
+     */
+    @Override
+    protected void onUnregistered(@NonNull String registrationId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onUnregistered(ADMProvider.NAME, registrationId);
     }
 
     /**
@@ -89,30 +106,8 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
         final Error error = convertError(errorId);
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(
-                        Result.error(ADMProvider.NAME,
-                                error,
-                                Result.Type.REGISTRATION)
-                );
-    }
-
-    /**
-     * Called on successful unregistration. This method may be called in response to your app
-     * calling startUnregister() or if ADM has unregistered the app for some reason (typically
-     * because the device has lost its association with a user's Amazon account).
-     * If this message is called, your app should notify your components that are using ADM
-     * to send messages, so that they know this instance of your app is no longer a valid recipient.
-     *
-     * @param registrationId The registration ID for the instance of your app that is now unregistered.
-     *                       This ID is no longer a valid destination for messages.
-     *                       Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
-     *                       will show the registration ID for an unregistered app as {@code null}.
-     */
-    @Override
-    protected void onUnregistered(@NonNull String registrationId) {
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(Result.success(ADMProvider.NAME, registrationId, Result.Type.UNREGISTRATION));
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistrationError(ADMProvider.NAME, error);
     }
 
     @NonNull

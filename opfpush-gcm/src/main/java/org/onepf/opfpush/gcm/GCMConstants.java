@@ -20,18 +20,22 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
  * @author Kirill Rozov
+ * @author Roamn Savin
  * @since 06.09.14.
  */
-//CHECKSTYLE:OFF
-interface GCMConstants {
-    String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
-    String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
-    String ACTION_UNREGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.UNREGISTRATION";
+public final class GCMConstants {
 
-    String EXTRA_ERROR_ID = "error_id";
-    String EXTRA_REGISTRATION_ID = "registration_id";
+    private GCMConstants() {
+        throw new UnsupportedOperationException();
+    }
 
-    String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
-    String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
+    public static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
+    public static final String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
+    public static final String ACTION_UNREGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.UNREGISTRATION";
+
+    public static final String EXTRA_ERROR_ID = "error_id";
+    public static final String EXTRA_REGISTRATION_ID = "registration_id";
+
+    public static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+    public static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 }
-//CHECKSTYLE:ON

@@ -18,13 +18,14 @@ package org.onepf.opfpush.gcm;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.Error;
 import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.Result;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -32,6 +33,8 @@ import org.onepf.opfpush.Result;
  * partial wake lock for this service while the service does its work. When the
  * service is finished, it calls {@code completeWakefulIntent()} to release the
  * wake lock.
+ *
+ * @author Roman Savin
  */
 public class GCMService extends IntentService {
 
@@ -46,7 +49,7 @@ public class GCMService extends IntentService {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
                 @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
-                onError(errorId, action);
+                onRegistrationError(errorId);
             } else {
                 onRegistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
@@ -54,12 +57,12 @@ public class GCMService extends IntentService {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
                 @GCMError String errorId
                         = intent.getStringExtra(GCMConstants.EXTRA_ERROR_ID);
-                onError(errorId, action);
+                onUnregistrationError(errorId);
             } else {
                 onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
         } else if (intent.getExtras() != null) {
-            String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
+            final String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
                 onDeletedMessages();
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
@@ -69,18 +72,37 @@ public class GCMService extends IntentService {
         GCMReceiver.completeWakefulIntent(intent);
     }
 
-    protected void onDeletedMessages() {
-        OPFPushHelper.getInstance(GCMService.this).getProviderCallback()
-                .onDeletedMessages(GCMProvider.NAME, OPFPushHelper.MESSAGES_COUNT_UNKNOWN);
-    }
-
-    private void onMessage(final Intent intent) {
-        OPFPushHelper.getInstance(GCMService.this).getProviderCallback()
+    private void onMessage(@NonNull final Intent intent) {
+        OPFPushHelper.getInstance(GCMService.this).getReceivedMessageHandler()
                 .onMessage(GCMProvider.NAME, intent.getExtras());
     }
 
-    private void onError(@GCMError String errorId,
-                         @GCMAction String action) {
+    private void onDeletedMessages() {
+        OPFPushHelper.getInstance(GCMService.this).getReceivedMessageHandler()
+                .onDeletedMessages(GCMProvider.NAME, OPFPushHelper.MESSAGES_COUNT_UNKNOWN);
+    }
+
+    private void onRegistered(@NonNull final String registrationId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistered(GCMProvider.NAME, registrationId);
+    }
+
+    private void onUnregistered(@Nullable final String oldRegistrationToken) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onUnregistered(GCMProvider.NAME, oldRegistrationToken);
+    }
+
+    private void onRegistrationError(@NonNull @GCMError final String errorId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistrationError(GCMProvider.NAME, convertError(errorId));
+    }
+
+    private void onUnregistrationError(@NonNull @GCMError final String errorId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onUnregistrationError(GCMProvider.NAME, convertError(errorId));
+    }
+
+    private Error convertError(@NonNull @GCMError final String errorId) {
         final Error error;
         if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
             error = Error.SERVICE_NOT_AVAILABLE;
@@ -90,29 +112,6 @@ public class GCMService extends IntentService {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
 
-        if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
-            OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                    Result.error(GCMProvider.NAME,
-                            error,
-                            Result.Type.REGISTRATION)
-            );
-        } else if (GCMConstants.ACTION_UNREGISTRATION_CALLBACK.equals(action)) {
-            OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                    Result.error(GCMProvider.NAME, error, Result.Type.UNREGISTRATION)
-            );
-        } else {
-            throw new OPFPushException(String.format("Unknown action '%s'.", action));
-        }
+        return error;
     }
-
-    private void onRegistered(final String registrationToken) {
-        OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                Result.success(GCMProvider.NAME, registrationToken, Result.Type.REGISTRATION));
-    }
-
-    private void onUnregistered(final String oldRegistrationToken) {
-        OPFPushHelper.getInstance(GCMService.this).getProviderCallback().onResult(
-                Result.success(GCMProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
-    }
-
 }

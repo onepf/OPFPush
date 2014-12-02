@@ -29,6 +29,8 @@ import static org.onepf.opfpush.OPFPushLog.LOGD;
 
 /**
  * Receiver for events from Google Cloud Messaging and {@link GCMProvider}.
+ *
+ * @author Roman Savin
  */
 public class GCMReceiver extends WakefulBroadcastReceiver {
 
@@ -36,7 +38,7 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         LOGD(Utils.toString(intent));
         if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
-            Bundle extras = intent.getExtras();
+            final Bundle extras = intent.getExtras();
             if (extras.size() == 1 && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
                 intent.setAction(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             } else {

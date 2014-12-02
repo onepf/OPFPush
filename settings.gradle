@@ -15,4 +15,4 @@
  */
 
 include ':opfpush', ':opfpush-gcm', ':opfpush-nokia', ':opfpush-adm'
-include ':samples:simple_listener', ':samples:gcm_migrate_sample'
+//include ':samples:simple_listener', ':samples:gcm_migrate_sample'

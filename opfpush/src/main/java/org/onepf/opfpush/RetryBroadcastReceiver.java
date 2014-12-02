@@ -31,8 +31,8 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
         final OPFPushHelper helper = OPFPushHelper.getInstance(context);
         if (helper.isInitDone()) {
             final String action = intent.getAction();
-            if (Constants.ACTION_REGISTER.equals(action)) {
-                helper.register(intent.getStringExtra(Constants.EXTRA_PROVIDER_NAME));
+            if (OPFConstants.ACTION_REGISTER.equals(action)) {
+                helper.register(intent.getStringExtra(OPFConstants.EXTRA_PROVIDER_NAME));
             } else {
                 throw new OPFPushException("Unknown action '%s'.", action);
             }

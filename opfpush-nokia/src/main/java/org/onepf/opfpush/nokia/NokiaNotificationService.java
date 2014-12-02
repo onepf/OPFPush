@@ -26,18 +26,44 @@ import com.nokia.push.PushConstants;
 import org.onepf.opfpush.Error;
 import org.onepf.opfpush.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.Result;
 
 /**
  * Service for handling communication from Nokia Push Notifications service.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 05.09.2014
  */
 public class NokiaNotificationService extends PushBaseIntentService {
 
     public NokiaNotificationService() {
         super("Nokia Push Client"); //Passed name will use as Thread name;
+    }
+
+    /**
+     * Called after a device has been registered.
+     *
+     * @param appContext     Application's context.
+     * @param registrationId The registration id returned by the Push Notifications service.
+     */
+    @Override
+    protected void onRegistered(@NonNull Context appContext,
+                                @NonNull String registrationId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistered(NokiaNotificationsProvider.NAME, registrationId);
+    }
+
+    /**
+     * Called after a device has been unregistered.
+     *
+     * @param appContext        Application's context.
+     * @param oldRegistrationId the registration id that was previously registered.
+     */
+    @Override
+    protected void onUnregistered(@NonNull Context appContext,
+                                  @NonNull String oldRegistrationId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onUnregistered(NokiaNotificationsProvider.NAME, oldRegistrationId);
     }
 
     /**
@@ -48,23 +74,8 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onMessage(@NonNull Context appContext, Intent intent) {
-        OPFPushHelper.getInstance(this).getProviderCallback().onMessage(NokiaNotificationsProvider.NAME, intent.getExtras());
-    }
-
-    /**
-     * Called on registration or unregistration error.
-     *
-     * @param appContext Application's context.
-     * @param errorId    Error id returned by the Push Notifications service.
-     */
-    @Override
-    protected void onError(@NonNull Context appContext, String errorId) {
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(
-                        Result.error(NokiaNotificationsProvider.NAME,
-                                convertError(errorId),
-                                Result.Type.UNKNOWN)
-                );
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onMessage(NokiaNotificationsProvider.NAME, intent.getExtras());
     }
 
     /**
@@ -76,8 +87,21 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onDeletedMessages(@NonNull Context appContext, int total) {
-        OPFPushHelper.getInstance(this).getProviderCallback()
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onDeletedMessages(NokiaNotificationsProvider.NAME, total);
+    }
+
+    /**
+     * Called on registration or unregistration error.
+     *
+     * @param appContext Application's context.
+     * @param errorId    Error id returned by the Push Notifications service.
+     */
+    @Override
+    protected void onError(@NonNull Context appContext,
+                           @NonNull @NokiaNotificationsError String errorId) {
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onError(NokiaNotificationsProvider.NAME, convertError(errorId));
     }
 
     /**
@@ -89,16 +113,12 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param errorId    Error id returned by the Push Notifications service.
      * @return If true, failed operation will be retried (using exponential backoff).
      */
+    //TODO return true if registration will be retried.
     @Override
     protected boolean onRecoverableError(@NonNull Context appContext,
                                          @NonNull @NokiaNotificationsError String errorId) {
-        Error error = convertError(errorId);
-        OPFPushHelper.getInstance(this).getProviderCallback()
-                .onResult(
-                        Result.error(NokiaNotificationsProvider.NAME,
-                                error,
-                                Result.Type.REGISTRATION)
-                );
+        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+                .onRegistrationError(NokiaNotificationsProvider.NAME, convertError(errorId));
         return false;
     }
 
@@ -113,31 +133,5 @@ public class NokiaNotificationService extends PushBaseIntentService {
         } else {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
-    }
-
-    /**
-     * Called after a device has been registered.
-     *
-     * @param appContext        Application's context.
-     * @param registrationToken The registration id returned by the Push Notifications service.
-     */
-    @Override
-    protected void onRegistered(@NonNull Context appContext,
-                                @NonNull String registrationToken) {
-        OPFPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.success(NokiaNotificationsProvider.NAME, registrationToken, Result.Type.REGISTRATION));
-    }
-
-    /**
-     * Called after a device has been unregistered.
-     *
-     * @param appContext           Application's context.
-     * @param oldRegistrationToken the registration id that was previously registered.
-     */
-    @Override
-    protected void onUnregistered(@NonNull Context appContext,
-                                  @NonNull String oldRegistrationToken) {
-        OPFPushHelper.getInstance(this).getProviderCallback().onResult(
-                Result.success(NokiaNotificationsProvider.NAME, oldRegistrationToken, Result.Type.UNREGISTRATION));
     }
 }

@@ -18,12 +18,16 @@ package org.onepf.opfpush;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 02.10.14.
  */
-//CHECKSTYLE:OFF
-interface Constants {
-    String EXTRA_PROVIDER_NAME = "provider_name";
+public final class OPFConstants {
 
-    String ACTION_REGISTER = BuildConfig.APPLICATION_ID + "intent.REGISTER";
+    private OPFConstants() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static final String EXTRA_PROVIDER_NAME = "provider_name";
+
+    public static final String ACTION_REGISTER = BuildConfig.APPLICATION_ID + "intent.REGISTER";
 }
-//CHECKSTYLE:ON
