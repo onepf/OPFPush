@@ -256,6 +256,7 @@ public final class OPFPushHelper {
                     }
                 }
             } else {
+                LOGI("Last provider is unavailable");
                 settings.saveLastProvider(null);
                 settings.saveState(STATE_UNREGISTERED);
 
@@ -310,6 +311,7 @@ public final class OPFPushHelper {
                     break;
 
                 case STATE_UNREGISTERING:
+                    //FIXME: Maybe better throw checked exception?
                     throw new OPFPushException("Can't register while unregistration is running.");
 
                 case STATE_REGISTERED:
@@ -413,6 +415,7 @@ public final class OPFPushHelper {
                     break;
 
                 case STATE_REGISTERING:
+                    //FIXME: Maybe better throw checked exception?
                     throw new OPFPushException("Can't unregister when registration in progress.!");
 
                 case STATE_UNREGISTERED:
@@ -607,6 +610,11 @@ public final class OPFPushHelper {
         public void onRegistered(@NonNull final String providerName,
                                  @NonNull final String registrationId) {
             synchronized (registrationLock) {
+                if (!isRegistering()) {
+                    //FIXME: maybe better send checked exception
+                    throw new IllegalStateException("Result can't be handle.");
+                }
+
                 final Backoff backoff = options.getBackoff();
                 if (backoff != null) {
                     backoff.reset();
@@ -637,6 +645,11 @@ public final class OPFPushHelper {
         public void onUnregistered(@NonNull final String providerName,
                                    @Nullable final String oldRegistrationId) {
             synchronized (registrationLock) {
+                if (!isUnregistering()) {
+                    //FIXME: maybe better send checked exception
+                    throw new IllegalStateException("Result can't be handle.");
+                }
+
                 LOGI("Successfully unregister provider '%s'.", providerName);
                 settings.clear();
                 currentProvider = null;
@@ -654,6 +667,11 @@ public final class OPFPushHelper {
         public void onRegistrationError(@NonNull final String providerName,
                                         @NonNull final Error error) {
             synchronized (registrationLock) {
+                if (!isRegistering()) {
+                    //FIXME: maybe better send checked exception
+                    throw new IllegalStateException("Result can't be handle.");
+                }
+
                 Assert.assertNotNull(error);
 
                 LOGI("Error register provider '%s'.", providerName);
@@ -683,6 +701,11 @@ public final class OPFPushHelper {
         public void onUnregistrationError(@NonNull final String providerName,
                                           @NonNull final Error error) {
             synchronized (registrationLock) {
+                if (!isUnregistering()) {
+                    //FIXME: maybe better send checked exception
+                    throw new IllegalStateException("Result can't be handle.");
+                }
+
                 settings.saveState(STATE_REGISTERED);
                 Assert.assertNotNull(error);
 
@@ -710,6 +733,7 @@ public final class OPFPushHelper {
                         return;
 
                     default:
+                        //FIXME: maybe better send checked exception
                         throw new IllegalStateException("Result can't be handle.");
                 }
             }

@@ -20,7 +20,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
+import org.onepf.opfpush.listener.TestEventListener;
+import org.onepf.opfpush.mock.MockPushProvider;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -28,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by krozov on 09.09.14.
+ * @author Kirill Rozov
+ * @author Roman Savin
+ * @since 11.09.14.
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -36,34 +39,43 @@ public class OptionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderTwiceAddProvider() {
-        Options.Builder builder = new Options.Builder();
-        PushProvider provider = new MockPushProvider();
+        final Options.Builder builder = new Options.Builder();
+        final PushProvider provider = new MockPushProvider();
         builder.addProviders(provider);
         builder.addProviders(provider);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderAddProviderWithSameName() {
-        Options.Builder builder = new Options.Builder();
+        final Options.Builder builder = new Options.Builder();
         builder.addProviders(new MockPushProvider());
         builder.addProviders(new MockPushProvider());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuildWithoutEventListener() {
+        new Options.Builder()
+                .addProviders(new MockPushProvider())
+                .build();
+    }
+
+    @Test
     public void testBuilderProviderOrder() {
-        Options.Builder builder = new Options.Builder();
-        PushProvider[] providers = {
+        final Options.Builder builder = new Options.Builder();
+        final PushProvider[] providers = {
                 new MockPushProvider("provider1"),
                 new MockPushProvider("provider2"),
                 new MockPushProvider("provider3"),
                 new MockPushProvider("provider4")
         };
         builder.addProviders(providers);
-        Options options = builder.build();
+        builder.setEventListener(new TestEventListener());
+        final Options options = builder.build();
 
-        List<PushProvider> optionsProviders = options.getProviders();
+        final List<PushProvider> optionsProviders = options.getProviders();
         Assert.assertEquals(providers.length, optionsProviders.size());
         for (int i = 0; i < providers.length; i++) {
-            PushProvider provider = optionsProviders.get(i);
+            final PushProvider provider = optionsProviders.get(i);
             Assert.assertNotNull(provider);
             Assert.assertEquals(providers[i].getName(), provider.getName());
             Assert.assertEquals(providers[i], provider);
@@ -77,28 +89,31 @@ public class OptionsTest {
 
     @Test
     public void testOptionsBuild() {
-        Options.Builder builder = new Options.Builder();
-        builder.addProviders(new MockPushProvider());
+        final Options.Builder builder = new Options.Builder();
+        final Options options = builder
+                .addProviders(new MockPushProvider())
+                .setEventListener(new TestEventListener())
+                .build();
 
-        Options options = builder.build();
         Assert.assertEquals(1, options.getProviders().size());
         Assert.assertEquals(MockPushProvider.class, options.getProviders().get(0).getClass());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testUnmodifiableProviders() {
-        Options.Builder builder = new Options.Builder();
-        ArrayList<PushProvider> providers = new ArrayList<PushProvider>(1);
-        final MockPushProvider mockPushProvider = new MockPushProvider();
+        final Options.Builder builder = new Options.Builder();
+        final List<PushProvider> providers = new ArrayList<PushProvider>(1);
+        final MockPushProvider mockPushProvider = new MockPushProvider("provider1");
         providers.add(mockPushProvider);
         builder.addProviders(providers);
+        builder.setEventListener(new TestEventListener());
 
-        Options options = builder.build();
+        final Options options = builder.build();
         Assert.assertNotNull(options.getProviders());
         Assert.assertNotSame(providers, options.getProviders());
         Assert.assertEquals(1, options.getProviders().size());
         Assert.assertSame(mockPushProvider, options.getProviders().get(0));
 
-        options.getProviders().add(null);
+        options.getProviders().add(new MockPushProvider("provider2"));
     }
 }

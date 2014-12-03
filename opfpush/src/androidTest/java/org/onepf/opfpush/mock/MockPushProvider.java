@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.mock;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.OPFPushHelper;
 import org.robolectric.Robolectric;
 
 import java.util.UUID;
 
 /**
-* @author Kirill Rozov
-* @since 10/9/14.
-*/
+ * @author Kirill Rozov
+ * @author Roman Savin
+ * @since 10/9/14.
+ */
 public class MockPushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
     public static final String DEFAULT_NAME = MockPushProvider.class.getName();
-    private String mRegistrationId;
-    private boolean mCheckAvailability = true;
+    private String registrationId;
+    private boolean isTestAvailable = true;
 
     public MockPushProvider() {
         this(DEFAULT_NAME);
@@ -46,8 +49,8 @@ public class MockPushProvider extends BasePushProvider {
         this(name, DEFAULT_HOST_APP_PACKAGE, checkAvailability);
     }
 
-    public MockPushProvider(boolean checkAvailability) {
-        this(DEFAULT_NAME, DEFAULT_HOST_APP_PACKAGE, checkAvailability);
+    public MockPushProvider(boolean isTestAvailable) {
+        this(DEFAULT_NAME, DEFAULT_HOST_APP_PACKAGE, isTestAvailable);
     }
 
     public MockPushProvider(@NonNull String name,
@@ -57,22 +60,22 @@ public class MockPushProvider extends BasePushProvider {
 
     public MockPushProvider(@NonNull String name,
                             @NonNull String hotAppPackage,
-                            boolean checkAvailability) {
+                            boolean isTestAvailable) {
         super(Robolectric.application, name, hotAppPackage);
-        mCheckAvailability = checkAvailability;
+        this.isTestAvailable = isTestAvailable;
     }
 
     @Override
     public void register() {
-        mRegistrationId = UUID.randomUUID().toString();
+        registrationId = UUID.randomUUID().toString();
         OPFPushHelper.getInstance(getContext()).getReceivedMessageHandler()
-                .onRegistered(getName(), mRegistrationId);
+                .onRegistered(getName(), registrationId);
     }
 
     @Override
     public void unregister() {
-        final String oldRegistrationId = mRegistrationId;
-        mRegistrationId = null;
+        final String oldRegistrationId = registrationId;
+        registrationId = null;
         OPFPushHelper.getInstance(getContext()).getReceivedMessageHandler()
                 .onUnregistered(getName(), oldRegistrationId);
     }
@@ -81,38 +84,33 @@ public class MockPushProvider extends BasePushProvider {
      * Set need to check availability of provider.
      * If availability don't check {@link #isAvailable()} always return {@code false}.
      */
-    public void setCheckAvailability(boolean checkAvailability) {
-        mCheckAvailability = checkAvailability;
+    public void setTestAvailable(boolean isTestAvailable) {
+        this.isTestAvailable = isTestAvailable;
     }
 
     @Override
     public void onRegistrationInvalid() {
-        mRegistrationId = null;
+        registrationId = null;
     }
 
     @Override
     public void onUnavailable() {
-        mRegistrationId = null;
+        registrationId = null;
     }
 
     @Override
     public boolean isAvailable() {
-        return mCheckAvailability && super.isAvailable();
+        return isTestAvailable && super.isAvailable();
     }
 
     @Override
     public boolean isRegistered() {
-        return mRegistrationId != null;
+        return registrationId != null;
     }
 
     @Nullable
     @Override
     public String getRegistrationId() {
-        return mRegistrationId;
-    }
-
-    @Override
-    public boolean checkManifest() {
-        return true;
+        return registrationId;
     }
 }

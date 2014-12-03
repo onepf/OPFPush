@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 02.10.14.
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
@@ -38,7 +39,8 @@ public class ExponentialBackoffTest {
     @Test
     public void testDelay() throws Exception {
         final int backoffTryCount = 6;
-        ExponentialBackoff backoff = new ExponentialBackoff(backoffTryCount);
+        final Backoff backoff = new ExponentialBackoff(backoffTryCount);
+
         int tryCount = 0;
         for (int expectedDelay = 2000; backoff.hasTries(); expectedDelay *= 2) {
             tryCount++;
@@ -55,10 +57,24 @@ public class ExponentialBackoffTest {
     @Test(expected = NoSuchElementException.class)
     public void test() throws Exception {
         int tryCount = 1;
-        ExponentialBackoff backoff = new ExponentialBackoff(tryCount);
+        final ExponentialBackoff backoff = new ExponentialBackoff(tryCount);
         for (int i = 0; i <= tryCount; i++) {
             backoff.hasTries();
             backoff.getTryDelay();
         }
+    }
+
+    @Test
+    public void testSummaryDelay() {
+        final int backoffTryCount = 3;
+        final ExponentialBackoff exponentialBackoff = new ExponentialBackoff(backoffTryCount);
+
+        int summaryDelay = 0;
+        for (int expectedDelay = 2000; exponentialBackoff.hasTries(); expectedDelay *= 2) {
+            summaryDelay += expectedDelay;
+            exponentialBackoff.getTryDelay();
+        }
+
+        Assert.assertEquals(summaryDelay, exponentialBackoff.summaryDelay());
     }
 }
