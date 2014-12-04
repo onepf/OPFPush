@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
+package org.onepf.opfpush.gcm.util;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 10/9/14.
  */
-public interface TestConstants {
-    String GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms";
-    String SENDER_ID = "12191132";
+public final class TestConstants {
+
+    private TestConstants() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static final String GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms";
+
+    public static final String SENDER_ID = "12191132";
+
+    public static final String REGISTRATION_ID = "123abc";
+
+    public static final String MESSAGE_EXTRA_KEY = "message";
 }

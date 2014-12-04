@@ -39,7 +39,9 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
         LOGD(Utils.toString(intent));
         if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
             final Bundle extras = intent.getExtras();
-            if (extras.size() == 1 && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
+            if (extras != null
+                    && extras.size() == 1
+                    && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
                 intent.setAction(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             } else {
                 return;

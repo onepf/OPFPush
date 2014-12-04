@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.listener;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import org.onepf.opfpush.Error;
+import org.onepf.opfpush.OPFPushHelper;
 
 /**
  * Interface definition for a callback to be invoked when event

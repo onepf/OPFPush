@@ -97,16 +97,16 @@ public final class PackageUtils {
      */
     public static BroadcastReceiver registerPackageChangeReceiver(@NonNull Context context,
                                                                   @NonNull PushProvider provider) {
-        PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
+        final PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
 
-        IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
+        final IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
         appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
         appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         context.registerReceiver(mPackageReceiver, appUpdateFilter);
 
         String hostAppPackage = provider.getHostAppPackage();
         if (hostAppPackage != null) {
-            IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+            final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
             hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
             hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
             context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);

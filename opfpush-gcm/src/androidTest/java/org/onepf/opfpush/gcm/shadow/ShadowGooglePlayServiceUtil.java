@@ -17,18 +17,15 @@
 package org.onepf.opfpush.gcm.shadow;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.onepf.opfpush.gcm.TestConstants;
-import org.onepf.opfpush.gcm.R;
+import org.onepf.opfpush.gcm.util.TestConstants;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
-import org.robolectric.annotation.RealObject;
 
 /**
  * @author Kirill Rozov

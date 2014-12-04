@@ -22,13 +22,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.gcm.shadow.ShadowGooglePlayServiceUtil;
+import org.onepf.opfpush.gcm.util.TestConstants;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -48,14 +46,14 @@ public class GCMProviderTest extends GCMProviderTestBase {
     @Test
     public void testCheckAvailable_LastGMSInstalled() throws Exception {
         addLatestGMSServiceApp();
-        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
+        final PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
         assertTrue(provider.isAvailable());
         removeGMCServiceApp();
     }
 
     @Test
     public void testCheckAvailable_NoGMS() throws Exception {
-        PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
+        final PushProvider provider = new GCMProvider(Robolectric.application, TestConstants.SENDER_ID);
         assertFalse(provider.isAvailable());
     }
 }

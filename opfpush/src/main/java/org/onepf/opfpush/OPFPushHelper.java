@@ -31,6 +31,7 @@ import android.text.TextUtils;
 
 import junit.framework.Assert;
 
+import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.util.Utils;
 
 import java.lang.annotation.Retention;

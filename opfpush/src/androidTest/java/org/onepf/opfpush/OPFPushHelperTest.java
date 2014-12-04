@@ -550,6 +550,7 @@ public class OPFPushHelperTest {
         checkProviderRegistrationState(helper, null);
     }
 
+    //TODO add tests for provider callback
     private static OPFPushHelper createHelperWithMockSenderPushProvider() {
         final Options.Builder builder = new Options.Builder()
                 .addProviders(new MockSenderPushProvider())

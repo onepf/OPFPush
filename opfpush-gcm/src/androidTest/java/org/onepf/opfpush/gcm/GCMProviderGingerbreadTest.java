@@ -20,7 +20,6 @@ import android.os.Build;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.gcm.shadow.ShadowGooglePlayServiceUtil;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
@@ -28,7 +27,7 @@ import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.onepf.opfpush.gcm.TestConstants.SENDER_ID;
+import static org.onepf.opfpush.gcm.util.TestConstants.SENDER_ID;
 
 /**
  * @author Kirill Rozov
@@ -45,7 +44,7 @@ public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
     @Test
     public void testCheckAvailable_LastGMSInstalled_NoGoogleAccount() throws Exception {
         addLatestGMSServiceApp();
-        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        final GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
         assertFalse(provider.isAvailable());
         removeGMCServiceApp();
     }
@@ -54,7 +53,7 @@ public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
     public void testCheckAvailable_LastGMSInstalled_WithGoogleAccount() throws Exception {
         addLatestGMSServiceApp();
         addGoogleAccount();
-        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        final GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
         assertTrue(provider.isAvailable());
         removeGoogleAccount();
         removeGMCServiceApp();
@@ -62,14 +61,14 @@ public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
 
     @Test
     public void testCheckAvailable_NoGMSInstalled_NoGoogleAccount() throws Exception {
-        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        final GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
         assertFalse(provider.isAvailable());
     }
 
     @Test
     public void testCheckAvailable_NoGMSInstalled_WithGoogleAccount() throws Exception {
         addGoogleAccount();
-        GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
+        final GCMProvider provider = new GCMProvider(Robolectric.application, SENDER_ID);
         assertFalse(provider.isAvailable());
         removeGoogleAccount();
     }

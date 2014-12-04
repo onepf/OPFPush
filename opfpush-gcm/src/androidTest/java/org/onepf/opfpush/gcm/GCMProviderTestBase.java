@@ -19,30 +19,36 @@ package org.onepf.opfpush.gcm;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.pm.PackageInfo;
-import android.content.res.Resources;
 import android.os.Handler;
 
 import org.junit.After;
 import org.junit.Before;
+import org.onepf.opfpush.gcm.util.TestConstants;
 import org.robolectric.Robolectric;
+import org.robolectric.shadows.ShadowLog;
 
 /**
  * @author Kirill Rozov
  * @since 10/8/14.
  */
-
 public abstract class GCMProviderTestBase {
 
     private static final Account TEST_GOOGLE_ACCOUNT
             = new Account("OnePF Test", GCMProvider.GOOGLE_ACCOUNT_TYPE);
 
+    @Before
+    public void addGooglePlayApp() {
+        ShadowLog.stream = System.out;
+        Robolectric.packageManager.addPackage(GCMProvider.GOOGLE_PLAY_APP_PACKAGE);
+    }
+
     protected static void addGoogleAccount() {
-        AccountManager accountManager = AccountManager.get(Robolectric.application);
+        final AccountManager accountManager = AccountManager.get(Robolectric.application);
         Robolectric.shadowOf(accountManager).addAccount(TEST_GOOGLE_ACCOUNT);
     }
 
     protected static void removeGoogleAccount() {
-        AccountManager accountManager = AccountManager.get(Robolectric.application);
+        final AccountManager accountManager = AccountManager.get(Robolectric.application);
         Robolectric.shadowOf(accountManager)
                 .removeAccount(TEST_GOOGLE_ACCOUNT, null, new Handler());
     }
@@ -52,7 +58,7 @@ public abstract class GCMProviderTestBase {
     }
 
     protected static void addGMSServiceApp(String versionName, int versionCode) {
-        PackageInfo packageInfo = new PackageInfo();
+        final PackageInfo packageInfo = new PackageInfo();
         packageInfo.packageName = TestConstants.GOOGLE_PLAY_SERVICES_PACKAGE;
         packageInfo.versionName = versionName;
         packageInfo.versionCode = versionCode;
@@ -60,13 +66,7 @@ public abstract class GCMProviderTestBase {
     }
 
     protected static void addLatestGMSServiceApp() {
-        Resources resources = Robolectric.application.getResources();
         addGMSServiceApp("4.0.30", 4030000);
-    }
-
-    @Before
-    public void addGooglePlayApp() {
-        Robolectric.packageManager.addPackage(GCMProvider.GOOGLE_PLAY_APP_PACKAGE);
     }
 
     @After
