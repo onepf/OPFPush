@@ -565,7 +565,7 @@ public final class OPFPushHelper {
     /**
      * Is used for handle received messages by broadcast receivers of concrete providers.
      */
-    public class ReceivedMessageHandler {
+    public final class ReceivedMessageHandler {
 
         ReceivedMessageHandler() {
         }

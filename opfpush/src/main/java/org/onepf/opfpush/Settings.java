@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
  * @author Kirill Rozov
  * @since 01.10.14.
  */
+//TODO Add timeout for storing state
 class Settings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";

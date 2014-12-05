@@ -57,6 +57,7 @@ import static org.onepf.opfpush.gcm.util.TestConstants.REGISTRATION_ID;
 public class GCMReceiverTest {
 
     private static final String ACTION_RECEIVE = "com.google.android.c2dm.intent.RECEIVE";
+    private static final String PERMISSION_SEND = "com.google.android.c2dm.permission.SEND";
 
     private GCMReceiver gcmReceiver = new GCMReceiver();
 
@@ -74,10 +75,9 @@ public class GCMReceiverTest {
         registrationUnregistrationFilter.addAction(ACTION_REGISTRATION_CALLBACK);
         registrationUnregistrationFilter.addAction(ACTION_UNREGISTRATION_CALLBACK);
 
-        final String permissionSend = "com.google.android.c2dm.permission.SEND";
-        Robolectric.application.registerReceiver(gcmReceiver, receiveFilter, permissionSend, null);
-        Robolectric.application.registerReceiver(gcmReceiver, actionRegistrationFilter, permissionSend, null);
-        Robolectric.application.registerReceiver(gcmReceiver, registrationUnregistrationFilter, permissionSend, null);
+        Robolectric.application.registerReceiver(gcmReceiver, receiveFilter, PERMISSION_SEND, null);
+        Robolectric.application.registerReceiver(gcmReceiver, actionRegistrationFilter, PERMISSION_SEND, null);
+        Robolectric.application.registerReceiver(gcmReceiver, registrationUnregistrationFilter, PERMISSION_SEND, null);
     }
 
     @Test

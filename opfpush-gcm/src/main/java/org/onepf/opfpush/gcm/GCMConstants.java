@@ -20,7 +20,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
  * @author Kirill Rozov
- * @author Roamn Savin
+ * @author Roman Savin
  * @since 06.09.14.
  */
 public final class GCMConstants {
