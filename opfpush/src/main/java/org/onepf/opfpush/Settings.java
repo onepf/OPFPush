@@ -23,50 +23,81 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.State;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.onepf.opfpush.model.State.REGISTERED;
+import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
+import static org.onepf.opfpush.model.State.UNREGISTERING;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 01.10.14.
  */
-//TODO Add timeout for storing state
+//TODO: Config timeout via options.
 class Settings {
+
+    private static final long STATE_INFINITY_TIMESTAMP = -1L;
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
+    private static final String KEY_STATE_TIMESTAMP = "state_timestamp";
 
     private static final String PREF_NAME = "org.onepf.openpush";
 
     @NonNull
-    private final SharedPreferences mPreferences;
+    private final SharedPreferences preferences;
 
     public Settings(@NonNull Context context) {
-        mPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     @NonNull
     public State getState() {
-        final int stateValue = mPreferences.getInt(KEY_STATE, UNREGISTERED.getValue());
-        final State state = State.fromValue(stateValue);
-        return state == null ? UNREGISTERED : state;
+        final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
+        State state = State.fromValue(stateValue);
+        if (state == null) {
+            state = UNREGISTERED;
+            saveState(state);
+        }
+
+        final long stateTimestamp = preferences.getLong(KEY_STATE_TIMESTAMP, STATE_INFINITY_TIMESTAMP);
+        if (stateTimestamp > TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)) {
+            if (state == REGISTERING) {
+                state = UNREGISTERED;
+                saveState(state);
+            } else if (state == UNREGISTERING) {
+                state = REGISTERED;
+                saveState(state);
+            }
+        }
+
+        return state;
     }
 
     public void saveState(@NonNull final State state) {
-        mPreferences.edit().putInt(KEY_STATE, state.getValue()).apply();
+        final long stateTimestamp = isInfinityState(state) ? STATE_INFINITY_TIMESTAMP
+                : System.currentTimeMillis();
+
+        preferences.edit()
+                .putInt(KEY_STATE, state.getValue())
+                .putLong(KEY_STATE_TIMESTAMP, stateTimestamp)
+                .apply();
     }
 
     public void clear() {
-        mPreferences.edit().clear().apply();
+        preferences.edit().clear().apply();
     }
 
     @Nullable
     public String getLastProviderName() {
-        return mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
+        return preferences.getString(KEY_LAST_PROVIDER_NAME, null);
     }
 
     public void saveLastProvider(@Nullable PushProvider provider) {
-        SharedPreferences.Editor editor = mPreferences.edit();
+        final SharedPreferences.Editor editor = preferences.edit();
         if (provider == null) {
             editor.remove(KEY_LAST_PROVIDER_NAME);
         } else {
@@ -77,16 +108,20 @@ class Settings {
 
     @Nullable
     public String getLastAndroidId() {
-        return mPreferences.getString(KEY_LAST_ANDROID_ID, null);
+        return preferences.getString(KEY_LAST_ANDROID_ID, null);
     }
 
     public void saveLastAndroidId(@Nullable String androidId) {
-        SharedPreferences.Editor editor = mPreferences.edit();
+        final SharedPreferences.Editor editor = preferences.edit();
         if (androidId == null) {
             editor.remove(KEY_LAST_ANDROID_ID);
         } else {
             editor.putString(KEY_LAST_ANDROID_ID, androidId);
         }
         editor.apply();
+    }
+
+    private boolean isInfinityState(@NonNull final State state) {
+        return state == REGISTERED || state == UNREGISTERED;
     }
 }
