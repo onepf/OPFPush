@@ -2,6 +2,8 @@ package org.onepf.opfpush;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.model.Message;
+
 /**
  * PushProvider that can send messages to server.
  *

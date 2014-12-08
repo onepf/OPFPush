@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.model;
 
 import android.os.Bundle;
 import android.os.Parcel;

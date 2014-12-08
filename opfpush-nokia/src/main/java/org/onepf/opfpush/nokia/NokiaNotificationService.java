@@ -23,8 +23,8 @@ import android.support.annotation.NonNull;
 import com.nokia.push.PushBaseIntentService;
 import com.nokia.push.PushConstants;
 
-import org.onepf.opfpush.Error;
-import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
 
 /**
@@ -113,7 +113,6 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param errorId    Error id returned by the Push Notifications service.
      * @return If true, failed operation will be retried (using exponential backoff).
      */
-    //TODO return true if registration will be retried.
     @Override
     protected boolean onRecoverableError(@NonNull Context appContext,
                                          @NonNull @NokiaNotificationsError String errorId) {
@@ -123,13 +122,13 @@ public class NokiaNotificationService extends PushBaseIntentService {
     }
 
     @NonNull
-    private static Error convertError(@NonNull @NokiaNotificationsError String errorId) {
+    private static OPFError convertError(@NonNull @NokiaNotificationsError String errorId) {
         if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return Error.INVALID_PARAMETERS;
+            return OPFError.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return Error.INVALID_PARAMETERS;
+            return OPFError.INVALID_PARAMETERS;
         } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return Error.SERVICE_NOT_AVAILABLE;
+            return OPFError.SERVICE_NOT_AVAILABLE;
         } else {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }

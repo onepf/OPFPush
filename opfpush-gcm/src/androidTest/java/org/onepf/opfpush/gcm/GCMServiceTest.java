@@ -28,10 +28,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.*;
-import org.onepf.opfpush.Error;
 import org.onepf.opfpush.gcm.mock.GCMServiceMock;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.listener.SimpleEventListener;
+import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.State;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -42,8 +43,8 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.onepf.opfpush.Error.AUTHENTICATION_FAILED;
-import static org.onepf.opfpush.Error.SERVICE_NOT_AVAILABLE;
+import static org.onepf.opfpush.model.OPFError.AUTHENTICATION_FAILED;
+import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
@@ -53,6 +54,8 @@ import static org.onepf.opfpush.gcm.GCMConstants.EXTRA_ERROR_ID;
 import static org.onepf.opfpush.gcm.GCMConstants.EXTRA_REGISTRATION_ID;
 import static org.onepf.opfpush.gcm.util.TestConstants.REGISTRATION_ID;
 import static org.onepf.opfpush.gcm.util.TestConstants.SENDER_ID;
+import static org.onepf.opfpush.model.State.REGISTERING;
+import static org.onepf.opfpush.model.State.UNREGISTERING;
 
 /**
  * @author Roman Savin
@@ -67,9 +70,6 @@ public class GCMServiceTest {
 
     private static final String PREF_NAME = "org.onepf.openpush";
     private static final String KEY_STATE = "state";
-
-    static final int STATE_REGISTERING = 1;
-    static final int STATE_UNREGISTERING = 3;
 
     @Before
     public void setup() {
@@ -88,7 +88,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertFalse(true); //Test failed because we get registration error.
                     }
@@ -119,7 +119,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertFalse(true); //Test failed because we get registration error.
                     }
@@ -149,7 +149,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(SERVICE_NOT_AVAILABLE, error);
                     }
@@ -179,7 +179,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(AUTHENTICATION_FAILED, error);
                     }
@@ -209,7 +209,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(SERVICE_NOT_AVAILABLE, error);
                     }
@@ -239,7 +239,7 @@ public class GCMServiceTest {
                     }
 
                     @Override
-                    public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
+                    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
                         LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(AUTHENTICATION_FAILED, error);
                     }
@@ -292,17 +292,17 @@ public class GCMServiceTest {
     }
 
     private void applyStateRegistering() {
-        applyState(STATE_REGISTERING);
+        applyState(REGISTERING);
     }
 
     private void applyStateUnregistering() {
-        applyState(STATE_UNREGISTERING);
+        applyState(UNREGISTERING);
     }
 
-    private void applyState(final int state) {
+    private void applyState(@NonNull final State state) {
         final Context appContext = Robolectric.getShadowApplication().getApplicationContext();
         final SharedPreferences preferences = appContext
                 .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        preferences.edit().putInt(KEY_STATE, state).apply();
+        preferences.edit().putInt(KEY_STATE, state.getValue()).apply();
     }
 }

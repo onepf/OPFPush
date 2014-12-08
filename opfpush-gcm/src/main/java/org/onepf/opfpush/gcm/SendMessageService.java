@@ -7,7 +7,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import junit.framework.Assert;
 
-import org.onepf.opfpush.Message;
+import org.onepf.opfpush.model.Message;
 
 import java.io.IOException;
 

@@ -21,6 +21,8 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.exception.OPFPushException;
+
 /**
  * Base class for create {@code PushProvider}.
  *

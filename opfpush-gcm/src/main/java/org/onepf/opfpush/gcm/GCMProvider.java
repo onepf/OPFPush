@@ -33,8 +33,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.SenderPushProvider;
-import org.onepf.opfpush.Message;
-import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.PackageUtils;
 
 import java.io.IOException;

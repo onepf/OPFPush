@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.mock;
-
-import android.support.annotation.NonNull;
-
-import org.onepf.opfpush.model.Message;
-import org.onepf.opfpush.SenderPushProvider;
+package org.onepf.opfpush.exception;
 
 /**
- * @author Roman Savin
- * @since 02.12.14
+ * Thrown when try work with OpenPush in wrong way.
+ *
+ * @author Kirill Rozov
+ * @since 05.09.14.
  */
-public class MockSenderPushProvider extends MockPushProvider implements SenderPushProvider {
+public class OPFPushException extends RuntimeException {
 
-    @Override
-    public void send(@NonNull Message msg) {
+    public OPFPushException(String detailMessage) {
+        super(detailMessage);
+    }
+
+    public OPFPushException(String messageFormat, Object... args) {
+        super(String.format(messageFormat, args));
+    }
+
+    public OPFPushException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
     }
 }

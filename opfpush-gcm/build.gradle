@@ -54,7 +54,7 @@ robolectric {
 
 dependencies {
     androidTestCompile 'org.robolectric:robolectric:2.4'
-    androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'junit:junit:4.12'
 
     compile project(':opfpush')
     //noinspection GradleDependency

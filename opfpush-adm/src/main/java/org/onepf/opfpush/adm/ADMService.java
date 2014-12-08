@@ -22,8 +22,8 @@ import android.support.annotation.NonNull;
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
-import org.onepf.opfpush.Error;
-import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
 
 /**
@@ -105,20 +105,20 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistrationError(@NonNull @ADMError String errorId) {
-        final Error error = convertError(errorId);
+        final OPFError error = convertError(errorId);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistrationError(ADMProvider.NAME, error);
     }
 
     @NonNull
-    private Error convertError(@NonNull @ADMError String errorId) {
-        final Error error;
+    private OPFError convertError(@NonNull @ADMError String errorId) {
+        final OPFError error;
         if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = Error.SERVICE_NOT_AVAILABLE;
+            error = OPFError.SERVICE_NOT_AVAILABLE;
         } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
-            error = Error.INVALID_SENDER;
+            error = OPFError.INVALID_SENDER;
         } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = Error.AUTHENTICATION_FAILED;
+            error = OPFError.AUTHENTICATION_FAILED;
         } else {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }

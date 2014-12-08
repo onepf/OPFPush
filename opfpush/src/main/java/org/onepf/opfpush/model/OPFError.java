@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.model;
 
 /**
  * Error of registration or unregistration.
@@ -27,7 +27,7 @@ package org.onepf.opfpush;
  * @author Kirill Rozov
  * @since 09.09.14.
  */
-public enum Error {
+public enum OPFError {
     /**
      * Service not available at this moment. Most popular reason of this error that no internet
      * connection available.

@@ -20,8 +20,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.Error;
+import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfpush.model.State;
 
 /**
  * @author Roman Savin
@@ -50,18 +51,33 @@ public class TestEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationError(@NonNull String providerName, @NonNull Error error) {
+    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
         OPFPushLog.LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
-    public void onUnregistrationError(@NonNull String providerName, @NonNull Error error) {
+    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
         OPFPushLog.LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+    }
+
+    @Override
+    public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
+        OPFPushLog.LOGD("onRegistrationStateError(%1$s, %2$s)", providerName, state);
+    }
+
+    @Override
+    public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
+        OPFPushLog.LOGD("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
     }
 
     @Override
     public void onNoAvailableProvider() {
         OPFPushLog.LOGD("onNoAvailableProvider()");
+    }
+
+    @Override
+    public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
+        OPFPushLog.LOGD("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
     }
 
     @Override

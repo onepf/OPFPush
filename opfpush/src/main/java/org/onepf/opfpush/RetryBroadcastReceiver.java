@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import org.onepf.opfpush.exception.OPFPushException;
+
 /**
  * @author Kirill Rozov
  * @since 01.10.14.

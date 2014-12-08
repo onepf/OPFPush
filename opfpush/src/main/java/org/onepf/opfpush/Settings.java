@@ -21,6 +21,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.State;
+
+import static org.onepf.opfpush.model.State.UNREGISTERED;
+
 /**
  * @author Kirill Rozov
  * @since 01.10.14.
@@ -41,15 +45,15 @@ class Settings {
         mPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    @OPFPushHelper.State
-    public int getState() {
-        @OPFPushHelper.State int state =
-                mPreferences.getInt(KEY_STATE, OPFPushHelper.STATE_UNREGISTERED);
-        return state;
+    @NonNull
+    public State getState() {
+        final int stateValue = mPreferences.getInt(KEY_STATE, UNREGISTERED.getValue());
+        final State state = State.fromValue(stateValue);
+        return state == null ? UNREGISTERED : state;
     }
 
-    public void saveState(@OPFPushHelper.State int state) {
-        mPreferences.edit().putInt(KEY_STATE, state).apply();
+    public void saveState(@NonNull final State state) {
+        mPreferences.edit().putInt(KEY_STATE, state.getValue()).apply();
     }
 
     public void clear() {

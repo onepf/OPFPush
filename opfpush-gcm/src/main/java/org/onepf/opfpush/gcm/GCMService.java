@@ -23,8 +23,8 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import org.onepf.opfpush.Error;
-import org.onepf.opfpush.OPFPushException;
+import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
 
 /**
@@ -102,12 +102,12 @@ public class GCMService extends IntentService {
                 .onUnregistrationError(GCMProvider.NAME, convertError(errorId));
     }
 
-    private Error convertError(@NonNull @GCMError final String errorId) {
-        final Error error;
+    private OPFError convertError(@NonNull @GCMError final String errorId) {
+        final OPFError error;
         if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = Error.SERVICE_NOT_AVAILABLE;
+            error = OPFError.SERVICE_NOT_AVAILABLE;
         } else if (GCMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = Error.AUTHENTICATION_FAILED;
+            error = OPFError.AUTHENTICATION_FAILED;
         } else {
             throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }

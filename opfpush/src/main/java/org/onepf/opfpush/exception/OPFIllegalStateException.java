@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.exception;
 
 /**
- * Thrown when try work with OpenPush in wrong way.
+ * Thrown when some operations perform in wrong state.
  *
- * @author Kirill Rozov
- * @since 05.09.14.
+ * @author Roman Savin
+ * @since 05.12.14
  */
-public class OPFPushException extends RuntimeException {
+public class OPFIllegalStateException extends IllegalStateException {
 
-    public OPFPushException(String detailMessage) {
+    public OPFIllegalStateException() {
+    }
+
+    public OPFIllegalStateException(String detailMessage) {
         super(detailMessage);
     }
 
-    public OPFPushException(String messageFormat, Object... args) {
-        super(String.format(messageFormat, args));
+    public OPFIllegalStateException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public OPFPushException(String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
+    public OPFIllegalStateException(Throwable cause) {
+        super(cause);
     }
 }
