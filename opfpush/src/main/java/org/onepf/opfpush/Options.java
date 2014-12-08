@@ -46,7 +46,6 @@ public final class Options {
     @NonNull
     private final EventListener eventListener;
 
-    private final boolean isRecoverProvider;
     private final boolean isSelectSystemPreferred;
 
     @Nullable
@@ -55,24 +54,11 @@ public final class Options {
     private Options(@NonNull Collection<? extends PushProvider> providers,
                     @NonNull EventListener eventListener,
                     @Nullable Backoff backoff,
-                    boolean isRecoverProvider,
                     boolean selectSystemPreferred) {
         this.providers = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
         this.eventListener = eventListener;
-        this.isRecoverProvider = isRecoverProvider;
         this.isSelectSystemPreferred = selectSystemPreferred;
         this.backoff = backoff;
-    }
-
-    /**
-     * Can the {@code OpenPushHelper} select next available provider,
-     * after current provider became unavailable.
-     *
-     * @return Can select next available provider for continue push work.
-     */
-    //TODO Find better name for this logic.
-    public boolean isRecoverProvider() {
-        return isRecoverProvider;
     }
 
     public boolean isSelectSystemPreferred() {
@@ -109,8 +95,6 @@ public final class Options {
         return "Options{"
                 + "providers="
                 + providers
-                + ", isRecoverProvider="
-                + isRecoverProvider
                 + ", isSelectSystemPreferred="
                 + isSelectSystemPreferred
                 + '}';
@@ -128,8 +112,7 @@ public final class Options {
         @Nullable
         private EventListener eventListener;
 
-        private boolean isRecoverProvider = true;
-        private boolean isSelectSystemPreferred;
+        private boolean isSelectSystemPreferred = true;
 
         @Nullable
         private Backoff backoff = new ExponentialBackoff();
@@ -147,19 +130,6 @@ public final class Options {
          */
         public Builder setSelectSystemPreferred(boolean selectSystemPreferred) {
             isSelectSystemPreferred = selectSystemPreferred;
-            return this;
-        }
-
-        /**
-         * Set does can the {@code OpenPushHelper} select next available provider,
-         * when current became unavailable.
-         * <p/>
-         * By default true.
-         *
-         * @return The current {@code Builder}.
-         */
-        public Builder setRecoverProvider(boolean recoverProvider) {
-            isRecoverProvider = recoverProvider;
             return this;
         }
 
@@ -244,7 +214,6 @@ public final class Options {
                     providers.values(),
                     eventListener,
                     backoff,
-                    isRecoverProvider,
                     isSelectSystemPreferred
             );
         }
@@ -254,8 +223,6 @@ public final class Options {
             return "Builder{"
                     + "providers="
                     + providers
-                    + ", isRecoverProvider="
-                    + isRecoverProvider
                     + ", systemPushPreferred="
                     + isSelectSystemPreferred
                     + '}';

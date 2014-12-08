@@ -38,7 +38,6 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
-import org.onepf.opfpush.util.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -247,12 +246,8 @@ public final class OPFPushHelper {
                     settings.saveState(REGISTERED);
                 } else {
                     LOGI("Last provider need register.");
-                    //TODO: Check after implementing new logic
                     settings.saveState(REGISTERING);
-                    if (!register(lastProvider)) {
-                        settings.saveState(UNREGISTERING);
-                        settings.saveLastProvider(null);
-                    }
+                    register(lastProvider);
                 }
             } else {
                 LOGI("Last provider is unavailable");
@@ -282,7 +277,6 @@ public final class OPFPushHelper {
         register();
     }
 
-
     /**
      * Start select push provider and registered it.
      * <p/>
@@ -307,7 +301,7 @@ public final class OPFPushHelper {
                             && registerSystemPreferredProvider()) {
                         return;
                     }
-                    registerNextProvider(null);
+                    registerFirstAvailableProvider();
                     break;
 
                 case UNREGISTERING:
@@ -318,10 +312,11 @@ public final class OPFPushHelper {
 
     private boolean registerSystemPreferredProvider() {
         for (PushProvider provider : options.getProviders()) {
-            String hostAppPackage = provider.getHostAppPackage();
+            final String hostAppPackage = provider.getHostAppPackage();
             if (hostAppPackage != null) {
                 if (PackageUtils.isSystemApp(appContext, hostAppPackage)
-                        && register(provider)) {
+                        && provider.isAvailable()) {
+                    register(provider);
                     return true;
                 }
             }
@@ -330,27 +325,16 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Register first available provider. Iterate all provider from the next provider after
-     * {@code lastProvider} param.
+     * Register first available provider.
      *
-     * @param lastProvider Last provider what check to registerWithNext or null if has no.
-     * @return True if find provider that can try to registerWithNext, otherwise false.
+     * @return True if find provider that can be registered, otherwise false.
      */
-    //TODO: Implement new logic
-    private boolean registerNextProvider(@Nullable PushProvider lastProvider) {
-        int nextProviderIndex = 0;
+    private boolean registerFirstAvailableProvider() {
         final List<PushProvider> providers = options.getProviders();
-        if (lastProvider != null) {
-            int lastProviderIndex = providers.indexOf(lastProvider);
-            if (lastProviderIndex != -1) {
-                nextProviderIndex = lastProviderIndex + 1;
-            }
-        }
 
-        for (int providersCount = providers.size();
-             nextProviderIndex < providersCount; ++nextProviderIndex) {
-
-            if (register(providers.get(nextProviderIndex))) {
+        for (PushProvider provider : providers) {
+            if (provider.isAvailable()) {
+                register(provider);
                 return true;
             }
         }
@@ -361,27 +345,18 @@ public final class OPFPushHelper {
         return false;
     }
 
-    boolean register(@NonNull String providerName) {
-        return register(getProviderWithException(providerName));
+    void register(@NonNull String providerName) {
+        register(getProviderWithException(providerName));
     }
 
     /**
      * Start register provider.
      *
      * @param provider Provider for registration.
-     * @return If provider available and can start registration return true, otherwise - false.
      */
-    private boolean register(@NonNull PushProvider provider) {
-        if (provider.isAvailable()) {
-            if (Utils.isNetworkConnected(appContext)) {
-                LOGD("Try register %s.", provider);
-                provider.register();
-            } else {
-                receivedMessageHandler.onRegistrationError(provider.getName(), OPFError.SERVICE_NOT_AVAILABLE);
-            }
-            return true;
-        }
-        return false;
+    private void register(@NonNull PushProvider provider) {
+        LOGD("Try register %s.", provider);
+        provider.register();
     }
 
     /**
@@ -523,9 +498,11 @@ public final class OPFPushHelper {
         settings.clear();
         currentProvider.onRegistrationInvalid();
         settings.saveState(REGISTERING);
-        //TODO: implement new registration logic
-        if (!register(currentProvider)) {
-            settings.saveState(UNREGISTERED);
+
+        if (currentProvider.isAvailable()) {
+            register(currentProvider);
+        } else {
+            onProviderUnavailable(currentProvider);
         }
     }
 
@@ -544,10 +521,7 @@ public final class OPFPushHelper {
             eventListener.onProviderBecameUnavailable(provider.getName());
         }
 
-        //TODO: Implement new recover logic
-        if (options.isRecoverProvider()) {
-            register(); //Restart registration
-        }
+        register(); //Restart registration
     }
 
     /**
@@ -662,22 +636,18 @@ public final class OPFPushHelper {
         public void onRegistrationError(@NonNull final String providerName,
                                         @NonNull final OPFError error) {
             synchronized (registrationLock) {
-                if (isRegistering() || isUnregistered()) {
+                LOGI("Error register provider '%s'.", providerName);
+                if (!isRegistered()) {
                     Assert.assertNotNull(error);
-
-                    LOGI("Error register provider '%s'.", providerName);
-                    final PushProvider provider = getProviderWithException(providerName);
 
                     settings.saveState(REGISTERING);
                     final Backoff backoff = options.getBackoff();
                     if (error == OPFError.SERVICE_NOT_AVAILABLE
-                            && backoff != null && backoff.hasTries()) {
+                            && backoff != null
+                            && backoff.hasTries()) {
                         postRetryRegister(providerName);
-                    } else {
-                        if (backoff != null) {
-                            backoff.reset();
-                        }
-                        registerNextProvider(provider);
+                    } else if (backoff != null) {
+                        backoff.reset();
                     }
                 }
 

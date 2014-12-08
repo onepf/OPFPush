@@ -342,7 +342,6 @@ public class OPFPushHelperTest {
         final PushProvider nextProvider = new MockPushProvider();
 
         final Options.Builder builder = new Options.Builder()
-                .setRecoverProvider(true)
                 .addProviders(lastProvider)
                 .addProviders(nextProvider)
                 .setEventListener(new TestEventListener());
@@ -381,7 +380,6 @@ public class OPFPushHelperTest {
         lastProvider.setTestAvailable(false);
 
         Options.Builder builder = new Options.Builder()
-                .setRecoverProvider(true)
                 .addProviders(new MockPushProvider(false))
                 .addProviders(lastProvider)
                 .setEventListener(new TestEventListener());
@@ -540,7 +538,6 @@ public class OPFPushHelperTest {
 
     private static void restoreUnavailableProvider_RecoverDisable(PushProvider... providers) {
         final Options.Builder builder = new Options.Builder()
-                .setRecoverProvider(false)
                 .addProviders(providers)
                 .setEventListener(new TestEventListener());
 
