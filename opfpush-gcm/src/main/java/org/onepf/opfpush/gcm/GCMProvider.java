@@ -257,7 +257,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             try {
                 final String registrationToken =
                         GoogleCloudMessaging.getInstance(getContext()).register(mSenderID);
-                if (registrationToken == null) {
+                if (TextUtils.isEmpty(registrationToken)) {
                     onAuthError();
                 } else {
                     onRegistrationSuccess(registrationToken);

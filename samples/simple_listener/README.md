@@ -1,1 +1,0 @@
-Sample application with OPFPush.

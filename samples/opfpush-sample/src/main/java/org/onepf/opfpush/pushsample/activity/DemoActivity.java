@@ -14,5 +14,22 @@
  * limitations under the License.
  */
 
-include ':opfpush', ':opfpush-gcm', ':opfpush-nokia', ':opfpush-adm'
-include ':samples:opfpush-sample'
+package org.onepf.opfpush.pushsample.activity;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import org.onepf.opfpush.pushsample.R;
+
+/**
+ * @author Roman Savin
+ * @since 09.12.14
+ */
+public class DemoActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_demo);
+    }
+}

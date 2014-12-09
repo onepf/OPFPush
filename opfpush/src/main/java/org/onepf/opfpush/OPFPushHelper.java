@@ -212,6 +212,7 @@ public final class OPFPushHelper {
      */
     @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
     public void init(@NonNull Options initialOptions) {
+        LOGI("Init start");
         if (isInitDone()) {
             throw new OPFPushException("You can init OpenPushHelper only one time.");
         }
@@ -231,6 +232,7 @@ public final class OPFPushHelper {
 
     private void initLastProvider() {
         synchronized (registrationLock) {
+            LOGI("Start init last provider");
             final PushProvider lastProvider = getLastProvider();
             if (lastProvider == null) {
                 LOGI("No last provider.");
@@ -290,7 +292,10 @@ public final class OPFPushHelper {
         checkInitDone();
 
         synchronized (registrationLock) {
-            switch (settings.getState()) {
+            final State state = settings.getState();
+            LOGI("Register start. State = " + state.toString());
+
+            switch (state) {
                 case REGISTERED:
                 case REGISTERING:
                     break;
@@ -580,7 +585,6 @@ public final class OPFPushHelper {
                     }
 
                     LOGI("Successfully register provider '%s'.", providerName);
-                    LOGI("Register id '%s'.", registrationId);
                     settings.saveState(REGISTERED);
                     settings.saveLastAndroidId(ANDROID_ID);
 
