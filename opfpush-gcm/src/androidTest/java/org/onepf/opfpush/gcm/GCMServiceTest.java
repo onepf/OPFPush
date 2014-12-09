@@ -96,7 +96,6 @@ public class GCMServiceTest {
         );
 
         applyStateRegistering();
-        assertTrue(helper.isRegistering());
 
         final Intent serviceIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));
@@ -127,7 +126,6 @@ public class GCMServiceTest {
         );
 
         applyStateUnregistering();
-        assertTrue(helper.isUnregistering());
 
         final Intent serviceIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));
@@ -157,7 +155,6 @@ public class GCMServiceTest {
         );
 
         applyStateRegistering();
-        assertTrue(helper.isRegistering());
 
         final Intent serviceIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));
@@ -187,7 +184,6 @@ public class GCMServiceTest {
         );
 
         applyStateRegistering();
-        assertTrue(helper.isRegistering());
 
         final Intent serviceIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));
@@ -217,7 +213,6 @@ public class GCMServiceTest {
         );
 
         applyStateUnregistering();
-        assertTrue(helper.isUnregistering());
 
         final Intent serviceIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));
@@ -247,7 +242,6 @@ public class GCMServiceTest {
         );
 
         applyStateUnregistering();
-        assertTrue(helper.isUnregistering());
 
         final Intent serviceIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
         serviceIntent.setComponent(new ComponentName(Robolectric.application, GCMServiceMock.class));

@@ -177,25 +177,19 @@ public final class OPFPushHelper {
         }
     }
 
-    /**
-     * Is push registered.
-     *
-     * @return True if push registered, else - false.
-     */
-    public boolean isRegistered() {
-        final State state = settings.getState();
-        return state == REGISTERED || state == UNREGISTERING;
+    boolean isRegistered() {
+        return settings.getState() == REGISTERED;
     }
 
-    public boolean isUnregistered() {
+    boolean isUnregistered() {
         return settings.getState() == UNREGISTERED;
     }
 
-    public boolean isRegistering() {
+    boolean isRegistering() {
         return settings.getState() == REGISTERING;
     }
 
-    public boolean isUnregistering() {
+    boolean isUnregistering() {
         return settings.getState() == UNREGISTERING;
     }
 
@@ -313,6 +307,33 @@ public final class OPFPushHelper {
                     throw new UnregistrationNotCompletedStateException();
             }
         }
+    }
+
+    /**
+     * Check is register operation available.
+     *
+     * @return true if initialization is done and unregistration isn't being performed.
+     */
+    public boolean isRegistrationAvailable() {
+        return isInitDone() && !isUnregistering();
+    }
+
+    /**
+     * Check is unregister operation available.
+     *
+     * @return true if initialization is done and registration isn't being performed.
+     */
+    public boolean isUnregistrationAvailable() {
+        return isInitDone() && !isRegistering();
+    }
+
+    @Nullable
+    public String getRegistrationId() {
+        if (currentProvider != null) {
+            return currentProvider.getRegistrationId();
+        }
+
+        return null;
     }
 
     private boolean registerSystemPreferredProvider() {
