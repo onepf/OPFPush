@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2012-2014 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +14,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <string name="app_name">PushSample</string>
-
-    <string name="registration">Registration…</string>
-    <string name="registration_id_fmt">Registration ID: %s</string>
-
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" />

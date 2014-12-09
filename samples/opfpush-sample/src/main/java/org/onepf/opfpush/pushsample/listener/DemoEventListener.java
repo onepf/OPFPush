@@ -24,6 +24,11 @@ import android.util.Log;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.pushsample.BusProvider;
+import org.onepf.opfpush.pushsample.model.Message;
+import org.onepf.opfpush.pushsample.model.RegistrationId;
+
+import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -36,6 +41,14 @@ public class DemoEventListener implements EventListener {
     @Override
     public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
         Log.d(TAG, String.format("onMessage(%1$s, %2$s)", providerName, extras));
+        if (extras == null) {
+            return;
+        }
+
+        final String message = extras.getString(MESSAGE_EXTRA_KEY);
+        if (message != null) {
+            BusProvider.getInstance().post(new Message(message));
+        }
     }
 
     @Override
@@ -46,6 +59,7 @@ public class DemoEventListener implements EventListener {
     @Override
     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
         Log.d(TAG, String.format("onRegistered(%1$s, %2$s)", providerName, registrationId));
+        BusProvider.getInstance().post(new RegistrationId(registrationId));
     }
 
     @Override
