@@ -14,7 +14,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="D:\projects\OPFPush-server\opfpush-server\target/MANIFEST.MF" />
+        <element id="file-copy" path="D:\projects\OPFPush\opfpush-server\target/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="opfpush-server/web/Web" />
     </root>
