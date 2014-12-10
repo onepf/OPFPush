@@ -34,16 +34,26 @@
     </option>
   </component>
   <component name="PDMPlugin">
-    <option name="options">
-      <map>
-        <entry key="Encoding" value="" />
-        <entry key="Target JDK" value="1.4" />
-      </map>
+    <option name="customRuleSets">
+      <list>
+        <option value="$PROJECT_DIR$/.idea/analyzers/pmd/ruleset.xml" />
+      </list>
     </option>
     <option name="options">
       <map>
         <entry key="Encoding" value="" />
-        <entry key="Target JDK" value="1.4" />
+        <entry key="Target JDK" value="1.7" />
+      </map>
+    </option>
+    <option name="customRuleSets">
+      <list>
+        <option value="$PROJECT_DIR$/.idea/analyzers/pmd/ruleset.xml" />
+      </list>
+    </option>
+    <option name="options">
+      <map>
+        <entry key="Encoding" value="" />
+        <entry key="Target JDK" value="1.7" />
       </map>
     </option>
   </component>

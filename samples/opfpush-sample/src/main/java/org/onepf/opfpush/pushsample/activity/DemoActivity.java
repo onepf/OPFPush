@@ -24,13 +24,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
-
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.pushsample.BusProvider;
 import org.onepf.opfpush.pushsample.R;
-import org.onepf.opfpush.pushsample.model.Message;
-import org.onepf.opfpush.pushsample.model.RegistrationId;
+import org.onepf.opfpush.pushsample.model.MessageEvent;
+import org.onepf.opfpush.pushsample.model.RegisteredEvent;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * @author Roman Savin
@@ -68,31 +67,31 @@ public class DemoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        BusProvider.getInstance().register(this);
+        EventBus.getDefault().registerSticky(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    @Subscribe
-    public void onMessageReceive(@NonNull final Message message) {
-        final String messageString = message.getMessage();
+    public void onEventMainThread(@NonNull final MessageEvent messageEvent) {
+        final String messageString = messageEvent.getMessage();
         if (!TextUtils.isEmpty(messageString)) {
             adapter.add(messageString);
         }
+        EventBus.getDefault().removeStickyEvent(messageEvent);
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    @Subscribe
-    public void onRegistered(@NonNull final RegistrationId registrationId) {
-        final String registrationIdString = registrationId.getRegistrationId();
+    public void onEventMainThread(@NonNull final RegisteredEvent registeredEvent) {
+        final String registrationIdString = registeredEvent.getRegistrationId();
         if (!TextUtils.isEmpty(registrationIdString)) {
             registrationIdTextView.setText(getString(R.string.registration_id_fmt,
                     registrationIdString));
         }
+        EventBus.getDefault().removeStickyEvent(registeredEvent);
     }
 }

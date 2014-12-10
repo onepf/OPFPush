@@ -40,7 +40,7 @@ public class DemoApplication extends Application {
                 .addProviders(new GCMProvider(this, GCM_SENDER_ID))
                 .setBackoff(new ExponentialBackoff())
                 .setSelectSystemPreferred(true)
-                .setEventListener(new DemoEventListener());
+                .setEventListener(new DemoEventListener(this));
 
         OPFPushLog.setLogEnable(true);
         final OPFPushHelper helper = OPFPushHelper.getInstance(this);

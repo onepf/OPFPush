@@ -22,12 +22,12 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 10.12.14
  */
-public class Message {
+public class MessageEvent {
 
     @NonNull
     private String message;
 
-    public Message(@NonNull final String message) {
+    public MessageEvent(@NonNull final String message) {
         this.message = message;
     }
 

@@ -22,12 +22,12 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 10.12.14
  */
-public class RegistrationId {
+public class RegisteredEvent {
 
     @NonNull
     private String registrationId;
 
-    public RegistrationId(@NonNull final String registrationId) {
+    public RegisteredEvent(@NonNull final String registrationId) {
         this.registrationId = registrationId;
     }
 

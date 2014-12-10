@@ -22,4 +22,6 @@
     <string name="registration">Registration…</string>
     <string name="registration_id_fmt">Registration ID: %s</string>
 
+    <string name="message_notification_title">Message</string>
+
 </resources>

@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample;
+package org.onepf.opfpush.pushsample.model;
 
-import com.squareup.otto.Bus;
+import android.support.annotation.NonNull;
 
 /**
  * @author Roman Savin
  * @since 10.12.14
  */
-public final class BusProvider {
+public class UnregisteredEvent {
 
-    private static final Bus BUS = new Bus();
+    @NonNull
+    private String registrationId;
 
-    private BusProvider() {
-        throw new UnsupportedOperationException();
+    public UnregisteredEvent(@NonNull final String registrationId) {
+        this.registrationId = registrationId;
     }
 
-    public static Bus getInstance() {
-        return BUS;
+    @NonNull
+    public String getRegistrationId() {
+        return registrationId;
     }
 }
