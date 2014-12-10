@@ -28,6 +28,9 @@ import org.onepf.opfpush.pushsample.BusProvider;
 import org.onepf.opfpush.pushsample.model.Message;
 import org.onepf.opfpush.pushsample.model.RegistrationId;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
 
 /**
@@ -47,7 +50,11 @@ public class DemoEventListener implements EventListener {
 
         final String message = extras.getString(MESSAGE_EXTRA_KEY);
         if (message != null) {
-            BusProvider.getInstance().post(new Message(message));
+            try {
+                BusProvider.getInstance().post(new Message(URLDecoder.decode(message, "UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
     }
 
