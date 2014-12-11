@@ -30,6 +30,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:onClick="onRegisterClick"
+        android:text="@string/register_button" />
+
+    <Button
+        android:id="@+id/unregister_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:onClick="onUnregisterClick"
+        android:text="@string/unregister_button" />
+
     <ListView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"

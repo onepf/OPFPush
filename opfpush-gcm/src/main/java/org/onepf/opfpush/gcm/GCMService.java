@@ -26,6 +26,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.util.Utils;
+
+import static org.onepf.opfpush.OPFPushLog.LOGD;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -44,6 +47,8 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        LOGD("GCMService.onHandleIntent(%s)", Utils.toString(intent));
+
         @GCMAction String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
             if (intent.hasExtra(GCMConstants.EXTRA_ERROR_ID)) {
@@ -104,12 +109,15 @@ public class GCMService extends IntentService {
 
     private OPFError convertError(@NonNull @GCMError final String errorId) {
         final OPFError error;
-        if (GCMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = OPFError.SERVICE_NOT_AVAILABLE;
-        } else if (GCMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = OPFError.AUTHENTICATION_FAILED;
-        } else {
-            throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+        switch (errorId) {
+            case GCMConstants.ERROR_SERVICE_NOT_AVAILABLE:
+                error = OPFError.SERVICE_NOT_AVAILABLE;
+                break;
+            case GCMConstants.ERROR_AUTHENTICATION_FAILED:
+                error = OPFError.AUTHENTICATION_FAILED;
+                break;
+            default:
+                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
 
         return error;

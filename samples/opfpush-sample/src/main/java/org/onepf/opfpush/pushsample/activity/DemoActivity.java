@@ -20,16 +20,22 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
+import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 
 import de.greenrobot.event.EventBus;
+
+import static org.onepf.opfpush.OPFPushLog.LOGD;
 
 /**
  * @author Roman Savin
@@ -41,7 +47,16 @@ public class DemoActivity extends Activity {
     private TextView registrationIdTextView;
 
     @NonNull
+    private Button registerButton;
+
+    @NonNull
+    private Button unregisterButton;
+
+    @NonNull
     private ArrayAdapter<String> adapter;
+
+    @NonNull
+    private OPFPushHelper helper = OPFPushHelper.getInstance(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +65,15 @@ public class DemoActivity extends Activity {
 
         registrationIdTextView = (TextView) findViewById(R.id.registration_id);
 
-        final OPFPushHelper helper = OPFPushHelper.getInstance(this);
+        registerButton = (Button) findViewById(R.id.register_button);
+        unregisterButton = (Button) findViewById(R.id.unregister_button);
+
         final String registrationId = helper.getRegistrationId();
         if (!TextUtils.isEmpty(registrationId)) {
-            registrationIdTextView.setText(getString(R.string.registration_id_fmt, registrationId));
+            LOGD("Registration Id : " + registrationId);
+            initViewsRegisteredState(registrationId);
         } else {
-            registrationIdTextView.setText(R.string.registration);
+            initViewsRegisteringState();
         }
 
         adapter = new ArrayAdapter<>(this, R.layout.item_message);
@@ -76,6 +94,26 @@ public class DemoActivity extends Activity {
         EventBus.getDefault().unregister(this);
     }
 
+    public void onRegisterClick(@NonNull final View view) {
+        if (helper.isRegistrationAvailable()) {
+            initViewsRegisteringState();
+            helper.register();
+        } else {
+            Toast.makeText(this, R.string.registration_not_available, Toast.LENGTH_SHORT).show();
+            initViewsUnregisteringState();
+        }
+    }
+
+    public void onUnregisterClick(@NonNull final View view) {
+        if (helper.isUnregistrationAvailable()) {
+            initViewsUnregisteringState();
+            helper.unregister();
+        } else {
+            Toast.makeText(this, R.string.unregistration_not_available, Toast.LENGTH_SHORT).show();
+            initViewsRegisteringState();
+        }
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final MessageEvent messageEvent) {
         final String messageString = messageEvent.getMessage();
@@ -89,9 +127,44 @@ public class DemoActivity extends Activity {
     public void onEventMainThread(@NonNull final RegisteredEvent registeredEvent) {
         final String registrationIdString = registeredEvent.getRegistrationId();
         if (!TextUtils.isEmpty(registrationIdString)) {
-            registrationIdTextView.setText(getString(R.string.registration_id_fmt,
-                    registrationIdString));
+            initViewsRegisteredState(registrationIdString);
         }
         EventBus.getDefault().removeStickyEvent(registeredEvent);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void onEventMainThread(@NonNull final UnregisteredEvent unregisteredEvent) {
+        final String registrationIdString = unregisteredEvent.getRegistrationId();
+        if (!TextUtils.isEmpty(registrationIdString)) {
+            initViewsUnregisteredState(registrationIdString);
+        }
+    }
+
+    private void initViewsRegisteringState() {
+        registrationIdTextView.setText(getString(R.string.registration));
+        registerButton.setVisibility(View.VISIBLE);
+        registerButton.setEnabled(false);
+        unregisterButton.setVisibility(View.GONE);
+    }
+
+    private void initViewsRegisteredState(@NonNull final String registrationId) {
+        registrationIdTextView.setText(getString(R.string.registered_state_fmt, registrationId));
+        registerButton.setVisibility(View.GONE);
+        unregisterButton.setVisibility(View.VISIBLE);
+        unregisterButton.setEnabled(true);
+    }
+
+    private void initViewsUnregisteredState(@NonNull final String registrationId) {
+        registrationIdTextView.setText(getString(R.string.unregistered_state_fmt, registrationId));
+        registerButton.setVisibility(View.VISIBLE);
+        registerButton.setEnabled(true);
+        unregisterButton.setVisibility(View.GONE);
+    }
+
+    private void initViewsUnregisteringState() {
+        registrationIdTextView.setText(getString(R.string.unregistration));
+        registerButton.setVisibility(View.GONE);
+        unregisterButton.setVisibility(View.VISIBLE);
+        unregisterButton.setEnabled(false);
     }
 }

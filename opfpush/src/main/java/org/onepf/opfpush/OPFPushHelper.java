@@ -400,16 +400,20 @@ public final class OPFPushHelper {
         checkInitDone();
 
         synchronized (registrationLock) {
-            switch (settings.getState()) {
+            final State state = settings.getState();
+            LOGI("Unregister start. State = " + state.toString());
+
+            switch (state) {
+                case UNREGISTERED:
+                case UNREGISTERING:
+                    break;
+
                 case REGISTERED:
                     Assert.assertNotNull(currentProvider);
 
                     settings.saveState(UNREGISTERING);
                     unregisterPackageChangeReceiver();
                     currentProvider.unregister();
-                    break;
-
-                case UNREGISTERING:
                     break;
 
                 case REGISTERING:

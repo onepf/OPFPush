@@ -36,7 +36,7 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        LOGD(Utils.toString(intent));
+        LOGD("GCMReceiver.onReceive(%1$s, %2$s)", context, Utils.toString(intent));
         if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
             final Bundle extras = intent.getExtras();
             if (extras != null

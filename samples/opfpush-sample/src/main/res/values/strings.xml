@@ -20,7 +20,15 @@
     <string name="app_name">PushSample</string>
 
     <string name="registration">Registration…</string>
-    <string name="registration_id_fmt">Registration ID: %s</string>
+    <string name="unregistration">Unregistration…</string>
+    <string name="registered_state_fmt">Registered. Registration ID: %s</string>
+    <string name="unregistered_state_fmt">Unregistered. Previous registration ID: %s</string>
+
+    <string name="registration_not_available">Registration isn\'t available</string>
+    <string name="unregistration_not_available">Unregistration isn\'t available</string>
+
+    <string name="register_button">Register</string>
+    <string name="unregister_button">Unregister</string>
 
     <string name="message_notification_title">Message</string>
 

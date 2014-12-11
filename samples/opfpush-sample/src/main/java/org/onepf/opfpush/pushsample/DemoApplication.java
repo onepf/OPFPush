@@ -45,6 +45,11 @@ public class DemoApplication extends Application {
         OPFPushLog.setLogEnable(true);
         final OPFPushHelper helper = OPFPushHelper.getInstance(this);
         helper.init(optionsBuilder.build());
-        helper.register();
+
+        if (helper.isRegistrationAvailable()) {
+            helper.register();
+        } else if (helper.isUnregistrationAvailable()) {
+            helper.unregister();
+        }
     }
 }

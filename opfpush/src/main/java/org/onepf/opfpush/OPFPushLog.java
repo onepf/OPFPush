@@ -35,21 +35,21 @@ public final class OPFPushLog {
 
     public static void LOGD(String message) {
         //noinspection PointlessBooleanExpression,ConstantConditions
-        if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
+        if (sLogEnable || Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, message);
         }
     }
 
     public static void LOGD(String messageFormat, Object... args) {
         //noinspection PointlessBooleanExpression,ConstantConditions
-        if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
+        if (sLogEnable || Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, String.format(messageFormat, args));
         }
     }
 
     public static void LOGD(String message, Throwable cause) {
         //noinspection PointlessBooleanExpression,ConstantConditions
-        if (sLogEnable && BuildConfig.DEBUG || Log.isLoggable(TAG, Log.DEBUG)) {
+        if (sLogEnable || Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, message, cause);
         }
     }

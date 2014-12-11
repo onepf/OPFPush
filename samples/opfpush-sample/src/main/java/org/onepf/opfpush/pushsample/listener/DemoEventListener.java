@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
@@ -42,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.greenrobot.event.EventBus;
 
+import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
 
 /**
@@ -49,8 +49,6 @@ import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
  * @since 09.12.14
  */
 public class DemoEventListener implements EventListener {
-
-    private static final String TAG = DemoEventListener.class.getSimpleName();
 
     private static final AtomicInteger NOTIFICATION_ID = new AtomicInteger(0);
 
@@ -68,7 +66,7 @@ public class DemoEventListener implements EventListener {
 
     @Override
     public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        Log.d(TAG, String.format("onMessage(%1$s, %2$s)", providerName, extras));
+        LOGD("onMessage(%1$s, %2$s)", providerName, extras);
         if (extras == null) {
             return;
         }
@@ -89,59 +87,60 @@ public class DemoEventListener implements EventListener {
 
     @Override
     public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
-        Log.d(TAG, String.format("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount));
+        LOGD("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-        Log.d(TAG, String.format("onRegistered(%1$s, %2$s)", providerName, registrationId));
+        LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
     @Override
     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-        Log.d(TAG, String.format("onUnregistered(%1$s, %2$s)", providerName, registrationId));
+        LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        Log.d(TAG, String.format("onRegistrationError(%1$s, %2$s)", providerName, error));
+        LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        Log.d(TAG, String.format("onUnregistrationError(%1$s, %2$s)", providerName, error));
+        LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
-        Log.d(TAG, String.format("onRegistrationStateError(%1$s, %2$s)", providerName, state));
+        LOGD("onRegistrationStateError(%1$s, %2$s)", providerName, state);
     }
 
     @Override
     public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
-        Log.d(TAG, String.format("onUnregistrationStateError(%1$s, %2$s)", providerName, state));
+        LOGD("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
     }
 
     @Override
     public void onNoAvailableProvider() {
-        Log.d(TAG, "onNoAvailableProvider()");
+        LOGD("onNoAvailableProvider()");
     }
 
     @Override
     public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
-        Log.d(TAG, String.format("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state));
+        LOGD("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
     }
 
     @Override
     public void onProviderBecameUnavailable(@NonNull String providerName) {
-        Log.d(TAG, String.format("onProviderBecameUnavailable(%s)", providerName));
+        LOGD("onProviderBecameUnavailable(%s)", providerName);
     }
 
     private void showNotification(
             @NonNull final String notificationTitle,
-            @NonNull final String notificationText) {
+            @NonNull final String notificationText
+    ) {
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(
                 appContext,
