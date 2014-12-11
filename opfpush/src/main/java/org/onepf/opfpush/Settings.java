@@ -56,15 +56,25 @@ class Settings {
 
     @NonNull
     public State getState() {
+        OPFPushLog.methodD(Settings.class, "getState");
+
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
         State state = State.fromValue(stateValue);
+
+        OPFPushLog.d("State : " + state);
         if (state == null) {
             state = UNREGISTERED;
             saveState(state);
         }
 
         final long stateTimestamp = preferences.getLong(KEY_STATE_TIMESTAMP, STATE_INFINITY_TIMESTAMP);
-        if (stateTimestamp > TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)) {
+        final long currentTime = System.currentTimeMillis();
+
+        OPFPushLog.d("State timestamp : " + stateTimestamp);
+        if (stateTimestamp != STATE_INFINITY_TIMESTAMP
+                && currentTime - stateTimestamp > TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)) {
+            OPFPushLog.d("state timestamp ");
+
             if (state == REGISTERING) {
                 state = UNREGISTERED;
                 saveState(state);
@@ -78,6 +88,8 @@ class Settings {
     }
 
     public void saveState(@NonNull final State state) {
+        OPFPushLog.methodD(Settings.class, "saveState", state);
+
         final long stateTimestamp = isInfinityState(state) ? STATE_INFINITY_TIMESTAMP
                 : System.currentTimeMillis();
 
@@ -97,6 +109,8 @@ class Settings {
     }
 
     public void saveLastProvider(@Nullable PushProvider provider) {
+        OPFPushLog.methodD(Settings.class, "saveLastProvider", provider);
+
         final SharedPreferences.Editor editor = preferences.edit();
         if (provider == null) {
             editor.remove(KEY_LAST_PROVIDER_NAME);
@@ -112,6 +126,8 @@ class Settings {
     }
 
     public void saveLastAndroidId(@Nullable String androidId) {
+        OPFPushLog.methodD(Settings.class, "saveLastAndroidId", androidId);
+
         final SharedPreferences.Editor editor = preferences.edit();
         if (androidId == null) {
             editor.remove(KEY_LAST_ANDROID_ID);

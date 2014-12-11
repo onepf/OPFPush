@@ -32,6 +32,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.exception.OPFPushException;
@@ -41,9 +42,6 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.onepf.opfpush.OPFPushLog.LOGE;
-import static org.onepf.opfpush.OPFPushLog.LOGW;
 
 /**
  * Google Cloud Messaging push provider implementation.
@@ -66,38 +64,34 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
     private static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 
-    private final String mSenderID;
+    private final String senderID;
 
     @Nullable
-    private ExecutorService mRegistrationExecutor;
+    private ExecutorService registrationExecutor;
 
     @NonNull
-    private final Settings mSettings;
+    private final GCMSettings settings;
 
     public GCMProvider(@NonNull Context context, @NonNull String senderID) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
 
-        mSenderID = senderID;
-        mSettings = new Settings(context);
+        this.senderID = senderID;
+        settings = new GCMSettings(context);
     }
 
     public synchronized void register() {
+        OPFPushLog.methodD(GCMProvider.class, "register");
         executeTask(new RegisterTask());
     }
 
-    private void executeTask(Runnable runnable) {
-        if (mRegistrationExecutor == null || mRegistrationExecutor.isShutdown()) {
-            mRegistrationExecutor = Executors.newSingleThreadExecutor();
-        }
-        mRegistrationExecutor.execute(runnable);
-    }
-
     public synchronized void unregister() {
-        executeTask(new UnregisterTask(mSettings.getRegistrationToken()));
+        OPFPushLog.methodD(GCMProvider.class, "unregister");
+        executeTask(new UnregisterTask(settings.getRegistrationId()));
     }
 
     @Override
     public boolean checkManifest() {
+        OPFPushLog.methodD(GCMProvider.class, "checkManifest");
         final Context ctx = getContext();
         return super.checkManifest()
                 && (!needGoogleAccounts() || checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
@@ -115,7 +109,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @Nullable
     public String getRegistrationId() {
-        return mSettings.getRegistrationToken();
+        return settings.getRegistrationId();
     }
 
     @Override
@@ -124,17 +118,17 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
-            LOGE("Can't find Google Cloud Messaging classes.");
+            OPFPushLog.e("Can't find Google Cloud Messaging classes.");
             return false;
         }
 
         if (super.isAvailable()) {
-            final int conResult =
-                    GooglePlayServicesUtil.isGooglePlayServicesAvailable(getContext());
+            final int conResult = GooglePlayServicesUtil
+                    .isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
                 return !needGoogleAccounts() || checkGoogleAccount();
             } else {
-                LOGW("Google Play Services ont available. Reason: '%s'.",
+                OPFPushLog.w("Google Play Services not available. Reason: '%s'.",
                         GooglePlayServicesUtil.getErrorString(conResult));
             }
         }
@@ -142,24 +136,27 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private boolean checkGoogleAccount() {
+        OPFPushLog.methodD(GCMProvider.class, "checkGoogleAccount");
         if (needGoogleAccounts()) {
+            OPFPushLog.d("Need google account");
             // On device with version of Android less than "4.0.4"
             // we need to ensure that the user has at least one google account.
-            Account[] googleAccounts
+            final Account[] googleAccounts
                     = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
             return googleAccounts.length != 0;
         } else {
+            OPFPushLog.d("Not need google account");
             return true;
         }
     }
 
     @Override
     public boolean isRegistered() {
-        if (TextUtils.isEmpty(mSettings.getRegistrationToken())) {
+        if (TextUtils.isEmpty(settings.getRegistrationId())) {
             return false;
         } else {
-            final int registeredVersion = mSettings.getAppVersion();
-            return registeredVersion != Settings.NO_SAVED_APP_VERSION
+            final int registeredVersion = settings.getAppVersion();
+            return registeredVersion != GCMSettings.NO_SAVED_APP_VERSION
                     && registeredVersion == getAppVersion();
         }
     }
@@ -173,10 +170,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     public void close() {
-        mSettings.reset();
-        if (mRegistrationExecutor != null) {
-            mRegistrationExecutor.shutdownNow();
-            mRegistrationExecutor = null;
+        OPFPushLog.methodD(GCMProvider.class, "close");
+
+        settings.reset();
+        if (registrationExecutor != null) {
+            OPFPushLog.d("Registration executor is not null");
+
+            registrationExecutor.shutdownNow();
+            registrationExecutor = null;
         }
 
         GoogleCloudMessaging.getInstance(getContext()).close();
@@ -186,104 +187,92 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public String toString() {
         return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
-                NAME, mSenderID, mSettings.getAppVersion());
+                NAME, senderID, settings.getAppVersion());
     }
 
     @Override
     public void onRegistrationInvalid() {
-        mSettings.saveRegistrationToken(null);
-        mSettings.removeAppVersion();
+        OPFPushLog.methodD(GCMProvider.class, "onRegistrationInvalid");
+        settings.saveRegistrationToken(null);
+        settings.removeAppVersion();
     }
 
     @Override
     public void onUnavailable() {
+        OPFPushLog.methodD(GCMProvider.class, "onUnavailable");
         close();
     }
 
     @Override
-    public void send(@NonNull Message msg) {
+    public void send(@NonNull final Message message) {
+        OPFPushLog.methodD(GCMProvider.class, "send", message);
+
         if (!isRegistered()) {
+            OPFPushLog.e("Registration state isn't REGISTERED");
             throw new IllegalStateException("Before send message you need register GCM.");
         }
 
-        Intent intent = new Intent(getContext(), SendMessageService.class);
-        intent.putExtra(SendMessageService.EXTRA_MESSAGE, msg);
-        intent.putExtra(SendMessageService.EXTRA_MESSAGES_TO, mSenderID + MESSAGES_TO_SUFFIX);
+        final Intent intent = new Intent(getContext(), SendMessageService.class);
+        intent.putExtra(SendMessageService.EXTRA_MESSAGE, message);
+        intent.putExtra(SendMessageService.EXTRA_MESSAGES_TO, senderID + MESSAGES_TO_SUFFIX);
         getContext().startService(intent);
     }
 
-    private final class UnregisterTask implements Runnable {
-        private final String mOldRegistrationToken;
+    private void executeTask(final Runnable runnable) {
+        OPFPushLog.methodD(GCMProvider.class, "executeTask", runnable);
 
-        private UnregisterTask(@NonNull String oldRegistrationToken) {
-            mOldRegistrationToken = oldRegistrationToken;
+        if (registrationExecutor == null || registrationExecutor.isShutdown()) {
+            registrationExecutor = Executors.newSingleThreadExecutor();
         }
-
-        @Override
-        public void run() {
-            try {
-                GoogleCloudMessaging.getInstance(getContext()).unregister();
-                close();
-
-                onUnregistrationSuccess();
-            } catch (IOException e) {
-                if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
-                    onServicesNotAvailable();
-                } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(e.getMessage())) {
-                    throw new OPFPushException("GCM unregister crash.", e);
-                } else {
-                    throw new OPFPushException("Unknown exception occur.", e);
-                }
-            }
-        }
-
-        private void onServicesNotAvailable() {
-            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                    GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-            getContext().sendBroadcast(intent);
-        }
-
-        private void onUnregistrationSuccess() {
-            Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, mOldRegistrationToken);
-            getContext().sendBroadcast(intent);
-        }
+        registrationExecutor.execute(runnable);
     }
 
     private final class RegisterTask implements Runnable {
+
         @Override
         public void run() {
+            OPFPushLog.methodD(RegisterTask.class, "run");
+
             try {
-                final String registrationToken =
-                        GoogleCloudMessaging.getInstance(getContext()).register(mSenderID);
-                if (TextUtils.isEmpty(registrationToken)) {
+                final String registrationId =
+                        GoogleCloudMessaging.getInstance(getContext()).register(senderID);
+                if (TextUtils.isEmpty(registrationId)) {
+                    OPFPushLog.d("Registration id is empty");
                     onAuthError();
                 } else {
-                    onRegistrationSuccess(registrationToken);
+                    OPFPushLog.d("Registration id isn't empty");
+                    onRegistrationSuccess(registrationId);
                 }
             } catch (IOException e) {
-                String error = e.getMessage();
-                if (GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE.equals(error)) {
-                    onServicesNotAvailable();
-                } else if (GoogleCloudMessaging.ERROR_MAIN_THREAD.equals(error)) {
-                    throw new OPFPushException("GCM register crash", e);
-                } else {
-                    onAuthError();
+                OPFPushLog.e(e.getCause().toString());
+
+                final String error = e.getMessage();
+                switch (error) {
+                    case GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE:
+                        onServicesNotAvailable();
+                        break;
+                    case GoogleCloudMessaging.ERROR_MAIN_THREAD:
+                        throw new OPFPushException("GCM register crash", e);
+                    default:
+                        onAuthError();
+                        break;
                 }
             }
         }
 
         private void onServicesNotAvailable() {
-            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                    GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+            OPFPushLog.methodD(RegisterTask.class, "onServicesNotAvailable");
+
+            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
             getContext().sendBroadcast(intent);
         }
 
-        private void onRegistrationSuccess(final String registrationToken) {
-            mSettings.saveRegistrationToken(registrationToken);
-            mSettings.saveAppVersion(getAppVersion());
+        private void onRegistrationSuccess(final String registrationId) {
+            OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
+
+            settings.saveRegistrationToken(registrationId);
+            settings.saveAppVersion(getAppVersion());
 
             //For finish registration we catch intent with action
             //GCMConstant.ACTION_REGISTRATION in GCMReceiver.
@@ -291,9 +280,62 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onAuthError() {
-            Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
+            OPFPushLog.methodD(RegisterTask.class, "onAuthError");
+
+            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
                     GCMConstants.ERROR_AUTHENTICATION_FAILED);
+            getContext().sendBroadcast(intent);
+        }
+    }
+
+    private final class UnregisterTask implements Runnable {
+
+        @NonNull
+        private final String oldRegistrationId;
+
+        private UnregisterTask(@NonNull String oldRegistrationToken) {
+            oldRegistrationId = oldRegistrationToken;
+        }
+
+        @Override
+        public void run() {
+            OPFPushLog.methodD(UnregisterTask.class, "run");
+
+            try {
+                GoogleCloudMessaging.getInstance(getContext()).unregister();
+                close();
+
+                onUnregistrationSuccess();
+            } catch (IOException e) {
+                OPFPushLog.e(e.getCause().toString());
+
+                final String error = e.getMessage();
+                switch (error) {
+                    case GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE:
+                        onServicesNotAvailable();
+                        break;
+                    case GoogleCloudMessaging.ERROR_MAIN_THREAD:
+                        throw new OPFPushException("GCM unregister crash.", e);
+                    default:
+                        throw new OPFPushException("Unknown exception occur.", e);
+                }
+            }
+        }
+
+        private void onServicesNotAvailable() {
+            OPFPushLog.methodD(UnregisterTask.class, "onServicesNotAvailable");
+
+            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
+            getContext().sendBroadcast(intent);
+        }
+
+        private void onUnregistrationSuccess() {
+            OPFPushLog.methodD(UnregisterTask.class, "onUnregistrationSuccess");
+
+            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);
             getContext().sendBroadcast(intent);
         }
     }

@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import com.nokia.push.PushBaseIntentService;
 import com.nokia.push.PushConstants;
 
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
@@ -47,8 +48,10 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param registrationId The registration id returned by the Push Notifications service.
      */
     @Override
-    protected void onRegistered(@NonNull Context appContext,
-                                @NonNull String registrationId) {
+    protected void onRegistered(@NonNull final Context appContext,
+                                @NonNull final String registrationId) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onRegistered",
+                appContext, registrationId);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistered(NokiaNotificationsProvider.NAME, registrationId);
     }
@@ -60,8 +63,10 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param oldRegistrationId the registration id that was previously registered.
      */
     @Override
-    protected void onUnregistered(@NonNull Context appContext,
-                                  @NonNull String oldRegistrationId) {
+    protected void onUnregistered(@NonNull final Context appContext,
+                                  @NonNull final String oldRegistrationId) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onUnregistered",
+                appContext, oldRegistrationId);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onUnregistered(NokiaNotificationsProvider.NAME, oldRegistrationId);
     }
@@ -73,7 +78,8 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param intent     Intent containing the message payload as extras.
      */
     @Override
-    protected void onMessage(@NonNull Context appContext, Intent intent) {
+    protected void onMessage(@NonNull final Context appContext, @NonNull final Intent intent) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onMessage", appContext, intent);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onMessage(NokiaNotificationsProvider.NAME, intent.getExtras());
     }
@@ -86,7 +92,8 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param total      Total number of collapsed messages.
      */
     @Override
-    protected void onDeletedMessages(@NonNull Context appContext, int total) {
+    protected void onDeletedMessages(@NonNull final Context appContext, final int total) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onDeletedMessages", appContext, total);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onDeletedMessages(NokiaNotificationsProvider.NAME, total);
     }
@@ -98,8 +105,9 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @param errorId    Error id returned by the Push Notifications service.
      */
     @Override
-    protected void onError(@NonNull Context appContext,
-                           @NonNull @NokiaNotificationsError String errorId) {
+    protected void onError(@NonNull final Context appContext,
+                           @NonNull @NokiaNotificationsError final String errorId) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onError", appContext, errorId);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onError(NokiaNotificationsProvider.NAME, convertError(errorId));
     }
@@ -114,8 +122,10 @@ public class NokiaNotificationService extends PushBaseIntentService {
      * @return If true, failed operation will be retried (using exponential backoff).
      */
     @Override
-    protected boolean onRecoverableError(@NonNull Context appContext,
-                                         @NonNull @NokiaNotificationsError String errorId) {
+    protected boolean onRecoverableError(@NonNull final Context appContext,
+                                         @NonNull @NokiaNotificationsError final String errorId) {
+        OPFPushLog.methodD(NokiaNotificationService.class, "onRecoverableError",
+                appContext, errorId);
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistrationError(NokiaNotificationsProvider.NAME, convertError(errorId));
         return false;
@@ -123,14 +133,15 @@ public class NokiaNotificationService extends PushBaseIntentService {
 
     @NonNull
     private static OPFError convertError(@NonNull @NokiaNotificationsError String errorId) {
-        if (PushConstants.ERROR_INVALID_PARAMETERS.equals(errorId)) {
-            return OPFError.INVALID_PARAMETERS;
-        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OPFError.INVALID_PARAMETERS;
-        } else if (PushConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            return OPFError.SERVICE_NOT_AVAILABLE;
-        } else {
-            throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+        switch (errorId) {
+            case PushConstants.ERROR_INVALID_PARAMETERS:
+                return OPFError.INVALID_PARAMETERS;
+            case PushConstants.ERROR_SERVICE_NOT_AVAILABLE:
+                return OPFError.SERVICE_NOT_AVAILABLE;
+            case PushConstants.ERROR_INVALID_SENDER:
+                return OPFError.INVALID_SENDER;
+            default:
+                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
     }
 }

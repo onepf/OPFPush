@@ -29,16 +29,22 @@ import android.support.annotation.Nullable;
 
 import junit.framework.Assert;
 
-import static org.onepf.opfpush.OPFPushLog.LOGI;
+import org.onepf.opfpush.util.Utils;
 
 /**
  * Different utils for check info about installed packages on device.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 07.09.14
  */
 public final class PackageUtils {
+
     public static final String PACKAGE_DATA_SCHEME = "package";
+
+    private PackageUtils() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Get version code of current application.
@@ -97,6 +103,8 @@ public final class PackageUtils {
      */
     public static BroadcastReceiver registerPackageChangeReceiver(@NonNull Context context,
                                                                   @NonNull PushProvider provider) {
+        OPFPushLog.methodD(PackageUtils.class, "registerPackageChangeReceiver", context, provider);
+
         final PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
 
         final IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
@@ -104,8 +112,10 @@ public final class PackageUtils {
         appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         context.registerReceiver(mPackageReceiver, appUpdateFilter);
 
-        String hostAppPackage = provider.getHostAppPackage();
+        final String hostAppPackage = provider.getHostAppPackage();
         if (hostAppPackage != null) {
+            OPFPushLog.d("Host app package isn't null");
+
             final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
             hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
             hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
@@ -113,9 +123,6 @@ public final class PackageUtils {
         }
 
         return mPackageReceiver;
-    }
-
-    private PackageUtils() {
     }
 
     private static class PackageChangeReceiver extends BroadcastReceiver {
@@ -131,18 +138,21 @@ public final class PackageUtils {
 
         @Override
         public void onReceive(@NonNull Context context, @NonNull Intent intent) {
+            OPFPushLog.methodD(PackageChangeReceiver.class, "onReceive",
+                    context, Utils.toString(intent));
+
             final String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
                 String hostAppPackage = mProvider.getHostAppPackage();
                 Assert.assertNotNull(hostAppPackage);
                 if (hostAppPackage.equals(getAppPackage(intent))) {
-                    LOGI("Host app '%s' of provider '%s' removed.",
+                    OPFPushLog.d("Host app '%s' of provider '%s' removed.",
                             hostAppPackage, mProvider.getName());
                     OPFPushHelper.getInstance(context).onProviderUnavailable(mProvider);
                 }
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
                 if (context.getPackageName().equals(getAppPackage(intent))) {
-                    LOGI("Application updated.");
+                    OPFPushLog.d("Application updated.");
                     OPFPushHelper.getInstance(context).onNeedRetryRegister();
                 }
             }

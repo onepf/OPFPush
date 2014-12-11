@@ -28,14 +28,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 
 import de.greenrobot.event.EventBus;
-
-import static org.onepf.opfpush.OPFPushLog.LOGD;
 
 /**
  * @author Roman Savin
@@ -70,7 +69,7 @@ public class DemoActivity extends Activity {
 
         final String registrationId = helper.getRegistrationId();
         if (!TextUtils.isEmpty(registrationId)) {
-            LOGD("Registration Id : " + registrationId);
+            OPFPushLog.d("Registration Id : " + registrationId);
             initViewsRegisteredState(registrationId);
         } else {
             initViewsRegisteringState();

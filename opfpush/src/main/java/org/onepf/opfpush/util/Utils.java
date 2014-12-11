@@ -28,11 +28,16 @@ import android.support.annotation.Nullable;
  * Different utils.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 29.09.14
  */
 public final class Utils {
 
     public static final String ITEM_DIVIDER = ", ";
+
+    private Utils() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Convert intent to string.
@@ -40,19 +45,24 @@ public final class Utils {
      * @return String representation of intent.
      */
     @Nullable
-    public static String toString(@NonNull Intent intent) {
-        StringBuilder b = new StringBuilder();
-        b.append("Intent{");
-        b.append("action=").append('"').append(intent.getAction()).append('"');
-        b.append(ITEM_DIVIDER);
-        b.append("data=").append('"').append(intent.getDataString()).append('"');
-        b.append(ITEM_DIVIDER);
-        b.append("component=").append('"').append(intent.getComponent()).append('"');
-        b.append(ITEM_DIVIDER);
-        Bundle extras = intent.getExtras();
-        b.append("extras=").append(extras == null ? null : toString(extras));
-        b.append('}');
-        return b.toString();
+    public static String toString(@Nullable final Intent intent) {
+        if (intent == null) {
+            return "null";
+        }
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Intent{");
+        stringBuilder.append("action=").append('"').append(intent.getAction()).append('"');
+        stringBuilder.append(ITEM_DIVIDER);
+        stringBuilder.append("data=").append('"').append(intent.getDataString()).append('"');
+        stringBuilder.append(ITEM_DIVIDER);
+        stringBuilder.append("component=").append('"').append(intent.getComponent()).append('"');
+        stringBuilder.append(ITEM_DIVIDER);
+
+        final Bundle extras = intent.getExtras();
+        stringBuilder.append("extras=").append(extras == null ? null : toString(extras));
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 
     /**
@@ -61,7 +71,7 @@ public final class Utils {
      * @return String representation of bundles.
      */
     @NonNull
-    public static String toString(Bundle bundle) {
+    public static String toString(@Nullable final Bundle bundle) {
         if (bundle == null) {
             return "null";
         }
@@ -70,26 +80,23 @@ public final class Utils {
             return "";
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append('[');
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append('[');
         for (String key : bundle.keySet()) {
-            builder.append('"').append(key).append('"');
-            builder.append(':');
-            builder.append('"').append(bundle.get(key)).append('"');
-            builder.append(ITEM_DIVIDER);
+            stringBuilder.append('"').append(key).append('"');
+            stringBuilder.append(':');
+            stringBuilder.append('"').append(bundle.get(key)).append('"');
+            stringBuilder.append(ITEM_DIVIDER);
         }
-        builder.setLength(builder.length() - ITEM_DIVIDER.length());
-        builder.append(']');
-        return builder.toString();
+        stringBuilder.setLength(stringBuilder.length() - ITEM_DIVIDER.length());
+        stringBuilder.append(']');
+        return stringBuilder.toString();
     }
 
-    public static boolean isNetworkConnected(@NonNull Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
+    public static boolean isNetworkConnected(@NonNull final Context context) {
+        final ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    private Utils() {
     }
 }

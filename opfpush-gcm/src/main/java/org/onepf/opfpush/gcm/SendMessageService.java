@@ -7,16 +7,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import junit.framework.Assert;
 
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Message;
 
 import java.io.IOException;
 
-import static org.onepf.opfpush.OPFPushLog.LOGE;
-import static org.onepf.opfpush.OPFPushLog.LOGI;
-import static org.onepf.opfpush.OPFPushLog.LOGW;
-
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 10/13/14.
  */
 public class SendMessageService extends IntentService {
@@ -31,21 +29,23 @@ public class SendMessageService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        OPFPushLog.methodD(SendMessageService.class, "onHandleIntent", intent);
+
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
-            Message msg = intent.getParcelableExtra(EXTRA_MESSAGE);
-            Assert.assertNotNull(msg);
-            String msgTo = intent.getStringExtra(EXTRA_MESSAGES_TO);
-            Assert.assertNotNull(msgTo);
+            final Message message = intent.getParcelableExtra(EXTRA_MESSAGE);
+            Assert.assertNotNull(message);
+            final String messageTo = intent.getStringExtra(EXTRA_MESSAGES_TO);
+            Assert.assertNotNull(messageTo);
 
             try {
                 GoogleCloudMessaging.getInstance(this)
-                        .send(msgTo, msg.getId(), msg.getTimeToLeave(), msg.getData());
-                LOGI("Message '%s' has sent.", msg);
+                        .send(messageTo, message.getId(), message.getTimeToLeave(), message.getData());
+                OPFPushLog.d("Message '%s' has sent.", message);
             } catch (IOException ex) {
-                LOGE(String.format("Error while send Message '%s'.", msg), ex);
+                OPFPushLog.e(String.format("Error while send Message '%s'.", message), ex);
             }
         } else {
-            LOGW("Unknown action '%s'.", intent.getAction());
+            OPFPushLog.w("Unknown action '%s'.", intent.getAction());
         }
     }
 }

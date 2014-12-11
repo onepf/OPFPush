@@ -22,9 +22,11 @@ import android.support.annotation.NonNull;
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.util.Utils;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -52,7 +54,8 @@ public class ADMService extends ADMMessageHandlerBase {
      *               see SampleADMMessageHandler.java in the ADMMessenger sample app.
      */
     @Override
-    protected void onMessage(@NonNull Intent intent) {
+    protected void onMessage(@NonNull final Intent intent) {
+        OPFPushLog.methodD(ADMService.class, "onMessage", Utils.toString(intent));
         OPFPushHelper.getInstance(this)
                 .getReceivedMessageHandler().onMessage(ADMProvider.NAME, intent.getExtras());
     }
@@ -68,7 +71,8 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       method also obtains the registration ID for an instance of your app.
      */
     @Override
-    protected void onRegistered(@NonNull String registrationId) {
+    protected void onRegistered(@NonNull final String registrationId) {
+        OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
         //TODO Send registration id.
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistered(ADMProvider.NAME, registrationId);
@@ -87,7 +91,8 @@ public class ADMService extends ADMMessageHandlerBase {
      *                       will show the registration ID for an unregistered app as {@code null}.
      */
     @Override
-    protected void onUnregistered(@NonNull String registrationId) {
+    protected void onUnregistered(@NonNull final String registrationId) {
+        OPFPushLog.methodD(ADMService.class, "onUnregistered", "registrationId");
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onUnregistered(ADMProvider.NAME, registrationId);
     }
@@ -104,23 +109,30 @@ public class ADMService extends ADMMessageHandlerBase {
      *                {@link ADMConstants#ERROR_SERVICE_NOT_AVAILABLE}.
      */
     @Override
-    protected void onRegistrationError(@NonNull @ADMError String errorId) {
+    protected void onRegistrationError(@NonNull @ADMError final String errorId) {
+        OPFPushLog.methodD(ADMService.class, "onRegistrationError", errorId);
         final OPFError error = convertError(errorId);
+        OPFPushLog.d("Converted error : " + error);
+
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistrationError(ADMProvider.NAME, error);
     }
 
     @NonNull
-    private OPFError convertError(@NonNull @ADMError String errorId) {
+    private OPFError convertError(@NonNull @ADMError final String errorId) {
         final OPFError error;
-        if (ADMConstants.ERROR_SERVICE_NOT_AVAILABLE.equals(errorId)) {
-            error = OPFError.SERVICE_NOT_AVAILABLE;
-        } else if (ADMConstants.ERROR_INVALID_SENDER.equals(errorId)) {
-            error = OPFError.INVALID_SENDER;
-        } else if (ADMConstants.ERROR_AUTHENTICATION_FAILED.equals(errorId)) {
-            error = OPFError.AUTHENTICATION_FAILED;
-        } else {
-            throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+        switch (errorId) {
+            case ADMConstants.ERROR_SERVICE_NOT_AVAILABLE:
+                error = OPFError.SERVICE_NOT_AVAILABLE;
+                break;
+            case ADMConstants.ERROR_INVALID_SENDER:
+                error = OPFError.INVALID_SENDER;
+                break;
+            case ADMConstants.ERROR_AUTHENTICATION_FAILED:
+                error = OPFError.AUTHENTICATION_FAILED;
+                break;
+            default:
+                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
         }
         return error;
     }

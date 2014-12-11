@@ -27,12 +27,14 @@ import org.onepf.opfpush.util.Utils;
  * Represent message for send from client to server that uses in Google Cloud Messaging.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 18.09.14.
  */
 public class Message implements Parcelable {
-    private final String mId;
-    private final Bundle mData;
-    private final long mTimeToLeave;
+
+    private final String id;
+    private final Bundle data;
+    private final long timeToLeave;
 
     /**
      * Create new message.
@@ -57,15 +59,15 @@ public class Message implements Parcelable {
             throw new IllegalArgumentException(String.format("timeToLeave='%d'."
                     + " Time to leave must be non negative value.", timeToLeave));
         }
-        mId = id;
-        mData = data;
-        mTimeToLeave = timeToLeave;
+        this.id = id;
+        this.data = data;
+        this.timeToLeave = timeToLeave;
     }
 
     private Message(Parcel parcel) {
-        mId = parcel.readString();
-        mTimeToLeave = parcel.readLong();
-        mData = parcel.readBundle();
+        id = parcel.readString();
+        timeToLeave = parcel.readLong();
+        data = parcel.readBundle();
     }
 
     @Override
@@ -75,33 +77,33 @@ public class Message implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
-        dest.writeLong(mTimeToLeave);
-        dest.writeBundle(mData);
+        dest.writeString(id);
+        dest.writeLong(timeToLeave);
+        dest.writeBundle(data);
     }
 
     @NonNull
     public String getId() {
-        return mId;
+        return id;
     }
 
     @NonNull
     public Bundle getData() {
-        return mData;
+        return data;
     }
 
     public long getTimeToLeave() {
-        return mTimeToLeave;
+        return timeToLeave;
     }
 
     @NonNull
     @Override
     public String toString() {
         return "Message{"
-                + "messageId='" + mId + '\''
-                + ", data='" + Utils.toString(mData)
+                + "messageId='" + id + '\''
+                + ", data='" + Utils.toString(data)
                 + '\''
-                + ", TTL='" + mTimeToLeave + '\''
+                + ", TTL='" + timeToLeave + '\''
                 + '}';
     }
 

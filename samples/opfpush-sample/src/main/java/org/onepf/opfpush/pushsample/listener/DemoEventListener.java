@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
+import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
@@ -34,6 +35,7 @@ import org.onepf.opfpush.pushsample.activity.DemoActivity;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.util.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -41,7 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.greenrobot.event.EventBus;
 
-import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
 
 /**
@@ -65,8 +66,8 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        LOGD("onMessage(%1$s, %2$s)", providerName, extras);
+    public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
+        OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, Utils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -80,61 +81,69 @@ public class DemoEventListener implements EventListener {
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                OPFPushLog.e(e.getCause().toString());
             }
         }
     }
 
     @Override
-    public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
-        LOGD("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
+    public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
+        OPFPushLog.methodD(DemoEventListener.class, "onDeletedMessages", providerName, messagesCount);
     }
 
     @Override
-    public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-        LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
+    public void onRegistered(@NonNull final String providerName,
+                             @NonNull final String registrationId) {
+        OPFPushLog.methodD(DemoEventListener.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
     @Override
-    public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-        LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+    public void onUnregistered(@NonNull final String providerName,
+                               @NonNull final String registrationId) {
+        OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
-    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
+    public void onRegistrationError(@NonNull final String providerName,
+                                    @NonNull final OPFError error) {
+        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
     }
 
     @Override
-    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+    public void onUnregistrationError(@NonNull final String providerName,
+                                      @NonNull final OPFError error) {
+        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
     }
 
     @Override
-    public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
-        LOGD("onRegistrationStateError(%1$s, %2$s)", providerName, state);
+    public void onRegistrationStateError(@NonNull final String providerName,
+                                         @NonNull final State state) {
+        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationStateError", providerName, state);
     }
 
     @Override
-    public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
-        LOGD("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
+    public void onUnregistrationStateError(@NonNull final String providerName,
+                                           @NonNull final State state) {
+        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationStateError", providerName, state);
     }
 
     @Override
     public void onNoAvailableProvider() {
-        LOGD("onNoAvailableProvider()");
+        OPFPushLog.d("onNoAvailableProvider()");
     }
 
     @Override
-    public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
-        LOGD("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
+    public void onWrongStateError(@NonNull final String providerName,
+                                  @NonNull final OPFError error,
+                                  @NonNull final State state) {
+        OPFPushLog.methodD(DemoEventListener.class, "onWrongStateError", providerName, error, state);
     }
 
     @Override
-    public void onProviderBecameUnavailable(@NonNull String providerName) {
-        LOGD("onProviderBecameUnavailable(%s)", providerName);
+    public void onProviderBecameUnavailable(@NonNull final String providerName) {
+        OPFPushLog.methodD(DemoEventListener.class, "onProviderBecameUnavailable", providerName);
     }
 
     private void showNotification(

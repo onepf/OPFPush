@@ -45,7 +45,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.onepf.opfpush.model.OPFError.AUTHENTICATION_FAILED;
 import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
-import static org.onepf.opfpush.OPFPushLog.LOGD;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ERROR_AUTHENTICATION_FAILED;
@@ -82,14 +81,14 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
                         assertEquals(GCMProvider.NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 
                     @Override
                     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertFalse(true); //Test failed because we get registration error.
                     }
                 }
@@ -112,14 +111,14 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
                         assertEquals(GCMProvider.NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 
                     @Override
                     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertFalse(true); //Test failed because we get registration error.
                     }
                 }
@@ -142,13 +141,13 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
                         assertFalse(true); //Test failed because we get registration error.
                     }
 
                     @Override
                     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(SERVICE_NOT_AVAILABLE, error);
                     }
                 }
@@ -171,13 +170,13 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
                         assertFalse(true); //Test failed because we get registration error.
                     }
 
                     @Override
                     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(AUTHENTICATION_FAILED, error);
                     }
                 }
@@ -200,13 +199,13 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
                         assertFalse(true); //Test failed because we get registration error.
                     }
 
                     @Override
                     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(SERVICE_NOT_AVAILABLE, error);
                     }
                 }
@@ -229,13 +228,13 @@ public class GCMServiceTest {
                 new SimpleEventListener() {
                     @Override
                     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-                        LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+                        OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
                         assertFalse(true); //Test failed because we get registration error.
                     }
 
                     @Override
                     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-                        LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+                        OPFPushLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
                         assertEquals(AUTHENTICATION_FAILED, error);
                     }
                 }

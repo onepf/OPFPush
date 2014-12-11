@@ -32,56 +32,56 @@ public class TestEventListener implements EventListener {
 
     @Override
     public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        OPFPushLog.LOGD("onMessage(%1$s, %2$s)", providerName, extras);
+        OPFPushLog.d("onMessage(%1$s, %2$s)", providerName, extras);
     }
 
     @Override
     public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
-        OPFPushLog.LOGD("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
+        OPFPushLog.d("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-        OPFPushLog.LOGD("onRegistered(%1$s, %2$s)", providerName, registrationId);
+        OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
     }
 
     @Override
     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
-        OPFPushLog.LOGD("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+        OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
     }
 
     @Override
     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        OPFPushLog.LOGD("onRegistrationError(%1$s, %2$s)", providerName, error);
+        OPFPushLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        OPFPushLog.LOGD("onUnregistrationError(%1$s, %2$s)", providerName, error);
+        OPFPushLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
-        OPFPushLog.LOGD("onRegistrationStateError(%1$s, %2$s)", providerName, state);
+        OPFPushLog.d("onRegistrationStateError(%1$s, %2$s)", providerName, state);
     }
 
     @Override
     public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
-        OPFPushLog.LOGD("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
+        OPFPushLog.d("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
     }
 
     @Override
     public void onNoAvailableProvider() {
-        OPFPushLog.LOGD("onNoAvailableProvider()");
+        OPFPushLog.d("onNoAvailableProvider()");
     }
 
     @Override
     public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
-        OPFPushLog.LOGD("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
+        OPFPushLog.d("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
     }
 
     @Override
     public void onProviderBecameUnavailable(@NonNull String providerName) {
-        OPFPushLog.LOGD("onProviderBecameUnavailable(%s)", providerName);
+        OPFPushLog.d("onProviderBecameUnavailable(%s)", providerName);
     }
 }

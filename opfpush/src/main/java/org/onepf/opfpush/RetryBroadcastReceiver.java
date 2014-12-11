@@ -21,17 +21,24 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfpush.util.Utils;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 01.10.14.
  */
 public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        OPFPushLog.methodD(RetryBroadcastReceiver.class, "onReceive",
+                context, Utils.toString(intent));
+
         final OPFPushHelper helper = OPFPushHelper.getInstance(context);
         if (helper.isInitDone()) {
+            OPFPushLog.d("Initialisation is done");
+
             final String action = intent.getAction();
             if (OPFConstants.ACTION_REGISTER.equals(action)) {
                 helper.register(intent.getStringExtra(OPFConstants.EXTRA_PROVIDER_NAME));

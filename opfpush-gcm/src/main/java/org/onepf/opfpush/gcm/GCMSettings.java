@@ -21,11 +21,13 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.OPFPushLog;
+
 /**
  * @author Kirill Rozov
  * @since 01.10.14.
  */
-class Settings {
+class GCMSettings {
 
     private static final String KEY_REGISTRATION_TOKEN = "registration_token";
     private static final String KEY_APP_VERSION = "app_version";
@@ -34,37 +36,42 @@ class Settings {
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
-    private SharedPreferences mPrefs;
+    private SharedPreferences preferences;
 
-    public Settings(@NonNull Context context) {
-        mPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    public GCMSettings(@NonNull final Context context) {
+        preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    public String getRegistrationToken() {
-        return mPrefs.getString(KEY_REGISTRATION_TOKEN, null);
+    public String getRegistrationId() {
+        return preferences.getString(KEY_REGISTRATION_TOKEN, null);
     }
 
-    public void saveRegistrationToken(@Nullable String token) {
+    public void saveRegistrationToken(@Nullable final String token) {
+        OPFPushLog.methodD(GCMSettings.class, "saveRegistrationToken", token);
+
         if (token == null) {
-            mPrefs.edit().remove(KEY_REGISTRATION_TOKEN).apply();
+            preferences.edit().remove(KEY_REGISTRATION_TOKEN).apply();
         } else {
-            mPrefs.edit().putString(KEY_REGISTRATION_TOKEN, token).apply();
+            preferences.edit().putString(KEY_REGISTRATION_TOKEN, token).apply();
         }
     }
 
     public int getAppVersion() {
-        return mPrefs.getInt(KEY_APP_VERSION, NO_SAVED_APP_VERSION);
+        return preferences.getInt(KEY_APP_VERSION, NO_SAVED_APP_VERSION);
     }
 
-    public void saveAppVersion(int appVersion) {
-        mPrefs.edit().putInt(KEY_APP_VERSION, appVersion).apply();
+    public void saveAppVersion(final int appVersion) {
+        OPFPushLog.methodD(GCMSettings.class, "saveAppVersion", appVersion);
+        preferences.edit().putInt(KEY_APP_VERSION, appVersion).apply();
     }
 
     public void removeAppVersion() {
-        mPrefs.edit().remove(KEY_APP_VERSION).apply();
+        OPFPushLog.methodD(GCMSettings.class, "removeAppVersion");
+        preferences.edit().remove(KEY_APP_VERSION).apply();
     }
 
     public void reset() {
-        mPrefs.edit().clear().apply();
+        OPFPushLog.methodD(GCMSettings.class, "reset");
+        preferences.edit().clear().apply();
     }
 }

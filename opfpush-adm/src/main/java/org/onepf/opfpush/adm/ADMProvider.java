@@ -25,6 +25,7 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.OPFPushLog;
 
 /**
  * Amazon Device Messaging push provider implementation.
@@ -50,16 +51,20 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void register() {
+        OPFPushLog.methodD(ADMProvider.class, "register");
+
         if (!isRegistered()) {
+            OPFPushLog.d("Start register ADMProvider.");
             adm.startRegister();
         }
     }
 
     @Override
     public boolean checkManifest() {
+        OPFPushLog.methodD(ADMProvider.class, "checkManifest");
         //TODO Maybe better use ADMManifest.checkManifestAuthoredProperly(getContext())?
         if (super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
-            Context ctx = getContext();
+            final Context ctx = getContext();
             return super.checkManifest()
                     && checkPermission(ctx, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
                     && checkPermission(ctx, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
@@ -76,6 +81,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void unregister() {
+        OPFPushLog.methodD(ADMProvider.class, "unregister");
         adm.startUnregister();
     }
 

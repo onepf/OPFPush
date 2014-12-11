@@ -21,9 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import static org.onepf.opfpush.OPFPushLog.LOGD;
-import static org.onepf.opfpush.OPFPushLog.LOGI;
-
 /**
  * @author Kirill Rozov
  * @since 09.09.14.
@@ -31,16 +28,19 @@ import static org.onepf.opfpush.OPFPushLog.LOGI;
 public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(@NonNull Context context, Intent intent) {
-        LOGD("OpenPush receive boot complete.");
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
+        OPFPushLog.methodD(BootCompleteReceiver.class, "onReceive", context, intent);
+
         final OPFPushHelper helper = OPFPushHelper.getInstance(context);
         if (helper.isRegistered()) {
+            OPFPushLog.d("Helper is registered");
             if (isAndroidIDChanged(context)) {
-                LOGI("Android ID changed.");
+                OPFPushLog.d("Android ID changed.");
                 helper.onNeedRetryRegister();
             }
         } else if (helper.isRegistering()) {
-            LOGI("Retry register after reboot.");
+            OPFPushLog.d("Registration in progress");
+            OPFPushLog.d("Retry register after reboot.");
             helper.restartRegisterOnBoot();
         }
     }

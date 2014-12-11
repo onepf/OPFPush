@@ -61,6 +61,7 @@ public final class ExponentialBackoff implements Backoff {
     }
 
     private long getTryDelay(int currentTryNumber) {
+        OPFPushLog.methodD(ExponentialBackoff.class, "getTryDelay", currentTryNumber);
         return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
     }
 
