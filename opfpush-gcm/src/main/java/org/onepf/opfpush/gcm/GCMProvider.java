@@ -37,6 +37,7 @@ import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.PackageUtils;
+import org.onepf.opfpush.util.Utils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -193,7 +194,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public void onRegistrationInvalid() {
         OPFPushLog.methodD(GCMProvider.class, "onRegistrationInvalid");
-        settings.saveRegistrationToken(null);
+        settings.saveRegistrationId(null);
         settings.removeAppVersion();
     }
 
@@ -271,7 +272,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         private void onRegistrationSuccess(final String registrationId) {
             OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
 
-            settings.saveRegistrationToken(registrationId);
+            settings.saveRegistrationId(registrationId);
             settings.saveAppVersion(getAppVersion());
 
             //For finish registration we catch intent with action
@@ -336,6 +337,8 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);
+
+            OPFPushLog.d("Send broadcast intent : " + Utils.toString(intent));
             getContext().sendBroadcast(intent);
         }
     }

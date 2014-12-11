@@ -83,8 +83,8 @@
                 <category android:name="${applicationId}" />
             </intent-filter>
             <intent-filter>
-                <action android:name="org.onepf.openpush.gcm.intent.UNREGISTRATION" />
-                <action android:name="org.onepf.openpush.gcm.intent.REGISTRATION" />
+                <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION" />
+                <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION" />
             </intent-filter>
         </receiver>
 

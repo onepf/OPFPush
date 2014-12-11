@@ -46,13 +46,13 @@ class GCMSettings {
         return preferences.getString(KEY_REGISTRATION_TOKEN, null);
     }
 
-    public void saveRegistrationToken(@Nullable final String token) {
-        OPFPushLog.methodD(GCMSettings.class, "saveRegistrationToken", token);
+    public void saveRegistrationId(@Nullable final String registrationId) {
+        OPFPushLog.methodD(GCMSettings.class, "saveRegistrationId", "registrationId");
 
-        if (token == null) {
+        if (registrationId == null) {
             preferences.edit().remove(KEY_REGISTRATION_TOKEN).apply();
         } else {
-            preferences.edit().putString(KEY_REGISTRATION_TOKEN, token).apply();
+            preferences.edit().putString(KEY_REGISTRATION_TOKEN, registrationId).apply();
         }
     }
 
