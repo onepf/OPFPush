@@ -76,6 +76,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
+        OPFPushLog.methodD(ADMProvider.class, "isRegistered");
         return adm.getRegistrationId() != null;
     }
 

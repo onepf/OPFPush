@@ -153,10 +153,15 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isRegistered() {
+        OPFPushLog.methodD(GCMProvider.class, "isRegistered");
         if (TextUtils.isEmpty(settings.getRegistrationId())) {
+            OPFPushLog.d("There isn't saved registration id");
             return false;
         } else {
             final int registeredVersion = settings.getAppVersion();
+
+            OPFPushLog.d("There is saved registration id");
+            OPFPushLog.d("Saved app version : " + registeredVersion);
             return registeredVersion != GCMSettings.NO_SAVED_APP_VERSION
                     && registeredVersion == getAppVersion();
         }

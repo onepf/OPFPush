@@ -120,6 +120,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
+        OPFPushLog.methodD(NokiaNotificationsProvider.class, "isRegistered");
         return PushRegistrar.isRegistered(getContext());
     }
 
