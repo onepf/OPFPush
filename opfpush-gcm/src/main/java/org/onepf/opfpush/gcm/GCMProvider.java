@@ -44,6 +44,9 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
+import static org.onepf.opfpush.gcm.GCMConstants.NAME;
+
 /**
  * Google Cloud Messaging push provider implementation.
  *
@@ -53,15 +56,12 @@ import java.util.concurrent.Executors;
  */
 public class GCMProvider extends BasePushProvider implements SenderPushProvider {
 
-    public static final String NAME = "Google Cloud Messaging";
-    public static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
+    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+    private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
 
-    static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
-
-    static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
-    static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
-    public static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
+    private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
+    private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
+    private static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
             = "com.google.android.gms.gcm.GoogleCloudMessaging";
     private static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 

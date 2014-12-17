@@ -28,6 +28,8 @@ import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.util.Utils;
 
+import static org.onepf.opfpush.adm.Constants.NAME;
+
 /**
  * This class allows your app to receive messages sent via ADM.
  * <p/>
@@ -57,7 +59,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onMessage(@NonNull final Intent intent) {
         OPFPushLog.methodD(ADMService.class, "onMessage", Utils.toString(intent));
         OPFPushHelper.getInstance(this)
-                .getReceivedMessageHandler().onMessage(ADMProvider.NAME, intent.getExtras());
+                .getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
     }
 
     /**
@@ -75,7 +77,7 @@ public class ADMService extends ADMMessageHandlerBase {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
         //TODO Send registration id.
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistered(ADMProvider.NAME, registrationId);
+                .onRegistered(NAME, registrationId);
     }
 
     /**
@@ -94,7 +96,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onUnregistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onUnregistered", "registrationId");
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onUnregistered(ADMProvider.NAME, registrationId);
+                .onUnregistered(NAME, registrationId);
     }
 
     /**
@@ -115,7 +117,7 @@ public class ADMService extends ADMMessageHandlerBase {
         OPFPushLog.d("Converted error : " + error);
 
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistrationError(ADMProvider.NAME, error);
+                .onRegistrationError(NAME, error);
     }
 
     @NonNull

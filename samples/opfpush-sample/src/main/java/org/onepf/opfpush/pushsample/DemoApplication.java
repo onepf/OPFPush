@@ -22,6 +22,7 @@ import org.onepf.opfpush.ExponentialBackoff;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.Options;
+import org.onepf.opfpush.adm.ADMProvider;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.pushsample.listener.DemoEventListener;
 
@@ -36,13 +37,17 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        OPFPushLog.setLogEnable(true);
+
         final Options.Builder optionsBuilder = new Options.Builder()
-                .addProviders(new GCMProvider(this, GCM_SENDER_ID))
+                .addProviders(
+                        new GCMProvider(this, GCM_SENDER_ID),
+                        new ADMProvider(this)
+                )
                 .setBackoff(new ExponentialBackoff())
                 .setSelectSystemPreferred(true)
                 .setEventListener(new DemoEventListener(this));
 
-        OPFPushLog.setLogEnable(true);
         final OPFPushHelper helper = OPFPushHelper.getInstance(this);
         helper.init(optionsBuilder.build());
 

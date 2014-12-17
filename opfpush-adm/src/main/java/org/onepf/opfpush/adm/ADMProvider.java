@@ -21,11 +21,14 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.OPFPushLog;
+
+import static org.onepf.opfpush.adm.Constants.AMAZON_MANUFACTURER;
+import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.adm.Constants.NAME;
 
 /**
  * Amazon Device Messaging push provider implementation.
@@ -37,16 +40,12 @@ import org.onepf.opfpush.OPFPushLog;
  */
 public class ADMProvider extends BasePushProvider {
 
-    private static final String AMAZON_MANUFACTURER = "Amazon";
-    public static final String NAME = "Amazon Device Messaging";
-    private static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
-
     @NonNull
-    private final ADM adm;
+    private ADMDelegate adm;
 
     public ADMProvider(@NonNull Context context) {
         super(context, NAME, KINDLE_STORE_APP_PACKAGE);
-        adm = new ADM(context);
+        adm = new ADMDelegate(context);
     }
 
     @Override

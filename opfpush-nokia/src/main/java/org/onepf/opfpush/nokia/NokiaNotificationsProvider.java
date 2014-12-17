@@ -25,6 +25,10 @@ import com.nokia.push.PushRegistrar;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.OPFPushLog;
 
+import static org.onepf.opfpush.nokia.Constants.NAME;
+import static org.onepf.opfpush.nokia.Constants.NOKIA_MANUFACTURER;
+import static org.onepf.opfpush.nokia.Constants.NOKIA_STORE_APP_PACKAGE;
+
 /**
  * Nokia Notification push provider implementation.
  *
@@ -34,10 +38,6 @@ import org.onepf.opfpush.OPFPushLog;
  * @since 06.09.14
  */
 public class NokiaNotificationsProvider extends BasePushProvider {
-
-    private static final String NOKIA_MANUFACTURER = "Nokia";
-    public static final String NAME = "Nokia Push"; //todo check the name
-    private static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 
     private final String[] sendersIds;
 

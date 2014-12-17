@@ -36,6 +36,10 @@ public final class GCMConstants {
     public static final String EXTRA_ERROR_ID = "error_id";
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
 
-    public static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
-    public static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
+    //Internal module constants
+    static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+    static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
+
+    static final String NAME = "Google Cloud Messaging";
+    static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
 }
