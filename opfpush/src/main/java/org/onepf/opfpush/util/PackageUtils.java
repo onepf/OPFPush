@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.util;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +25,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import junit.framework.Assert;
-
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfpush.PackageChangeReceiver;
+import org.onepf.opfpush.PushProvider;
 
 /**
  * Different utils for check info about installed packages on device.
@@ -40,7 +39,7 @@ import org.onepf.opfpush.util.Utils;
  */
 public final class PackageUtils {
 
-    public static final String PACKAGE_DATA_SCHEME = "package";
+    private static final String PACKAGE_DATA_SCHEME = "package";
 
     private PackageUtils() {
         throw new UnsupportedOperationException();
@@ -51,9 +50,10 @@ public final class PackageUtils {
      *
      * @return If find app - return it's version code, else {@link Integer#MIN_VALUE}.
      */
-    public static int getAppVersion(@NonNull Context context)
+    public static int getAppVersion(@NonNull final Context context)
             throws PackageManager.NameNotFoundException {
-        PackageInfo packageInfo = context.getPackageManager()
+
+        final PackageInfo packageInfo = context.getPackageManager()
                 .getPackageInfo(context.getPackageName(), 0);
         if (packageInfo == null) {
             throw new PackageManager.NameNotFoundException(context.getPackageName());
@@ -68,9 +68,10 @@ public final class PackageUtils {
      * @param appPackage Package of application for verify.
      * @return True when application is system, false - otherwise.
      */
-    public static boolean isSystemApp(@NonNull Context context, @NonNull String appPackage) {
+    public static boolean isSystemApp(@NonNull final Context context,
+                                      @NonNull final String appPackage) {
         try {
-            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
+            final ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
             return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0
                     || (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
         } catch (PackageManager.NameNotFoundException e) {
@@ -85,7 +86,8 @@ public final class PackageUtils {
      * @param appPackage Package of application for verify.
      * @return True when application is installed, false - otherwise.
      */
-    public static boolean isInstalled(@NonNull Context context, @NonNull String appPackage) {
+    public static boolean isInstalled(@NonNull final Context context,
+                                      @NonNull final String appPackage) {
         try {
             return context.getPackageManager().getApplicationInfo(appPackage, 0) != null;
         } catch (PackageManager.NameNotFoundException e) {
@@ -101,16 +103,18 @@ public final class PackageUtils {
      * @param provider Provider for what listen package changes.
      * @return Created {@code BroadcastReceiver}.
      */
-    public static BroadcastReceiver registerPackageChangeReceiver(@NonNull Context context,
-                                                                  @NonNull PushProvider provider) {
+    public static BroadcastReceiver registerPackageChangeReceiver(
+            @NonNull final Context context,
+            @NonNull final PushProvider provider
+    ) {
         OPFPushLog.methodD(PackageUtils.class, "registerPackageChangeReceiver", context, provider);
 
-        final PackageChangeReceiver mPackageReceiver = new PackageChangeReceiver(provider);
+        final PackageChangeReceiver packageChangeReceiver = new PackageChangeReceiver(provider);
 
         final IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
         appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
         appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
-        context.registerReceiver(mPackageReceiver, appUpdateFilter);
+        context.registerReceiver(packageChangeReceiver, appUpdateFilter);
 
         final String hostAppPackage = provider.getHostAppPackage();
         if (hostAppPackage != null) {
@@ -119,50 +123,9 @@ public final class PackageUtils {
             final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
             hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
             hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
-            context.registerReceiver(mPackageReceiver, hostAppRemovedFilter);
+            context.registerReceiver(packageChangeReceiver, hostAppRemovedFilter);
         }
 
-        return mPackageReceiver;
-    }
-
-    private static class PackageChangeReceiver extends BroadcastReceiver {
-
-        private static final String PACKAGE_URI_PREFIX = PACKAGE_DATA_SCHEME + ':';
-
-        @NonNull
-        private PushProvider mProvider;
-
-        PackageChangeReceiver(@NonNull PushProvider provider) {
-            mProvider = provider;
-        }
-
-        @Override
-        public void onReceive(@NonNull Context context, @NonNull Intent intent) {
-            OPFPushLog.methodD(PackageChangeReceiver.class, "onReceive",
-                    context, Utils.toString(intent));
-
-            final String action = intent.getAction();
-            if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                String hostAppPackage = mProvider.getHostAppPackage();
-                Assert.assertNotNull(hostAppPackage);
-                if (hostAppPackage.equals(getAppPackage(intent))) {
-                    OPFPushLog.d("Host app '%s' of provider '%s' removed.",
-                            hostAppPackage, mProvider.getName());
-                    OPFPushHelper.getInstance(context).onProviderUnavailable(mProvider);
-                }
-            } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
-                if (context.getPackageName().equals(getAppPackage(intent))) {
-                    OPFPushLog.d("Application updated.");
-                    OPFPushHelper.getInstance(context).onNeedRetryRegister();
-                }
-            }
-        }
-
-        @Nullable
-        private static String getAppPackage(Intent intent) {
-            final String data = intent.getDataString();
-            return data.startsWith(PACKAGE_URI_PREFIX)
-                    ? data.replaceFirst(PACKAGE_URI_PREFIX, "") : null;
-        }
+        return packageChangeReceiver;
     }
 }

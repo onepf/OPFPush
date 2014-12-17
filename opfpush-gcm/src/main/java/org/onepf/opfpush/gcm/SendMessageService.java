@@ -9,6 +9,7 @@ import junit.framework.Assert;
 
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.util.Utils;
 
 import java.io.IOException;
 
@@ -28,8 +29,8 @@ public class SendMessageService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        OPFPushLog.methodD(SendMessageService.class, "onHandleIntent", intent);
+    protected void onHandleIntent(final Intent intent) {
+        OPFPushLog.methodD(SendMessageService.class, "onHandleIntent", Utils.toString(intent));
 
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             final Message message = intent.getParcelableExtra(EXTRA_MESSAGE);
@@ -38,8 +39,12 @@ public class SendMessageService extends IntentService {
             Assert.assertNotNull(messageTo);
 
             try {
-                GoogleCloudMessaging.getInstance(this)
-                        .send(messageTo, message.getId(), message.getTimeToLeave(), message.getData());
+                GoogleCloudMessaging.getInstance(this).send(
+                        messageTo,
+                        message.getId(),
+                        message.getTimeToLeave(),
+                        message.getData()
+                );
                 OPFPushLog.d("Message '%s' has sent.", message);
             } catch (IOException ex) {
                 OPFPushLog.e(String.format("Error while send Message '%s'.", message), ex);

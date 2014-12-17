@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.configuration;
 
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.listener.EventListener;
 
 import java.util.ArrayList;
@@ -31,14 +32,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Configuration object for {@link OPFPushHelper}.
- * You can create instance of this class with {@link Options.Builder}.
+ * Configuration object for {@link org.onepf.opfpush.OPFPushHelper}.
+ * You can create instance of this class with {@link Configuration.Builder}.
  *
  * @author Kirill Rozov
  * @author Roman Savin
  * @since 04.09.2014
  */
-public final class Options {
+public final class Configuration {
 
     @NonNull
     private final List<PushProvider> providers;
@@ -46,23 +47,20 @@ public final class Options {
     @NonNull
     private final EventListener eventListener;
 
-    private final boolean isSelectSystemPreferred;
-
     @Nullable
     private final Backoff backoff;
 
-    private Options(@NonNull Collection<? extends PushProvider> providers,
-                    @NonNull EventListener eventListener,
-                    @Nullable Backoff backoff,
-                    boolean selectSystemPreferred) {
-        this.providers = Collections.unmodifiableList(new ArrayList<PushProvider>(providers));
-        this.eventListener = eventListener;
-        this.isSelectSystemPreferred = selectSystemPreferred;
-        this.backoff = backoff;
-    }
+    private final boolean isSelectSystemPreferred;
 
-    public boolean isSelectSystemPreferred() {
-        return isSelectSystemPreferred;
+    private Configuration(@NonNull final Collection<? extends PushProvider> providers,
+                          @NonNull final EventListener eventListener,
+                          @Nullable final Backoff backoff,
+                          final boolean selectSystemPreferred) {
+
+        this.providers = Collections.unmodifiableList(new ArrayList<>(providers));
+        this.eventListener = eventListener;
+        this.backoff = backoff;
+        this.isSelectSystemPreferred = selectSystemPreferred;
     }
 
     /**
@@ -90,58 +88,43 @@ public final class Options {
         return backoff;
     }
 
+    public boolean isSelectSystemPreferred() {
+        return isSelectSystemPreferred;
+    }
+
     @Override
     public String toString() {
-        return "Options{"
-                + "providers="
-                + providers
-                + ", isSelectSystemPreferred="
-                + isSelectSystemPreferred
+        return "Configuration {"
+                + "providers = " + providers
+                + ", isSelectSystemPreferred = " + isSelectSystemPreferred
                 + '}';
     }
 
     /**
-     * Helper class to create instance of {@link org.onepf.opfpush.Options}.
+     * Helper class to create instance of {@link Configuration}.
      */
-    public static class Builder {
-        public static final int PROVIDERS_CAPACITY = 4;
+    public static final class Builder {
 
         @Nullable
-        private Map<String, PushProvider> providers;
+        private Map<String, PushProvider> providersMap;
 
         @Nullable
         private EventListener eventListener;
 
-        private boolean isSelectSystemPreferred = true;
-
         @Nullable
         private Backoff backoff = new ExponentialBackoff();
 
-        /**
-         * Mark for try select the best store for device from added providers.
-         * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
-         * If system has no preferred store or it isn't available push provider will be selected
-         * be default algorithm.
-         * <p/>
-         * By default false.
-         *
-         * @param selectSystemPreferred Does select system preferred store.
-         * @return The current {@code Builder}.
-         */
-        public Builder setSelectSystemPreferred(boolean selectSystemPreferred) {
-            isSelectSystemPreferred = selectSystemPreferred;
-            return this;
-        }
+        private boolean isSelectSystemPreferred = true;
 
         /**
-         * Add the providers to the options.
+         * Add the providers to the configuration.
          *
          * @param providers Providers to add.
          * @return The current {@code Builder}.
          * @throws java.lang.IllegalArgumentException If try to add already added providers.
          */
         @NonNull
-        public Builder addProviders(@NonNull PushProvider... providers) {
+        public Builder addProviders(@NonNull final PushProvider... providers) {
             if (providers.length == 0) {
                 return this;
             } else {
@@ -149,21 +132,15 @@ public final class Options {
             }
         }
 
-        @NonNull
-        public Builder setEventListener(@NonNull EventListener eventListener) {
-            this.eventListener = eventListener;
-            return this;
-        }
-
         /**
-         * Add the providers to the options.
+         * Add the providers to the configuration.
          *
          * @param providers Providers to add.
          * @return The current {@code Builder}.
          * @throws java.lang.IllegalArgumentException If try to add already added providers.
          */
         @NonNull
-        public Builder addProviders(@NonNull List<? extends PushProvider> providers) {
+        public Builder addProviders(@NonNull final List<? extends PushProvider> providers) {
             if (providers.isEmpty()) {
                 return this;
             }
@@ -174,19 +151,26 @@ public final class Options {
                 }
             }
 
-            if (this.providers == null) {
-                this.providers = new LinkedHashMap<String, PushProvider>(PROVIDERS_CAPACITY);
+            if (this.providersMap == null) {
+                this.providersMap = new LinkedHashMap<>();
             }
 
             for (PushProvider provider : providers) {
                 final String providerName = provider.getName();
-                if (this.providers.containsKey(providerName)) {
+                if (this.providersMap.containsKey(providerName)) {
                     throw new IllegalArgumentException(
-                            String.format("Provider '%s' already added.", provider));
+                            String.format("Provider '%s' already added.", provider)
+                    );
                 } else {
-                    this.providers.put(providerName, provider);
+                    this.providersMap.put(providerName, provider);
                 }
             }
+            return this;
+        }
+
+        @NonNull
+        public Builder setEventListener(@NonNull final EventListener eventListener) {
+            this.eventListener = eventListener;
             return this;
         }
 
@@ -196,22 +180,38 @@ public final class Options {
         }
 
         /**
-         * Create instance of {@link Options} with data from the builder.
+         * Mark for try select the best store for device from added providers.
+         * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
+         * If system has no preferred store or it isn't available push provider will be selected
+         * be default algorithm.
+         * <p/>
+         * By default false.
          *
-         * @return New {@link Options} object.
+         * @param isSelectSystemPreferred Does select system preferred store.
+         * @return The current {@code Builder}.
+         */
+        public Builder setSelectSystemPreferred(final boolean isSelectSystemPreferred) {
+            this.isSelectSystemPreferred = isSelectSystemPreferred;
+            return this;
+        }
+
+        /**
+         * Create instance of {@link Configuration} with data from the builder.
+         *
+         * @return New {@link Configuration} object.
          * @throws java.lang.IllegalArgumentException If no one provider added.
          */
         @NonNull
-        public Options build() {
-            if (providers == null) {
+        public Configuration build() {
+            if (providersMap == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
             }
             if (eventListener == null) {
                 throw new IllegalArgumentException("Need to add event listener.");
             }
 
-            return new Options(
-                    providers.values(),
+            return new Configuration(
+                    providersMap.values(),
                     eventListener,
                     backoff,
                     isSelectSystemPreferred
@@ -221,8 +221,8 @@ public final class Options {
         @Override
         public String toString() {
             return "Builder{"
-                    + "providers="
-                    + providers
+                    + "providersMap="
+                    + providersMap
                     + ", systemPushPreferred="
                     + isSelectSystemPreferred
                     + '}';

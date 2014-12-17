@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.configuration;
 
 import android.support.annotation.NonNull;
+
+import org.onepf.opfpush.OPFPushLog;
 
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -28,21 +30,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 05.09.14.
  */
 public final class ExponentialBackoff implements Backoff {
+
     public static final int DEFAULT_TRY_COUNT = Integer.MAX_VALUE;
-    private final int tryCount;
+
+    private final int maxTryCount;
 
     @NonNull
     private final AtomicInteger tryNumber = new AtomicInteger(0);
 
-    public ExponentialBackoff(int tryCount) {
-        if (tryCount < 1) {
-            throw new IllegalArgumentException("Try count can't less than 1.");
-        }
-        this.tryCount = tryCount;
+    public ExponentialBackoff() {
+        maxTryCount = DEFAULT_TRY_COUNT;
     }
 
-    public ExponentialBackoff() {
-        tryCount = DEFAULT_TRY_COUNT;
+    public ExponentialBackoff(final int maxTryCount) {
+        if (maxTryCount < 1) {
+            throw new IllegalArgumentException("Try count can't less than 1.");
+        }
+        this.maxTryCount = maxTryCount;
     }
 
     /**
@@ -54,7 +58,7 @@ public final class ExponentialBackoff implements Backoff {
 
     @Override
     public long getTryDelay() {
-        if (tryNumber.get() > tryCount) {
+        if (tryNumber.get() > maxTryCount) {
             throw new NoSuchElementException();
         }
         return getTryDelay(tryNumber.get());
@@ -72,6 +76,6 @@ public final class ExponentialBackoff implements Backoff {
 
     @Override
     public boolean hasTries() {
-        return tryNumber.getAndIncrement() < tryCount;
+        return tryNumber.getAndIncrement() < maxTryCount;
     }
 }

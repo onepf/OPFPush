@@ -38,6 +38,9 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.configuration.Backoff;
+import org.onepf.opfpush.configuration.Configuration;
+import org.onepf.opfpush.util.PackageUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +58,7 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
  * Main class for manage push providers.
  * For get instance of this class call {@link #getInstance(android.content.Context)}.
  * <p/>
- * Before do any operations with {@code OpenPushHelper} you must call {@link #init(Options)}.
+ * Before do any operations with {@code OpenPushHelper} you must call {@link #init(org.onepf.opfpush.configuration.Configuration)}.
  * <p/>
  * For start select provider for registerWithNext call {@link #register()}.
  *
@@ -89,15 +92,21 @@ public final class OPFPushHelper {
     @Nullable
     private AlarmManager alarmManager;
 
-    private volatile Options options;
+    private volatile Configuration configuration;
 
-    private final Object registrationLock = new Object();
-    private final Object initLock = new Object();
-
+    @NonNull
     private final ReceivedMessageHandler receivedMessageHandler = new ReceivedMessageHandler();
+
+    @NonNull
     private final Settings settings;
 
-    private OPFPushHelper(@NonNull Context context) {
+    @NonNull
+    private final Object registrationLock = new Object();
+
+    @NonNull
+    private final Object initLock = new Object();
+
+    private OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = new Settings(context);
     }
@@ -129,156 +138,30 @@ public final class OPFPushHelper {
         return instance;
     }
 
-    public ReceivedMessageHandler getReceivedMessageHandler() {
-        checkInitDone();
-        return receivedMessageHandler;
-    }
-
-    /**
-     * Is init done and you may work with {@code OpenPushHelper}.
-     *
-     * @return True if init is done, else - false.
-     */
-    public boolean isInitDone() {
-        synchronized (initLock) {
-            return options != null;
-        }
-    }
-
-    /**
-     * Check can you send message in current time. This method return only if provider is registered
-     * and it is implement {@link SenderPushProvider} interface.
-     */
-    public boolean canSendMessages() {
-        return currentProvider instanceof SenderPushProvider;
-    }
-
-    /**
-     * Send message to server. Before send message check that you can send messages with
-     * {@link #canSendMessages()} method.
-     *
-     * @param message Message to send.
-     * @throws OPFPushException When try send message when any provider isn't registered
-     *                          or registered provider doesn't support send messages.
-     */
-    public void sendMessage(@NonNull final Message message) {
-        synchronized (registrationLock) {
-            OPFPushLog.methodD(OPFPushHelper.class, "sendMessage", message);
-
-            if (currentProvider instanceof SenderPushProvider) {
-                ((SenderPushProvider) currentProvider).send(message);
-            } else if (isRegistered()) {
-                throw new OPFPushException(
-                        "Current provider '%s' not support send messages.",
-                        currentProvider
-                );
-            } else {
-                throw new OPFIllegalStateException("Provider not registered.");
-            }
-        }
-    }
-
-    boolean isRegistered() {
-        return settings.getState() == REGISTERED;
-    }
-
-    boolean isUnregistered() {
-        return settings.getState() == UNREGISTERED;
-    }
-
-    boolean isRegistering() {
-        return settings.getState() == REGISTERING;
-    }
-
-    boolean isUnregistering() {
-        return settings.getState() == UNREGISTERING;
-    }
-
-    private void checkInitDone() {
-        if (!isInitDone()) {
-            throw new OPFPushException("Before work with OpenPushHelper call init() first.");
-        }
-    }
-
     /**
      * Init {@code OpenPushHelper}. You must call this method before do any operation.
      *
-     * @param initialOptions Instance of {@code Options}.
+     * @param initialConfiguration Instance of {@code Options}.
      */
     @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
-    public void init(@NonNull final Options initialOptions) {
-        OPFPushLog.methodD(OPFPushHelper.class, "init", initialOptions);
+    public void init(@NonNull final Configuration initialConfiguration) {
+        OPFPushLog.methodD(OPFPushHelper.class, "init", initialConfiguration);
 
         if (isInitDone()) {
             throw new OPFPushException("You can init OpenPushHelper only one time.");
         }
 
-        if (this.options == null) {
+        if (this.configuration == null) {
             synchronized (initLock) {
-                if (this.options == null) {
-                    this.options = initialOptions;
+                if (this.configuration == null) {
+                    this.configuration = initialConfiguration;
                 }
             }
         }
 
-        this.eventListener = new EventListenerWrapper(options.getEventListener());
+        this.eventListener = new EventListenerWrapper(configuration.getEventListener());
         initLastProvider();
         OPFPushLog.i("Init done.");
-    }
-
-    private void initLastProvider() {
-        synchronized (registrationLock) {
-            OPFPushLog.methodD(OPFPushHelper.class, "initLastProvider");
-
-            final PushProvider lastProvider = getLastProvider();
-            if (lastProvider == null) {
-                OPFPushLog.d("No last provider.");
-                return;
-            }
-
-            OPFPushLog.d("Try restore last provider '%s'.", lastProvider);
-
-            if (lastProvider.isAvailable()) {
-                OPFPushLog.d("Last provider is available");
-
-                if (lastProvider.isRegistered()) {
-                    OPFPushLog.d("Last provider is registered.");
-                    currentProvider = lastProvider;
-                    settings.saveState(REGISTERED);
-                } else {
-                    OPFPushLog.d("Last provider need register.");
-                    settings.saveState(REGISTERING);
-                    register(lastProvider);
-                }
-            } else {
-                OPFPushLog.d("Last provider is unavailable");
-
-                settings.saveLastProvider(null);
-                settings.saveState(UNREGISTERED);
-
-                onProviderUnavailable(lastProvider);
-            }
-        }
-    }
-
-    /**
-     * Check if at least one provider available.
-     */
-    public boolean hasAvailableProvider() {
-        for (PushProvider provider : options.getProviders()) {
-            if (provider.isAvailable()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void restartRegisterOnBoot() {
-        OPFPushLog.methodD(OPFPushHelper.class, "restartRegisterOnBoot");
-
-        checkInitDone();
-        settings.clear();
-        register();
     }
 
     /**
@@ -306,7 +189,7 @@ public final class OPFPushHelper {
 
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
-                    if (options.isSelectSystemPreferred()
+                    if (configuration.isSelectSystemPreferred()
                             && registerSystemPreferredProvider()) {
                         return;
                     }
@@ -317,94 +200,6 @@ public final class OPFPushHelper {
                     throw new UnregistrationNotCompletedStateException();
             }
         }
-    }
-
-    /**
-     * Check is register operation available.
-     *
-     * @return true if initialization is done and unregistration isn't being performed.
-     */
-    public boolean isRegistrationAvailable() {
-        return isInitDone() && !isUnregistering();
-    }
-
-    /**
-     * Check is unregister operation available.
-     *
-     * @return true if initialization is done and registration isn't being performed.
-     */
-    public boolean isUnregistrationAvailable() {
-        return isInitDone() && !isRegistering();
-    }
-
-    @Nullable
-    public String getRegistrationId() {
-        if (currentProvider != null) {
-            return currentProvider.getRegistrationId();
-        }
-
-        return null;
-    }
-
-    private boolean registerSystemPreferredProvider() {
-        OPFPushLog.methodD(OPFPushHelper.class, "registerSystemPreferredProvider");
-
-        for (PushProvider provider : options.getProviders()) {
-            final String hostAppPackage = provider.getHostAppPackage();
-            OPFPushLog.d("Provider name : " + provider.getName());
-            OPFPushLog.d("Host app package : " + hostAppPackage);
-
-            if (hostAppPackage != null) {
-                if (PackageUtils.isSystemApp(appContext, hostAppPackage)
-                        && provider.isAvailable()) {
-                    register(provider);
-                    return true;
-                }
-            }
-        }
-
-        OPFPushLog.d("There aren't any available system preferred providers");
-        return false;
-    }
-
-    /**
-     * Register first available provider.
-     *
-     * @return True if find provider that can be registered, otherwise false.
-     */
-    private boolean registerFirstAvailableProvider() {
-        OPFPushLog.methodD(OPFPushHelper.class, "registerFirstAvailableProvider");
-
-        final List<PushProvider> providers = options.getProviders();
-
-        for (PushProvider provider : providers) {
-            OPFPushLog.d("Provider name : " + provider.getName());
-
-            if (provider.isAvailable()) {
-                OPFPushLog.d("Provider is available");
-                register(provider);
-                return true;
-            }
-        }
-
-        settings.saveState(UNREGISTERED);
-        OPFPushLog.w("No more available providers.");
-        eventListener.onNoAvailableProvider();
-        return false;
-    }
-
-    void register(@NonNull final String providerName) {
-        register(getProviderWithException(providerName));
-    }
-
-    /**
-     * Start register provider.
-     *
-     * @param provider Provider for registration.
-     */
-    private void register(@NonNull final PushProvider provider) {
-        OPFPushLog.methodD(OPFPushHelper.class, "register", provider);
-        provider.register();
     }
 
     /**
@@ -446,6 +241,305 @@ public final class OPFPushHelper {
         }
     }
 
+    /**
+     * Check can you send message in current time. This method return only if provider is registered
+     * and it is implement {@link SenderPushProvider} interface.
+     */
+    public boolean canSendMessages() {
+        return currentProvider instanceof SenderPushProvider;
+    }
+
+    /**
+     * Send message to server. Before send message check that you can send messages with
+     * {@link #canSendMessages()} method.
+     *
+     * @param message Message to send.
+     * @throws OPFPushException When try send message when any provider isn't registered
+     *                          or registered provider doesn't support send messages.
+     */
+    public void sendMessage(@NonNull final Message message) {
+        synchronized (registrationLock) {
+            OPFPushLog.methodD(OPFPushHelper.class, "sendMessage", message);
+
+            if (currentProvider instanceof SenderPushProvider) {
+                ((SenderPushProvider) currentProvider).send(message);
+            } else if (isRegistered()) {
+                throw new OPFPushException(
+                        "Current provider '%s' not support send messages.",
+                        currentProvider
+                );
+            } else {
+                throw new OPFIllegalStateException("Provider not registered.");
+            }
+        }
+    }
+
+    /**
+     * Check if at least one provider available.
+     */
+    //TODO: remove if useless
+    public boolean hasAvailableProvider() {
+        for (PushProvider provider : configuration.getProviders()) {
+            if (provider.isAvailable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check is register operation available.
+     *
+     * @return true if initialization is done and unregistration isn't being performed.
+     */
+    public boolean isRegistrationAvailable() {
+        return isInitDone() && !isUnregistering();
+    }
+
+    /**
+     * Check is unregister operation available.
+     *
+     * @return true if initialization is done and registration isn't being performed.
+     */
+    public boolean isUnregistrationAvailable() {
+        return isInitDone() && !isRegistering();
+    }
+
+    @Nullable
+    public String getRegistrationId() {
+        if (currentProvider != null) {
+            return currentProvider.getRegistrationId();
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public PushProvider getCurrentProvider() {
+        return currentProvider;
+    }
+
+    @NonNull
+    public ReceivedMessageHandler getReceivedMessageHandler() {
+        checkInitDone();
+        return receivedMessageHandler;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "OpenPushHelper{"
+                + "options="
+                + configuration
+                + ", currentProvider="
+                + currentProvider
+                + ", initDone="
+                + isInitDone()
+                + ", registered="
+                + isRegistered()
+                + '}';
+    }
+
+    /**
+     * Is init done and you may work with {@code OpenPushHelper}.
+     *
+     * @return True if init is done, else - false.
+     */
+    boolean isInitDone() {
+        synchronized (initLock) {
+            return configuration != null;
+        }
+    }
+
+    boolean isRegistered() {
+        return settings.getState() == REGISTERED;
+    }
+
+    boolean isUnregistered() {
+        return settings.getState() == UNREGISTERED;
+    }
+
+    boolean isRegistering() {
+        return settings.getState() == REGISTERING;
+    }
+
+    boolean isUnregistering() {
+        return settings.getState() == UNREGISTERING;
+    }
+
+    void restartRegisterOnBoot() {
+        OPFPushLog.methodD(OPFPushHelper.class, "restartRegisterOnBoot");
+
+        checkInitDone();
+        settings.clear();
+        register();
+    }
+
+    void register(@NonNull final String providerName) {
+        register(getProviderWithException(providerName));
+    }
+
+    /**
+     * Call this method when device state changed and need retry registration.
+     * May be call only when the helper in registered state.
+     */
+    void onNeedRetryRegister() {
+        OPFPushLog.methodD(OPFPushHelper.class, "onNeedRetryRegister", currentProvider);
+        Assert.assertNotNull(currentProvider);
+
+        settings.clear();
+        currentProvider.onRegistrationInvalid();
+        settings.saveState(REGISTERING);
+
+        if (currentProvider.isAvailable()) {
+            register(currentProvider);
+        } else {
+            onProviderUnavailable(currentProvider);
+        }
+    }
+
+    /**
+     * Call this method when provider become unavailable.
+     *
+     * @param provider Provider that become unavailable.
+     */
+    void onProviderUnavailable(@NonNull final PushProvider provider) {
+        OPFPushLog.methodD(OPFPushHelper.class, "onProviderUnavailable", provider);
+
+        provider.onUnavailable();
+        if (provider.equals(currentProvider)) {
+            OPFPushLog.d("Unavailable provider is equals current provider");
+
+            currentProvider = null;
+            settings.saveState(UNREGISTERED);
+            eventListener.onProviderBecameUnavailable(provider.getName());
+        }
+
+        register(); //Restart registration
+    }
+
+    private void postRetryRegister(@NonNull final String providerName) {
+        OPFPushLog.methodD(OPFPushHelper.class, "postRetryRegister", providerName);
+
+        Assert.assertNotNull(configuration.getBackoff());
+
+        final long when = System.currentTimeMillis() + configuration.getBackoff().getTryDelay();
+
+        OPFPushLog.d("Post retry register provider '%s' at %s", providerName,
+                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
+
+        final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
+        intent.setAction(OPFConstants.ACTION_REGISTER);
+        intent.putExtra(OPFConstants.EXTRA_PROVIDER_NAME, providerName);
+
+        if (alarmManager == null) {
+            alarmManager = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
+        }
+        if (alarmManager != null) {
+            alarmManager.set(
+                    AlarmManager.RTC, when, PendingIntent.getBroadcast(appContext, 0, intent, 0)
+            );
+        }
+    }
+
+    private void checkInitDone() {
+        if (!isInitDone()) {
+            throw new OPFPushException("Before work with OpenPushHelper call init() first.");
+        }
+    }
+
+    private void initLastProvider() {
+        synchronized (registrationLock) {
+            OPFPushLog.methodD(OPFPushHelper.class, "initLastProvider");
+
+            final PushProvider lastProvider = getLastProvider();
+            if (lastProvider == null) {
+                OPFPushLog.d("No last provider.");
+                return;
+            }
+
+            OPFPushLog.d("Try restore last provider '%s'.", lastProvider);
+
+            if (lastProvider.isAvailable()) {
+                OPFPushLog.d("Last provider is available");
+
+                if (lastProvider.isRegistered()) {
+                    OPFPushLog.d("Last provider is registered.");
+                    currentProvider = lastProvider;
+                    settings.saveState(REGISTERED);
+                } else {
+                    OPFPushLog.d("Last provider need register.");
+                    settings.saveState(REGISTERING);
+                    register(lastProvider);
+                }
+            } else {
+                OPFPushLog.d("Last provider is unavailable");
+
+                settings.saveLastProvider(null);
+                settings.saveState(UNREGISTERED);
+
+                onProviderUnavailable(lastProvider);
+            }
+        }
+    }
+
+    private boolean registerSystemPreferredProvider() {
+        OPFPushLog.methodD(OPFPushHelper.class, "registerSystemPreferredProvider");
+
+        for (PushProvider provider : configuration.getProviders()) {
+            final String hostAppPackage = provider.getHostAppPackage();
+            OPFPushLog.d("Provider name : " + provider.getName());
+            OPFPushLog.d("Host app package : " + hostAppPackage);
+
+            if (hostAppPackage != null) {
+                if (PackageUtils.isSystemApp(appContext, hostAppPackage)
+                        && provider.isAvailable()) {
+                    register(provider);
+                    return true;
+                }
+            }
+        }
+
+        OPFPushLog.d("There aren't any available system preferred providers");
+        return false;
+    }
+
+    /**
+     * Register first available provider.
+     *
+     * @return True if find provider that can be registered, otherwise false.
+     */
+    private boolean registerFirstAvailableProvider() {
+        OPFPushLog.methodD(OPFPushHelper.class, "registerFirstAvailableProvider");
+
+        final List<PushProvider> providers = configuration.getProviders();
+
+        for (PushProvider provider : providers) {
+            OPFPushLog.d("Provider name : " + provider.getName());
+
+            if (provider.isAvailable()) {
+                OPFPushLog.d("Provider is available");
+                register(provider);
+                return true;
+            }
+        }
+
+        settings.saveState(UNREGISTERED);
+        OPFPushLog.w("No more available providers.");
+        eventListener.onNoAvailableProvider();
+        return false;
+    }
+
+    /**
+     * Start register provider.
+     *
+     * @param provider Provider for registration.
+     */
+    private void register(@NonNull final PushProvider provider) {
+        OPFPushLog.methodD(OPFPushHelper.class, "register", provider);
+        provider.register();
+    }
+
     private void unregisterPackageChangeReceiver() {
         OPFPushLog.methodD(OPFPushHelper.class, "unregisterPackageChangeReceiver");
 
@@ -453,11 +547,6 @@ public final class OPFPushHelper {
             appContext.unregisterReceiver(packageReceiver);
             packageReceiver = null;
         }
-    }
-
-    @Nullable
-    public PushProvider getCurrentProvider() {
-        return currentProvider;
     }
 
     /**
@@ -471,7 +560,7 @@ public final class OPFPushHelper {
     private PushProvider getProvider(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "getProvider", providerName);
 
-        for (PushProvider provider : options.getProviders()) {
+        for (PushProvider provider : configuration.getProviders()) {
             if (providerName.equals(provider.getName())) {
                 return provider;
             }
@@ -515,83 +604,6 @@ public final class OPFPushHelper {
 
         OPFPushLog.d("There isn't a stored provider");
         return null;
-    }
-
-    @Override
-    public String toString() {
-        return "OpenPushHelper{"
-                + "options="
-                + options
-                + ", currentProvider="
-                + currentProvider
-                + ", initDone="
-                + isInitDone()
-                + ", registered="
-                + isRegistered()
-                + '}';
-    }
-
-    void postRetryRegister(@NonNull final String providerName) {
-        OPFPushLog.methodD(OPFPushHelper.class, "postRetryRegister", providerName);
-
-        Assert.assertNotNull(options.getBackoff());
-
-        final long when = System.currentTimeMillis() + options.getBackoff().getTryDelay();
-
-        OPFPushLog.d("Post retry register provider '%s' at %s", providerName,
-                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
-
-        final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
-        intent.setAction(OPFConstants.ACTION_REGISTER);
-        intent.putExtra(OPFConstants.EXTRA_PROVIDER_NAME, providerName);
-
-        if (alarmManager == null) {
-            alarmManager = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
-        }
-        if (alarmManager != null) {
-            alarmManager.set(
-                    AlarmManager.RTC, when, PendingIntent.getBroadcast(appContext, 0, intent, 0)
-            );
-        }
-    }
-
-    /**
-     * Call this method when device state changed and need retry registration.
-     * May be call only when the helper in registered state.
-     */
-    void onNeedRetryRegister() {
-        OPFPushLog.methodD(OPFPushHelper.class, "onNeedRetryRegister", currentProvider);
-        Assert.assertNotNull(currentProvider);
-
-        settings.clear();
-        currentProvider.onRegistrationInvalid();
-        settings.saveState(REGISTERING);
-
-        if (currentProvider.isAvailable()) {
-            register(currentProvider);
-        } else {
-            onProviderUnavailable(currentProvider);
-        }
-    }
-
-    /**
-     * Call this method when provider become unavailable.
-     *
-     * @param provider Provider that become unavailable.
-     */
-    void onProviderUnavailable(@NonNull final PushProvider provider) {
-        OPFPushLog.methodD(OPFPushHelper.class, "onProviderUnavailable", provider);
-
-        provider.onUnavailable();
-        if (provider.equals(currentProvider)) {
-            OPFPushLog.d("Unavailable provider is equals current provider");
-
-            currentProvider = null;
-            settings.saveState(UNREGISTERED);
-            eventListener.onProviderBecameUnavailable(provider.getName());
-        }
-
-        register(); //Restart registration
     }
 
     /**
@@ -650,7 +662,7 @@ public final class OPFPushHelper {
                 if (!isUnregistering()) {
                     OPFPushLog.d("Successfully register provider '%s'.", providerName);
 
-                    final Backoff backoff = options.getBackoff();
+                    final Backoff backoff = configuration.getBackoff();
                     if (backoff != null) {
                         backoff.reset();
                     }
@@ -720,7 +732,7 @@ public final class OPFPushHelper {
                     OPFPushLog.d("Registration state isn't REGISTERED");
 
                     settings.saveState(REGISTERING);
-                    final Backoff backoff = options.getBackoff();
+                    final Backoff backoff = configuration.getBackoff();
                     if (error == OPFError.SERVICE_NOT_AVAILABLE
                             && backoff != null
                             && backoff.hasTries()) {
@@ -792,6 +804,7 @@ public final class OPFPushHelper {
      * @since 24.09.14.
      */
     private static final class EventListenerWrapper implements EventListener {
+
         private static final Handler HANDLER = new Handler(Looper.getMainLooper());
         private final EventListener listener;
 

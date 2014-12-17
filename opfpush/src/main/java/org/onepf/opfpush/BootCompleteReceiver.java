@@ -21,8 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import static android.provider.Settings.Secure.ANDROID_ID;
+
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 09.09.14.
  */
 public class BootCompleteReceiver extends BroadcastReceiver {
@@ -46,6 +49,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     }
 
     public static boolean isAndroidIDChanged(@NonNull Context context) {
-        return !android.provider.Settings.Secure.ANDROID_ID.equals(new Settings(context).getLastAndroidId());
+        return !ANDROID_ID.equals(new Settings(context).getLastAndroidId());
     }
 }

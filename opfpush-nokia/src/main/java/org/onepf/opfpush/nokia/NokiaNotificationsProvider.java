@@ -19,6 +19,7 @@ package org.onepf.opfpush.nokia;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.nokia.push.PushRegistrar;
 
@@ -39,9 +40,11 @@ import static org.onepf.opfpush.nokia.Constants.NOKIA_STORE_APP_PACKAGE;
  */
 public class NokiaNotificationsProvider extends BasePushProvider {
 
+    @NonNull
     private final String[] sendersIds;
 
-    public NokiaNotificationsProvider(@NonNull Context context, @NonNull String... sendersID) {
+    public NokiaNotificationsProvider(@NonNull final Context context,
+                                      @NonNull final String... sendersID) {
         super(context, NAME, NOKIA_STORE_APP_PACKAGE);
         sendersIds = sendersID;
     }
@@ -87,7 +90,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     /**
      * Sets whether the device was successfully registered in the server side.
      */
-    public void setRegisteredOnServer(final Context context, final boolean flag) {
+    public void setRegisteredOnServer(@NonNull final Context context, final boolean flag) {
         OPFPushLog.methodD(NokiaNotificationsProvider.class, "setRegisteredOnServer", context, flag);
         PushRegistrar.setRegisteredOnServer(context, flag);
     }
@@ -95,7 +98,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     /**
      * Sets how long (in milliseconds) the {@link #isRegistered()} flag is valid.
      */
-    public void setRegisterOnServerLifespan(final Context context, final long lifespan) {
+    public void setRegisterOnServerLifespan(@NonNull final Context context, final long lifespan) {
         OPFPushLog.methodD(NokiaNotificationsProvider.class, "setRegisterOnServerLifespan",
                 context, lifespan);
         PushRegistrar.setRegisterOnServerLifespan(context, lifespan);
@@ -113,6 +116,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
         return PushRegistrar.isRegisteredOnServer(getContext());
     }
 
+    @Nullable
     @Override
     public String getRegistrationId() {
         return PushRegistrar.getRegistrationId(getContext());

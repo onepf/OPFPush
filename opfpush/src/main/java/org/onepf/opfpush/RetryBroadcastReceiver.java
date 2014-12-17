@@ -19,6 +19,7 @@ package org.onepf.opfpush;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.util.Utils;
@@ -31,7 +32,7 @@ import org.onepf.opfpush.util.Utils;
 public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFPushLog.methodD(RetryBroadcastReceiver.class, "onReceive",
                 context, Utils.toString(intent));
 

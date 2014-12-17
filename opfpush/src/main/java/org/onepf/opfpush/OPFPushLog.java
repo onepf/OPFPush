@@ -20,8 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import static org.onepf.opfpush.util.Utils.ITEM_DIVIDER;
-
 /**
  * @author Roman Savin
  * @since 11.12.14
@@ -29,6 +27,8 @@ import static org.onepf.opfpush.util.Utils.ITEM_DIVIDER;
 public final class OPFPushLog {
 
     private static final String TAG = "OPFPush";
+
+    private static final String ITEM_DIVIDER = ", ";
 
     private static boolean isLogEnable;
 

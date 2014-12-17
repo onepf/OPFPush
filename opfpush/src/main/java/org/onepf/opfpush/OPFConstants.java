@@ -27,7 +27,7 @@ public final class OPFConstants {
         throw new UnsupportedOperationException();
     }
 
-    public static final String EXTRA_PROVIDER_NAME = "provider_name";
+    static final String EXTRA_PROVIDER_NAME = "provider_name";
 
-    public static final String ACTION_REGISTER = BuildConfig.APPLICATION_ID + "intent.REGISTER";
+    static final String ACTION_REGISTER = BuildConfig.APPLICATION_ID + "intent.REGISTER";
 }

@@ -33,7 +33,7 @@ import android.support.annotation.Nullable;
  */
 public final class Utils {
 
-    public static final String ITEM_DIVIDER = ", ";
+    private static final String ITEM_DIVIDER = ", ";
 
     private Utils() {
         throw new UnsupportedOperationException();

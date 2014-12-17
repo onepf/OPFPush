@@ -20,6 +20,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfpush.configuration.Backoff;
+import org.onepf.opfpush.configuration.ExponentialBackoff;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 

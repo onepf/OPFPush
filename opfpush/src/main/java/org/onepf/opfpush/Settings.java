@@ -50,7 +50,7 @@ class Settings {
     @NonNull
     private final SharedPreferences preferences;
 
-    public Settings(@NonNull Context context) {
+    public Settings(@NonNull final Context context) {
         preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
@@ -108,7 +108,7 @@ class Settings {
         return preferences.getString(KEY_LAST_PROVIDER_NAME, null);
     }
 
-    public void saveLastProvider(@Nullable PushProvider provider) {
+    public void saveLastProvider(@Nullable final PushProvider provider) {
         OPFPushLog.methodD(Settings.class, "saveLastProvider", provider);
 
         final SharedPreferences.Editor editor = preferences.edit();
@@ -125,7 +125,7 @@ class Settings {
         return preferences.getString(KEY_LAST_ANDROID_ID, null);
     }
 
-    public void saveLastAndroidId(@Nullable String androidId) {
+    public void saveLastAndroidId(@Nullable final String androidId) {
         OPFPushLog.methodD(Settings.class, "saveLastAndroidId", androidId);
 
         final SharedPreferences.Editor editor = preferences.edit();

@@ -18,11 +18,11 @@ package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
 
-import org.onepf.opfpush.ExponentialBackoff;
+import org.onepf.opfpush.adm.ADMProvider;
+import org.onepf.opfpush.configuration.ExponentialBackoff;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.Options;
-import org.onepf.opfpush.adm.ADMProvider;
+import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.pushsample.listener.DemoEventListener;
 
@@ -39,7 +39,7 @@ public class DemoApplication extends Application {
         super.onCreate();
         OPFPushLog.setLogEnable(true);
 
-        final Options.Builder optionsBuilder = new Options.Builder()
+        final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
                         new GCMProvider(this, GCM_SENDER_ID),
                         new ADMProvider(this)
@@ -49,7 +49,7 @@ public class DemoApplication extends Application {
                 .setEventListener(new DemoEventListener(this));
 
         final OPFPushHelper helper = OPFPushHelper.getInstance(this);
-        helper.init(optionsBuilder.build());
+        helper.init(configBuilder.build());
 
         if (helper.isRegistrationAvailable()) {
             helper.register();

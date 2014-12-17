@@ -21,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfpush.util.PackageUtils;
 
 /**
  * Base class for create {@code PushProvider}.
@@ -48,39 +49,12 @@ public abstract class BasePushProvider implements PushProvider {
      * @param hostAppPackage Package of application that handle push message from server
      *                       and deliver it to applications.
      */
-    protected BasePushProvider(@NonNull Context context,
-                               @NonNull String name,
-                               @NonNull String hostAppPackage) {
+    protected BasePushProvider(@NonNull final Context context,
+                               @NonNull final String name,
+                               @NonNull final String hostAppPackage) {
         this.appContext = context.getApplicationContext();
         this.name = name;
         this.hostAppPackage = hostAppPackage;
-    }
-
-    /**
-     * Verify is manifest contains permission.
-     *
-     * @param ctx        Any instance of {@code Context}.
-     * @param permission Permission for verify.
-     */
-    protected static boolean checkPermission(@NonNull Context ctx, @NonNull String permission) {
-        OPFPushLog.methodD(BasePushProvider.class, "checkPermission", ctx, permission);
-
-        switch (ctx.getPackageManager().checkPermission(permission, ctx.getPackageName())) {
-            case PackageManager.PERMISSION_GRANTED:
-                return true;
-
-            default:
-                throw new OPFPushException("Your manifest doesn't contain permission '"
-                        + permission + ".' Check your AndroidManifest.xml.");
-        }
-    }
-
-    /**
-     * Get {@code Context} instance.
-     */
-    @NonNull
-    protected Context getContext() {
-        return appContext;
     }
 
     @Override
@@ -135,5 +109,33 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public void onRegistrationInvalid() {
+    }
+
+    /**
+     * Verify is manifest contains permission.
+     *
+     * @param context    Any instance of {@code Context}.
+     * @param permission Permission for verify.
+     */
+    protected static boolean checkPermission(@NonNull final Context context,
+                                             @NonNull final String permission) {
+        OPFPushLog.methodD(BasePushProvider.class, "checkPermission", context, permission);
+
+        switch (context.getPackageManager().checkPermission(permission, context.getPackageName())) {
+            case PackageManager.PERMISSION_GRANTED:
+                return true;
+
+            default:
+                throw new OPFPushException("Your manifest doesn't contain permission '"
+                        + permission + ".' Check your AndroidManifest.xml.");
+        }
+    }
+
+    /**
+     * Get {@code Context} instance.
+     */
+    @NonNull
+    protected Context getContext() {
+        return appContext;
     }
 }

@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.listener.TestEventListener;
 import org.onepf.opfpush.mock.MockPushProvider;
+import org.onepf.opfpush.configuration.Configuration;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -35,11 +36,11 @@ import java.util.List;
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
-public class OptionsTest {
+public class ConfigurationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderTwiceAddProvider() {
-        final Options.Builder builder = new Options.Builder();
+        final Configuration.Builder builder = new Configuration.Builder();
         final PushProvider provider = new MockPushProvider();
         builder.addProviders(provider);
         builder.addProviders(provider);
@@ -47,21 +48,21 @@ public class OptionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderAddProviderWithSameName() {
-        final Options.Builder builder = new Options.Builder();
+        final Configuration.Builder builder = new Configuration.Builder();
         builder.addProviders(new MockPushProvider());
         builder.addProviders(new MockPushProvider());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildWithoutEventListener() {
-        new Options.Builder()
+        new Configuration.Builder()
                 .addProviders(new MockPushProvider())
                 .build();
     }
 
     @Test
     public void testBuilderProviderOrder() {
-        final Options.Builder builder = new Options.Builder();
+        final Configuration.Builder builder = new Configuration.Builder();
         final PushProvider[] providers = {
                 new MockPushProvider("provider1"),
                 new MockPushProvider("provider2"),
@@ -70,9 +71,9 @@ public class OptionsTest {
         };
         builder.addProviders(providers);
         builder.setEventListener(new TestEventListener());
-        final Options options = builder.build();
+        final Configuration configuration = builder.build();
 
-        final List<PushProvider> optionsProviders = options.getProviders();
+        final List<PushProvider> optionsProviders = configuration.getProviders();
         Assert.assertEquals(providers.length, optionsProviders.size());
         for (int i = 0; i < providers.length; i++) {
             final PushProvider provider = optionsProviders.get(i);
@@ -84,36 +85,36 @@ public class OptionsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderWithoutProvider() {
-        new Options.Builder().build();
+        new Configuration.Builder().build();
     }
 
     @Test
     public void testOptionsBuild() {
-        final Options.Builder builder = new Options.Builder();
-        final Options options = builder
+        final Configuration.Builder builder = new Configuration.Builder();
+        final Configuration configuration = builder
                 .addProviders(new MockPushProvider())
                 .setEventListener(new TestEventListener())
                 .build();
 
-        Assert.assertEquals(1, options.getProviders().size());
-        Assert.assertEquals(MockPushProvider.class, options.getProviders().get(0).getClass());
+        Assert.assertEquals(1, configuration.getProviders().size());
+        Assert.assertEquals(MockPushProvider.class, configuration.getProviders().get(0).getClass());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testUnmodifiableProviders() {
-        final Options.Builder builder = new Options.Builder();
+        final Configuration.Builder builder = new Configuration.Builder();
         final List<PushProvider> providers = new ArrayList<PushProvider>(1);
         final MockPushProvider mockPushProvider = new MockPushProvider("provider1");
         providers.add(mockPushProvider);
         builder.addProviders(providers);
         builder.setEventListener(new TestEventListener());
 
-        final Options options = builder.build();
-        Assert.assertNotNull(options.getProviders());
-        Assert.assertNotSame(providers, options.getProviders());
-        Assert.assertEquals(1, options.getProviders().size());
-        Assert.assertSame(mockPushProvider, options.getProviders().get(0));
+        final Configuration configuration = builder.build();
+        Assert.assertNotNull(configuration.getProviders());
+        Assert.assertNotSame(providers, configuration.getProviders());
+        Assert.assertEquals(1, configuration.getProviders().size());
+        Assert.assertSame(mockPushProvider, configuration.getProviders().get(0));
 
-        options.getProviders().add(new MockPushProvider("provider2"));
+        configuration.getProviders().add(new MockPushProvider("provider2"));
     }
 }

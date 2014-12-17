@@ -33,6 +33,7 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.listener.SimpleEventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.configuration.Configuration;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -42,7 +43,6 @@ import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.onepf.opfpush.model.OPFError.AUTHENTICATION_FAILED;
 import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
@@ -82,7 +82,7 @@ public class GCMServiceTest {
                     @Override
                     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
                         OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
-                        assertEquals(GCMProvider.NAME, providerName);
+                        assertEquals(GCMConstants.NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 
@@ -112,7 +112,7 @@ public class GCMServiceTest {
                     @Override
                     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
                         OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
-                        assertEquals(GCMProvider.NAME, providerName);
+                        assertEquals(GCMConstants.NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 
@@ -252,12 +252,11 @@ public class GCMServiceTest {
     }
 
     private OPFPushHelper initOPFPushHelper(@NonNull final EventListener eventListener) {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new GCMProvider(Robolectric.application, SENDER_ID))
                 .setEventListener(eventListener);
         final OPFPushHelper helper = newOPFPushHelperInstance();
         helper.init(builder.build());
-        assertTrue(helper.isInitDone());
         return helper;
     }
 

@@ -43,7 +43,7 @@ public class ADMProvider extends BasePushProvider {
     @NonNull
     private ADMDelegate adm;
 
-    public ADMProvider(@NonNull Context context) {
+    public ADMProvider(@NonNull final Context context) {
         super(context, NAME, KINDLE_STORE_APP_PACKAGE);
         adm = new ADMDelegate(context);
     }

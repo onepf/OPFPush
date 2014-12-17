@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import com.amazon.device.messaging.ADM;
 
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.PackageUtils;
+import org.onepf.opfpush.util.PackageUtils;
 
 import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
 

@@ -36,7 +36,7 @@ import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.PackageUtils;
+import org.onepf.opfpush.util.PackageUtils;
 import org.onepf.opfpush.util.Utils;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     private final GCMSettings settings;
 
-    public GCMProvider(@NonNull Context context, @NonNull String senderID) {
+    public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
 
         this.senderID = senderID;
@@ -102,17 +102,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                 && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
-    private boolean needGoogleAccounts() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4);
-    }
-
-    @Override
-    @Nullable
-    public String getRegistrationId() {
-        return settings.getRegistrationId();
-    }
-
     @Override
     public boolean isAvailable() {
         //Need verify that GCM classes present, because dependency provided.
@@ -136,19 +125,10 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         return false;
     }
 
-    private boolean checkGoogleAccount() {
-        OPFPushLog.methodD(GCMProvider.class, "checkGoogleAccount");
-        if (needGoogleAccounts()) {
-            OPFPushLog.d("Need google account");
-            // On device with version of Android less than "4.0.4"
-            // we need to ensure that the user has at least one google account.
-            final Account[] googleAccounts
-                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
-            return googleAccounts.length != 0;
-        } else {
-            OPFPushLog.d("Not need google account");
-            return true;
-        }
+    @Override
+    @Nullable
+    public String getRegistrationId() {
+        return settings.getRegistrationId();
     }
 
     @Override
@@ -165,35 +145,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             return registeredVersion != GCMSettings.NO_SAVED_APP_VERSION
                     && registeredVersion == getAppVersion();
         }
-    }
-
-    int getAppVersion() {
-        try {
-            return PackageUtils.getAppVersion(getContext());
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new OPFPushException("Application not found", e);
-        }
-    }
-
-    public void close() {
-        OPFPushLog.methodD(GCMProvider.class, "close");
-
-        settings.reset();
-        if (registrationExecutor != null) {
-            OPFPushLog.d("Registration executor is not null");
-
-            registrationExecutor.shutdownNow();
-            registrationExecutor = null;
-        }
-
-        GoogleCloudMessaging.getInstance(getContext()).close();
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
-                NAME, senderID, settings.getAppVersion());
     }
 
     @Override
@@ -224,7 +175,56 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         getContext().startService(intent);
     }
 
-    private void executeTask(final Runnable runnable) {
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
+                NAME, senderID, settings.getAppVersion());
+    }
+
+    private int getAppVersion() {
+        try {
+            return PackageUtils.getAppVersion(getContext());
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new OPFPushException("Application not found", e);
+        }
+    }
+
+    private boolean needGoogleAccounts() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4);
+    }
+
+    private boolean checkGoogleAccount() {
+        OPFPushLog.methodD(GCMProvider.class, "checkGoogleAccount");
+        if (needGoogleAccounts()) {
+            OPFPushLog.d("Need google account");
+            // On device with version of Android less than "4.0.4"
+            // we need to ensure that the user has at least one google account.
+            final Account[] googleAccounts
+                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
+            return googleAccounts.length != 0;
+        } else {
+            OPFPushLog.d("Not need google account");
+            return true;
+        }
+    }
+
+    private void close() {
+        OPFPushLog.methodD(GCMProvider.class, "close");
+
+        settings.reset();
+        if (registrationExecutor != null) {
+            OPFPushLog.d("Registration executor is not null");
+
+            registrationExecutor.shutdownNow();
+            registrationExecutor = null;
+        }
+
+        GoogleCloudMessaging.getInstance(getContext()).close();
+    }
+
+    private void executeTask(@NonNull final Runnable runnable) {
         OPFPushLog.methodD(GCMProvider.class, "executeTask", runnable);
 
         if (registrationExecutor == null || registrationExecutor.isShutdown()) {
@@ -274,7 +274,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             getContext().sendBroadcast(intent);
         }
 
-        private void onRegistrationSuccess(final String registrationId) {
+        private void onRegistrationSuccess(@NonNull final String registrationId) {
             OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
 
             settings.saveRegistrationId(registrationId);

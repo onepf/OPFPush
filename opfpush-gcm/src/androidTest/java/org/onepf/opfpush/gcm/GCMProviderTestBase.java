@@ -33,13 +33,14 @@ import org.robolectric.shadows.ShadowLog;
  */
 public abstract class GCMProviderTestBase {
 
+    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     private static final Account TEST_GOOGLE_ACCOUNT
-            = new Account("OnePF Test", GCMProvider.GOOGLE_ACCOUNT_TYPE);
+            = new Account("OnePF Test", GOOGLE_ACCOUNT_TYPE);
 
     @Before
     public void addGooglePlayApp() {
         ShadowLog.stream = System.out;
-        Robolectric.packageManager.addPackage(GCMProvider.GOOGLE_PLAY_APP_PACKAGE);
+        Robolectric.packageManager.addPackage(GCMConstants.GOOGLE_PLAY_APP_PACKAGE);
     }
 
     protected static void addGoogleAccount() {
@@ -71,6 +72,6 @@ public abstract class GCMProviderTestBase {
 
     @After
     public void removeGooglePlayApp() {
-        Robolectric.packageManager.removePackage(GCMProvider.GOOGLE_PLAY_APP_PACKAGE);
+        Robolectric.packageManager.removePackage(GCMConstants.GOOGLE_PLAY_APP_PACKAGE);
     }
 }

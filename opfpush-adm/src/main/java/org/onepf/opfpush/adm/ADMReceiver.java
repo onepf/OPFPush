@@ -26,7 +26,7 @@ import com.amazon.device.messaging.ADMMessageReceiver;
  * @author Roman Savin
  * @since 06.09.14.
  */
-public class ADMReceiver extends ADMMessageReceiver {
+public final class ADMReceiver extends ADMMessageReceiver {
 
     public ADMReceiver() {
         super(ADMService.class);

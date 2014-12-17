@@ -32,6 +32,7 @@ import org.onepf.opfpush.mock.MockInfinityUnregisterPushProvider;
 import org.onepf.opfpush.mock.MockPushProvider;
 import org.onepf.opfpush.mock.MockSenderPushProvider;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.configuration.Configuration;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -69,7 +70,7 @@ public class OPFPushHelperTest {
 
     @Test
     public void testInit() throws Exception {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider())
                 .setEventListener(new TestEventListener());
         final OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
@@ -82,7 +83,7 @@ public class OPFPushHelperTest {
 
     @Test(expected = OPFPushException.class)
     public void testInitTwice() throws Exception {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider())
                 .setEventListener(new TestEventListener());
         final OPFPushHelper opfPushHelper = OPFPushHelper.newInstance(Robolectric.application);
@@ -95,7 +96,7 @@ public class OPFPushHelperTest {
 
     @Test(expected = OPFPushException.class)
     public void testUnregisterWithoutRegister() throws Exception {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider())
                 .setEventListener(new TestEventListener());
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
@@ -110,7 +111,7 @@ public class OPFPushHelperTest {
         final String providerName = "providerName";
 
         final PushProvider provider = new MockPushProvider(providerName);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(provider)
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -150,7 +151,7 @@ public class OPFPushHelperTest {
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         assertFalse(helper.isInitDone());
 
-        Options.Builder builder = new Options.Builder()
+        Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(
                         new MockPushProvider("providerName1", false),
                         new MockPushProvider("providerName2")
@@ -179,7 +180,7 @@ public class OPFPushHelperTest {
                 new MockPushProvider("provider1", "org.openpf.store1"),
                 new MockPushProvider("provider2", "org.openpf.store2")
         };
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(providers)
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -217,7 +218,7 @@ public class OPFPushHelperTest {
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
         final String providerName = "providerName";
 
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider(providerName))
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -238,7 +239,7 @@ public class OPFPushHelperTest {
     @Test(expected = OPFPushException.class)
     public void testRegisterTwice() throws Exception {
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider())
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -291,7 +292,7 @@ public class OPFPushHelperTest {
         assertEquals(provider.getName(), lastProviderName);
 
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(provider)
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -325,7 +326,7 @@ public class OPFPushHelperTest {
         provider.setTestAvailable(false);
 
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(provider)
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -341,7 +342,7 @@ public class OPFPushHelperTest {
 
         final PushProvider nextProvider = new MockPushProvider();
 
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(lastProvider)
                 .addProviders(nextProvider)
                 .setEventListener(new TestEventListener());
@@ -379,7 +380,7 @@ public class OPFPushHelperTest {
         final MockPushProvider lastProvider = createHelperAndRegisterWithMockProvider();
         lastProvider.setTestAvailable(false);
 
-        Options.Builder builder = new Options.Builder()
+        Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider(false))
                 .addProviders(lastProvider)
                 .setEventListener(new TestEventListener());
@@ -452,7 +453,7 @@ public class OPFPushHelperTest {
 
     @Test(expected = OPFPushException.class)
     public void testSendMessageWhenNotRegisteredWithNotSendSupportProvider() throws Exception {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockPushProvider("providerForPref"))
                 .setEventListener(new TestEventListener());
 
@@ -494,13 +495,13 @@ public class OPFPushHelperTest {
         }
     }
 
-    private static Options getOptions(@NonNull OPFPushHelper helper) {
+    private static Configuration getOptions(@NonNull OPFPushHelper helper) {
         try {
             final Field optionsField = OPFPushHelper.class.getDeclaredField("options");
             if (!optionsField.isAccessible()) {
                 optionsField.setAccessible(true);
             }
-            return (Options) optionsField.get(helper);
+            return (Configuration) optionsField.get(helper);
         } catch (Exception e) {
             throw new RuntimeException("Error get options");
         }
@@ -508,7 +509,7 @@ public class OPFPushHelperTest {
 
     private static OPFPushHelper createHelperWithInfinityRegisterProvider() {
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockInfinityRegisterPushProvider())
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -517,7 +518,7 @@ public class OPFPushHelperTest {
 
     private static OPFPushHelper createHelperWithInfinityUnregisterProvider() {
         final OPFPushHelper helper = OPFPushHelper.newInstance(Robolectric.application);
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockInfinityUnregisterPushProvider())
                 .setEventListener(new TestEventListener());
         helper.init(builder.build());
@@ -526,7 +527,7 @@ public class OPFPushHelperTest {
 
     private static MockPushProvider createHelperAndRegisterWithMockProvider() {
         final MockPushProvider provider = new MockPushProvider("providerForPref");
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(provider)
                 .setEventListener(new TestEventListener());
 
@@ -537,7 +538,7 @@ public class OPFPushHelperTest {
     }
 
     private static void restoreUnavailableProvider_RecoverDisable(PushProvider... providers) {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(providers)
                 .setEventListener(new TestEventListener());
 
@@ -551,7 +552,7 @@ public class OPFPushHelperTest {
 
     //TODO add tests for provider callback
     private static OPFPushHelper createHelperWithMockSenderPushProvider() {
-        final Options.Builder builder = new Options.Builder()
+        final Configuration.Builder builder = new Configuration.Builder()
                 .addProviders(new MockSenderPushProvider())
                 .setEventListener(new TestEventListener());
 

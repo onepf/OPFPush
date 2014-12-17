@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.gcm.util.WakefulBroadcastReceiver;
@@ -34,7 +35,7 @@ import org.onepf.opfpush.util.Utils;
 public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
-    public void onReceive(final Context context, final Intent intent) {
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFPushLog.methodD(GCMReceiver.class, "onReceive", context, Utils.toString(intent));
 
         if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {

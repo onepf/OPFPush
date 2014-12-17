@@ -32,6 +32,19 @@ import org.onepf.opfpush.util.Utils;
  */
 public class Message implements Parcelable {
 
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+
+        @Override
+        public Message createFromParcel(Parcel source) {
+            return new Message(source);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
+
     private final String id;
     private final Bundle data;
     private final long timeToLeave;
@@ -42,7 +55,7 @@ public class Message implements Parcelable {
      * @param id   Message's ID.
      * @param data Messages' data to send.
      */
-    public Message(@NonNull String id, @NonNull Bundle data) {
+    public Message(@NonNull final String id, @NonNull final Bundle data) {
         this(id, data, 0);
     }
 
@@ -54,7 +67,7 @@ public class Message implements Parcelable {
      * @param timeToLeave How long message is valid. Set 0 to default value.
      * @throws java.lang.IllegalArgumentException If {@code timeToLeave} is negative.
      */
-    public Message(@NonNull String id, @NonNull Bundle data, long timeToLeave) {
+    public Message(@NonNull final String id, @NonNull final Bundle data, final long timeToLeave) {
         if (timeToLeave < 0) {
             throw new IllegalArgumentException(String.format("timeToLeave='%d'."
                     + " Time to leave must be non negative value.", timeToLeave));
@@ -64,7 +77,7 @@ public class Message implements Parcelable {
         this.timeToLeave = timeToLeave;
     }
 
-    private Message(Parcel parcel) {
+    private Message(final Parcel parcel) {
         id = parcel.readString();
         timeToLeave = parcel.readLong();
         data = parcel.readBundle();
@@ -106,16 +119,4 @@ public class Message implements Parcelable {
                 + ", TTL='" + timeToLeave + '\''
                 + '}';
     }
-
-    public static final Creator<Message> CREATOR = new Creator<Message>() {
-        @Override
-        public Message createFromParcel(Parcel source) {
-            return new Message(source);
-        }
-
-        @Override
-        public Message[] newArray(int size) {
-            return new Message[size];
-        }
-    };
 }
