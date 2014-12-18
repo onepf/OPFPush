@@ -32,9 +32,9 @@ android {
 }
 
 dependencies {
-    compile project(':opfpush-providers:opfpush-adm')
-    compile project(':opfpush-providers:opfpush-gcm')
-    compile project(':opfpush-providers:opfpush-nokia')
+    compile project(':opfpush-providers:adm')
+    compile project(':opfpush-providers:gcm')
+    compile project(':opfpush-providers:nokia')
 
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.android.support:appcompat-v7:21.0.2'
