@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.gcm.util.WakefulBroadcastReceiver;
 import org.onepf.opfpush.util.Utils;
 
 /**

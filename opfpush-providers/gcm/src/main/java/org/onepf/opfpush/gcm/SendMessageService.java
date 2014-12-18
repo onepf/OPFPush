@@ -5,8 +5,6 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import junit.framework.Assert;
-
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.util.Utils;
@@ -34,9 +32,7 @@ public class SendMessageService extends IntentService {
 
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             final Message message = intent.getParcelableExtra(EXTRA_MESSAGE);
-            Assert.assertNotNull(message);
             final String messageTo = intent.getStringExtra(EXTRA_MESSAGES_TO);
-            Assert.assertNotNull(messageTo);
 
             try {
                 GoogleCloudMessaging.getInstance(this).send(

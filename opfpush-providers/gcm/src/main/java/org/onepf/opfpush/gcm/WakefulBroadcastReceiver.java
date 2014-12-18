@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm.util;
+package org.onepf.opfpush.gcm;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -28,7 +28,7 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
     private static final String EXTRA_WAKE_LOCK_ID = "android.support.content.wakelockid";
 
     private static final SparseArray<PowerManager.WakeLock> WAKE_LOCK_SPARSE_ARRAY
-            = new SparseArray<PowerManager.WakeLock>();
+            = new SparseArray<>();
     private static int mNextId = 1;
 
     /**

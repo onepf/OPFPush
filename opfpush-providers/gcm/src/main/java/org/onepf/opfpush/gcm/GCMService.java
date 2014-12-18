@@ -19,7 +19,6 @@ package org.onepf.opfpush.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -96,7 +95,7 @@ public class GCMService extends IntentService {
                 .onRegistered(NAME, registrationId);
     }
 
-    private void onUnregistered(@Nullable final String oldRegistrationId) {
+    private void onUnregistered(@NonNull final String oldRegistrationId) {
         OPFPushLog.methodD(GCMService.class, "onUnregistered", "oldRegistrationId");
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onUnregistered(NAME, oldRegistrationId);

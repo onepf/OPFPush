@@ -47,14 +47,14 @@ public final class Configuration {
     @NonNull
     private final EventListener eventListener;
 
-    @Nullable
+    @NonNull
     private final Backoff backoff;
 
     private final boolean isSelectSystemPreferred;
 
     private Configuration(@NonNull final Collection<? extends PushProvider> providers,
                           @NonNull final EventListener eventListener,
-                          @Nullable final Backoff backoff,
+                          @NonNull final Backoff backoff,
                           final boolean selectSystemPreferred) {
 
         this.providers = Collections.unmodifiableList(new ArrayList<>(providers));
@@ -83,7 +83,7 @@ public final class Configuration {
         return eventListener;
     }
 
-    @Nullable
+    @NonNull
     public Backoff getBackoff() {
         return backoff;
     }
@@ -111,7 +111,7 @@ public final class Configuration {
         @Nullable
         private EventListener eventListener;
 
-        @Nullable
+        @NonNull
         private Backoff backoff = new ExponentialBackoff();
 
         private boolean isSelectSystemPreferred = true;
@@ -174,7 +174,7 @@ public final class Configuration {
             return this;
         }
 
-        public Builder setBackoff(@Nullable Backoff backoff) {
+        public Builder setBackoff(@NonNull Backoff backoff) {
             this.backoff = backoff;
             return this;
         }

@@ -24,9 +24,6 @@ package org.onepf.opfpush.exception;
  */
 public class OPFIllegalStateException extends IllegalStateException {
 
-    public OPFIllegalStateException() {
-    }
-
     public OPFIllegalStateException(String detailMessage) {
         super(detailMessage);
     }

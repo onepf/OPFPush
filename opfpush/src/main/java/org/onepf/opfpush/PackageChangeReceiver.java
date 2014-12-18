@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import junit.framework.Assert;
-
 import org.onepf.opfpush.util.Utils;
 
 /**
@@ -49,8 +47,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             final String hostAppPackage = provider.getHostAppPackage();
-            Assert.assertNotNull(hostAppPackage);
-            if (hostAppPackage.equals(getAppPackage(intent))) {
+            if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
                 OPFPushLog.d("Host app '%s' of provider '%s' removed.",
                         hostAppPackage, provider.getName());
                 OPFPushHelper.getInstance(context).onProviderUnavailable(provider);
