@@ -33,7 +33,7 @@
             android:required="false"/>
 
         <service
-            android:name="org.onepf.opfpush.adm.ADMService"
+            android:name=".ADMService"
             android:exported="false"/>
 
         <!--<receiver-->

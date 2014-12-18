@@ -38,7 +38,7 @@
         </receiver>
 
         <service
-            android:name="org.onepf.opfpush.nokia.NokiaNotificationService"
+            android:name=".NokiaNotificationService"
             android:exported="false"/>
     </application>
 </manifest>

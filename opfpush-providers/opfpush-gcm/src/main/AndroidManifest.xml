@@ -31,11 +31,11 @@
 
     <application>
         <service
-            android:name="org.onepf.opfpush.gcm.GCMService"
+            android:name=".GCMService"
             android:exported="false"/>
 
         <service
-            android:name="org.onepf.opfpush.gcm.SendMessageService"
+            android:name=".SendMessageService"
             android:exported="false"/>
 
         <!--<receiver-->
