@@ -23,6 +23,14 @@
   </servlet>
 
   <servlet>
+    <servlet-name>AdmServlet</servlet-name>
+    <servlet-class>
+      org.onepf.opfpush.AdmServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
     <servlet-name>StoreIdServlet</servlet-name>
     <servlet-class>
       org.onepf.opfpush.StoreIdServlet
@@ -33,6 +41,11 @@
   <servlet-mapping>
     <servlet-name>MainActivityServlet</servlet-name>
     <url-pattern>/main</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AdmServlet</servlet-name>
+    <url-pattern>/adm</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -31,8 +31,7 @@ public class MainActivityServlet extends HttpServlet {
 
     // Handles HTTP GET request from the main.jsp
     @Override
-    protected void doGet(HttpServletRequest req,
-                         HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.sendRedirect("/main.jsp");
     }
 

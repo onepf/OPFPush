@@ -7,11 +7,15 @@
 
 <html>
 
+  <head>
+    <link rel='icon' href='favicon.png'/>
+  </head>
+
   <body>
 	Insert device Registration_id:
   	<form action="/storeid" method="post">
 		<div><textarea name="txtRegId" rows="3" cols="60"></textarea></div>
-	    <div><input type="submit" value="Submit" /></div>   
+	    <div><input type="submit" value="Submit" /></div>
   	</form>
   </body>
 </html>
