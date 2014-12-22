@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.model.State;
 
 /**
  * @author Roman Savin
@@ -60,27 +59,7 @@ public class SimpleEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
-
-    }
-
-    @Override
-    public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
-
-    }
-
-    @Override
     public void onNoAvailableProvider() {
-
-    }
-
-    @Override
-    public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
-
-    }
-
-    @Override
-    public void onProviderBecameUnavailable(@NonNull String providerName) {
 
     }
 }

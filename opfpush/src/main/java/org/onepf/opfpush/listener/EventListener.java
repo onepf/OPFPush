@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.model.State;
 
 /**
  * Interface definition for a callback to be invoked when event
@@ -86,43 +85,7 @@ public interface EventListener {
     void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error);
 
     /**
-     * There is wrong state while registration was performed.
-     *
-     * @param providerName Name of provider in what error occur.
-     * @param state        Current state.
-     */
-    void onRegistrationStateError(@NonNull String providerName, @NonNull State state);
-
-    /**
-     * There is wrong state while unregistration was performed.
-     *
-     * @param providerName Name of provider in what error occur.
-     * @param state        Current state.
-     */
-    void onUnregistrationStateError(@NonNull String providerName, @NonNull State state);
-
-    /**
      * {@code OpenPushHelper} can't find any available provider for register push.
      */
     void onNoAvailableProvider();
-
-    /**
-     * Provider registration or unregistration failed, but current state is {@code REGISTERED} or
-     * {@code UNREGISTERED}.
-     *
-     * @param providerName Name of provider in what error occur.
-     * @param error        Occurred error
-     * @param state        Current state.
-     */
-    void onWrongStateError(@NonNull String providerName,
-                           @NonNull OPFError error,
-                           @NonNull State state);
-
-    /**
-     * Provider went to unavailable state. Is most case reason ot this is removing
-     * host application of the provider.
-     *
-     * @param providerName Name of provider.
-     */
-    void onProviderBecameUnavailable(@NonNull String providerName);
 }

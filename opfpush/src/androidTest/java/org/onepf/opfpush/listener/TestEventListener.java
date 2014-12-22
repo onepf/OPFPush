@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.model.State;
 
 /**
  * @author Roman Savin
@@ -61,27 +60,7 @@ public class TestEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationStateError(@NonNull String providerName, @NonNull State state) {
-        OPFPushLog.d("onRegistrationStateError(%1$s, %2$s)", providerName, state);
-    }
-
-    @Override
-    public void onUnregistrationStateError(@NonNull String providerName, @NonNull State state) {
-        OPFPushLog.d("onUnregistrationStateError(%1$s, %2$s)", providerName, state);
-    }
-
-    @Override
     public void onNoAvailableProvider() {
         OPFPushLog.d("onNoAvailableProvider()");
-    }
-
-    @Override
-    public void onWrongStateError(@NonNull String providerName, @NonNull OPFError error, @NonNull State state) {
-        OPFPushLog.d("onWrongStateError(%1$s, %2$s, %3$s)", providerName, error, state);
-    }
-
-    @Override
-    public void onProviderBecameUnavailable(@NonNull String providerName) {
-        OPFPushLog.d("onProviderBecameUnavailable(%s)", providerName);
     }
 }

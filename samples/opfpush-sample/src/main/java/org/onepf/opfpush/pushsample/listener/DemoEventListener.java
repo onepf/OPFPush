@@ -29,7 +29,6 @@ import android.support.v4.app.NotificationCompat;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.activity.DemoActivity;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
@@ -118,32 +117,8 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationStateError(@NonNull final String providerName,
-                                         @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationStateError", providerName, state);
-    }
-
-    @Override
-    public void onUnregistrationStateError(@NonNull final String providerName,
-                                           @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationStateError", providerName, state);
-    }
-
-    @Override
     public void onNoAvailableProvider() {
         OPFPushLog.d("onNoAvailableProvider()");
-    }
-
-    @Override
-    public void onWrongStateError(@NonNull final String providerName,
-                                  @NonNull final OPFError error,
-                                  @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onWrongStateError", providerName, error, state);
-    }
-
-    @Override
-    public void onProviderBecameUnavailable(@NonNull final String providerName) {
-        OPFPushLog.methodD(DemoEventListener.class, "onProviderBecameUnavailable", providerName);
     }
 
     private void showNotification(

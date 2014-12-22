@@ -158,7 +158,7 @@ public final class OPFPushHelper {
         }
 
         this.eventListener = new EventListenerWrapper(configuration.getEventListener());
-        initLastProvider();
+        restoreLastProvider();
         OPFPushLog.i("Init done.");
     }
 
@@ -182,9 +182,8 @@ public final class OPFPushHelper {
 
             switch (state) {
                 case REGISTERED:
-                case REGISTERING:
                     break;
-
+                case REGISTERING:
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
                     if (configuration.isSelectSystemPreferred()
@@ -226,12 +225,10 @@ public final class OPFPushHelper {
 
             switch (state) {
                 case UNREGISTERED:
-                case UNREGISTERING:
                     break;
-
+                case UNREGISTERING:
                 case REGISTERED:
                     settings.saveState(UNREGISTERING);
-                    unregisterPackageChangeReceiver();
                     currentProvider.unregister();
                     break;
 
@@ -272,19 +269,6 @@ public final class OPFPushHelper {
                 throw new OPFIllegalStateException("Provider not registered.");
             }
         }
-    }
-
-    /**
-     * Check if at least one provider available.
-     */
-    //TODO: remove if useless
-    public boolean hasAvailableProvider() {
-        for (PushProvider provider : configuration.getProviders()) {
-            if (provider.isAvailable()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -389,16 +373,8 @@ public final class OPFPushHelper {
         settings.clear();
         if (currentProvider != null) {
             currentProvider.onRegistrationInvalid();
-            settings.saveState(REGISTERING);
-
-            if (currentProvider.isAvailable()) {
-                register(currentProvider);
-            } else {
-                onProviderUnavailable(currentProvider);
-            }
-        } else {
-            register();
         }
+        register();
     }
 
     /**
@@ -414,11 +390,10 @@ public final class OPFPushHelper {
             OPFPushLog.d("Unavailable provider is equals current provider");
 
             currentProvider = null;
-            settings.saveState(UNREGISTERED);
-            eventListener.onProviderBecameUnavailable(provider.getName());
-        }
+            settings.clear();
 
-        register(); //Restart registration
+            register(); //Restart registration
+        }
     }
 
     private void postRetryRegister(@NonNull final String providerName) {
@@ -449,38 +424,26 @@ public final class OPFPushHelper {
         }
     }
 
-    private void initLastProvider() {
-        synchronized (registrationLock) {
-            OPFPushLog.methodD(OPFPushHelper.class, "initLastProvider");
+    private void restoreLastProvider() {
+        OPFPushLog.methodD(OPFPushHelper.class, "restoreLastProvider");
 
-            final PushProvider lastProvider = getLastProvider();
-            if (lastProvider == null) {
-                OPFPushLog.d("No last provider.");
-                return;
-            }
+        final PushProvider lastProvider = getLastProvider();
+        if (lastProvider == null) {
+            OPFPushLog.d("No last provider.");
+            return;
+        }
 
-            OPFPushLog.d("Try restore last provider '%s'.", lastProvider);
+        OPFPushLog.d("Try restore last provider '%s'.", lastProvider);
 
-            if (lastProvider.isAvailable()) {
-                OPFPushLog.d("Last provider is available");
+        if (lastProvider.isAvailable() && lastProvider.isRegistered()) {
+            OPFPushLog.d("Last provider is available and registered");
+            currentProvider = lastProvider;
+            settings.saveState(REGISTERED);
+        } else {
+            OPFPushLog.d("Last provider is unavailable or unregistered");
+            settings.clear();
 
-                if (lastProvider.isRegistered()) {
-                    OPFPushLog.d("Last provider is registered.");
-                    currentProvider = lastProvider;
-                    settings.saveState(REGISTERED);
-                } else {
-                    OPFPushLog.d("Last provider need register.");
-                    settings.saveState(REGISTERING);
-                    register(lastProvider);
-                }
-            } else {
-                OPFPushLog.d("Last provider is unavailable");
-
-                settings.saveLastProvider(null);
-                settings.saveState(UNREGISTERED);
-
-                onProviderUnavailable(lastProvider);
-            }
+            onProviderUnavailable(lastProvider);
         }
     }
 
@@ -538,7 +501,12 @@ public final class OPFPushHelper {
      */
     private void register(@NonNull final PushProvider provider) {
         OPFPushLog.methodD(OPFPushHelper.class, "register", provider);
-        provider.register();
+        final String regId = provider.getRegistrationId();
+        if (!provider.isRegistered() || TextUtils.isEmpty(regId)) {
+            provider.register();
+        } else {
+            receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());
+        }
     }
 
     private void unregisterPackageChangeReceiver() {
@@ -642,14 +610,6 @@ public final class OPFPushHelper {
 
         /**
          * Receiver must call this method when a registration request succeeds.
-         * <p/>
-         * Valid states for this callback method are {@code REGISTERING, REGISTERED, UNREGISTERED}.
-         * In these cases {@code REGISTERED} state will be saved and
-         * {@link EventListener#onRegistered(String, String)} method will be invoked.
-         * <p/>
-         * {@code UNREGISTERING} state is wrong for this method.
-         * This state means that unregistration was started before registered result was handled.
-         * In this case {@link EventListener#onRegistrationStateError(String, State)} method will be invoked.
          *
          * @param providerName   Name of provider that was registered.
          * @param registrationId The new registration ID for the instance of your app.
@@ -660,38 +620,24 @@ public final class OPFPushHelper {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onRegistered",
                         providerName, "registrationId"); //Don't log registration id.
 
-                if (!isUnregistering()) {
-                    OPFPushLog.d("Successfully register provider '%s'.", providerName);
+                OPFPushLog.d("Successfully register provider '%s'.", providerName);
 
-                    configuration.getBackoff().reset();
+                configuration.getBackoff().reset();
 
-                    settings.saveState(REGISTERED);
-                    settings.saveLastAndroidId(ANDROID_ID);
+                settings.saveState(REGISTERED);
+                settings.saveLastAndroidId(ANDROID_ID);
+                currentProvider = getProviderWithException(providerName);
+                settings.saveLastProvider(currentProvider);
 
-                    currentProvider = getProviderWithException(providerName);
-                    settings.saveLastProvider(currentProvider);
+                eventListener.onRegistered(providerName, registrationId);
 
-                    eventListener.onRegistered(providerName, registrationId);
-
-                    packageReceiver = PackageUtils
-                            .registerPackageChangeReceiver(appContext, currentProvider);
-                } else {
-                    OPFPushLog.d("Registration state is Unregistering.");
-                    eventListener.onRegistrationStateError(providerName, UNREGISTERING);
-                }
+                packageReceiver = PackageUtils
+                        .registerPackageChangeReceiver(appContext, currentProvider);
             }
         }
 
         /**
          * Receiver must call this method on successful unregistration.
-         * <p/>
-         * Valid states for this callback method are {@code UNREGISTERING, REGISTERED, UNREGISTERED}.
-         * In these cases all shared preferences will be cleared and
-         * {@link EventListener#onUnregistered(String, String)} method will be invoked.
-         * <p/>
-         * {@code REGISTERING} state is wrong for this method.
-         * This state means that unregistration was performed before registration.
-         * In this case {@link EventListener#onUnregistrationStateError(String, State)} method will be invoked.
          *
          * @param providerName      Name of provider that was unregistered.
          * @param oldRegistrationId The registration ID for the instance of your app that is now unregistered.
@@ -702,15 +648,11 @@ public final class OPFPushHelper {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistered",
                         providerName, "oldRegistrationId"); //Don't log registration id.
 
-                if (!isRegistering()) {
-                    OPFPushLog.d("Successfully unregister provider '%s'.", providerName);
-                    settings.clear();
-                    currentProvider = null;
-                    eventListener.onUnregistered(providerName, oldRegistrationId);
-                } else {
-                    OPFPushLog.d("Registration state is Registration");
-                    eventListener.onUnregistrationStateError(providerName, REGISTERING);
-                }
+                OPFPushLog.d("Successfully unregister provider '%s'.", providerName);
+                settings.clear();
+                currentProvider = null;
+                unregisterPackageChangeReceiver();
+                eventListener.onUnregistered(providerName, oldRegistrationId);
             }
         }
 
@@ -727,7 +669,7 @@ public final class OPFPushHelper {
                 if (!isRegistered()) {
                     OPFPushLog.d("Registration state isn't REGISTERED");
 
-                    settings.saveState(REGISTERING);
+                    settings.saveState(UNREGISTERED);
                     final Backoff backoff = configuration.getBackoff();
                     if (error == OPFError.SERVICE_NOT_AVAILABLE
                             && backoff.hasTries()) {
@@ -753,7 +695,7 @@ public final class OPFPushHelper {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistrationError",
                         providerName, error);
 
-                if (isUnregistering()) {
+                if (isUnregistering() || isUnregistered()) {
                     settings.saveState(REGISTERED);
                 }
                 eventListener.onUnregistrationError(providerName, error);
@@ -771,20 +713,13 @@ public final class OPFPushHelper {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onError", providerName, error);
 
                 final State state = settings.getState();
-                OPFPushLog.d("Registration state : " + state);
-                switch (state) {
-                    case REGISTERING:
-                        onRegistrationError(providerName, error);
-                        break;
-
-                    case UNREGISTERING:
-                        onUnregistrationError(providerName, error);
-                        break;
-
-                    default:
-                        //TODO: Search better solution for this case.
-                        eventListener.onWrongStateError(providerName, error, state);
-                        break;
+                final boolean isRegistered = getProviderWithException(providerName).isRegistered();
+                OPFPushLog.d("Registration state : " + state + " Provider.isRegistered == " + isRegistered);
+                if (state == REGISTERING || !isRegistered) {
+                    onRegistrationError(providerName, error);
+                } else {
+                    //state == UNREGISTERING || isRegistered
+                    onUnregistrationError(providerName, error);
                 }
             }
         }
@@ -839,6 +774,17 @@ public final class OPFPushHelper {
         }
 
         @Override
+        public void onUnregistered(@NonNull final String providerName,
+                                   @NonNull final String registrationId) {
+            HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onUnregistered(providerName, registrationId);
+                }
+            });
+        }
+
+        @Override
         public void onRegistrationError(@NonNull final String providerName, @NonNull final OPFError error) {
             HANDLER.post(new Runnable() {
                 @Override
@@ -861,66 +807,11 @@ public final class OPFPushHelper {
         }
 
         @Override
-        public void onRegistrationStateError(@NonNull final String providerName,
-                                             @NonNull final State state) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onRegistrationStateError(providerName, state);
-                }
-            });
-        }
-
-        @Override
-        public void onUnregistrationStateError(@NonNull final String providerName,
-                                               @NonNull final State state) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onUnregistrationStateError(providerName, state);
-                }
-            });
-        }
-
-        @Override
         public void onNoAvailableProvider() {
             HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
                     listener.onNoAvailableProvider();
-                }
-            });
-        }
-
-        @Override
-        public void onWrongStateError(@NonNull final String providerName,
-                                      @NonNull final OPFError error,
-                                      @NonNull final State state) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onWrongStateError(providerName, error, state);
-                }
-            });
-        }
-
-        @Override
-        public void onUnregistered(@NonNull final String providerName,
-                                   @NonNull final String registrationId) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onUnregistered(providerName, registrationId);
-                }
-            });
-        }
-
-        @Override
-        public void onProviderBecameUnavailable(@NonNull final String providerName) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onProviderBecameUnavailable(providerName);
                 }
             });
         }

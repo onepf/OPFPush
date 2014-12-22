@@ -5,9 +5,6 @@
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="org.robolectric.annotation.Implementation" />
-    </list>
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
@@ -31,30 +28,6 @@
           <item index="3" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
         </list>
       </value>
-    </option>
-  </component>
-  <component name="PDMPlugin">
-    <option name="customRuleSets">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/analyzers/pmd/ruleset.xml" />
-      </list>
-    </option>
-    <option name="options">
-      <map>
-        <entry key="Encoding" value="" />
-        <entry key="Target JDK" value="1.7" />
-      </map>
-    </option>
-    <option name="customRuleSets">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/analyzers/pmd/ruleset.xml" />
-      </list>
-    </option>
-    <option name="options">
-      <map>
-        <entry key="Encoding" value="" />
-        <entry key="Target JDK" value="1.7" />
-      </map>
     </option>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -157,6 +130,22 @@
       <Host>localhost</Host>
       <Port>5050</Port>
     </configuration>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 
