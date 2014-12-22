@@ -1,14 +1,9 @@
 package org.onepf.opfpush;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
-import com.google.android.gcm.server.Sender;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.repackaged.org.joda.time.DateTime;
-import com.google.cloud.sql.jdbc.Connection;
 import org.json.simple.*;
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,17 +60,18 @@ public class AdmServlet extends HttpServlet {
 
         // Creating a message
         String message = URLEncoder.encode(txtInput, "UTF-8");
+        String response = null;
 
         try {
-            sendMessageToDevice(message, REGISTRATION_ID, "msg", 3600);
+            response = sendMessageToDevice(message, REGISTRATION_ID, "msg", 3600);
         } catch (Exception e) {
             _log.info(e.getMessage());
-            resp.sendRedirect("/asp.jsp?message=exception=" + e.getMessage());
+            resp.sendRedirect("/adm.jsp?exception=" + e.getMessage());
             return;
         }
 
         _log.info("Message posted: " + message);
-        resp.sendRedirect("/asp.jsp?message=" + message);
+        resp.sendRedirect("/adm.jsp?response=" + response + "?message=" + message);
     }
 
     private String parseResponse(InputStream in) throws Exception
@@ -134,87 +130,82 @@ public class AdmServlet extends HttpServlet {
     // Constructs and sends a request to ADM Servers to enqueue a message for delivery to a specific app instance.
     // Updates registration id if a newer one is received with the ADM server response.
     private String sendMessageToDevice(String message, String device, String consolidationKey, int expiresAfter) throws Exception {
-        URL url = new URL(AMAZON_ADM_URL + device + "/messages");
-        HttpURLConnection request = (HttpURLConnection) url.openConnection();
-        request.setDoOutput(true);
-        request.setRequestMethod("POST");
-        request.setRequestProperty("Content-Type", "application/json");
-        request.setRequestProperty("Accept", "application/json");
-        request.setRequestProperty("x-amzn-type-version", "com.amazon.device.messaging.ADMMessage@1.0");
-        request.setRequestProperty("x-amzn-accept-type", "com.amazon.device.messaging.ADMSendResult@1.0");
-        request.setRequestProperty("Authorization", "Bearer " + _authToken);
 
-        String timeStamp = DateTime.now().toDateTimeISO().toString();
+        URL admUrl = new URL(AMAZON_ADM_URL + device + "/messages");
+
+        // Generate the HTTPS connection for the POST request. You cannot make a connection
+        // over HTTP.
+        HttpURLConnection conn = (HttpURLConnection) admUrl.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true);
+
+        // Set the content type and accept headers.
+        conn.setRequestProperty("content-type", "application/json");
+        conn.setRequestProperty("accept", "application/json");
+        conn.setRequestProperty("X-Amzn-Type-Version ", "com.amazon.device.messaging.ADMMessage@1.0");
+        conn.setRequestProperty("X-Amzn-Accept-Type", "com.amazon.device.messaging.ADMSendResult@1.0");
+
+        // Add the authorization token as a header.
+        conn.setRequestProperty("Authorization", "Bearer " + _authToken);
 
         JSONObject json = new JSONObject();
 
         JSONObject data = new JSONObject();
+        String timeStamp = DateTime.now().toDateTimeISO().toString();
         data.put("message", message);
         data.put("timeStamp", timeStamp);
 
         json.put("data", data);
         json.put("consolidationKey", consolidationKey);
         json.put("expiresAfter", expiresAfter);
-        json.put("md5", ""); // TODO: implement calculate checksum
+        //json.put("md5", ""); // TODO: implement calculate checksum
 
         _log.info("Request data: " + json.toJSONString());
 
+        byte[] jsonString = json.toJSONString().getBytes("UTF-8");
+
         // Send the encoded parameters on the connection.
-        OutputStream os = request.getOutputStream();
-        os.write(json.toJSONString().getBytes("UTF-8"));
+        OutputStream os = conn.getOutputStream();
+        os.write(jsonString, 0, jsonString.length);
         os.flush();
-        request.connect();
+        conn.connect();
 
-        // Convert the response into a String object.
-        String responseContent = parseResponse(request.getInputStream());
-        //JSONObject parsedObject = (JSONObject) JSONValue.parse(responseContent);
-        _log.info("Response data: " + responseContent);
+        // Obtain the response code from the connection.
+        int responseCode = conn.getResponseCode();
+        _log.info("Response code: " + responseCode);
 
-        return responseContent;
+        // Check if we received a failure response, and if so, get the reason for the failure.
+        if( responseCode != 200)
+        {
+            if( responseCode == 401 )
+            {
+                // If a 401 response code was received, the access token has expired. The token should be refreshed
+                // and this request may be retried.
+            }
 
-        /*
-        try:
-        // POST EnqueueMessage request to AMD Servers.
-        response = urllib2.urlopen(req, json.dumps(JSON_MSG_REQUEST))
+            String errorContent = parseResponse(conn.getErrorStream());
+            throw new RuntimeException(String.format("ERROR: The enqueue request failed with a " +
+                            "%d response code, with the following message: %s",
+                    responseCode, errorContent));
+        }
+        else
+        {
+            // The request was successful. The response contains the canonical Registration ID for the specific instance of your
+            // app, which may be different that the one used for the request.
 
-        // Retreiving Amazon ADM request ID.Include this with troubleshooting reports.
-                X_Amzn_RequestId = response.info().get('x-amzn-RequestId')
+            String responseContent = parseResponse(conn.getInputStream());
+            JSONObject parsedObject = (JSONObject) JSONValue.parse(responseContent);
 
-        // Retreiving the MD5 value computed by ADM servers.
-        MD5_from_ADM = response.info().get('x-amzn-data-md5')
-        print "ADM server md5_checksum " + MD5_from_ADM
+            String canonicalRegistrationId = (String) parsedObject.get("registrationID");
 
-        // Checking if the app 's registration ID needs to be updated.
-        response_data = json.load(response)
-        canonical_reg_id = response_data['registrationID']
-        if device != canonical_reg_id:
-        print "Updating registration Id"
-        if self.devices.has_key(device):
-        self.devices.pop(device)
-        self.devices[canonical_reg_id] = canonical_reg_id
-        return 'Message sent.'
-        except urllib2.HTTPError as e:
-        error_reason = json.load(e)['reason']
-        if e.code == 400:
-        return 'Handle ' + str(e) + '. invalid input. Reason: ' + error_reason
-        elif e.code == 401:
-        return self.handle_invalid_token_error(e)
-        elif e.code == 403:
-        return 'Handle ' + str(e) + '. max rate exceeded. Reason: ' + error_reason
-        elif e.code == 413:
-        return 'Handle ' + str(e) + '. message greater than 6KB. Reason: ' + error_reason
-        elif e.code == 500:
-        return 'Handle ' + str(e) + '.  internal server error'
-        elif e.code == 503:
-        return self.handle_server_temporarily_unavailable_error(e)
-        else:
-        return 'Message was not sent',str(e)
-        except urllib2.URLError as e:
-        return 'Message was not sent','URLError: ' + str(e.reason)
-        except urllib2.HTTPException as e:
-        return 'Message was not sent','HTTPException: ' + str(e)
-        except Exception as e:
-        return 'Message was not sent','Exception: ' + str(e)
-        */
+            // Check if the two Registration IDs are different.
+            if(!canonicalRegistrationId.equals(device))
+            {
+                // At this point the data structure that stores the Registration ID values should be updated
+                // with the correct Registration ID for this particular app instance.
+            }
+
+            return parsedObject.toJSONString();
+        }
     }
 }
