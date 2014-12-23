@@ -88,6 +88,20 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="org.onepf.opfpush.nokia.NokiaNotificationsReceiver"
+            android:permission="com.nokia.pushnotifications.permission.SEND">
+            <intent-filter>
+                <!-- Receives the actual messages. -->
+                <action android:name="com.nokia.pushnotifications.intent.RECEIVE" />
+                <!-- Receives the registration id. -->
+                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
+
+
     </application>
 
 </manifest>

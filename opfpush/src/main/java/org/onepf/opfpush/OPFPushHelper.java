@@ -592,6 +592,7 @@ public final class OPFPushHelper {
         public void onMessage(@NonNull final String providerName,
                               @Nullable final Bundle extras) {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onMessage", providerName);
+            settings.saveState(REGISTERED);
             eventListener.onMessage(providerName, extras);
         }
 
@@ -605,6 +606,7 @@ public final class OPFPushHelper {
                                       final int messagesCount) {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onDeletedMessages",
                     providerName, messagesCount);
+            settings.saveState(REGISTERED);
             eventListener.onDeletedMessages(providerName, messagesCount);
         }
 

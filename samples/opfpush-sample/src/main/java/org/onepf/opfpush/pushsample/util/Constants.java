@@ -26,5 +26,9 @@ public final class Constants {
         throw new UnsupportedOperationException();
     }
 
+    //for GCM
     public static final String MESSAGE_EXTRA_KEY = "message";
+
+    //for Nokia
+    public static final String PAYLOAD_EXTRA_KEY = "payload";
 }

@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.greenrobot.event.EventBus;
 
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
+import static org.onepf.opfpush.pushsample.util.Constants.PAYLOAD_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -71,7 +72,13 @@ public class DemoEventListener implements EventListener {
             return;
         }
 
-        final String message = extras.getString(MESSAGE_EXTRA_KEY);
+        String message = null;
+        if (extras.containsKey(MESSAGE_EXTRA_KEY)) {
+            message = extras.getString(MESSAGE_EXTRA_KEY);
+        } else if (extras.containsKey(PAYLOAD_EXTRA_KEY)) {
+            message = extras.getString(PAYLOAD_EXTRA_KEY);
+        }
+
         if (message != null) {
             try {
                 showNotification(
