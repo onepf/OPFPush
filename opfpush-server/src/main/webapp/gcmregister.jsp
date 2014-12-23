@@ -13,7 +13,7 @@
 
   <body>
 	Insert device Registration_id:
-  	<form action="/storeid" method="post">
+  	<form action="/gcmregister" method="post">
 		<div><textarea name="txtRegId" rows="3" cols="60"></textarea></div>
 	    <div><input type="submit" value="Submit" /></div>
   	</form>

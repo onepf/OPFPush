@@ -16,7 +16,7 @@
   	<% if (request.getParameter("message") != null) { %>
 		<%= request.getParameter("message")%>
 	<% } %>
-	<form action="/main" method="post">
+	<form action="/gcm" method="post">
 		<div><textarea name="txtInput" rows="3" cols="60"></textarea></div>
 		<div><input type="submit" value="Submit" /></div>   
   	</form>

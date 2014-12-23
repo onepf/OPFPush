@@ -1,9 +1,10 @@
 package org.onepf.opfpush;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.*;
 import com.google.appengine.repackaged.org.joda.time.DateTime;
-import org.json.simple.*;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,7 +48,7 @@ public class AdmServlet extends HttpServlet {
         }
     }
 
-    // Handles HTTP GET request from the main.jsp
+    // Handles HTTP GET request from the gcm.jsp
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.sendRedirect("/adm.jsp");
@@ -60,29 +61,32 @@ public class AdmServlet extends HttpServlet {
 
         // Creating a message
         String message = URLEncoder.encode(txtInput, "UTF-8");
-        String response = null;
 
-        try {
-            response = sendMessageToDevice(message, REGISTRATION_ID, "msg", 3600);
-        } catch (Exception e) {
-            _log.info(e.getMessage());
-            resp.sendRedirect("/adm.jsp?exception=" + e.getMessage());
-            return;
+        ArrayList<String> devices = getAllRegIds();
+        if (!devices.isEmpty()) {
+            for (String device : devices) {
+                try {
+                    sendMessageToDevice(message, device, "message", 3600);
+                } catch (Exception e) {
+                    _log.info(e.getMessage());
+                    continue;
+                }
+                _log.info("Message posted: " + message);
+            }
+            resp.sendRedirect("/adm.jsp?message=" + message);
+        } else {
+            _log.info("No devices registered.");
+            resp.sendRedirect("/adm.jsp?message=warning-no-devices");
         }
-
-        _log.info("Message posted: " + message);
-        resp.sendRedirect("/adm.jsp?response=" + response + "?message=" + message);
     }
 
-    private String parseResponse(InputStream in) throws Exception
-    {
+    private String parseResponse(InputStream in) throws Exception {
         InputStreamReader inputStream = new InputStreamReader(in, "UTF-8");
         BufferedReader buff = new BufferedReader(inputStream);
 
         StringBuilder sb = new StringBuilder();
         String line = buff.readLine();
-        while (line != null )
-        {
+        while (line != null) {
             sb.append(line);
             line = buff.readLine();
         }
@@ -93,28 +97,27 @@ public class AdmServlet extends HttpServlet {
     /**
      * HTTPS request to Amazon to obtain an access token
      */
-    private String getAuthToken(String clientId, String clientSecret) throws Exception
-    {
+    private String getAuthToken(String clientId, String clientSecret) throws Exception {
         // Encode the body of your request, including your clientID and clientSecret values.
-        String body = "grant_type="    + URLEncoder.encode("client_credentials", "UTF-8") + "&" +
-                      "scope="         + URLEncoder.encode("messaging:push", "UTF-8")     + "&" +
-                      "client_id="     + URLEncoder.encode(clientId, "UTF-8")             + "&" +
-                      "client_secret=" + URLEncoder.encode(clientSecret, "UTF-8");
+        String body = "grant_type=" + URLEncoder.encode("client_credentials", "UTF-8") + "&" +
+                "scope=" + URLEncoder.encode("messaging:push", "UTF-8") + "&" +
+                "client_id=" + URLEncoder.encode(clientId, "UTF-8") + "&" +
+                "client_secret=" + URLEncoder.encode(clientSecret, "UTF-8");
 
         // Create a new URL object with the base URL for the access token request.
         URL authUrl = new URL(AMAZON_TOKEN_URL);
 
         // Generate the HTTPS connection. You cannot make a connection over HTTP.
         HttpURLConnection con = (HttpURLConnection) authUrl.openConnection();
-        con.setDoOutput( true );
-        con.setRequestMethod( "POST" );
+        con.setDoOutput(true);
+        con.setRequestMethod("POST");
 
         // Set the Content-Type header.
-        con.setRequestProperty( "Content-Type" , "application/x-www-form-urlencoded" );
-        con.setRequestProperty( "Charset" , "UTF-8" );
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        con.setRequestProperty("Charset", "UTF-8");
         // Send the encoded parameters on the connection.
         OutputStream os = con.getOutputStream();
-        os.write(body.getBytes( "UTF-8" ));
+        os.write(body.getBytes("UTF-8"));
         os.flush();
         con.connect();
 
@@ -175,10 +178,8 @@ public class AdmServlet extends HttpServlet {
         _log.info("Response code: " + responseCode);
 
         // Check if we received a failure response, and if so, get the reason for the failure.
-        if( responseCode != 200)
-        {
-            if( responseCode == 401 )
-            {
+        if (responseCode != 200) {
+            if (responseCode == 401) {
                 // If a 401 response code was received, the access token has expired. The token should be refreshed
                 // and this request may be retried.
             }
@@ -187,9 +188,7 @@ public class AdmServlet extends HttpServlet {
             throw new RuntimeException(String.format("ERROR: The enqueue request failed with a " +
                             "%d response code, with the following message: %s",
                     responseCode, errorContent));
-        }
-        else
-        {
+        } else {
             // The request was successful. The response contains the canonical Registration ID for the specific instance of your
             // app, which may be different that the one used for the request.
 
@@ -199,13 +198,25 @@ public class AdmServlet extends HttpServlet {
             String canonicalRegistrationId = (String) parsedObject.get("registrationID");
 
             // Check if the two Registration IDs are different.
-            if(!canonicalRegistrationId.equals(device))
-            {
+            if (!canonicalRegistrationId.equals(device)) {
                 // At this point the data structure that stores the Registration ID values should be updated
                 // with the correct Registration ID for this particular app instance.
             }
 
             return parsedObject.toJSONString();
         }
+    }
+
+    // Reads all previously stored device tokens from the database
+    private ArrayList<String> getAllRegIds() {
+        ArrayList<String> regIds = new ArrayList<String>();
+        Query gaeQuery = new Query("ADMDeviceIds");
+        PreparedQuery pq = _datastore.prepare(gaeQuery);
+        for (Entity result : pq.asIterable()) {
+            Text id = (Text) result.getProperty("regid");
+            regIds.add(id.toString());
+        }
+
+        return regIds;
     }
 }

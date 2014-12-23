@@ -15,9 +15,17 @@
 --><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="WebApp_ID" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <servlet>
-    <servlet-name>MainActivityServlet</servlet-name>
+    <servlet-name>GcmServlet</servlet-name>
     <servlet-class>
-      org.onepf.opfpush.MainActivityServlet
+      org.onepf.opfpush.GcmServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>GcmRegisterServlet</servlet-name>
+    <servlet-class>
+      org.onepf.opfpush.GcmRegisterServlet
     </servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
@@ -31,16 +39,21 @@
   </servlet>
 
   <servlet>
-    <servlet-name>StoreIdServlet</servlet-name>
+    <servlet-name>AdmRegisterServlet</servlet-name>
     <servlet-class>
-      org.onepf.opfpush.StoreIdServlet
+      org.onepf.opfpush.AdmRegisterServlet
     </servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>MainActivityServlet</servlet-name>
-    <url-pattern>/main</url-pattern>
+    <servlet-name>GcmServlet</servlet-name>
+    <url-pattern>/gcm</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>GcmRegisterServlet</servlet-name>
+    <url-pattern>/gcmregister</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -49,8 +62,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>StoreIdServlet</servlet-name>
-    <url-pattern>/storeid</url-pattern>
+    <servlet-name>AdmRegisterServlet</servlet-name>
+    <url-pattern>/admregister</url-pattern>
   </servlet-mapping>
 
 </web-app>

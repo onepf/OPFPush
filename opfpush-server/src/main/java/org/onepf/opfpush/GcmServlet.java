@@ -1,41 +1,35 @@
 package org.onepf.opfpush;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.logging.Logger;
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
+import com.google.android.gcm.server.Sender;
+import com.google.appengine.api.datastore.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
-import com.google.android.gcm.server.Sender;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-
-public class MainActivityServlet extends HttpServlet {
+public class GcmServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(MainActivityServlet.class.getName());
+    private static final Logger log = Logger.getLogger(GcmServlet.class.getName());
     // API_KEY is sender_auth_token (server key previously generated in GCM)
     private static final String API_KEY = "AIzaSyCue1O-_9pFmAovLklyKEukfxuMp9q3bxY";
-    // Datastore is database where all device tokens get stored
     private static DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
 
-    // Handles HTTP GET request from the main.jsp
+    // Handles HTTP GET request from the gcm.jsp
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/main.jsp");
+        resp.sendRedirect("/gcm.jsp");
     }
 
-    // Handles HTTP POST request - submit message from the main.jsp
+    // Handles HTTP POST request - submit message from the gcm.jsp
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String txtInput = req.getParameter("txtInput");
@@ -51,10 +45,10 @@ public class MainActivityServlet extends HttpServlet {
             // Sending multicast message to GCM specifying all targeting devices
             MulticastResult result = sender.send(message, devices, 5);
             log.info("Message posted: " + utf8txtInput);
-            resp.sendRedirect("/main.jsp?message=" + utf8txtInput);
+            resp.sendRedirect("/gcm.jsp?message=" + utf8txtInput);
         } else {
             log.info("No devices registered.");
-            resp.sendRedirect("/main.jsp?message=warning-no-devices");
+            resp.sendRedirect("/gcm.jsp?message=warning-no-devices");
         }
     }
 
