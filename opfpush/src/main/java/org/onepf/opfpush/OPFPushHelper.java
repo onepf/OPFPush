@@ -181,9 +181,9 @@ public final class OPFPushHelper {
             OPFPushLog.d("Register state : " + state.toString());
 
             switch (state) {
+                case REGISTERING:
                 case REGISTERED:
                     break;
-                case REGISTERING:
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
                     if (configuration.isSelectSystemPreferred()
@@ -224,9 +224,9 @@ public final class OPFPushHelper {
             }
 
             switch (state) {
+                case UNREGISTERING:
                 case UNREGISTERED:
                     break;
-                case UNREGISTERING:
                 case REGISTERED:
                     settings.saveState(UNREGISTERING);
                     currentProvider.unregister();

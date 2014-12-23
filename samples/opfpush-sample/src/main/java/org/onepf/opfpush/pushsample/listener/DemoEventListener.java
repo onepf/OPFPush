@@ -33,7 +33,9 @@ import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.activity.DemoActivity;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
+import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.util.Utils;
 
 import java.io.UnsupportedEncodingException;
@@ -115,12 +117,14 @@ public class DemoEventListener implements EventListener {
     public void onRegistrationError(@NonNull final String providerName,
                                     @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
+        EventBus.getDefault().postSticky(new RegistrationErrorEvent(error));
     }
 
     @Override
     public void onUnregistrationError(@NonNull final String providerName,
                                       @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
+        EventBus.getDefault().postSticky(new UnregistrationErrorEvent(error));
     }
 
     @Override

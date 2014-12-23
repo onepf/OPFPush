@@ -24,6 +24,9 @@
     <string name="registered_state_fmt">Registered. Registration ID: %s</string>
     <string name="unregistered_state_fmt">Unregistered. Previous registration ID: %s</string>
 
+    <string name="registration_error_fmt">Registration error: %s</string>
+    <string name="unregistration_error_fmt">Unregistration error: %s</string>
+
     <string name="registration_not_available">Registration isn\'t available</string>
     <string name="unregistration_not_available">Unregistration isn\'t available</string>
 
