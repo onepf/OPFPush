@@ -69,7 +69,8 @@ public class AdmServlet extends HttpServlet {
                     sendMessageToDevice(message, device, "message", 3600);
                 } catch (Exception e) {
                     _log.info(e.getMessage());
-                    continue;
+                    resp.sendRedirect("/adm.jsp?error=" + e.getMessage());
+                    return;
                 }
                 _log.info("Message posted: " + message);
             }
@@ -214,7 +215,7 @@ public class AdmServlet extends HttpServlet {
         PreparedQuery pq = _datastore.prepare(gaeQuery);
         for (Entity result : pq.asIterable()) {
             Text id = (Text) result.getProperty("regid");
-            regIds.add(id.toString());
+            regIds.add(id.getValue());
         }
 
         return regIds;

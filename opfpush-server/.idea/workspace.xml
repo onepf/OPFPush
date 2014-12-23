@@ -67,10 +67,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="adm.jsp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="adm.jsp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/adm.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6123499" vertical-offset="0" max-vertical-offset="583">
+            <state vertical-scroll-proportion="-13.730769" vertical-offset="0" max-vertical-offset="510">
               <caret line="21" column="11" selection-start-line="21" selection-start-column="11" selection-end-line="21" selection-end-column="11" />
               <folding />
             </state>
@@ -107,11 +107,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AdmServlet.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AdmServlet.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmServlet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3621">
-              <caret line="27" column="4" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.2246696" vertical-offset="0" max-vertical-offset="3638">
+              <caret line="27" column="664" selection-start-line="27" selection-start-column="43" selection-end-line="27" selection-end-column="664" />
               <folding>
                 <element signature="docComment;method#getAuthToken#0;class#AdmServlet#0" expanded="true" />
               </folding>
@@ -123,7 +123,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmRegisterServlet.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="816">
-              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -156,12 +156,12 @@
         <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/StoreIdServlet.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/adm-register.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmServlet.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/GcmServlet.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/GcmRegisterServlet.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmRegisterServlet.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/gcm.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/gcmregister.jsp" />
+        <option value="$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmServlet.java" />
       </list>
     </option>
   </component>
@@ -554,16 +554,16 @@
       <workItem from="1418987751000" duration="1198000" />
       <workItem from="1418991476544" duration="1452000" />
       <workItem from="1418996627266" duration="11234000" />
-      <workItem from="1419335728854" duration="12510000" />
+      <workItem from="1419335728854" duration="13218000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="57342000" />
+    <option name="totallyTimeSpent" value="58050000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -573,7 +573,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Application Servers" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32946146" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -929,24 +929,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmRegisterServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="816">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3621">
-          <caret line="27" column="4" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
-          <folding>
-            <element signature="docComment;method#getAuthToken#0;class#AdmServlet#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="248" max-vertical-offset="1258">
@@ -1005,9 +987,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/adm.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6123499" vertical-offset="0" max-vertical-offset="583">
+        <state vertical-scroll-proportion="-13.730769" vertical-offset="0" max-vertical-offset="510">
           <caret line="21" column="11" selection-start-line="21" selection-start-column="11" selection-end-line="21" selection-end-column="11" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmRegisterServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="816">
+          <caret line="29" column="17" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/onepf/opfpush/AdmServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2246696" vertical-offset="0" max-vertical-offset="3638">
+          <caret line="27" column="664" selection-start-line="27" selection-start-column="43" selection-end-line="27" selection-end-column="664" />
+          <folding>
+            <element signature="docComment;method#getAuthToken#0;class#AdmServlet#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
