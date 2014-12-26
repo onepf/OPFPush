@@ -137,8 +137,7 @@ public class AdmServlet extends HttpServlet {
 
         URL admUrl = new URL(AMAZON_ADM_URL + device + "/messages");
 
-        // Generate the HTTPS connection for the POST request. You cannot make a connection
-        // over HTTP.
+        // Generate the HTTPS connection for the POST request. You cannot make a connection over HTTP.
         HttpURLConnection conn = (HttpURLConnection) admUrl.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
