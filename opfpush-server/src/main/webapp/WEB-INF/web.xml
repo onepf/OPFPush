@@ -46,6 +46,14 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
 
+  <servlet>
+    <servlet-name>NokiaRegisterServlet</servlet-name>
+    <servlet-class>
+      org.onepf.opfpush.NokiaRegisterServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>GcmServlet</servlet-name>
     <url-pattern>/gcm</url-pattern>
@@ -64,6 +72,11 @@
   <servlet-mapping>
     <servlet-name>AdmRegisterServlet</servlet-name>
     <url-pattern>/admregister</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>NokiaRegisterServlet</servlet-name>
+    <url-pattern>/nokiaregister</url-pattern>
   </servlet-mapping>
 
 </web-app>
