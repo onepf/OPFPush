@@ -26,7 +26,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/registration_id"
+        android:id="@+id/info_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

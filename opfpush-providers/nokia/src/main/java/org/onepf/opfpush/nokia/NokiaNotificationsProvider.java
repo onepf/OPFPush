@@ -52,7 +52,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     @Override
     public boolean isAvailable() {
         OPFPushLog.methodD(NokiaNotificationsProvider.class, "isAvailable");
-        if (super.isAvailable() && Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
+        if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
             try {
                 PushRegistrar.checkDevice(getContext());
                 return true;

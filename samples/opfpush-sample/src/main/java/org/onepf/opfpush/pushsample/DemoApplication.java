@@ -24,6 +24,7 @@ import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
+import org.onepf.opfpush.nokia.NokiaNotificationsProvider;
 import org.onepf.opfpush.pushsample.listener.DemoEventListener;
 
 /**
@@ -34,6 +35,8 @@ public class DemoApplication extends Application {
 
     private static final String GCM_SENDER_ID = "539088697591";
 
+    private static final String NOKIA_SENDER_ID = "pushsample";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -42,7 +45,8 @@ public class DemoApplication extends Application {
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
                         new GCMProvider(this, GCM_SENDER_ID),
-                        new ADMProvider(this)
+                        new ADMProvider(this),
+                        new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
                 )
                 .setBackoff(new ExponentialBackoff())
                 .setSelectSystemPreferred(true)

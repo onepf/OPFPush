@@ -250,7 +250,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                     onRegistrationSuccess(registrationId);
                 }
             } catch (IOException e) {
-                OPFPushLog.e(e.getCause().toString());
+                OPFPushLog.e("Error while register GCM.", e);
 
                 final String error = e.getMessage();
                 switch (error) {

@@ -29,12 +29,13 @@ import android.support.v4.app.NotificationCompat;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.activity.DemoActivity;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
+import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.util.Utils;
 
 import java.io.UnsupportedEncodingException;
@@ -44,6 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.greenrobot.event.EventBus;
 
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
+import static org.onepf.opfpush.pushsample.util.Constants.PAYLOAD_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -72,7 +74,13 @@ public class DemoEventListener implements EventListener {
             return;
         }
 
-        final String message = extras.getString(MESSAGE_EXTRA_KEY);
+        String message = null;
+        if (extras.containsKey(MESSAGE_EXTRA_KEY)) {
+            message = extras.getString(MESSAGE_EXTRA_KEY);
+        } else if (extras.containsKey(PAYLOAD_EXTRA_KEY)) {
+            message = extras.getString(PAYLOAD_EXTRA_KEY);
+        }
+
         if (message != null) {
             try {
                 showNotification(
@@ -109,41 +117,19 @@ public class DemoEventListener implements EventListener {
     public void onRegistrationError(@NonNull final String providerName,
                                     @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
+        EventBus.getDefault().postSticky(new RegistrationErrorEvent(error));
     }
 
     @Override
     public void onUnregistrationError(@NonNull final String providerName,
                                       @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
-    }
-
-    @Override
-    public void onRegistrationStateError(@NonNull final String providerName,
-                                         @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationStateError", providerName, state);
-    }
-
-    @Override
-    public void onUnregistrationStateError(@NonNull final String providerName,
-                                           @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationStateError", providerName, state);
+        EventBus.getDefault().postSticky(new UnregistrationErrorEvent(error));
     }
 
     @Override
     public void onNoAvailableProvider() {
         OPFPushLog.d("onNoAvailableProvider()");
-    }
-
-    @Override
-    public void onWrongStateError(@NonNull final String providerName,
-                                  @NonNull final OPFError error,
-                                  @NonNull final State state) {
-        OPFPushLog.methodD(DemoEventListener.class, "onWrongStateError", providerName, error, state);
-    }
-
-    @Override
-    public void onProviderBecameUnavailable(@NonNull final String providerName) {
-        OPFPushLog.methodD(DemoEventListener.class, "onProviderBecameUnavailable", providerName);
     }
 
     private void showNotification(

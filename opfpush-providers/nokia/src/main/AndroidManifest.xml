@@ -26,17 +26,6 @@
         <!--android:protectionLevel="signature"/>-->
 
     <application>
-        <receiver
-            android:name=".NokiaNotificationsReceiver"
-            android:permission="com.nokia.pushnotifications.permission.SEND">
-            <intent-filter>
-                <!-- Receives the actual messages. -->
-                <action android:name="com.nokia.pushnotifications.intent.RECEIVE"/>
-                <!-- Receives the registration id. -->
-                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION"/>
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".NokiaNotificationService"
             android:exported="false"/>

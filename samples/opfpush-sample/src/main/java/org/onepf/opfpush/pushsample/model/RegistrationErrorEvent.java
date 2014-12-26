@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.util;
+package org.onepf.opfpush.pushsample.model;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfpush.model.OPFError;
 
 /**
  * @author Roman Savin
- * @since 10.12.14
+ * @since 23.12.14
  */
-public final class Constants {
+public class RegistrationErrorEvent {
 
-    private Constants() {
-        throw new UnsupportedOperationException();
+    @NonNull
+    private OPFError error;
+
+    public RegistrationErrorEvent(@NonNull final OPFError error) {
+        this.error = error;
     }
 
-    //for GCM
-    public static final String MESSAGE_EXTRA_KEY = "message";
-
-    //for Nokia
-    public static final String PAYLOAD_EXTRA_KEY = "payload";
+    @NonNull
+    public OPFError getError() {
+        return error;
+    }
 }
