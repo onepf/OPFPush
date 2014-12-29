@@ -44,7 +44,7 @@ public final class Configuration {
     @NonNull
     private final List<PushProvider> providers;
 
-    @NonNull
+    @Nullable
     private final EventListener eventListener;
 
     @NonNull
@@ -53,7 +53,7 @@ public final class Configuration {
     private final boolean isSelectSystemPreferred;
 
     private Configuration(@NonNull final Collection<? extends PushProvider> providers,
-                          @NonNull final EventListener eventListener,
+                          @Nullable final EventListener eventListener,
                           @NonNull final Backoff backoff,
                           final boolean selectSystemPreferred) {
 
@@ -78,7 +78,7 @@ public final class Configuration {
      *
      * @return event listener of push providers.
      */
-    @NonNull
+    @Nullable
     public EventListener getEventListener() {
         return eventListener;
     }
@@ -205,9 +205,6 @@ public final class Configuration {
         public Configuration build() {
             if (providersMap == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");
-            }
-            if (eventListener == null) {
-                throw new IllegalArgumentException("Need to add event listener.");
             }
 
             return new Configuration(

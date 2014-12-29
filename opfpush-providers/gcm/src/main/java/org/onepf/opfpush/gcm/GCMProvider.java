@@ -314,7 +314,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
                 onUnregistrationSuccess();
             } catch (IOException e) {
-                OPFPushLog.e(e.getCause().toString());
+                OPFPushLog.e("Error while unregister GCM.", e);
 
                 final String error = e.getMessage();
                 switch (error) {

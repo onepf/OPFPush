@@ -14,4 +14,13 @@
  * limitations under the License.
  */
 
-include ':opfpush', ':opfpush-providers:gcm', ':opfpush-providers:nokia', ':opfpush-providers:adm', 'samples:opfpush-sample'
+package org.onepf.opfpush.model;
+
+/**
+ * @author Roman Savin
+ * @since 25.12.14
+ */
+public enum MessageType {
+    MESSAGE_TYPE_DELETED,
+    MESSAGE_TYPE_MESSAGE
+}

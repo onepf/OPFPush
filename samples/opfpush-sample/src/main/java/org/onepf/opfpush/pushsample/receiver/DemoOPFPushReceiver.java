@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.listener;
+package org.onepf.opfpush.pushsample.receiver;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.OPFPushReceiver;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
@@ -43,20 +43,15 @@ import static org.onepf.opfpush.pushsample.util.Constants.PAYLOAD_EXTRA_KEY;
 
 /**
  * @author Roman Savin
- * @since 09.12.14
+ * @since 25.12.14
  */
-public class DemoEventListener implements EventListener {
-
-    @NonNull
-    private Context appContext;
-
-    public DemoEventListener(@NonNull final Context context) {
-        this.appContext = context.getApplicationContext();
-    }
+public class DemoOPFPushReceiver extends OPFPushReceiver {
 
     @Override
-    public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
-        OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, Utils.toString(extras));
+    protected void onMessage(@NonNull final Context context,
+                             @NonNull final String providerName,
+                             @Nullable final Bundle extras) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onMessage", context, providerName, Utils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -71,8 +66,8 @@ public class DemoEventListener implements EventListener {
         if (message != null) {
             try {
                 NotificationUtils.showNotification(
-                        appContext,
-                        appContext.getString(R.string.message_notification_title),
+                        context,
+                        context.getString(R.string.message_notification_title),
                         message
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
@@ -83,40 +78,46 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
-        OPFPushLog.methodD(DemoEventListener.class, "onDeletedMessages", providerName, messagesCount);
+    protected void onDeletedMessage(@NonNull final Context context,
+                                    @NonNull final String providerName,
+                                    final int messagesCount) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onDeletedMessages", providerName, messagesCount);
     }
 
     @Override
-    public void onRegistered(@NonNull final String providerName,
-                             @NonNull final String registrationId) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistered", providerName, registrationId);
+    protected void onRegistered(@NonNull final Context context,
+                                @NonNull final String providerName,
+                                @NonNull final String registrationId) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
     @Override
-    public void onUnregistered(@NonNull final String providerName,
-                               @NonNull final String registrationId) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
-        EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
+    protected void onUnregistered(@NonNull final Context context,
+                                  @NonNull final String providerName,
+                                  @NonNull final String oldRegistrationId) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onUnregistered", providerName, oldRegistrationId);
+        EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
     }
 
     @Override
-    public void onRegistrationError(@NonNull final String providerName,
-                                    @NonNull final OPFError error) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
+    protected void onRegistrationError(@NonNull final Context context,
+                                       @NonNull final String providerName,
+                                       @NonNull final OPFError error) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onRegistrationError", providerName, error);
         EventBus.getDefault().postSticky(new RegistrationErrorEvent(error));
     }
 
     @Override
-    public void onUnregistrationError(@NonNull final String providerName,
-                                      @NonNull final OPFError error) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
+    protected void onUnregistrationError(@NonNull final Context context,
+                                         @NonNull final String providerName,
+                                         @NonNull final OPFError error) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onUnregistrationError", providerName, error);
         EventBus.getDefault().postSticky(new UnregistrationErrorEvent(error));
     }
 
     @Override
-    public void onNoAvailableProvider() {
-        OPFPushLog.methodD(DemoEventListener.class, "onNoAvailableProvider()");
+    protected void onNoAvailableProvider(@NonNull final Context context) {
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onNoAvailableProvider()", context);
     }
 }

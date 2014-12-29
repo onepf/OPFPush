@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.onepf.opfpush.OPFConstants;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
@@ -86,7 +87,7 @@ public class GCMService extends IntentService {
     private void onDeletedMessages() {
         OPFPushLog.methodD(GCMService.class, "onDeletedMessages");
         OPFPushHelper.getInstance(GCMService.this).getReceivedMessageHandler()
-                .onDeletedMessages(NAME, OPFPushHelper.MESSAGES_COUNT_UNKNOWN);
+                .onDeletedMessages(NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
     }
 
     private void onRegistered(@NonNull final String registrationId) {

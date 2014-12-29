@@ -23,12 +23,21 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.PackageChangeReceiver;
 import org.onepf.opfpush.PushProvider;
+
+import java.util.List;
+
+import static android.content.pm.PackageManager.GET_RESOLVED_FILTER;
+import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
+import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
+import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
 
 /**
  * Different utils for check info about installed packages on device.
@@ -127,5 +136,25 @@ public final class PackageUtils {
         }
 
         return packageChangeReceiver;
+    }
+
+    public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
+        OPFPushLog.methodD(PackageUtils.class, "isOPFReceiverRegistered", context);
+
+        final Intent intent = new Intent(ACTION_RECEIVE);
+        final List<ResolveInfo> resolveInfos = context.getPackageManager()
+                .queryBroadcastReceivers(intent, GET_RESOLVED_FILTER);
+
+        for (ResolveInfo resolveInfo : resolveInfos) {
+            final IntentFilter intentFilter = resolveInfo.filter;
+            if (intentFilter != null && intentFilter.hasAction(ACTION_RECEIVE)
+                    && intentFilter.hasAction(ACTION_REGISTRATION)
+                    && intentFilter.hasAction(ACTION_UNREGISTRATION)
+                    && intentFilter.hasAction(ACTION_NO_AVAILABLE_PROVIDER)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

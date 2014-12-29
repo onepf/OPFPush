@@ -22,8 +22,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -66,17 +64,11 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
  */
 public final class OPFPushHelper {
 
-    /**
-     * Use for {@code messagesCount} argument in
-     * {@link ReceivedMessageHandler#onDeletedMessages(String, int)} when messages count is unknown.
-     */
-    public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
-
     @Nullable
     private static OPFPushHelper instance;
 
     @NonNull
-    private EventListenerWrapper eventListener;
+    private EventListener eventListenerWrapper;
 
     @NonNull
     private final Context appContext;
@@ -157,7 +149,19 @@ public final class OPFPushHelper {
             }
         }
 
-        this.eventListener = new EventListenerWrapper(configuration.getEventListener());
+        final EventListener eventListener = configuration.getEventListener();
+        final boolean isOPFReceiverRegistered = PackageUtils.isOPFReceiverRegistered(appContext);
+
+        OPFPushLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
+                + "; eventListenerWrapper == " + eventListener);
+        if (isOPFReceiverRegistered && eventListener != null) {
+            throw new OPFPushException("You can't register OPFReceiver and set event listener");
+        } else if (!isOPFReceiverRegistered && eventListener == null) {
+            throw new OPFPushException("You must register OPFReceiver or set event listener");
+        }
+
+        this.eventListenerWrapper = EventListenerWrapperCreator
+                .getEventListenerWrapper(appContext, eventListener);
         restoreLastProvider();
         OPFPushLog.i("Init done.");
     }
@@ -490,7 +494,7 @@ public final class OPFPushHelper {
 
         settings.saveState(UNREGISTERED);
         OPFPushLog.w("No more available providers.");
-        eventListener.onNoAvailableProvider();
+        eventListenerWrapper.onNoAvailableProvider();
         return false;
     }
 
@@ -593,7 +597,7 @@ public final class OPFPushHelper {
                               @Nullable final Bundle extras) {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onMessage", providerName);
             settings.saveState(REGISTERED);
-            eventListener.onMessage(providerName, extras);
+            eventListenerWrapper.onMessage(providerName, extras);
         }
 
         /**
@@ -607,7 +611,7 @@ public final class OPFPushHelper {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onDeletedMessages",
                     providerName, messagesCount);
             settings.saveState(REGISTERED);
-            eventListener.onDeletedMessages(providerName, messagesCount);
+            eventListenerWrapper.onDeletedMessages(providerName, messagesCount);
         }
 
         /**
@@ -631,7 +635,7 @@ public final class OPFPushHelper {
                 currentProvider = getProviderWithException(providerName);
                 settings.saveLastProvider(currentProvider);
 
-                eventListener.onRegistered(providerName, registrationId);
+                eventListenerWrapper.onRegistered(providerName, registrationId);
 
                 packageReceiver = PackageUtils
                         .registerPackageChangeReceiver(appContext, currentProvider);
@@ -654,7 +658,7 @@ public final class OPFPushHelper {
                 settings.clear();
                 currentProvider = null;
                 unregisterPackageChangeReceiver();
-                eventListener.onUnregistered(providerName, oldRegistrationId);
+                eventListenerWrapper.onUnregistered(providerName, oldRegistrationId);
             }
         }
 
@@ -681,7 +685,7 @@ public final class OPFPushHelper {
                     }
                 }
 
-                eventListener.onRegistrationError(providerName, error);
+                eventListenerWrapper.onRegistrationError(providerName, error);
             }
         }
 
@@ -700,7 +704,7 @@ public final class OPFPushHelper {
                 if (isUnregistering() || isUnregistered()) {
                     settings.saveState(REGISTERED);
                 }
-                eventListener.onUnregistrationError(providerName, error);
+                eventListenerWrapper.onUnregistrationError(providerName, error);
             }
         }
 
@@ -724,98 +728,6 @@ public final class OPFPushHelper {
                     onUnregistrationError(providerName, error);
                 }
             }
-        }
-    }
-
-    /**
-     * Wrapper for execute all method on main thread.
-     *
-     * @author Kirill Rozov
-     * @author Roman Savin
-     * @since 24.09.14.
-     */
-    private static final class EventListenerWrapper implements EventListener {
-
-        private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-        private final EventListener listener;
-
-        private EventListenerWrapper(EventListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onMessage(providerName, extras);
-                }
-            });
-        }
-
-        @Override
-        public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onDeletedMessages(providerName, messagesCount);
-                }
-            });
-        }
-
-        @Override
-        public void onRegistered(@NonNull final String providerName,
-                                 @NonNull final String registrationId) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onRegistered(providerName, registrationId);
-                }
-            });
-
-        }
-
-        @Override
-        public void onUnregistered(@NonNull final String providerName,
-                                   @NonNull final String registrationId) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onUnregistered(providerName, registrationId);
-                }
-            });
-        }
-
-        @Override
-        public void onRegistrationError(@NonNull final String providerName, @NonNull final OPFError error) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onRegistrationError(providerName, error);
-                }
-            });
-
-        }
-
-        @Override
-        public void onUnregistrationError(@NonNull final String providerName,
-                                          @NonNull final OPFError error) {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onUnregistrationError(providerName, error);
-                }
-            });
-        }
-
-        @Override
-        public void onNoAvailableProvider() {
-            HANDLER.post(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onNoAvailableProvider();
-                }
-            });
         }
     }
 }

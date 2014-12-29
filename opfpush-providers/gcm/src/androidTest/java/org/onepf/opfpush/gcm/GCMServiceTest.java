@@ -34,6 +34,7 @@ import org.onepf.opfpush.listener.SimpleEventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.configuration.Configuration;
+import org.onepf.opfpush.OPFPushLog;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;

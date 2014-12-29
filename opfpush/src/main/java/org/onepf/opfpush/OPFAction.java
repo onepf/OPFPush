@@ -14,4 +14,23 @@
  * limitations under the License.
  */
 
-include ':opfpush', ':opfpush-providers:gcm', ':opfpush-providers:nokia', ':opfpush-providers:adm', 'samples:opfpush-sample'
+package org.onepf.opfpush;
+
+import android.support.annotation.StringDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * @author Roman Savin
+ * @since 25.12.14
+ */
+@Retention(RetentionPolicy.SOURCE)
+@StringDef({
+        OPFConstants.ACTION_RECEIVE,
+        OPFConstants.ACTION_REGISTRATION,
+        OPFConstants.ACTION_UNREGISTRATION,
+        OPFConstants.ACTION_NO_AVAILABLE_PROVIDER
+})
+@interface OPFAction {
+}
