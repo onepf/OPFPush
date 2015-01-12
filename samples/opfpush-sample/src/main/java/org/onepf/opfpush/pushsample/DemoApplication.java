@@ -55,10 +55,6 @@ public class DemoApplication extends Application {
         final OPFPushHelper helper = OPFPushHelper.getInstance(this);
         helper.init(configBuilder.build());
 
-        if (helper.isRegistrationAvailable()) {
-            helper.register();
-        } else if (helper.isUnregistrationAvailable()) {
-            helper.unregister();
-        }
+        helper.register();
     }
 }

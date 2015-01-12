@@ -25,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
@@ -97,23 +96,13 @@ public class DemoActivity extends Activity {
     }
 
     public void onRegisterClick(@NonNull final View view) {
-        if (helper.isRegistrationAvailable()) {
-            initViewsRegisteringState();
-            helper.register();
-        } else {
-            Toast.makeText(this, R.string.registration_not_available, Toast.LENGTH_SHORT).show();
-            initViewsUnregisteringState();
-        }
+        initViewsRegisteringState();
+        helper.register();
     }
 
     public void onUnregisterClick(@NonNull final View view) {
-        if (helper.isUnregistrationAvailable()) {
-            initViewsUnregisteringState();
-            helper.unregister();
-        } else {
-            Toast.makeText(this, R.string.unregistration_not_available, Toast.LENGTH_SHORT).show();
-            initViewsRegisteringState();
-        }
+        initViewsUnregisteringState();
+        helper.unregister();
     }
 
     @SuppressWarnings("UnusedDeclaration")

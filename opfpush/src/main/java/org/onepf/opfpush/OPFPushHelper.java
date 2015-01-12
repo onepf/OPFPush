@@ -28,8 +28,6 @@ import android.text.TextUtils;
 
 import org.onepf.opfpush.exception.OPFIllegalStateException;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.exception.RegistrationNotCompletedStateException;
-import org.onepf.opfpush.exception.UnregistrationNotCompletedStateException;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
@@ -172,8 +170,7 @@ public final class OPFPushHelper {
      * If you want to modify current registered provider, you must call unregister() first.
      * <p/>
      *
-     * @throws OPFPushException                         When try call this method while init not done.
-     * @throws UnregistrationNotCompletedStateException If unregistration process in progress.
+     * @throws OPFPushException When try call this method while init not done.
      */
     public void register() {
         OPFPushLog.methodD(OPFPushHelper.class, "register");
@@ -188,6 +185,7 @@ public final class OPFPushHelper {
                 case REGISTERING:
                 case REGISTERED:
                     break;
+                case UNREGISTERING:
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
                     if (configuration.isSelectSystemPreferred()
@@ -196,9 +194,6 @@ public final class OPFPushHelper {
                     }
                     registerFirstAvailableProvider();
                     break;
-
-                case UNREGISTERING:
-                    throw new UnregistrationNotCompletedStateException();
             }
         }
     }
@@ -211,8 +206,7 @@ public final class OPFPushHelper {
      * A better approach is to simply have your server stop sending messages.
      * Only use unregister if you want to change your sender ID.
      *
-     * @throws OPFPushException                       When try call this method while init not done.
-     * @throws RegistrationNotCompletedStateException If registration process in progress.
+     * @throws OPFPushException When try call this method while init not done.
      */
     public void unregister() {
         OPFPushLog.methodD(OPFPushHelper.class, "unregister");
@@ -231,13 +225,11 @@ public final class OPFPushHelper {
                 case UNREGISTERING:
                 case UNREGISTERED:
                     break;
+                case REGISTERING:
                 case REGISTERED:
                     settings.saveState(UNREGISTERING);
                     currentProvider.unregister();
                     break;
-
-                case REGISTERING:
-                    throw new RegistrationNotCompletedStateException();
             }
         }
     }
@@ -273,24 +265,6 @@ public final class OPFPushHelper {
                 throw new OPFIllegalStateException("Provider not registered.");
             }
         }
-    }
-
-    /**
-     * Check is register operation available.
-     *
-     * @return true if initialization is done and unregistration isn't being performed.
-     */
-    public boolean isRegistrationAvailable() {
-        return isInitDone() && !isUnregistering();
-    }
-
-    /**
-     * Check is unregister operation available.
-     *
-     * @return true if initialization is done and registration isn't being performed.
-     */
-    public boolean isUnregistrationAvailable() {
-        return isInitDone() && !isRegistering();
     }
 
     @Nullable
