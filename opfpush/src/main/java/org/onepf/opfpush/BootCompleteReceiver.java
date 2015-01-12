@@ -34,7 +34,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFPushLog.methodD(BootCompleteReceiver.class, "onReceive", context, intent);
 
-        final OPFPushHelper helper = OPFPushHelper.getInstance(context);
+        final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {
             OPFPushLog.d("Helper is registered");
             if (isAndroidIDChanged(context)) {

@@ -22,10 +22,10 @@ import android.support.annotation.NonNull;
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.util.Utils;
 
 import static org.onepf.opfpush.adm.Constants.NAME;
@@ -58,8 +58,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onMessage(@NonNull final Intent intent) {
         OPFPushLog.methodD(ADMService.class, "onMessage", Utils.toString(intent));
-        OPFPushHelper.getInstance(this)
-                .getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
+        OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
     }
 
     /**
@@ -75,8 +74,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
     }
 
     /**
@@ -94,8 +92,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onUnregistered", "registrationId");
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onUnregistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(NAME, registrationId);
     }
 
     /**
@@ -115,8 +112,7 @@ public class ADMService extends ADMMessageHandlerBase {
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
 
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistrationError(NAME, error);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(NAME, error);
     }
 
     @NonNull

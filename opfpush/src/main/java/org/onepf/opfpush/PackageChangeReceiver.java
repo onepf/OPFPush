@@ -50,12 +50,12 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
             if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
                 OPFPushLog.d("Host app '%s' of provider '%s' removed.",
                         hostAppPackage, provider.getName());
-                OPFPushHelper.getInstance(context).onProviderUnavailable(provider);
+                OPFPush.getHelper().onProviderUnavailable(provider);
             }
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
             if (context.getPackageName().equals(getAppPackage(intent))) {
                 OPFPushLog.d("Application updated.");
-                OPFPushHelper.getInstance(context).onNeedRetryRegister();
+                OPFPush.getHelper().onNeedRetryRegister();
             }
         }
     }

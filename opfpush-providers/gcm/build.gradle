@@ -16,7 +16,6 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply plugin: 'robolectric'
 apply from: '../../maven_push.gradle'
 
 android {
@@ -36,18 +35,6 @@ android {
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
-}
-
-robolectric {
-    // configure the set of classes for JUnit tests
-    include '**/*Test.class'
-    exclude '**/espresso/**/*.class'
-
-    // configure max heap size of the test JVM
-    maxHeapSize = '2048m'
-
-    // configure whether failing tests should fail the build
-    ignoreFailures true
 }
 
 dependencies {

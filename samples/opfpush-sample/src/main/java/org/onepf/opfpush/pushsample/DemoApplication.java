@@ -18,9 +18,9 @@ package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
 
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
 import org.onepf.opfpush.configuration.ExponentialBackoff;
-import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
@@ -52,9 +52,7 @@ public class DemoApplication extends Application {
                 .setSelectSystemPreferred(true)
                 .setEventListener(new DemoEventListener(this));
 
-        final OPFPushHelper helper = OPFPushHelper.getInstance(this);
-        helper.init(configBuilder.build());
-
-        helper.register();
+        OPFPush.init(this, configBuilder.build());
+        OPFPush.getHelper().register();
     }
 }

@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
@@ -57,7 +58,7 @@ public class DemoActivity extends Activity {
     private ArrayAdapter<String> adapter;
 
     @NonNull
-    private OPFPushHelper helper = OPFPushHelper.getInstance(this);
+    private OPFPushHelper helper = OPFPush.getHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

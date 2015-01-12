@@ -50,7 +50,6 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
 
 /**
  * Main class for manage push providers.
- * For get instance of this class call {@link #getInstance(android.content.Context)}.
  * <p/>
  * Before do any operations with {@code OpenPushHelper} you must call {@link #init(org.onepf.opfpush.configuration.Configuration)}.
  * <p/>
@@ -61,9 +60,6 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
  * @since 04.09.2014
  */
 public final class OPFPushHelper {
-
-    @Nullable
-    private static OPFPushHelper instance;
 
     @NonNull
     private EventListener eventListenerWrapper;
@@ -94,74 +90,9 @@ public final class OPFPushHelper {
     @NonNull
     private final Object initLock = new Object();
 
-    private OPFPushHelper(@NonNull final Context context) {
+    OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = new Settings(context);
-    }
-
-    /**
-     * Get instance of {@code OpenPushHelper}.
-     *
-     * @param context The current context.
-     * @return Instance of {@link OPFPushHelper}.
-     */
-    @SuppressFBWarnings({"DC_DOUBLECHECK"})
-    public static OPFPushHelper getInstance(@NonNull final Context context) {
-        OPFPushLog.methodD(OPFPushHelper.class, "getInstance", context);
-
-        if (instance == null) {
-            synchronized (OPFPushHelper.class) {
-                if (instance == null) {
-                    instance = new OPFPushHelper(context);
-                }
-            }
-        }
-        return instance;
-    }
-
-    static OPFPushHelper newInstance(@NonNull final Context context) {
-        synchronized (OPFPushHelper.class) {
-            instance = new OPFPushHelper(context);
-        }
-        return instance;
-    }
-
-    /**
-     * Init {@code OpenPushHelper}. You must call this method before do any operation.
-     *
-     * @param initialConfiguration Instance of {@code Options}.
-     */
-    @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
-    public void init(@NonNull final Configuration initialConfiguration) {
-        OPFPushLog.methodD(OPFPushHelper.class, "init", initialConfiguration);
-
-        if (isInitDone()) {
-            throw new OPFPushException("You can init OpenPushHelper only one time.");
-        }
-
-        if (this.configuration == null) {
-            synchronized (initLock) {
-                if (this.configuration == null) {
-                    this.configuration = initialConfiguration;
-                }
-            }
-        }
-
-        final EventListener eventListener = configuration.getEventListener();
-        final boolean isOPFReceiverRegistered = PackageUtils.isOPFReceiverRegistered(appContext);
-
-        OPFPushLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
-                + "; eventListenerWrapper == " + eventListener);
-        if (isOPFReceiverRegistered && eventListener != null) {
-            throw new OPFPushException("You can't register OPFReceiver and set event listener");
-        } else if (!isOPFReceiverRegistered && eventListener == null) {
-            throw new OPFPushException("You must register OPFReceiver or set event listener");
-        }
-
-        this.eventListenerWrapper = EventListenerWrapperCreator
-                .getEventListenerWrapper(appContext, eventListener);
-        restoreLastProvider();
-        OPFPushLog.i("Init done.");
     }
 
     /**
@@ -300,6 +231,44 @@ public final class OPFPushHelper {
                 + ", registered="
                 + isRegistered()
                 + '}';
+    }
+
+    /**
+     * Init {@code OpenPushHelper}. You must call this method before do any operation.
+     *
+     * @param initialConfiguration Instance of {@code Options}.
+     */
+    @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
+    void init(@NonNull final Configuration initialConfiguration) {
+        OPFPushLog.methodD(OPFPushHelper.class, "init", initialConfiguration);
+
+        if (isInitDone()) {
+            throw new OPFPushException("You can init OpenPushHelper only one time.");
+        }
+
+        if (this.configuration == null) {
+            synchronized (initLock) {
+                if (this.configuration == null) {
+                    this.configuration = initialConfiguration;
+                }
+            }
+        }
+
+        final EventListener eventListener = configuration.getEventListener();
+        final boolean isOPFReceiverRegistered = PackageUtils.isOPFReceiverRegistered(appContext);
+
+        OPFPushLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
+                + "; eventListenerWrapper == " + eventListener);
+        if (isOPFReceiverRegistered && eventListener != null) {
+            throw new OPFPushException("You can't register OPFReceiver and set event listener");
+        } else if (!isOPFReceiverRegistered && eventListener == null) {
+            throw new OPFPushException("You must register OPFReceiver or set event listener");
+        }
+
+        this.eventListenerWrapper = EventListenerWrapperCreator
+                .getEventListenerWrapper(appContext, eventListener);
+        restoreLastProvider();
+        OPFPushLog.i("Init done.");
     }
 
     /**
@@ -556,6 +525,7 @@ public final class OPFPushHelper {
     /**
      * Is used for handle received messages by broadcast receivers of concrete providers.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public final class ReceivedMessageHandler {
 
         ReceivedMessageHandler() {

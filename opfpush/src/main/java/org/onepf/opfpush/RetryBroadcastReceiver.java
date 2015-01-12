@@ -36,7 +36,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
         OPFPushLog.methodD(RetryBroadcastReceiver.class, "onReceive",
                 context, Utils.toString(intent));
 
-        final OPFPushHelper helper = OPFPushHelper.getInstance(context);
+        final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {
             OPFPushLog.d("Initialisation is done");
 

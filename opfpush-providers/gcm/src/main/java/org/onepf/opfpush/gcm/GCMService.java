@@ -23,10 +23,10 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.OPFConstants;
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.util.Utils;
 
 import static org.onepf.opfpush.gcm.GCMConstants.NAME;
@@ -80,26 +80,23 @@ public class GCMService extends IntentService {
 
     private void onMessage(@NonNull final Intent intent) {
         OPFPushLog.methodD(GCMService.class, "onMessage", Utils.toString(intent));
-        OPFPushHelper.getInstance(GCMService.this).getReceivedMessageHandler()
-                .onMessage(NAME, intent.getExtras());
+        OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
     }
 
     private void onDeletedMessages() {
         OPFPushLog.methodD(GCMService.class, "onDeletedMessages");
-        OPFPushHelper.getInstance(GCMService.this).getReceivedMessageHandler()
+        OPFPush.getHelper().getReceivedMessageHandler()
                 .onDeletedMessages(NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
     }
 
     private void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(GCMService.class, "onRegistered", "registrationId");
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
     }
 
     private void onUnregistered(@NonNull final String oldRegistrationId) {
         OPFPushLog.methodD(GCMService.class, "onUnregistered", "oldRegistrationId");
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onUnregistered(NAME, oldRegistrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(NAME, oldRegistrationId);
     }
 
     private void onRegistrationError(@NonNull @GCMError final String errorId) {
@@ -107,8 +104,7 @@ public class GCMService extends IntentService {
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
 
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
-                .onRegistrationError(NAME, error);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(NAME, error);
     }
 
     private void onUnregistrationError(@NonNull @GCMError final String errorId) {
@@ -116,7 +112,7 @@ public class GCMService extends IntentService {
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
 
-        OPFPushHelper.getInstance(this).getReceivedMessageHandler()
+        OPFPush.getHelper().getReceivedMessageHandler()
                 .onUnregistrationError(NAME, error);
     }
 
