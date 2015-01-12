@@ -27,6 +27,6 @@ final class Constants {
     }
 
     static final String NOKIA_MANUFACTURER = "Nokia";
-    static final String NAME = "Nokia Push"; //todo check the name
+    static final String NAME = "Nokia Push";
     static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 }

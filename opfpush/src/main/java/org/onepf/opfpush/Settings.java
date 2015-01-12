@@ -35,7 +35,6 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
  * @author Roman Savin
  * @since 01.10.14.
  */
-//TODO: Config timeout via options.
 class Settings {
 
     private static final long STATE_INFINITY_TIMESTAMP = -1L;

@@ -75,7 +75,6 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
-        //TODO Send registration id.
         OPFPushHelper.getInstance(this).getReceivedMessageHandler()
                 .onRegistered(NAME, registrationId);
     }
