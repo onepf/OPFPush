@@ -21,7 +21,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 /**
  * Represent message for send from client to server that uses in Google Cloud Messaging.
@@ -114,7 +114,7 @@ public class Message implements Parcelable {
     public String toString() {
         return "Message{"
                 + "messageId='" + id + '\''
-                + ", data='" + Utils.toString(data)
+                + ", data='" + OPFUtils.toString(data)
                 + '\''
                 + ", TTL='" + timeToLeave + '\''
                 + '}';

@@ -26,7 +26,7 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.adm.Constants.NAME;
 
@@ -57,7 +57,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NonNull final Intent intent) {
-        OPFPushLog.methodD(ADMService.class, "onMessage", Utils.toString(intent));
+        OPFPushLog.methodD(ADMService.class, "onMessage", OPFUtils.toString(intent));
         OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
     }
 

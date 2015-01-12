@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 /**
  * @author Roman Savin
@@ -42,7 +42,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFPushLog.methodD(PackageChangeReceiver.class, "onReceive",
-                context, Utils.toString(intent));
+                context, OPFUtils.toString(intent));
 
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {

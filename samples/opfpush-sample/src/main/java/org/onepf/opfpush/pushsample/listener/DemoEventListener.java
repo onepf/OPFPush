@@ -31,7 +31,7 @@ import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -56,7 +56,7 @@ public class DemoEventListener implements EventListener {
 
     @Override
     public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
-        OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, Utils.toString(extras));
+        OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }

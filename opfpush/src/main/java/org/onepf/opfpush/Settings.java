@@ -17,11 +17,11 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.State;
+import org.onepf.opfutils.OPFPreferences;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,13 +44,11 @@ class Settings {
     private static final String KEY_LAST_ANDROID_ID = "android_id";
     private static final String KEY_STATE_TIMESTAMP = "state_timestamp";
 
-    private static final String PREF_NAME = "org.onepf.openpush";
-
     @NonNull
-    private final SharedPreferences preferences;
+    private final OPFPreferences preferences;
 
     public Settings(@NonNull final Context context) {
-        preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        preferences = new OPFPreferences(context);
     }
 
     @NonNull
@@ -92,48 +90,41 @@ class Settings {
         final long stateTimestamp = isInfinityState(state) ? STATE_INFINITY_TIMESTAMP
                 : System.currentTimeMillis();
 
-        preferences.edit()
-                .putInt(KEY_STATE, state.getValue())
-                .putLong(KEY_STATE_TIMESTAMP, stateTimestamp)
-                .apply();
+        preferences.put(KEY_STATE_TIMESTAMP, stateTimestamp);
     }
 
     public void clear() {
-        preferences.edit().clear().apply();
+        preferences.clear();
     }
 
     @Nullable
     public String getLastProviderName() {
-        return preferences.getString(KEY_LAST_PROVIDER_NAME, null);
+        return preferences.getString(KEY_LAST_PROVIDER_NAME);
     }
 
     public void saveLastProvider(@Nullable final PushProvider provider) {
         OPFPushLog.methodD(Settings.class, "saveLastProvider", provider);
 
-        final SharedPreferences.Editor editor = preferences.edit();
         if (provider == null) {
-            editor.remove(KEY_LAST_PROVIDER_NAME);
+            preferences.remove(KEY_LAST_PROVIDER_NAME);
         } else {
-            editor.putString(KEY_LAST_PROVIDER_NAME, provider.getName());
+            preferences.put(KEY_LAST_PROVIDER_NAME, provider.getName());
         }
-        editor.apply();
     }
 
     @Nullable
     public String getLastAndroidId() {
-        return preferences.getString(KEY_LAST_ANDROID_ID, null);
+        return preferences.getString(KEY_LAST_ANDROID_ID);
     }
 
     public void saveLastAndroidId(@Nullable final String androidId) {
         OPFPushLog.methodD(Settings.class, "saveLastAndroidId", androidId);
 
-        final SharedPreferences.Editor editor = preferences.edit();
         if (androidId == null) {
-            editor.remove(KEY_LAST_ANDROID_ID);
+            preferences.remove(KEY_LAST_ANDROID_ID);
         } else {
-            editor.putString(KEY_LAST_ANDROID_ID, androidId);
+            preferences.put(KEY_LAST_ANDROID_ID, androidId);
         }
-        editor.apply();
     }
 
     private boolean isInfinityState(@NonNull final State state) {

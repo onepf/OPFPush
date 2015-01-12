@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 /**
  * @author Kirill Rozov
@@ -34,7 +34,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFPushLog.methodD(RetryBroadcastReceiver.class, "onReceive",
-                context, Utils.toString(intent));
+                context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {

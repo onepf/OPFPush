@@ -7,7 +7,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Message;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class SendMessageService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        OPFPushLog.methodD(SendMessageService.class, "onHandleIntent", Utils.toString(intent));
+        OPFPushLog.methodD(SendMessageService.class, "onHandleIntent", OPFUtils.toString(intent));
 
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             final Message message = intent.getParcelableExtra(EXTRA_MESSAGE);

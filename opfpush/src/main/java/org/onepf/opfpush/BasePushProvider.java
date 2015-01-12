@@ -21,7 +21,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.util.PackageUtils;
+import org.onepf.opfutils.OPFUtils;
 
 /**
  * Base class for create {@code PushProvider}.
@@ -59,7 +59,7 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public boolean isAvailable() {
-        return PackageUtils.isInstalled(appContext, hostAppPackage);
+        return OPFUtils.isInstalled(appContext, hostAppPackage);
     }
 
     @Override

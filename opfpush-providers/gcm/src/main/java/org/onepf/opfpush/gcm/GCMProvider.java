@@ -36,8 +36,7 @@ import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.util.PackageUtils;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -184,7 +183,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     private int getAppVersion() {
         try {
-            return PackageUtils.getAppVersion(getContext());
+            return OPFUtils.getAppVersion(getContext());
         } catch (PackageManager.NameNotFoundException e) {
             throw new OPFPushException("Application not found", e);
         }
@@ -343,7 +342,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);
 
-            OPFPushLog.d("Send broadcast intent : " + Utils.toString(intent));
+            OPFPushLog.d("Send broadcast intent : " + OPFUtils.toString(intent));
             getContext().sendBroadcast(intent);
         }
     }

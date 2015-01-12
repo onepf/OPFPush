@@ -20,9 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
@@ -46,62 +43,12 @@ import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
  * @author Roman Savin
  * @since 07.09.14
  */
-public final class PackageUtils {
+public final class ReceiverUtils {
 
     private static final String PACKAGE_DATA_SCHEME = "package";
 
-    private PackageUtils() {
+    private ReceiverUtils() {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Get version code of current application.
-     *
-     * @return If find app - return it's version code, else {@link Integer#MIN_VALUE}.
-     */
-    public static int getAppVersion(@NonNull final Context context)
-            throws PackageManager.NameNotFoundException {
-
-        final PackageInfo packageInfo = context.getPackageManager()
-                .getPackageInfo(context.getPackageName(), 0);
-        if (packageInfo == null) {
-            throw new PackageManager.NameNotFoundException(context.getPackageName());
-        }
-        return packageInfo.versionCode;
-    }
-
-    /**
-     * Check is application system.
-     *
-     * @param context    The current context.
-     * @param appPackage Package of application for verify.
-     * @return True when application is system, false - otherwise.
-     */
-    public static boolean isSystemApp(@NonNull final Context context,
-                                      @NonNull final String appPackage) {
-        try {
-            final ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(appPackage, 0);
-            return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0
-                    || (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Check is application installed on device.
-     *
-     * @param context    The current context.
-     * @param appPackage Package of application for verify.
-     * @return True when application is installed, false - otherwise.
-     */
-    public static boolean isInstalled(@NonNull final Context context,
-                                      @NonNull final String appPackage) {
-        try {
-            return context.getPackageManager().getApplicationInfo(appPackage, 0) != null;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
     }
 
     /**
@@ -116,12 +63,12 @@ public final class PackageUtils {
             @NonNull final Context context,
             @NonNull final PushProvider provider
     ) {
-        OPFPushLog.methodD(PackageUtils.class, "registerPackageChangeReceiver", context, provider);
+        OPFPushLog.methodD(ReceiverUtils.class, "registerPackageChangeReceiver", context, provider);
 
         final PackageChangeReceiver packageChangeReceiver = new PackageChangeReceiver(provider);
 
         final IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
-        appUpdateFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+        appUpdateFilter.addDataScheme(ReceiverUtils.PACKAGE_DATA_SCHEME);
         appUpdateFilter.addDataPath(context.getPackageName(), PatternMatcher.PATTERN_LITERAL);
         context.registerReceiver(packageChangeReceiver, appUpdateFilter);
 
@@ -130,7 +77,7 @@ public final class PackageUtils {
             OPFPushLog.d("Host app package isn't null");
 
             final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
-            hostAppRemovedFilter.addDataScheme(PackageUtils.PACKAGE_DATA_SCHEME);
+            hostAppRemovedFilter.addDataScheme(ReceiverUtils.PACKAGE_DATA_SCHEME);
             hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
             context.registerReceiver(packageChangeReceiver, hostAppRemovedFilter);
         }
@@ -139,7 +86,7 @@ public final class PackageUtils {
     }
 
     public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
-        OPFPushLog.methodD(PackageUtils.class, "isOPFReceiverRegistered", context);
+        OPFPushLog.methodD(ReceiverUtils.class, "isOPFReceiverRegistered", context);
 
         final Intent intent = new Intent(ACTION_RECEIVE);
         final List<ResolveInfo> resolveInfos = context.getPackageManager()

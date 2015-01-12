@@ -34,7 +34,10 @@ import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.configuration.Backoff;
 import org.onepf.opfpush.configuration.Configuration;
-import org.onepf.opfpush.util.PackageUtils;
+import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfutils.Checkable;
+import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -90,6 +93,16 @@ public final class OPFPushHelper {
     @NonNull
     private final Object initLock = new Object();
 
+    @NonNull
+    private final Checkable initDoneCheckable = new Checkable() {
+        @Override
+        public boolean check() {
+            synchronized (initLock) {
+                return configuration != null;
+            }
+        }
+    };
+
     OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = new Settings(context);
@@ -106,7 +119,7 @@ public final class OPFPushHelper {
     public void register() {
         OPFPushLog.methodD(OPFPushHelper.class, "register");
 
-        checkInitDone();
+        OPFChecks.checkInit(initDoneCheckable, true);
 
         synchronized (registrationLock) {
             final State state = settings.getState();
@@ -142,7 +155,7 @@ public final class OPFPushHelper {
     public void unregister() {
         OPFPushLog.methodD(OPFPushHelper.class, "unregister");
 
-        checkInitDone();
+        OPFChecks.checkInit(initDoneCheckable, true);
 
         synchronized (registrationLock) {
             final State state = settings.getState();
@@ -214,7 +227,7 @@ public final class OPFPushHelper {
 
     @NonNull
     public ReceivedMessageHandler getReceivedMessageHandler() {
-        checkInitDone();
+        OPFChecks.checkInit(initDoneCheckable, true);
         return receivedMessageHandler;
     }
 
@@ -255,7 +268,7 @@ public final class OPFPushHelper {
         }
 
         final EventListener eventListener = configuration.getEventListener();
-        final boolean isOPFReceiverRegistered = PackageUtils.isOPFReceiverRegistered(appContext);
+        final boolean isOPFReceiverRegistered = ReceiverUtils.isOPFReceiverRegistered(appContext);
 
         OPFPushLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
                 + "; eventListenerWrapper == " + eventListener);
@@ -277,9 +290,7 @@ public final class OPFPushHelper {
      * @return True if init is done, else - false.
      */
     boolean isInitDone() {
-        synchronized (initLock) {
-            return configuration != null;
-        }
+        return initDoneCheckable.check();
     }
 
     boolean isRegistered() {
@@ -301,7 +312,7 @@ public final class OPFPushHelper {
     void restartRegisterOnBoot() {
         OPFPushLog.methodD(OPFPushHelper.class, "restartRegisterOnBoot");
 
-        checkInitDone();
+        OPFChecks.checkInit(initDoneCheckable, true);
         settings.clear();
         register();
     }
@@ -365,12 +376,6 @@ public final class OPFPushHelper {
         }
     }
 
-    private void checkInitDone() {
-        if (!isInitDone()) {
-            throw new OPFPushException("Before work with OpenPushHelper call init() first.");
-        }
-    }
-
     private void restoreLastProvider() {
         OPFPushLog.methodD(OPFPushHelper.class, "restoreLastProvider");
 
@@ -403,7 +408,7 @@ public final class OPFPushHelper {
             OPFPushLog.d("Host app package : " + hostAppPackage);
 
             if (hostAppPackage != null) {
-                if (PackageUtils.isSystemApp(appContext, hostAppPackage)
+                if (OPFUtils.isSystemApp(appContext, hostAppPackage)
                         && provider.isAvailable()) {
                     register(provider);
                     return true;
@@ -581,7 +586,7 @@ public final class OPFPushHelper {
 
                 eventListenerWrapper.onRegistered(providerName, registrationId);
 
-                packageReceiver = PackageUtils
+                packageReceiver = ReceiverUtils
                         .registerPackageChangeReceiver(appContext, currentProvider);
             }
         }

@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 /**
  * Receiver for events from Google Cloud Messaging and {@link GCMProvider}.
@@ -35,7 +35,7 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(GCMReceiver.class, "onReceive", context, Utils.toString(intent));
+        OPFPushLog.methodD(GCMReceiver.class, "onReceive", context, OPFUtils.toString(intent));
 
         if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
             final Bundle extras = intent.getExtras();

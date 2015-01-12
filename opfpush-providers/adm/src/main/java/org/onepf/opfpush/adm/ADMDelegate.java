@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import com.amazon.device.messaging.ADM;
 
 import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.util.PackageUtils;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
 
@@ -39,7 +39,7 @@ final class ADMDelegate {
     public ADMDelegate(@NonNull final Context context) {
         OPFPushLog.methodD(ADMDelegate.class, "ADMDelegate", context);
 
-        if (PackageUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)) {
+        if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)) {
             OPFPushLog.d("Kindle store app is installed");
             adm = new ADM(context.getApplicationContext());
         }

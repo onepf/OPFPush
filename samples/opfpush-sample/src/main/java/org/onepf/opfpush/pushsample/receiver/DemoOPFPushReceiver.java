@@ -31,7 +31,7 @@ import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -51,7 +51,8 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     protected void onMessage(@NonNull final Context context,
                              @NonNull final String providerName,
                              @Nullable final Bundle extras) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onMessage", context, providerName, Utils.toString(extras));
+        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onMessage",
+                context, providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }

@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.model.MessageType;
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
@@ -69,7 +69,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
 
     @Override
     public final void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "onReceive", context, Utils.toString(intent));
+        OPFPushLog.methodD(OPFPushReceiver.class, "onReceive", context, OPFUtils.toString(intent));
 
         @OPFAction final String action = intent.getAction();
         switch (action) {
@@ -90,7 +90,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
 
     private void handleRegistrationAction(@NonNull final Context context,
                                           @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleRegistrationAction", context, Utils.toString(intent));
+        OPFPushLog.methodD(OPFPushReceiver.class, "handleRegistrationAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         if (intent.hasExtra(EXTRA_ERROR)) {
@@ -110,7 +110,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
 
     private void handleUnregistrationAction(@NonNull final Context context,
                                             @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleUnregistrationAction", context, Utils.toString(intent));
+        OPFPushLog.methodD(OPFPushReceiver.class, "handleUnregistrationAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         if (intent.hasExtra(EXTRA_ERROR)) {
@@ -130,7 +130,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
 
     private void handleReceiveAction(@NonNull final Context context,
                                      @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleReceiveAction", context, Utils.toString(intent));
+        OPFPushLog.methodD(OPFPushReceiver.class, "handleReceiveAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         final MessageType messageType = (MessageType) intent.getSerializableExtra(EXTRA_MESSAGE_TYPE);

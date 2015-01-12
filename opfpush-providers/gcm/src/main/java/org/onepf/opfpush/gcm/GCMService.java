@@ -27,7 +27,7 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
-import org.onepf.opfpush.util.Utils;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.gcm.GCMConstants.NAME;
 
@@ -48,7 +48,7 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        OPFPushLog.methodD(GCMService.class, "onHandleIntent", Utils.toString(intent));
+        OPFPushLog.methodD(GCMService.class, "onHandleIntent", OPFUtils.toString(intent));
 
         @GCMAction String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
@@ -79,7 +79,7 @@ public class GCMService extends IntentService {
     }
 
     private void onMessage(@NonNull final Intent intent) {
-        OPFPushLog.methodD(GCMService.class, "onMessage", Utils.toString(intent));
+        OPFPushLog.methodD(GCMService.class, "onMessage", OPFUtils.toString(intent));
         OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
     }
 
