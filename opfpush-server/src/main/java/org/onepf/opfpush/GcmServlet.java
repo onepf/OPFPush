@@ -1,8 +1,6 @@
 package org.onepf.opfpush;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
-import com.google.android.gcm.server.Sender;
+import com.google.android.gcm.server.*;
 import com.google.appengine.api.datastore.*;
 
 import javax.servlet.ServletException;
@@ -12,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class GcmServlet extends HttpServlet {
@@ -43,7 +42,41 @@ public class GcmServlet extends HttpServlet {
         ArrayList<String> devices = getAllRegIds();
         if (!devices.isEmpty()) {
             // Sending multicast message to GCM specifying all targeting devices
-            MulticastResult result = sender.send(message, devices, 5);
+            MulticastResult multicastResult = sender.send(message, devices, 5);
+            List<Result> results = multicastResult.getResults();
+            // analyze the results
+            for (int i = 0; i < devices.size(); i++) {
+                String regId = devices.get(i);
+                Result result = results.get(i);
+                String messageId = result.getMessageId();
+                if (messageId != null) {
+                    _log.fine("Succesfully sent message to device: " + regId + "; messageId = " + messageId);
+                    String canonicalRegId = result.getCanonicalRegistrationId();
+                    if (canonicalRegId != null) {
+                        // same device has more than on registration id: update it
+                        _log.info("canonicalRegId " + canonicalRegId);
+                        Entity entity = null;
+                        try {
+                            entity = _datastore.get(KeyFactory.createKey("GCMDeviceIds", regId));
+                        } catch (EntityNotFoundException e) {
+                            _log.info("ID not found: " + regId);
+                        }
+                        if (entity != null) {
+                            entity.setProperty("regid", regId);
+                            _datastore.put(entity);
+                        }
+                    }
+                } else {
+                    String error = result.getErrorCodeName();
+                    if (error.equals(Constants.ERROR_NOT_REGISTERED)) {
+                        // application has been removed from device - unregister it
+                        _log.info("Unregistered device: " + regId);
+                        _datastore.delete(KeyFactory.createKey("GCMDeviceIds", regId));
+                    } else {
+                        _log.severe("Error sending message to " + regId + ": " + error);
+                    }
+                }
+            }
             _log.info("Message posted: " + utf8txtInput);
             resp.sendRedirect("/gcm.jsp?message=" + utf8txtInput);
         } else {

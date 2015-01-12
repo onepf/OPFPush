@@ -27,16 +27,11 @@ public class GcmRegisterServlet extends HttpServlet {
         Entity regId = new Entity("GCMDeviceIds", txtRegId);
         regId.setProperty("regid", txtRegId);
         if (!isReqIdExist(txtRegId)) {
-            saveToDB(regId);
+            _datastore.put(regId);
             _log.info("RegId inserted into DB: " + txtRegId);
         }
 
         resp.sendRedirect("/gcmregister.jsp");
-    }
-
-    // Save device token in the database
-    private void saveToDB(Entity regId) {
-        _datastore.put(regId);
     }
 
     // Checks if the device token already exist in the database
@@ -46,7 +41,7 @@ public class GcmRegisterServlet extends HttpServlet {
         try {
             entity = _datastore.get(keyRegId);
         } catch (EntityNotFoundException e) {
-            e.printStackTrace();
+            _log.info("ID not found: " + regId);
         }
         if (entity != null) {
             return true;
