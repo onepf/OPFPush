@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.NAME;
+import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
  * Google Cloud Messaging push provider implementation.
@@ -94,11 +95,11 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         OPFPushLog.methodD(GCMProvider.class, "checkManifest");
         final Context ctx = getContext();
         return super.checkManifest()
-                && (!needGoogleAccounts() || checkPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
-                && checkPermission(ctx, Manifest.permission.WAKE_LOCK)
-                && checkPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                && checkPermission(ctx, PERMISSION_RECEIVE)
-                && checkPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
+                && (!needGoogleAccounts() || hasRequestedPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
+                && hasRequestedPermission(ctx, Manifest.permission.WAKE_LOCK)
+                && hasRequestedPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
+                && hasRequestedPermission(ctx, PERMISSION_RECEIVE)
+                && hasRequestedPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
     @Override

@@ -17,11 +17,11 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFUtils;
+
+import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
  * Base class for create {@code PushProvider}.
@@ -83,7 +83,7 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public boolean checkManifest() {
         OPFPushLog.methodD(BasePushProvider.class, "checkManifest");
-        return checkPermission(appContext, android.Manifest.permission.INTERNET);
+        return hasRequestedPermission(appContext, android.Manifest.permission.INTERNET);
     }
 
     @Override
@@ -109,26 +109,6 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public void onRegistrationInvalid() {
-    }
-
-    /**
-     * Verify is manifest contains permission.
-     *
-     * @param context    Any instance of {@code Context}.
-     * @param permission Permission for verify.
-     */
-    protected static boolean checkPermission(@NonNull final Context context,
-                                             @NonNull final String permission) {
-        OPFPushLog.methodD(BasePushProvider.class, "checkPermission", context, permission);
-
-        switch (context.getPackageManager().checkPermission(permission, context.getPackageName())) {
-            case PackageManager.PERMISSION_GRANTED:
-                return true;
-
-            default:
-                throw new OPFPushException("Your manifest doesn't contain permission '"
-                        + permission + ".' Check your AndroidManifest.xml.");
-        }
     }
 
     /**
