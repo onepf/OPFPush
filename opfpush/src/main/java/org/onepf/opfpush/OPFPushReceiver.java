@@ -27,9 +27,11 @@ import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
 import static org.onepf.opfpush.OPFConstants.EXTRA_ERROR;
+import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_COUNT;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_TYPE;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
 import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ID;
@@ -82,7 +84,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
             case ACTION_UNREGISTRATION:
                 handleUnregistrationAction(context, intent);
                 break;
-            default:
+            case ACTION_RECEIVE:
                 handleReceiveAction(context, intent);
                 break;
         }
@@ -139,7 +141,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
                 onDeletedMessage(
                         context,
                         providerName,
-                        intent.getIntExtra(EXTRA_MESSAGE_TYPE, MESSAGES_COUNT_UNKNOWN)
+                        intent.getIntExtra(EXTRA_MESSAGE_COUNT, MESSAGES_COUNT_UNKNOWN)
                 );
                 break;
             case MESSAGE_TYPE_MESSAGE:
