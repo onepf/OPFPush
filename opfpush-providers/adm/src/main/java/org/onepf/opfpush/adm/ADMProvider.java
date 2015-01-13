@@ -29,7 +29,6 @@ import org.onepf.opfpush.OPFPushLog;
 import static org.onepf.opfpush.adm.Constants.AMAZON_MANUFACTURER;
 import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
 import static org.onepf.opfpush.adm.Constants.NAME;
-import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
  * Amazon Device Messaging push provider implementation.
@@ -62,16 +61,13 @@ public class ADMProvider extends BasePushProvider {
     @Override
     public boolean checkManifest() {
         OPFPushLog.methodD(ADMProvider.class, "checkManifest");
-        //TODO Maybe better use ADMManifest.checkManifestAuthoredProperly(getContext())?
-        if (super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
-            final Context context = getContext();
-            return super.checkManifest()
-                    && hasRequestedPermission(context, android.Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                    && hasRequestedPermission(context, ADMManifest.PERMISSION_RECEIVE_MESSAGES)
-                    && hasRequestedPermission(context, context.getPackageName() + ".permission.RECEIVE_ADM_MESSAGE");
-        } else {
+        try {
+            ADMManifest.checkManifestAuthoredProperly(getContext());
+        } catch (IllegalStateException e) {
+            OPFPushLog.d("Error while check manifest: " + e);
             return false;
         }
+        return super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
     }
 
     @Override

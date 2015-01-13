@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfutils.OPFUtils;
 
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
@@ -83,7 +85,8 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public boolean checkManifest() {
         OPFPushLog.methodD(BasePushProvider.class, "checkManifest");
-        return hasRequestedPermission(appContext, android.Manifest.permission.INTERNET);
+        return hasRequestedPermission(appContext, INTERNET)
+                && hasRequestedPermission(appContext, RECEIVE_BOOT_COMPLETED);
     }
 
     @Override

@@ -93,13 +93,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public boolean checkManifest() {
         OPFPushLog.methodD(GCMProvider.class, "checkManifest");
-        final Context ctx = getContext();
+        final Context context = getContext();
         return super.checkManifest()
                 && (!needGoogleAccounts() || hasRequestedPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
-                && hasRequestedPermission(ctx, Manifest.permission.WAKE_LOCK)
-                && hasRequestedPermission(ctx, Manifest.permission.RECEIVE_BOOT_COMPLETED)
-                && hasRequestedPermission(ctx, PERMISSION_RECEIVE)
-                && hasRequestedPermission(ctx, ctx.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
+                && hasRequestedPermission(context, Manifest.permission.WAKE_LOCK)
+                && hasRequestedPermission(context, PERMISSION_RECEIVE)
+                && hasRequestedPermission(context, context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
     }
 
     @Override
