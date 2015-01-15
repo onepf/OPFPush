@@ -673,7 +673,6 @@ public final class OPFPushHelper {
                 if (state == REGISTERING || !isRegistered) {
                     onRegistrationError(providerName, error);
                 } else {
-                    //state == UNREGISTERING || isRegistered
                     onUnregistrationError(providerName, error);
                 }
             }

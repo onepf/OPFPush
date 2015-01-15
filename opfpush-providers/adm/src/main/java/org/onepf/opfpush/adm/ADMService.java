@@ -112,7 +112,7 @@ public class ADMService extends ADMMessageHandlerBase {
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
 
-        OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(NAME, error);
+        OPFPush.getHelper().getReceivedMessageHandler().onError(NAME, error);
     }
 
     @NonNull

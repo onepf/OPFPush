@@ -41,6 +41,7 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         OPFPushLog.setLogEnable(true);
+        OPFPushLog.methodD(DemoApplication.class, "onCreate");
 
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
