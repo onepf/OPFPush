@@ -91,6 +91,7 @@ class Settings {
                 : System.currentTimeMillis();
 
         preferences.put(KEY_STATE_TIMESTAMP, stateTimestamp);
+        preferences.put(KEY_STATE, state.getValue());
     }
 
     public void clear() {
