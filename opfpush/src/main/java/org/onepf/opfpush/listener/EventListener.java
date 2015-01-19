@@ -86,6 +86,8 @@ public interface EventListener {
 
     /**
      * {@code OpenPushHelper} can't find any available provider for register push.
+     * Notify user that push notifications will not be received.
+     * Try to add more push providers to opfpush configurations.
      */
     void onNoAvailableProvider();
 }
