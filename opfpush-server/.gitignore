@@ -14,3 +14,5 @@ WebContent/WEB-INF/lib/jsr107cache-1.1.jar
 WebContent/WEB-INF/appengine-generated
 WebContent/WEB-INF/classes
 bin
+/target/
+/classes/
