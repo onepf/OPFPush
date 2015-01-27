@@ -598,7 +598,7 @@ public final class OPFPushHelper {
          * @param oldRegistrationId The registration ID for the instance of your app that is now unregistered.
          */
         public void onUnregistered(@NonNull final String providerName,
-                                   @NonNull final String oldRegistrationId) {
+                                   @Nullable final String oldRegistrationId) {
             synchronized (registrationLock) {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistered",
                         providerName, "oldRegistrationId"); //Don't log registration id.

@@ -19,6 +19,7 @@ package org.onepf.opfpush.pushsample.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -135,9 +136,7 @@ public class DemoActivity extends Activity {
     public void onEventMainThread(@NonNull final UnregisteredEvent unregisteredEvent) {
         OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", unregisteredEvent);
         final String registrationIdString = unregisteredEvent.getRegistrationId();
-        if (!TextUtils.isEmpty(registrationIdString)) {
-            initViewsUnregisteredState(registrationIdString);
-        }
+        initViewsUnregisteredState(registrationIdString);
         EventBus.getDefault().removeStickyEvent(unregisteredEvent);
     }
 
@@ -175,7 +174,7 @@ public class DemoActivity extends Activity {
         unregisterButton.setEnabled(true);
     }
 
-    private void initViewsUnregisteredState(@NonNull final String registrationId) {
+    private void initViewsUnregisteredState(@Nullable final String registrationId) {
         OPFPushLog.methodD(DemoActivity.class, "initViewsUnregisteredState", registrationId);
         infoText.setText(getString(R.string.unregistered_state_fmt, registrationId));
         registerButton.setVisibility(View.VISIBLE);

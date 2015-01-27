@@ -21,7 +21,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -142,7 +141,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             OPFPushLog.d("There is saved registration id");
             OPFPushLog.d("Saved app version : " + registeredVersion);
             return registeredVersion != GCMSettings.NO_SAVED_APP_VERSION
-                    && registeredVersion == getAppVersion();
+                    && registeredVersion == OPFUtils.getAppVersion(getContext());
         }
     }
 
@@ -179,14 +178,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     public String toString() {
         return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
                 NAME, senderID, settings.getAppVersion());
-    }
-
-    private int getAppVersion() {
-        try {
-            return OPFUtils.getAppVersion(getContext());
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new OPFPushException("Application not found", e);
-        }
     }
 
     private boolean needGoogleAccounts() {
@@ -277,7 +268,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
 
             settings.saveRegistrationId(registrationId);
-            settings.saveAppVersion(getAppVersion());
+            settings.saveAppVersion(OPFUtils.getAppVersion(getContext()));
 
             //For finish registration we catch intent with action
             //GCMConstant.ACTION_REGISTRATION in GCMReceiver.

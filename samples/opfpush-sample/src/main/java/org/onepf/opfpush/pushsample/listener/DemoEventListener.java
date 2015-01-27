@@ -96,7 +96,7 @@ public class DemoEventListener implements EventListener {
 
     @Override
     public void onUnregistered(@NonNull final String providerName,
-                               @NonNull final String registrationId) {
+                               @Nullable final String registrationId) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }

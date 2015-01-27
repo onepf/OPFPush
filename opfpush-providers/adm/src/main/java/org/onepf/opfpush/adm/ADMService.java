@@ -18,12 +18,14 @@ package org.onepf.opfpush.adm;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFUtils;
@@ -58,7 +60,15 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onMessage(@NonNull final Intent intent) {
         OPFPushLog.methodD(ADMService.class, "onMessage", OPFUtils.toString(intent));
-        OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
+        //ADM can receive messages even if it's unregistered. So we have to check ADM state.
+        final PushProvider currentProvider = OPFPush.getHelper().getCurrentProvider();
+
+        if (currentProvider != null
+                && NAME.equals(currentProvider.getName())
+                && currentProvider.isRegistered()) {
+            OPFPushLog.d("ADMProvider is registered");
+            OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
+        }
     }
 
     /**
@@ -74,6 +84,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
+        ADMSettings.getInstance(getApplicationContext()).saveRegistrationId(registrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
     }
 
@@ -84,14 +95,19 @@ public class ADMService extends ADMMessageHandlerBase {
      * If this message is called, your app should notify your components that are using ADM
      * to send messages, so that they know this instance of your app is no longer a valid recipient.
      *
-     * @param registrationId The registration ID for the instance of your app that is now unregistered.
-     *                       This ID is no longer a valid destination for messages.
-     *                       Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
-     *                       will show the registration ID for an unregistered app as {@code null}.
+     * @param admRegistrationId The registration ID for the instance of your app that is now unregistered.
+     *                          This ID is no longer a valid destination for messages.
+     *                          Calling {@link com.amazon.device.messaging.ADM#getRegistrationId()}
+     *                          will show the registration ID for an unregistered app as {@code null}.
      */
     @Override
-    protected void onUnregistered(@NonNull final String registrationId) {
-        OPFPushLog.methodD(ADMService.class, "onUnregistered", "registrationId");
+    protected void onUnregistered(@Nullable final String admRegistrationId) {
+        OPFPushLog.methodD(ADMService.class, "onUnregistered", "admRegistrationId");
+        final ADMSettings settings = ADMSettings.getInstance(getApplicationContext());
+        final String registrationId = admRegistrationId == null
+                ? settings.getRegistrationId()
+                : admRegistrationId;
+        settings.reset();
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(NAME, registrationId);
     }
 

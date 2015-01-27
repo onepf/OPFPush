@@ -45,7 +45,7 @@ public class TestEventListener implements EventListener {
     }
 
     @Override
-    public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
+    public void onUnregistered(@NonNull String providerName, @Nullable String registrationId) {
         OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
     }
 

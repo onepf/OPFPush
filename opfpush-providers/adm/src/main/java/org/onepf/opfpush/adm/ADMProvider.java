@@ -43,9 +43,12 @@ public class ADMProvider extends BasePushProvider {
     @NonNull
     private ADMDelegate adm;
 
+    private ADMSettings settings;
+
     public ADMProvider(@NonNull final Context context) {
         super(context, NAME, KINDLE_STORE_APP_PACKAGE);
         adm = new ADMDelegate(context);
+        settings = ADMSettings.getInstance(getContext());
     }
 
     @Override
@@ -73,7 +76,7 @@ public class ADMProvider extends BasePushProvider {
     @Override
     public boolean isRegistered() {
         OPFPushLog.methodD(ADMProvider.class, "isRegistered");
-        return adm.getRegistrationId() != null;
+        return getRegistrationId() != null;
     }
 
     @Override
@@ -90,6 +93,12 @@ public class ADMProvider extends BasePushProvider {
     @Override
     @Nullable
     public String getRegistrationId() {
-        return adm.getRegistrationId();
+        OPFPushLog.methodD(ADMProvider.class, "getRegistrationId");
+        if (adm.getRegistrationId() != null) {
+            OPFPushLog.d("ADM registration id is not empty");
+            return adm.getRegistrationId();
+        }
+
+        return settings.getRegistrationId();
     }
 }

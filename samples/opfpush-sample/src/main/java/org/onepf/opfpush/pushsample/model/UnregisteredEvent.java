@@ -16,7 +16,7 @@
 
 package org.onepf.opfpush.pushsample.model;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * @author Roman Savin
@@ -24,14 +24,14 @@ import android.support.annotation.NonNull;
  */
 public class UnregisteredEvent {
 
-    @NonNull
+    @Nullable
     private String registrationId;
 
-    public UnregisteredEvent(@NonNull final String registrationId) {
+    public UnregisteredEvent(@Nullable final String registrationId) {
         this.registrationId = registrationId;
     }
 
-    @NonNull
+    @Nullable
     public String getRegistrationId() {
         return registrationId;
     }

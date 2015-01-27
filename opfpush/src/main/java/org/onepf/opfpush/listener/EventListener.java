@@ -64,7 +64,7 @@ public interface EventListener {
      * @param providerName   Name of unregistered provider.
      * @param registrationId Old registration id for push notification.
      */
-    void onUnregistered(@NonNull String providerName, @NonNull String registrationId);
+    void onUnregistered(@NonNull String providerName, @Nullable String registrationId);
 
     /**
      * Provider registration failed. Provider can continue try to register

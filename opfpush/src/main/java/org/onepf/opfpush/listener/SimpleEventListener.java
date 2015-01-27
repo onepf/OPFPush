@@ -44,7 +44,7 @@ public class SimpleEventListener implements EventListener {
     }
 
     @Override
-    public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
+    public void onUnregistered(@NonNull String providerName, @Nullable String registrationId) {
 
     }
 
