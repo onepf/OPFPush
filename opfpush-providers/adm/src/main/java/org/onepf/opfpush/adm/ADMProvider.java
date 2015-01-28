@@ -102,4 +102,10 @@ public class ADMProvider extends BasePushProvider {
 
         return regIdStorage.getRegistrationId();
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return NAME;
+    }
 }

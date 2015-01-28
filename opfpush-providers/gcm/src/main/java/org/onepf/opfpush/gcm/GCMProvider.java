@@ -165,8 +165,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s (senderId: '%s')",
-                NAME, senderID);
+        return String.format(Locale.US, "%s (senderId: '%s')", NAME, senderID);
     }
 
     private boolean needGoogleAccounts() {

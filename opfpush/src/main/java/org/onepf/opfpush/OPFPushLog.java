@@ -111,15 +111,11 @@ public final class OPFPushLog {
     }
 
     public static void e(@Nullable final String message) {
-        if (isLogEnable) {
-            Log.e(TAG, message);
-        }
+        Log.e(TAG, message);
     }
 
     public static void e(@Nullable final String message, @Nullable final Throwable cause) {
-        if (isLogEnable) {
-            Log.e(TAG, message, cause);
-        }
+        Log.e(TAG, message, cause);
     }
 
     public static void methodD(@NonNull final Class aClass,

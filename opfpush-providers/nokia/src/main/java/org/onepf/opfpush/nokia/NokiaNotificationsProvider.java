@@ -26,6 +26,8 @@ import com.nokia.push.PushRegistrar;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.OPFPushLog;
 
+import java.util.Locale;
+
 import static org.onepf.opfpush.nokia.Constants.NAME;
 import static org.onepf.opfpush.nokia.Constants.NOKIA_MANUFACTURER;
 import static org.onepf.opfpush.nokia.Constants.NOKIA_STORE_APP_PACKAGE;
@@ -57,7 +59,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
                 PushRegistrar.checkDevice(getContext());
                 return true;
             } catch (UnsupportedOperationException exception) {
-                OPFPushLog.e(exception.getCause().toString());
+                OPFPushLog.e(exception.toString());
                 return false;
             }
         } else {
@@ -72,7 +74,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
             PushRegistrar.checkManifest(getContext());
             return super.checkManifest();
         } catch (UnsupportedOperationException exception) {
-            OPFPushLog.e(exception.getCause().toString());
+            OPFPushLog.e(exception.toString());
             return false;
         }
     }
@@ -145,5 +147,16 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     public void onUnavailable() {
         OPFPushLog.methodD(NokiaNotificationsProvider.class, "onUnavailable");
         PushRegistrar.onDestroy(getContext());
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        final StringBuilder senderIdsBuilder = new StringBuilder("[");
+        for (String senderID : sendersIds) {
+            senderIdsBuilder.append(senderID).append(", ");
+        }
+        senderIdsBuilder.append("]");
+        return String.format(Locale.US, "%s (senderId: '%s')", NAME, senderIdsBuilder.toString());
     }
 }

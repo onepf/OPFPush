@@ -545,8 +545,13 @@ public final class OPFPushHelper {
         public void onMessage(@NonNull final String providerName,
                               @Nullable final Bundle extras) {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onMessage", providerName);
-            settings.saveState(REGISTERED);
-            eventListenerWrapper.onMessage(providerName, extras);
+            if (currentProvider != null && providerName.equals(currentProvider.getName())) {
+                settings.saveState(REGISTERED);
+                eventListenerWrapper.onMessage(providerName, extras);
+            } else {
+                OPFPushLog.e("Ignore onMessage from provider " + providerName
+                        + ". Current provider is " + currentProvider);
+            }
         }
 
         /**
@@ -559,8 +564,13 @@ public final class OPFPushHelper {
                                       final int messagesCount) {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onDeletedMessages",
                     providerName, messagesCount);
-            settings.saveState(REGISTERED);
-            eventListenerWrapper.onDeletedMessages(providerName, messagesCount);
+            if (currentProvider != null && providerName.equals(currentProvider.getName())) {
+                settings.saveState(REGISTERED);
+                eventListenerWrapper.onDeletedMessages(providerName, messagesCount);
+            } else {
+                OPFPushLog.e("Ignore onDeletedMessages from provider " + providerName
+                        + ". Current provider is " + currentProvider);
+            }
         }
 
         /**
