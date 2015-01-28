@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.adm;
+package org.onepf.opfpush.gcm;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -25,31 +25,32 @@ import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
 /**
+ * @author Kirill Rozov
  * @author Roman Savin
- * @since 27.01.2015
+ * @since 01.10.14.
  */
-final class ADMSettings {
-
-    public static final int NO_SAVED_APP_VERSION = -1;
+final class RegIdStorage {
 
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
 
-    private static final String ADM_POSTFIX = "adm";
+    private static final String GCM_POSTFIX = "gcm";
 
-    private static volatile ADMSettings instance;
+    public static final int NO_SAVED_APP_VERSION = -1;
+
+    private static volatile RegIdStorage instance;
 
     private OPFPreferences preferences;
 
-    private ADMSettings(@NonNull final Context context) {
-        preferences = new OPFPreferences(context, ADM_POSTFIX);
+    private RegIdStorage(@NonNull final Context context) {
+        preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
-    public static ADMSettings getInstance(@NonNull final Context context) {
+    public static RegIdStorage getInstance(@NonNull final Context context) {
         if (instance == null) {
-            synchronized (ADMSettings.class) {
+            synchronized (RegIdStorage.class) {
                 if (instance == null) {
-                    instance = new ADMSettings(context);
+                    instance = new RegIdStorage(context);
                 }
             }
         }
@@ -59,7 +60,7 @@ final class ADMSettings {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFPushLog.methodD(ADMSettings.class, "getRegistrationId");
+        OPFPushLog.methodD(RegIdStorage.class, "getRegistrationId");
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -69,7 +70,7 @@ final class ADMSettings {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFPushLog.methodD(ADMSettings.class, "saveRegistrationId");
+        OPFPushLog.methodD(RegIdStorage.class, "saveRegistrationId", "registrationId");
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -79,16 +80,16 @@ final class ADMSettings {
     }
 
     public synchronized void reset() {
-        OPFPushLog.methodD(ADMSettings.class, "reset");
+        OPFPushLog.methodD(RegIdStorage.class, "reset");
         preferences.clear();
-    }
-
-    private void saveAppVersion(final int appVersion) {
-        OPFPushLog.methodD(ADMSettings.class, "saveAppVersion", appVersion);
-        preferences.put(KEY_APP_VERSION, appVersion);
     }
 
     private int getAppVersion() {
         return preferences.getInt(KEY_APP_VERSION, NO_SAVED_APP_VERSION);
+    }
+
+    private void saveAppVersion(final int appVersion) {
+        OPFPushLog.methodD(RegIdStorage.class, "saveAppVersion", appVersion);
+        preferences.put(KEY_APP_VERSION, appVersion);
     }
 }

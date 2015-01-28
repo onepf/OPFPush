@@ -70,13 +70,13 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private ExecutorService registrationExecutor;
 
     @NonNull
-    private final GCMSettings settings;
+    private final RegIdStorage regIdStorage;
 
     public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
         super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
 
         this.senderID = senderID;
-        settings = new GCMSettings(context);
+        regIdStorage = RegIdStorage.getInstance(context);
     }
 
     public synchronized void register() {
@@ -86,7 +86,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     public synchronized void unregister() {
         OPFPushLog.methodD(GCMProvider.class, "unregister");
-        executeTask(new UnregisterTask(settings.getRegistrationId()));
+        executeTask(new UnregisterTask(regIdStorage.getRegistrationId()));
     }
 
     @Override
@@ -126,30 +126,19 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @Nullable
     public String getRegistrationId() {
-        return settings.getRegistrationId();
+        return regIdStorage.getRegistrationId();
     }
 
     @Override
     public boolean isRegistered() {
         OPFPushLog.methodD(GCMProvider.class, "isRegistered");
-        if (TextUtils.isEmpty(settings.getRegistrationId())) {
-            OPFPushLog.d("There isn't saved registration id");
-            return false;
-        } else {
-            final int registeredVersion = settings.getAppVersion();
-
-            OPFPushLog.d("There is saved registration id");
-            OPFPushLog.d("Saved app version : " + registeredVersion);
-            return registeredVersion != GCMSettings.NO_SAVED_APP_VERSION
-                    && registeredVersion == OPFUtils.getAppVersion(getContext());
-        }
+        return !TextUtils.isEmpty(regIdStorage.getRegistrationId());
     }
 
     @Override
     public void onRegistrationInvalid() {
         OPFPushLog.methodD(GCMProvider.class, "onRegistrationInvalid");
-        settings.saveRegistrationId(null);
-        settings.removeAppVersion();
+        regIdStorage.reset();
     }
 
     @Override
@@ -176,8 +165,8 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s (senderId: '%s', appVersion: %d)",
-                NAME, senderID, settings.getAppVersion());
+        return String.format(Locale.US, "%s (senderId: '%s')",
+                NAME, senderID);
     }
 
     private boolean needGoogleAccounts() {
@@ -203,7 +192,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private void close() {
         OPFPushLog.methodD(GCMProvider.class, "close");
 
-        settings.reset();
+        regIdStorage.reset();
         if (registrationExecutor != null) {
             OPFPushLog.d("Registration executor is not null");
 
@@ -266,9 +255,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
             OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
-
-            settings.saveRegistrationId(registrationId);
-            settings.saveAppVersion(OPFUtils.getAppVersion(getContext()));
+            regIdStorage.saveRegistrationId(registrationId);
 
             //For finish registration we catch intent with action
             //GCMConstant.ACTION_REGISTRATION in GCMReceiver.
@@ -287,10 +274,10 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     private final class UnregisterTask implements Runnable {
 
-        @NonNull
+        @Nullable
         private final String oldRegistrationId;
 
-        private UnregisterTask(@NonNull String oldRegistrationToken) {
+        private UnregisterTask(@Nullable String oldRegistrationToken) {
             oldRegistrationId = oldRegistrationToken;
         }
 

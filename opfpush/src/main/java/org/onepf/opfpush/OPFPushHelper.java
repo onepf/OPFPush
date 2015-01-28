@@ -105,7 +105,7 @@ public final class OPFPushHelper {
 
     OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
-        settings = new Settings(context);
+        settings = Settings.getInstance(context);
     }
 
     /**

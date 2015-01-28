@@ -84,7 +84,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
-        ADMSettings.getInstance(getApplicationContext()).saveRegistrationId(registrationId);
+        RegIdStorage.getInstance(getApplicationContext()).saveRegistrationId(registrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
     }
 
@@ -103,7 +103,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
         OPFPushLog.methodD(ADMService.class, "onUnregistered", "admRegistrationId");
-        final ADMSettings settings = ADMSettings.getInstance(getApplicationContext());
+        final RegIdStorage settings = RegIdStorage.getInstance(getApplicationContext());
         final String registrationId = admRegistrationId == null
                 ? settings.getRegistrationId()
                 : admRegistrationId;

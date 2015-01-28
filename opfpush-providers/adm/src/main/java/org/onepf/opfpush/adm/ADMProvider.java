@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.amazon.device.messaging.development.ADMManifest;
 
@@ -43,12 +44,12 @@ public class ADMProvider extends BasePushProvider {
     @NonNull
     private ADMDelegate adm;
 
-    private ADMSettings settings;
+    private RegIdStorage regIdStorage;
 
     public ADMProvider(@NonNull final Context context) {
         super(context, NAME, KINDLE_STORE_APP_PACKAGE);
         adm = new ADMDelegate(context);
-        settings = ADMSettings.getInstance(getContext());
+        regIdStorage = RegIdStorage.getInstance(getContext());
     }
 
     @Override
@@ -76,7 +77,7 @@ public class ADMProvider extends BasePushProvider {
     @Override
     public boolean isRegistered() {
         OPFPushLog.methodD(ADMProvider.class, "isRegistered");
-        return getRegistrationId() != null;
+        return !TextUtils.isEmpty(getRegistrationId());
     }
 
     @Override
@@ -94,11 +95,11 @@ public class ADMProvider extends BasePushProvider {
     @Nullable
     public String getRegistrationId() {
         OPFPushLog.methodD(ADMProvider.class, "getRegistrationId");
-        if (adm.getRegistrationId() != null) {
+        if (!TextUtils.isEmpty(adm.getRegistrationId())) {
             OPFPushLog.d("ADM registration id is not empty");
             return adm.getRegistrationId();
         }
 
-        return settings.getRegistrationId();
+        return regIdStorage.getRegistrationId();
     }
 }

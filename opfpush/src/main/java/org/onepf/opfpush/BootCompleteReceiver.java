@@ -49,6 +49,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     }
 
     public static boolean isAndroidIDChanged(@NonNull Context context) {
-        return !ANDROID_ID.equals(new Settings(context).getLastAndroidId());
+        return !ANDROID_ID.equals(Settings.getInstance(context).getLastAndroidId());
     }
 }

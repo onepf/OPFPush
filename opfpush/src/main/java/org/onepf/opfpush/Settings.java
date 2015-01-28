@@ -35,7 +35,8 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
  * @author Roman Savin
  * @since 01.10.14.
  */
-class Settings {
+//TODO: thread safe
+final class Settings {
 
     private static final long STATE_INFINITY_TIMESTAMP = -1L;
 
@@ -44,11 +45,25 @@ class Settings {
     private static final String KEY_LAST_ANDROID_ID = "android_id";
     private static final String KEY_STATE_TIMESTAMP = "state_timestamp";
 
+    private static volatile Settings instance;
+
     @NonNull
     private final OPFPreferences preferences;
 
-    public Settings(@NonNull final Context context) {
+    private Settings(@NonNull final Context context) {
         preferences = new OPFPreferences(context);
+    }
+
+    public static Settings getInstance(@NonNull final Context context) {
+        if (instance == null) {
+            synchronized (Settings.class) {
+                if (instance == null) {
+                    instance = new Settings(context);
+                }
+            }
+        }
+
+        return instance;
     }
 
     @NonNull
