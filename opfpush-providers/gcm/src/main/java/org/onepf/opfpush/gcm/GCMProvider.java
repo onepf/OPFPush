@@ -300,7 +300,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                     case GoogleCloudMessaging.ERROR_MAIN_THREAD:
                         throw new OPFPushException("GCM unregister crash.", e);
                     default:
-                        throw new OPFPushException("Unknown exception occur.", e);
+                        OPFPushLog.e("Error while unregister : " + e);
                 }
             }
         }

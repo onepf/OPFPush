@@ -55,7 +55,9 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onMessage(@NonNull final String providerName, @Nullable final Bundle extras) {
+    public void onMessage(@NonNull final Context context,
+                          @NonNull final String providerName,
+                          @Nullable final Bundle extras) {
         OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
@@ -83,40 +85,46 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onDeletedMessages(@NonNull final String providerName, final int messagesCount) {
+    public void onDeletedMessages(@NonNull final Context context,
+                                  @NonNull final String providerName,
+                                  final int messagesCount) {
         OPFPushLog.methodD(DemoEventListener.class, "onDeletedMessages", providerName, messagesCount);
     }
 
     @Override
-    public void onRegistered(@NonNull final String providerName,
+    public void onRegistered(@NonNull final Context context,
+                             @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFPushLog.methodD(DemoEventListener.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
     @Override
-    public void onUnregistered(@NonNull final String providerName,
+    public void onUnregistered(@NonNull final Context context,
+                               @NonNull final String providerName,
                                @Nullable final String registrationId) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
-    public void onRegistrationError(@NonNull final String providerName,
+    public void onRegistrationError(@NonNull final Context context,
+                                    @NonNull final String providerName,
                                     @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
         EventBus.getDefault().postSticky(new RegistrationErrorEvent(error));
     }
 
     @Override
-    public void onUnregistrationError(@NonNull final String providerName,
+    public void onUnregistrationError(@NonNull final Context context,
+                                      @NonNull final String providerName,
                                       @NonNull final OPFError error) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
         EventBus.getDefault().postSticky(new UnregistrationErrorEvent(error));
     }
 
     @Override
-    public void onNoAvailableProvider() {
+    public void onNoAvailableProvider(@NonNull final Context context) {
         OPFPushLog.methodD(DemoEventListener.class, "onNoAvailableProvider()");
     }
 }

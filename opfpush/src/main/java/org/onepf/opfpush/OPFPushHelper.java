@@ -442,7 +442,7 @@ public final class OPFPushHelper {
 
         settings.saveState(UNREGISTERED);
         OPFPushLog.w("No more available providers.");
-        eventListenerWrapper.onNoAvailableProvider();
+        eventListenerWrapper.onNoAvailableProvider(appContext);
         return false;
     }
 
@@ -547,7 +547,7 @@ public final class OPFPushHelper {
             OPFPushLog.methodD(ReceivedMessageHandler.class, "onMessage", providerName);
             if (currentProvider != null && providerName.equals(currentProvider.getName())) {
                 settings.saveState(REGISTERED);
-                eventListenerWrapper.onMessage(providerName, extras);
+                eventListenerWrapper.onMessage(appContext, providerName, extras);
             } else {
                 OPFPushLog.e("Ignore onMessage from provider " + providerName
                         + ". Current provider is " + currentProvider);
@@ -566,7 +566,7 @@ public final class OPFPushHelper {
                     providerName, messagesCount);
             if (currentProvider != null && providerName.equals(currentProvider.getName())) {
                 settings.saveState(REGISTERED);
-                eventListenerWrapper.onDeletedMessages(providerName, messagesCount);
+                eventListenerWrapper.onDeletedMessages(appContext, providerName, messagesCount);
             } else {
                 OPFPushLog.e("Ignore onDeletedMessages from provider " + providerName
                         + ". Current provider is " + currentProvider);
@@ -594,7 +594,7 @@ public final class OPFPushHelper {
                 currentProvider = getProviderWithException(providerName);
                 settings.saveLastProvider(currentProvider);
 
-                eventListenerWrapper.onRegistered(providerName, registrationId);
+                eventListenerWrapper.onRegistered(appContext, providerName, registrationId);
 
                 packageReceiver = ReceiverUtils
                         .registerPackageChangeReceiver(appContext, currentProvider);
@@ -617,7 +617,7 @@ public final class OPFPushHelper {
                 settings.clear();
                 currentProvider = null;
                 unregisterPackageChangeReceiver();
-                eventListenerWrapper.onUnregistered(providerName, oldRegistrationId);
+                eventListenerWrapper.onUnregistered(appContext, providerName, oldRegistrationId);
             }
         }
 
@@ -644,7 +644,7 @@ public final class OPFPushHelper {
                     }
                 }
 
-                eventListenerWrapper.onRegistrationError(providerName, error);
+                eventListenerWrapper.onRegistrationError(appContext, providerName, error);
             }
         }
 
@@ -663,7 +663,7 @@ public final class OPFPushHelper {
                 if (isUnregistering() || isUnregistered()) {
                     settings.saveState(REGISTERED);
                 }
-                eventListenerWrapper.onUnregistrationError(providerName, error);
+                eventListenerWrapper.onUnregistrationError(appContext, providerName, error);
             }
         }
 

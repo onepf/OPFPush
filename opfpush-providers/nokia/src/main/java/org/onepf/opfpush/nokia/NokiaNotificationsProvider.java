@@ -46,9 +46,9 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     private final String[] sendersIds;
 
     public NokiaNotificationsProvider(@NonNull final Context context,
-                                      @NonNull final String... sendersID) {
+                                      @NonNull final String... sendersIds) {
         super(context, NAME, NOKIA_STORE_APP_PACKAGE);
-        sendersIds = sendersID;
+        this.sendersIds = sendersIds;
     }
 
     @Override
