@@ -114,7 +114,7 @@ public final class Configuration {
         @NonNull
         private Backoff backoff = new ExponentialBackoff();
 
-        private boolean isSelectSystemPreferred = true;
+        private boolean isSelectSystemPreferred = false;
 
         /**
          * Add the providers to the configuration.

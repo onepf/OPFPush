@@ -40,8 +40,13 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -75,6 +80,12 @@ public final class OPFPushHelper {
 
     @Nullable
     private PushProvider currentProvider;
+
+    @NonNull
+    private List<PushProvider> sortedProvidersList;
+
+    @NonNull
+    private Map<String, OPFError> registerProviderErrors = new HashMap<>();
 
     @Nullable
     private AlarmManager alarmManager;
@@ -124,7 +135,7 @@ public final class OPFPushHelper {
         synchronized (registrationLock) {
             final State state = settings.getState();
             OPFPushLog.d("Register state : " + state.toString());
-
+            //TODO: check is provider registered.
             switch (state) {
                 case REGISTERING:
                 case REGISTERED:
@@ -132,10 +143,6 @@ public final class OPFPushHelper {
                 case UNREGISTERING:
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
-                    if (configuration.isSelectSystemPreferred()
-                            && registerSystemPreferredProvider()) {
-                        return;
-                    }
                     registerFirstAvailableProvider();
                     break;
             }
@@ -278,8 +285,9 @@ public final class OPFPushHelper {
             throw new OPFPushException("You must register OPFReceiver or set event listener");
         }
 
+        initSortedProviderList();
         this.eventListenerWrapper = EventListenerWrapperCreator
-                .getEventListenerWrapper(appContext, eventListener);
+                .getEventListenerWrapper(eventListener);
         restoreLastProvider();
         OPFPushLog.i("Init done.");
     }
@@ -399,51 +407,52 @@ public final class OPFPushHelper {
         }
     }
 
-    private boolean registerSystemPreferredProvider() {
-        OPFPushLog.methodD(OPFPushHelper.class, "registerSystemPreferredProvider");
-
-        for (PushProvider provider : configuration.getProviders()) {
-            final String hostAppPackage = provider.getHostAppPackage();
-            OPFPushLog.d("Provider name : " + provider.getName());
-            OPFPushLog.d("Host app package : " + hostAppPackage);
-
-            if (hostAppPackage != null) {
-                if (OPFUtils.isSystemApp(appContext, hostAppPackage)
-                        && provider.isAvailable()) {
-                    register(provider);
-                    return true;
-                }
-            }
-        }
-
-        OPFPushLog.d("There aren't any available system preferred providers");
-        return false;
-    }
-
     /**
      * Register first available provider.
-     *
-     * @return True if find provider that can be registered, otherwise false.
      */
-    private boolean registerFirstAvailableProvider() {
+    private void registerFirstAvailableProvider() {
         OPFPushLog.methodD(OPFPushHelper.class, "registerFirstAvailableProvider");
+        registerNextAvailableProvider(null);
+    }
 
-        final List<PushProvider> providers = configuration.getProviders();
+    private void registerNextAvailableProvider(@Nullable String prevProviderName) {
+        OPFPushLog.methodD(OPFPushHelper.class, "registerNextAvailableProvider", prevProviderName);
 
-        for (PushProvider provider : providers) {
-            OPFPushLog.d("Provider name : " + provider.getName());
+        final int providersCount = sortedProvidersList.size();
+        final int prevProviderPosition = getProviderPosition(sortedProvidersList, prevProviderName);
 
-            if (provider.isAvailable()) {
-                OPFPushLog.d("Provider is available");
+        for (int i = (prevProviderPosition + 1) % providersCount, j = 0;
+             j < providersCount;
+             i = (i + 1) % providersCount, j++) {
+
+            final PushProvider provider = sortedProvidersList.get(i);
+            final String providerName = provider.getName();
+            OPFPushLog.d("Provider name : " + providerName);
+            if (provider.isAvailable() && !registerProviderErrors.containsKey(providerName)) {
+                OPFPushLog.d("Provider is available.");
                 register(provider);
-                return true;
             }
         }
 
         settings.saveState(UNREGISTERED);
         OPFPushLog.w("No more available providers.");
-        eventListenerWrapper.onNoAvailableProvider(appContext);
-        return false;
+        eventListenerWrapper.onNoAvailableProvider(appContext, registerProviderErrors);
+    }
+
+    private int getProviderPosition(@NonNull final List<PushProvider> providers,
+                                    @Nullable final String providerName) {
+        OPFPushLog.methodD(OPFPushHelper.class, "getProviderPosition", providers, providerName);
+
+        final int providersCount = providers.size();
+        if (providerName != null) {
+            for (int i = 0; i < providersCount; i++) {
+                if (providerName.equals(providers.get(i).getName())) {
+                    return i;
+                }
+            }
+        }
+
+        return providersCount - 1;
     }
 
     /**
@@ -481,7 +490,7 @@ public final class OPFPushHelper {
     private PushProvider getProvider(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "getProvider", providerName);
 
-        for (PushProvider provider : configuration.getProviders()) {
+        for (PushProvider provider : sortedProvidersList) {
             if (providerName.equals(provider.getName())) {
                 return provider;
             }
@@ -527,6 +536,40 @@ public final class OPFPushHelper {
         return null;
     }
 
+    private void initSortedProviderList() {
+        OPFPushLog.methodD(OPFPushHelper.class, "initSortedProviderList");
+        sortedProvidersList = new ArrayList<>(configuration.getProviders());
+        if (!configuration.isSelectSystemPreferred()) {
+            OPFPushLog.d("No system preferred");
+            return;
+        }
+
+        Collections.sort(sortedProvidersList, new Comparator<PushProvider>() {
+            @Override
+            public int compare(PushProvider leftProvider, PushProvider rightProvider) {
+                final String leftHostAppPackage = leftProvider.getHostAppPackage();
+                final String rightHostAppPackage = rightProvider.getHostAppPackage();
+
+                boolean isLeftProviderSystem = false;
+                boolean isRightProviderSystem = false;
+                if (leftHostAppPackage != null) {
+                    isLeftProviderSystem = OPFUtils.isSystemApp(appContext, leftHostAppPackage);
+                }
+                if (rightHostAppPackage != null) {
+                    isRightProviderSystem = OPFUtils.isSystemApp(appContext, rightHostAppPackage);
+                }
+
+                if (isLeftProviderSystem == isRightProviderSystem) {
+                    return 0;
+                } else if (isLeftProviderSystem) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+    }
+
     /**
      * Is used for handle received messages by broadcast receivers of concrete providers.
      */
@@ -549,6 +592,7 @@ public final class OPFPushHelper {
                 settings.saveState(REGISTERED);
                 eventListenerWrapper.onMessage(appContext, providerName, extras);
             } else {
+                //TODO: If current provider null show push.
                 OPFPushLog.e("Ignore onMessage from provider " + providerName
                         + ". Current provider is " + currentProvider);
             }
@@ -593,6 +637,7 @@ public final class OPFPushHelper {
                 settings.saveLastAndroidId(ANDROID_ID);
                 currentProvider = getProviderWithException(providerName);
                 settings.saveLastProvider(currentProvider);
+                registerProviderErrors.clear();
 
                 eventListenerWrapper.onRegistered(appContext, providerName, registrationId);
 
@@ -616,6 +661,7 @@ public final class OPFPushHelper {
                 OPFPushLog.d("Successfully unregister provider '%s'.", providerName);
                 settings.clear();
                 currentProvider = null;
+                registerProviderErrors.clear();
                 unregisterPackageChangeReceiver();
                 eventListenerWrapper.onUnregistered(appContext, providerName, oldRegistrationId);
             }
@@ -640,11 +686,11 @@ public final class OPFPushHelper {
                             && backoff.hasTries()) {
                         postRetryRegister(providerName);
                     } else {
+                        registerProviderErrors.put(providerName, error);
                         backoff.reset();
+                        registerNextAvailableProvider(providerName);
                     }
                 }
-
-                eventListenerWrapper.onRegistrationError(appContext, providerName, error);
             }
         }
 

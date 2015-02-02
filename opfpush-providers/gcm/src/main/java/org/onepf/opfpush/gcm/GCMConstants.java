@@ -29,6 +29,8 @@ public final class GCMConstants {
         throw new UnsupportedOperationException();
     }
 
+    public static final String PROVIDER_NAME = "Google Cloud Messaging";
+
     public static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
     public static final String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
     public static final String ACTION_UNREGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.UNREGISTRATION";
@@ -40,6 +42,5 @@ public final class GCMConstants {
     static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 
-    static final String NAME = "Google Cloud Messaging";
     static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
 }

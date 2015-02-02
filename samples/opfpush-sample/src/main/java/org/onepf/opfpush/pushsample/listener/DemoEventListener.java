@@ -26,8 +26,8 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
+import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
@@ -35,6 +35,7 @@ import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Map;
 
 import de.greenrobot.event.EventBus;
 
@@ -108,14 +109,6 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationError(@NonNull final Context context,
-                                    @NonNull final String providerName,
-                                    @NonNull final OPFError error) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistrationError", providerName, error);
-        EventBus.getDefault().postSticky(new RegistrationErrorEvent(error));
-    }
-
-    @Override
     public void onUnregistrationError(@NonNull final Context context,
                                       @NonNull final String providerName,
                                       @NonNull final OPFError error) {
@@ -124,7 +117,9 @@ public class DemoEventListener implements EventListener {
     }
 
     @Override
-    public void onNoAvailableProvider(@NonNull final Context context) {
-        OPFPushLog.methodD(DemoEventListener.class, "onNoAvailableProvider()");
+    public void onNoAvailableProvider(@NonNull final Context context,
+                                      @NonNull final Map<String, OPFError> registrationErrors) {
+        OPFPushLog.methodD(DemoEventListener.class, "onNoAvailableProvider", context, registrationErrors);
+        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

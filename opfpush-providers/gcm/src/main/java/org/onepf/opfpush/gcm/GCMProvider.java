@@ -43,7 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
-import static org.onepf.opfpush.gcm.GCMConstants.NAME;
+import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
@@ -73,7 +73,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private final RegIdStorage regIdStorage;
 
     public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
-        super(context, NAME, GOOGLE_PLAY_APP_PACKAGE);
+        super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE);
 
         this.senderID = senderID;
         regIdStorage = RegIdStorage.getInstance(context);
@@ -165,7 +165,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s (senderId: '%s')", NAME, senderID);
+        return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderID);
     }
 
     private boolean needGoogleAccounts() {

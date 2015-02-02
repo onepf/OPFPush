@@ -30,13 +30,16 @@ import android.widget.TextView;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfpush.adm.ADMConstants;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
+import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.RegistrationErrorEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
+
+import java.util.Map;
 
 import de.greenrobot.event.EventBus;
 
@@ -141,21 +144,24 @@ public class DemoActivity extends Activity {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public void onEventMainThread(@NonNull final RegistrationErrorEvent registrationErrorEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", registrationErrorEvent);
-        final OPFError error = registrationErrorEvent.getError();
-        initViewsUnregisteredState("");
-        infoText.setText(getString(R.string.registration_error_fmt, error.name()));
-        EventBus.getDefault().removeStickyEvent(registrationErrorEvent);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final UnregistrationErrorEvent unregistrationErrorEvent) {
         OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", unregistrationErrorEvent);
         final OPFError error = unregistrationErrorEvent.getError();
         initViewsRegisteredState("");
         infoText.setText(getString(R.string.unregistration_error_fmt, error.name()));
         EventBus.getDefault().removeStickyEvent(unregistrationErrorEvent);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
+        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", noAvailableProviderEvent);
+        final Map<String, OPFError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
+        if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
+            final OPFError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
+            initViewsUnregisteredState("");
+            infoText.setText(getString(R.string.registration_error_fmt, error.name()));
+            EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
+        }
     }
 
     private void initViewsRegisteringState() {

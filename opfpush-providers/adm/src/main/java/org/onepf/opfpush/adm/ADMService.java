@@ -30,7 +30,7 @@ import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFUtils;
 
-import static org.onepf.opfpush.adm.Constants.NAME;
+import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -64,10 +64,10 @@ public class ADMService extends ADMMessageHandlerBase {
         final PushProvider currentProvider = OPFPush.getHelper().getCurrentProvider();
 
         if (currentProvider != null
-                && NAME.equals(currentProvider.getName())
+                && PROVIDER_NAME.equals(currentProvider.getName())
                 && currentProvider.isRegistered()) {
             OPFPushLog.d("ADMProvider is registered");
-            OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
+            OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
         }
     }
 
@@ -85,7 +85,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
         RegIdStorage.getInstance(getApplicationContext()).saveRegistrationId(registrationId);
-        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
     /**
@@ -108,7 +108,7 @@ public class ADMService extends ADMMessageHandlerBase {
                 ? settings.getRegistrationId()
                 : admRegistrationId;
         settings.reset();
-        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, registrationId);
     }
 
     /**
@@ -128,7 +128,7 @@ public class ADMService extends ADMMessageHandlerBase {
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
 
-        OPFPush.getHelper().getReceivedMessageHandler().onError(NAME, error);
+        OPFPush.getHelper().getReceivedMessageHandler().onError(PROVIDER_NAME, error);
     }
 
     @NonNull

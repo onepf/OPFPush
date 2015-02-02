@@ -25,7 +25,7 @@ import com.amazon.device.messaging.ADM;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfutils.OPFUtils;
 
-import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
 
 /**
  * @author Roman Savin

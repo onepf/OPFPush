@@ -14,19 +14,29 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.adm;
+package org.onepf.opfpush.pushsample.model;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfpush.model.OPFError;
+
+import java.util.Map;
 
 /**
  * @author Roman Savin
- * @since 17.12.14
+ * @since 02.02.2015
  */
-final class Constants {
+public class NoAvailableProviderEvent {
 
-    private Constants() {
-        throw new UnsupportedOperationException();
+    @NonNull
+    private Map<String, OPFError> registrationErrors;
+
+    public NoAvailableProviderEvent(@NonNull final Map<String, OPFError> registrationErrors) {
+        this.registrationErrors = registrationErrors;
     }
 
-    static final String AMAZON_MANUFACTURER = "Amazon";
-    static final String NAME = "Amazon Device Messaging";
-    static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
+    @NonNull
+    public Map<String, OPFError> getRegistrationErrors() {
+        return registrationErrors;
+    }
 }

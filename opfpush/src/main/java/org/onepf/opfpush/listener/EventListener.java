@@ -24,6 +24,8 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.OPFPushHelper;
 
+import java.util.Map;
+
 /**
  * Interface definition for a callback to be invoked when event
  * in {@link OPFPushHelper} is occurred.
@@ -72,16 +74,6 @@ public interface EventListener {
     void onUnregistered(@NonNull Context context, @NonNull String providerName, @Nullable String registrationId);
 
     /**
-     * Provider registration failed. Provider can continue try to register
-     * with exponential backoff (is {@code error} is recoverable) or can try to register next.
-     *
-     * @param context      application context.
-     * @param providerName Name of provider in what error occur.
-     * @param error        Occurred error
-     */
-    void onRegistrationError(@NonNull Context context, @NonNull String providerName, @NonNull OPFError error);
-
-    /**
      * Provider unregistration failed. Provider can continue try to unregister
      * with exponential backoff (is {@code error} is recoverable).
      *
@@ -98,5 +90,5 @@ public interface EventListener {
      *
      * @param context application context.
      */
-    void onNoAvailableProvider(@NonNull Context context);
+    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, OPFError> registerationErrors);
 }

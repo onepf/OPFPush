@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
-
-import android.support.annotation.NonNull;
-
-import org.onepf.opfpush.model.OPFError;
+package org.onepf.opfpush.nokia;
 
 /**
  * @author Roman Savin
- * @since 23.12.14
+ * @since 17.12.14
  */
-public class RegistrationErrorEvent {
+public final class NokiaPushConstants {
 
-    @NonNull
-    private OPFError error;
-
-    public RegistrationErrorEvent(@NonNull final OPFError error) {
-        this.error = error;
+    private NokiaPushConstants() {
+        throw new UnsupportedOperationException();
     }
 
-    @NonNull
-    public OPFError getError() {
-        return error;
-    }
+    public static final String PROVIDER_NAME = "Nokia Push";
+
+    static final String NOKIA_MANUFACTURER = "Nokia";
+    static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 }

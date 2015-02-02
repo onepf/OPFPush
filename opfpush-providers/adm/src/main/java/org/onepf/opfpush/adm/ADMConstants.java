@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.nokia;
+package org.onepf.opfpush.adm;
 
 /**
  * @author Roman Savin
  * @since 17.12.14
  */
-final class Constants {
+public final class ADMConstants {
 
-    private Constants() {
+    private ADMConstants() {
         throw new UnsupportedOperationException();
     }
 
-    static final String NOKIA_MANUFACTURER = "Nokia";
-    static final String NAME = "Nokia Push";
-    static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
+    public static final String PROVIDER_NAME = "Amazon Device Messaging";
+
+    static final String AMAZON_MANUFACTURER = "Amazon";
+    static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
 }

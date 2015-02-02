@@ -36,6 +36,7 @@ public final class OPFConstants {
     public static final String EXTRA_REGISTRATION_ID = "org.onepf.opfpush.intent.EXTRA_REGISTRATION_ID";
     public static final String EXTRA_MESSAGE_TYPE = "org.onepf.opfpush.intent.EXTRA_MESSAGE_TYPE";
     public static final String EXTRA_MESSAGE_COUNT = "org.onepf.opfpush.intent.EXTRA_MESSAGE_COUNT";
+    public static final String EXTRA_REGISTRATION_ERRORS = "org.onepf.opfpush.intent.EXTRA_REGISTRATION_ERRORS";
 
     public static final String ACTION_NO_AVAILABLE_PROVIDER = "org.onepf.opfpush.intent.NO_AVAILABLE_PROVIDER";
     public static final String ACTION_RECEIVE = "org.onepf.opfpush.intent.RECEIVE";

@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
 
+import java.util.Map;
+
 /**
  * @author Roman Savin
  * @since 03.12.14
@@ -58,13 +60,6 @@ public class SimpleEventListener implements EventListener {
     }
 
     @Override
-    public void onRegistrationError(@NonNull Context context,
-                                    @NonNull String providerName,
-                                    @NonNull OPFError error) {
-
-    }
-
-    @Override
     public void onUnregistrationError(@NonNull Context context,
                                       @NonNull String providerName,
                                       @NonNull OPFError error) {
@@ -72,7 +67,8 @@ public class SimpleEventListener implements EventListener {
     }
 
     @Override
-    public void onNoAvailableProvider(@NonNull Context context) {
+    public void onNoAvailableProvider(@NonNull Context context,
+                                      @NonNull Map<String, OPFError> registrationErrors) {
 
     }
 }

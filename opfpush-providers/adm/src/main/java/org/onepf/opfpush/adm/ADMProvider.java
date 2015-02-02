@@ -27,9 +27,9 @@ import com.amazon.device.messaging.development.ADMManifest;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.OPFPushLog;
 
-import static org.onepf.opfpush.adm.Constants.AMAZON_MANUFACTURER;
-import static org.onepf.opfpush.adm.Constants.KINDLE_STORE_APP_PACKAGE;
-import static org.onepf.opfpush.adm.Constants.NAME;
+import static org.onepf.opfpush.adm.ADMConstants.AMAZON_MANUFACTURER;
+import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
 
 /**
  * Amazon Device Messaging push provider implementation.
@@ -47,7 +47,7 @@ public class ADMProvider extends BasePushProvider {
     private RegIdStorage regIdStorage;
 
     public ADMProvider(@NonNull final Context context) {
-        super(context, NAME, KINDLE_STORE_APP_PACKAGE);
+        super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE);
         adm = new ADMDelegate(context);
         regIdStorage = RegIdStorage.getInstance(getContext());
     }
@@ -106,6 +106,6 @@ public class ADMProvider extends BasePushProvider {
     @NonNull
     @Override
     public String toString() {
-        return NAME;
+        return PROVIDER_NAME;
     }
 }
