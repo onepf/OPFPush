@@ -33,6 +33,8 @@ public final class ExponentialBackoff implements Backoff {
 
     public static final int DEFAULT_TRY_COUNT = Integer.MAX_VALUE;
 
+    public static final int TRY_COUNT_BEFORE_DELAY_RESET = 16;
+
     private final int maxTryCount;
 
     @NonNull
@@ -66,7 +68,7 @@ public final class ExponentialBackoff implements Backoff {
 
     private long getTryDelay(int currentTryNumber) {
         OPFPushLog.methodD(ExponentialBackoff.class, "getTryDelay", currentTryNumber);
-        return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
+        return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber % TRY_COUNT_BEFORE_DELAY_RESET));
     }
 
     @Override
