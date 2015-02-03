@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.onepf.opfpush.configuration.ExponentialBackoff;
 import org.onepf.opfpush.exception.OPFIllegalStateException;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.listener.EventListener;
@@ -97,6 +98,12 @@ public final class OPFPushHelper {
 
     @NonNull
     private final Settings settings;
+
+    @NonNull
+    private final Backoff registrationBackoff = new ExponentialBackoff();
+
+    @NonNull
+    private final Backoff unregistrationBackoff = new ExponentialBackoff();
 
     @NonNull
     private final Object registrationLock = new Object();
@@ -365,7 +372,7 @@ public final class OPFPushHelper {
     private void postRetryRegister(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "postRetryRegister", providerName);
 
-        final long when = System.currentTimeMillis() + configuration.getBackoff().getTryDelay();
+        final long when = System.currentTimeMillis() + registrationBackoff.getTryDelay();
 
         OPFPushLog.d("Post retry register provider '%s' at %s", providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
@@ -631,7 +638,7 @@ public final class OPFPushHelper {
 
                 OPFPushLog.d("Successfully register provider '%s'.", providerName);
 
-                configuration.getBackoff().reset();
+                registrationBackoff.reset();
 
                 settings.saveState(REGISTERED);
                 settings.saveLastAndroidId(ANDROID_ID);
@@ -681,13 +688,12 @@ public final class OPFPushHelper {
                     OPFPushLog.d("Registration state isn't REGISTERED");
 
                     settings.saveState(UNREGISTERED);
-                    final Backoff backoff = configuration.getBackoff();
                     if (error == OPFError.SERVICE_NOT_AVAILABLE
-                            && backoff.hasTries()) {
+                            && registrationBackoff.hasTries()) {
                         postRetryRegister(providerName);
                     } else {
                         registerProviderErrors.put(providerName, error);
-                        backoff.reset();
+                        registrationBackoff.reset();
                         registerNextAvailableProvider(providerName);
                     }
                 }
