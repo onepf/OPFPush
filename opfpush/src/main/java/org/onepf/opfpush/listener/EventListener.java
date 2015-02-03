@@ -74,16 +74,6 @@ public interface EventListener {
     void onUnregistered(@NonNull Context context, @NonNull String providerName, @Nullable String registrationId);
 
     /**
-     * Provider unregistration failed. Provider can continue try to unregister
-     * with exponential backoff (is {@code error} is recoverable).
-     *
-     * @param context      application context.
-     * @param providerName Name of provider in what error occur.
-     * @param error        Occurred error
-     */
-    void onUnregistrationError(@NonNull Context context, @NonNull String providerName, @NonNull OPFError error);
-
-    /**
      * {@code OpenPushHelper} can't find any available provider for register push.
      * Notify user that push notifications will not be received.
      * Try to add more push providers to opfpush configurations.

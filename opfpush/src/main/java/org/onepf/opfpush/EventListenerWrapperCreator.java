@@ -33,7 +33,6 @@ import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
-import static org.onepf.opfpush.OPFConstants.EXTRA_ERROR;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_COUNT;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_TYPE;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
@@ -131,21 +130,6 @@ final class EventListenerWrapperCreator {
             }
 
             @Override
-            public void onUnregistrationError(
-                    @NonNull final Context context,
-                    @NonNull final String providerName,
-                    @NonNull final OPFError error
-            ) {
-                OPFUtils.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        OPFPushLog.d("Post onUnregistrationError(%1$s, %2$s)", providerName, error);
-                        eventListener.onUnregistrationError(context, providerName, error);
-                    }
-                });
-            }
-
-            @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
                     @NonNull final Map<String, OPFError> registrationErrors) {
@@ -219,19 +203,6 @@ final class EventListenerWrapperCreator {
                 final Intent intent = new Intent(ACTION_UNREGISTRATION);
                 intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
                 intent.putExtra(EXTRA_REGISTRATION_ID, registrationId);
-                context.sendBroadcast(intent);
-            }
-
-            @Override
-            public void onUnregistrationError(
-                    @NonNull final Context context,
-                    @NonNull final String providerName,
-                    @NonNull final OPFError error
-            ) {
-                OPFPushLog.d("SendBroadcast onUnregistrationError(%1$s, %2$s)", providerName, error);
-                final Intent intent = new Intent(ACTION_UNREGISTRATION);
-                intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
-                intent.putExtra(EXTRA_ERROR, error);
                 context.sendBroadcast(intent);
             }
 

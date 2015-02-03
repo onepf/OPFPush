@@ -33,7 +33,6 @@ import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
-import static org.onepf.opfpush.OPFConstants.EXTRA_ERROR;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_COUNT;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_TYPE;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
@@ -96,19 +95,11 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
         OPFPushLog.methodD(OPFPushReceiver.class, "handleUnregistrationAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
-        if (intent.hasExtra(EXTRA_ERROR)) {
-            onUnregistrationError(
-                    context,
-                    providerName,
-                    (OPFError) intent.getSerializableExtra(EXTRA_ERROR)
-            );
-        } else {
-            onUnregistered(
-                    context,
-                    providerName,
-                    intent.getStringExtra(EXTRA_REGISTRATION_ID)
-            );
-        }
+        onUnregistered(
+                context,
+                providerName,
+                intent.getStringExtra(EXTRA_REGISTRATION_ID)
+        );
     }
 
     private void handleReceiveAction(@NonNull final Context context,

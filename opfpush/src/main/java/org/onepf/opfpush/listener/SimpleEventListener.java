@@ -60,13 +60,6 @@ public class SimpleEventListener implements EventListener {
     }
 
     @Override
-    public void onUnregistrationError(@NonNull Context context,
-                                      @NonNull String providerName,
-                                      @NonNull OPFError error) {
-
-    }
-
-    @Override
     public void onNoAvailableProvider(@NonNull Context context,
                                       @NonNull Map<String, OPFError> registrationErrors) {
 

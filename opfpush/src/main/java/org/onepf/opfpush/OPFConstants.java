@@ -27,12 +27,9 @@ public final class OPFConstants {
         throw new UnsupportedOperationException();
     }
 
-    static final String ACTION_REGISTER = BuildConfig.APPLICATION_ID + "intent.REGISTER";
-
     public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
 
     public static final String EXTRA_PROVIDER_NAME = "org.onepf.opfpush.intent.EXTRA_PROVIDER_NAME";
-    public static final String EXTRA_ERROR = "org.onepf.opfpush.intent.EXTRA_ERROR";
     public static final String EXTRA_REGISTRATION_ID = "org.onepf.opfpush.intent.EXTRA_REGISTRATION_ID";
     public static final String EXTRA_MESSAGE_TYPE = "org.onepf.opfpush.intent.EXTRA_MESSAGE_TYPE";
     public static final String EXTRA_MESSAGE_COUNT = "org.onepf.opfpush.intent.EXTRA_MESSAGE_COUNT";
@@ -42,4 +39,7 @@ public final class OPFConstants {
     public static final String ACTION_RECEIVE = "org.onepf.opfpush.intent.RECEIVE";
     public static final String ACTION_REGISTRATION = "org.onepf.opfpush.intent.REGISTRATION";
     public static final String ACTION_UNREGISTRATION = "org.onepf.opfpush.intent.UNREGISTRATION";
+
+    static final String ACTION_RETRY_REGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_REGISTER";
+    static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
 }

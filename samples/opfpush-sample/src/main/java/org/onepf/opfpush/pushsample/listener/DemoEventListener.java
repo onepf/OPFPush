@@ -29,7 +29,6 @@ import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
 import org.onepf.opfutils.OPFUtils;
 
@@ -106,14 +105,6 @@ public class DemoEventListener implements EventListener {
                                @Nullable final String registrationId) {
         OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
-    }
-
-    @Override
-    public void onUnregistrationError(@NonNull final Context context,
-                                      @NonNull final String providerName,
-                                      @NonNull final OPFError error) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistrationError", providerName, error);
-        EventBus.getDefault().postSticky(new UnregistrationErrorEvent(error));
     }
 
     @Override

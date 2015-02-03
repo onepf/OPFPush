@@ -24,6 +24,10 @@ import android.support.annotation.NonNull;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFUtils;
 
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
+import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
+
 /**
  * @author Kirill Rozov
  * @author Roman Savin
@@ -41,10 +45,15 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
             OPFPushLog.d("Initialisation is done");
 
             final String action = intent.getAction();
-            if (OPFConstants.ACTION_REGISTER.equals(action)) {
-                helper.register(intent.getStringExtra(OPFConstants.EXTRA_PROVIDER_NAME));
-            } else {
-                throw new OPFPushException("Unknown action '%s'.", action);
+            switch (action) {
+                case ACTION_RETRY_REGISTER:
+                    helper.register(intent.getStringExtra(EXTRA_PROVIDER_NAME));
+                    break;
+                case ACTION_RETRY_UNREGISTER:
+                    helper.unregister(intent.getStringExtra(EXTRA_PROVIDER_NAME));
+                    break;
+                default:
+                    throw new OPFPushException("Unknown action '%s'.", action);
             }
         }
     }

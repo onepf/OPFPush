@@ -37,7 +37,6 @@ import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.pushsample.model.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregistrationErrorEvent;
 
 import java.util.Map;
 
@@ -141,15 +140,6 @@ public class DemoActivity extends Activity {
         final String registrationIdString = unregisteredEvent.getRegistrationId();
         initViewsUnregisteredState(registrationIdString);
         EventBus.getDefault().removeStickyEvent(unregisteredEvent);
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void onEventMainThread(@NonNull final UnregistrationErrorEvent unregistrationErrorEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", unregistrationErrorEvent);
-        final OPFError error = unregistrationErrorEvent.getError();
-        initViewsRegisteredState("");
-        infoText.setText(getString(R.string.unregistration_error_fmt, error.name()));
-        EventBus.getDefault().removeStickyEvent(unregistrationErrorEvent);
     }
 
     @SuppressWarnings("UnusedDeclaration")

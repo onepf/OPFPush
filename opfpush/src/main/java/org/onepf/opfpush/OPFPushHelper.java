@@ -51,7 +51,12 @@ import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static android.content.Context.ALARM_SERVICE;
 import static android.provider.Settings.Secure.ANDROID_ID;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
+import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
+import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.model.State.REGISTERED;
 import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
@@ -336,6 +341,10 @@ public final class OPFPushHelper {
         register(getProviderWithException(providerName));
     }
 
+    void unregister(@NonNull final String providerName) {
+        unregister(getProviderWithException(providerName));
+    }
+
     /**
      * Call this method when device state changed and need retry registration.
      * May be call only when the helper in registered state.
@@ -371,18 +380,27 @@ public final class OPFPushHelper {
 
     private void postRetryRegister(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "postRetryRegister", providerName);
+        postRetry(providerName, registrationBackoff, ACTION_RETRY_REGISTER);
+    }
 
-        final long when = System.currentTimeMillis() + registrationBackoff.getTryDelay();
+    private void postRetryUnregister(@NonNull final String providerName) {
+        OPFPushLog.methodD(OPFPushHelper.class, "postRetryUnregister", providerName);
+        postRetry(providerName, unregistrationBackoff, ACTION_RETRY_UNREGISTER);
+    }
 
-        OPFPushLog.d("Post retry register provider '%s' at %s", providerName,
+    private void postRetry(@NonNull final String providerName,
+                           @NonNull Backoff backoff,
+                           @NonNull String action) {
+        final long when = System.currentTimeMillis() + backoff.getTryDelay();
+        OPFPushLog.d("Post retry provider '%s' at %s", providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
-        intent.setAction(OPFConstants.ACTION_REGISTER);
-        intent.putExtra(OPFConstants.EXTRA_PROVIDER_NAME, providerName);
+        intent.setAction(action);
+        intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
 
         if (alarmManager == null) {
-            alarmManager = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
+            alarmManager = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
         }
         if (alarmManager != null) {
             alarmManager.set(
@@ -474,6 +492,15 @@ public final class OPFPushHelper {
             provider.register();
         } else {
             receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());
+        }
+    }
+
+    private void unregister(@NonNull final PushProvider provider) {
+        OPFPushLog.methodD(OPFPushHelper.class, "unregister", provider);
+        if (provider.isRegistered()) {
+            provider.unregister();
+        } else {
+            receivedMessageHandler.onUnregistered(provider.getName(), provider.getRegistrationId());
         }
     }
 
@@ -661,6 +688,7 @@ public final class OPFPushHelper {
          */
         public void onUnregistered(@NonNull final String providerName,
                                    @Nullable final String oldRegistrationId) {
+            //TODO is current provider
             synchronized (registrationLock) {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistered",
                         providerName, "oldRegistrationId"); //Don't log registration id.
@@ -688,7 +716,7 @@ public final class OPFPushHelper {
                     OPFPushLog.d("Registration state isn't REGISTERED");
 
                     settings.saveState(UNREGISTERED);
-                    if (error == OPFError.SERVICE_NOT_AVAILABLE
+                    if (error == SERVICE_NOT_AVAILABLE
                             && registrationBackoff.hasTries()) {
                         postRetryRegister(providerName);
                     } else {
@@ -712,10 +740,18 @@ public final class OPFPushHelper {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistrationError",
                         providerName, error);
 
+                //TODO: check is current provider
+                //TODO: maybe reset registrationBackoff
                 if (isUnregistering() || isUnregistered()) {
                     settings.saveState(REGISTERED);
+                    if (error == SERVICE_NOT_AVAILABLE
+                            && unregistrationBackoff.hasTries()) {
+                        postRetryUnregister(providerName);
+                    } else {
+                        OPFPushLog.e("Error while unregister provider %1$s : %2$s",
+                                providerName, error);
+                    }
                 }
-                eventListenerWrapper.onUnregistrationError(appContext, providerName, error);
             }
         }
 
