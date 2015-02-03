@@ -14,38 +14,47 @@
   ~ limitations under the License.
   -->
 
-<manifest
-    package="org.onepf.opfpush.adm"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:amazon="http://schemas.amazon.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:amazon="http://schemas.amazon.com/apk/res/android"
+    package="org.onepf.opfpush.adm">
 
-    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
+    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <!--<uses-permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>-->
     <!--<permission-->
-        <!--android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"-->
-        <!--android:protectionLevel="signature"/>-->
+    <!--android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"-->
+    <!--android:protectionLevel="signature"/>-->
 
     <application>
 
         <amazon:enable-feature
             android:name="com.amazon.device.messaging"
-            android:required="false"/>
+            android:required="false" />
 
         <service
             android:name=".ADMService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <!--<receiver-->
-            <!--android:name="org.onepf.opfpush.adm.ADMReceiver"-->
-            <!--android:permission="com.amazon.device.messaging.permission.SEND">-->
+        <!--android:name="org.onepf.opfpush.adm.ADMReceiver"-->
+        <!--android:permission="com.amazon.device.messaging.permission.SEND">-->
 
-            <!--<intent-filter>-->
-                <!--<action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>-->
-                <!--<action android:name="com.amazon.device.messaging.intent.RECEIVE"/>-->
+        <!--<intent-filter>-->
+        <!--<action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>-->
+        <!--<action android:name="com.amazon.device.messaging.intent.RECEIVE"/>-->
 
-                <!--<category android:name="${applicationId}"/>-->
-            <!--</intent-filter>-->
+        <!--<category android:name="${applicationId}"/>-->
+        <!--</intent-filter>-->
         <!--</receiver>-->
+
+        <receiver android:name=".LoginAccountsChangedReceiver">
+
+            <intent-filter>
+                <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED" />
+            </intent-filter>
+
+        </receiver>
+
     </application>
 </manifest>

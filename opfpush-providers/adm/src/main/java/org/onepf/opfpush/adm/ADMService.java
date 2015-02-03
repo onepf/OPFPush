@@ -19,6 +19,7 @@ package org.onepf.opfpush.adm;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
@@ -84,7 +85,10 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
-        RegIdStorage.getInstance(getApplicationContext()).saveRegistrationId(registrationId);
+        final PreferencesProvider preferencesProvider = PreferencesProvider
+                .getInstance(getApplicationContext());
+        preferencesProvider.saveRegistrationId(registrationId);
+        preferencesProvider.removeAuthenticationFailedFlag();
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
@@ -103,7 +107,7 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
         OPFPushLog.methodD(ADMService.class, "onUnregistered", "admRegistrationId");
-        final RegIdStorage settings = RegIdStorage.getInstance(getApplicationContext());
+        final PreferencesProvider settings = PreferencesProvider.getInstance(getApplicationContext());
         final String registrationId = admRegistrationId == null
                 ? settings.getRegistrationId()
                 : admRegistrationId;
@@ -127,6 +131,16 @@ public class ADMService extends ADMMessageHandlerBase {
         OPFPushLog.methodD(ADMService.class, "onRegistrationError", errorId);
         final OPFError error = convertError(errorId);
         OPFPushLog.d("Converted error : " + error);
+
+        final PreferencesProvider preferencesProvider = PreferencesProvider
+                .getInstance(getApplicationContext());
+        if (!TextUtils.isEmpty(preferencesProvider.getRegistrationId())) {
+            //Registration Error
+            preferencesProvider.removeAuthenticationFailedFlag();
+        } else if (error == OPFError.AUTHENTICATION_FAILED) {
+            //Unregistration Error
+            preferencesProvider.saveAuthenticationFailedFlag();
+        }
 
         OPFPush.getHelper().getReceivedMessageHandler().onError(PROVIDER_NAME, error);
     }

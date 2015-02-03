@@ -44,12 +44,12 @@ public class ADMProvider extends BasePushProvider {
     @NonNull
     private ADMDelegate adm;
 
-    private RegIdStorage regIdStorage;
+    private PreferencesProvider preferencesProvider;
 
     public ADMProvider(@NonNull final Context context) {
         super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE);
         adm = new ADMDelegate(context);
-        regIdStorage = RegIdStorage.getInstance(getContext());
+        preferencesProvider = PreferencesProvider.getInstance(getContext());
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ADMProvider extends BasePushProvider {
             return adm.getRegistrationId();
         }
 
-        return regIdStorage.getRegistrationId();
+        return preferencesProvider.getRegistrationId();
     }
 
     @NonNull

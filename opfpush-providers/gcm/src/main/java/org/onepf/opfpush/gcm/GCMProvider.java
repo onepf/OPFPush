@@ -70,13 +70,13 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private ExecutorService registrationExecutor;
 
     @NonNull
-    private final RegIdStorage regIdStorage;
+    private final PreferencesProvider preferencesProvider;
 
     public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
         super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE);
 
         this.senderID = senderID;
-        regIdStorage = RegIdStorage.getInstance(context);
+        preferencesProvider = PreferencesProvider.getInstance(context);
     }
 
     public synchronized void register() {
@@ -86,7 +86,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     public synchronized void unregister() {
         OPFPushLog.methodD(GCMProvider.class, "unregister");
-        executeTask(new UnregisterTask(regIdStorage.getRegistrationId()));
+        executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
     }
 
     @Override
@@ -126,19 +126,19 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @Nullable
     public String getRegistrationId() {
-        return regIdStorage.getRegistrationId();
+        return preferencesProvider.getRegistrationId();
     }
 
     @Override
     public boolean isRegistered() {
         OPFPushLog.methodD(GCMProvider.class, "isRegistered");
-        return !TextUtils.isEmpty(regIdStorage.getRegistrationId());
+        return !TextUtils.isEmpty(preferencesProvider.getRegistrationId());
     }
 
     @Override
     public void onRegistrationInvalid() {
         OPFPushLog.methodD(GCMProvider.class, "onRegistrationInvalid");
-        regIdStorage.reset();
+        preferencesProvider.reset();
     }
 
     @Override
@@ -191,7 +191,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private void close() {
         OPFPushLog.methodD(GCMProvider.class, "close");
 
-        regIdStorage.reset();
+        preferencesProvider.reset();
         if (registrationExecutor != null) {
             OPFPushLog.d("Registration executor is not null");
 
@@ -254,7 +254,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
             OPFPushLog.methodD(RegisterTask.class, "onRegistrationSuccess", "registrationId");
-            regIdStorage.saveRegistrationId(registrationId);
+            preferencesProvider.saveRegistrationId(registrationId);
 
             //For finish registration we catch intent with action
             //GCMConstant.ACTION_REGISTRATION in GCMReceiver.

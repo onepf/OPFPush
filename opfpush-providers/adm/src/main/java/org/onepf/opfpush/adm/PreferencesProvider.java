@@ -28,28 +28,29 @@ import org.onepf.opfutils.OPFUtils;
  * @author Roman Savin
  * @since 27.01.2015
  */
-final class RegIdStorage {
+final class PreferencesProvider {
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
+    private static final String KEY_AUTHENTICATION_FAILED_FLAG = "authentication_failed_flag";
 
     private static final String ADM_POSTFIX = "adm";
 
-    private static volatile RegIdStorage instance;
+    private static volatile PreferencesProvider instance;
 
     private OPFPreferences preferences;
 
-    private RegIdStorage(@NonNull final Context context) {
+    private PreferencesProvider(@NonNull final Context context) {
         preferences = new OPFPreferences(context, ADM_POSTFIX);
     }
 
-    public static RegIdStorage getInstance(@NonNull final Context context) {
+    public static PreferencesProvider getInstance(@NonNull final Context context) {
         if (instance == null) {
-            synchronized (RegIdStorage.class) {
+            synchronized (PreferencesProvider.class) {
                 if (instance == null) {
-                    instance = new RegIdStorage(context);
+                    instance = new PreferencesProvider(context);
                 }
             }
         }
@@ -59,18 +60,14 @@ final class RegIdStorage {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFPushLog.methodD(RegIdStorage.class, "getRegistrationId");
-        if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
-            return preferences.getString(KEY_REGISTRATION_ID);
-        } else {
-            saveRegistrationId(null);
-            return null;
-        }
+        OPFPushLog.methodD(PreferencesProvider.class, "getRegistrationId");
+        updateAppVersion();
+        return preferences.getString(KEY_REGISTRATION_ID);
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFPushLog.methodD(RegIdStorage.class, "saveRegistrationId");
-        saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
+        OPFPushLog.methodD(PreferencesProvider.class, "saveRegistrationId");
+        updateAppVersion();
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
         } else {
@@ -78,13 +75,39 @@ final class RegIdStorage {
         }
     }
 
+    public synchronized boolean isAuthenticationFailed() {
+        updateAppVersion();
+        return preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG, false);
+    }
+
+    public synchronized void saveAuthenticationFailedFlag() {
+        OPFPushLog.methodD(PreferencesProvider.class, "saveAuthenticationFailedFlag");
+
+        updateAppVersion();
+        preferences.put(KEY_AUTHENTICATION_FAILED_FLAG, true);
+    }
+
+    public synchronized void removeAuthenticationFailedFlag() {
+        OPFPushLog.methodD(PreferencesProvider.class, "removeAuthenticationFailedFlag");
+
+        updateAppVersion();
+        preferences.remove(KEY_AUTHENTICATION_FAILED_FLAG);
+    }
+
     public synchronized void reset() {
-        OPFPushLog.methodD(RegIdStorage.class, "reset");
+        OPFPushLog.methodD(PreferencesProvider.class, "reset");
         preferences.clear();
     }
 
+    private void updateAppVersion() {
+        if (getAppVersion() != OPFUtils.getAppVersion(preferences.getContext())) {
+            reset();
+            saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
+        }
+    }
+
     private void saveAppVersion(final int appVersion) {
-        OPFPushLog.methodD(RegIdStorage.class, "saveAppVersion", appVersion);
+        OPFPushLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 

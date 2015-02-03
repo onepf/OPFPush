@@ -30,4 +30,5 @@ public final class ADMConstants {
 
     static final String AMAZON_MANUFACTURER = "Amazon";
     static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
+    static final String ACCOUNT_TYPE = "com.amazon.account";
 }

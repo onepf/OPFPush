@@ -40,6 +40,6 @@ public final class OPFConstants {
     public static final String ACTION_REGISTRATION = "org.onepf.opfpush.intent.REGISTRATION";
     public static final String ACTION_UNREGISTRATION = "org.onepf.opfpush.intent.UNREGISTRATION";
 
-    static final String ACTION_RETRY_REGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_REGISTER";
-    static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
+    public static final String ACTION_RETRY_REGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_REGISTER";
+    public static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
 }
