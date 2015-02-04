@@ -26,14 +26,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.onepf.opfpush.configuration.ExponentialBackoff;
-import org.onepf.opfpush.exception.OPFIllegalStateException;
+import org.onepf.opfpush.backoff.BackoffManager;
+import org.onepf.opfpush.backoff.InfinityExponentialBackoffManager;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.Operation;
 import org.onepf.opfpush.model.State;
-import org.onepf.opfpush.configuration.Backoff;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.util.ReceiverUtils;
 import org.onepf.opfutils.Checkable;
@@ -57,6 +57,8 @@ import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
 import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
+import static org.onepf.opfpush.model.Operation.REGISTER;
+import static org.onepf.opfpush.model.Operation.UNREGISTER;
 import static org.onepf.opfpush.model.State.REGISTERED;
 import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
@@ -105,10 +107,7 @@ public final class OPFPushHelper {
     private final Settings settings;
 
     @NonNull
-    private final Backoff registrationBackoff = new ExponentialBackoff();
-
-    @NonNull
-    private final Backoff unregistrationBackoff = new ExponentialBackoff();
+    private final BackoffManager backoffManager;
 
     @NonNull
     private final Object registrationLock = new Object();
@@ -129,6 +128,7 @@ public final class OPFPushHelper {
     OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = Settings.getInstance(context);
+        backoffManager = InfinityExponentialBackoffManager.getInstance();
     }
 
     /**
@@ -225,7 +225,7 @@ public final class OPFPushHelper {
                         currentProvider
                 );
             } else {
-                throw new OPFIllegalStateException("Provider not registered.");
+                throw new IllegalStateException("Provider not registered.");
             }
         }
     }
@@ -380,18 +380,19 @@ public final class OPFPushHelper {
 
     private void postRetryRegister(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "postRetryRegister", providerName);
-        postRetry(providerName, registrationBackoff, ACTION_RETRY_REGISTER);
+        postRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     private void postRetryUnregister(@NonNull final String providerName) {
         OPFPushLog.methodD(OPFPushHelper.class, "postRetryUnregister", providerName);
-        postRetry(providerName, unregistrationBackoff, ACTION_RETRY_UNREGISTER);
+        postRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
     private void postRetry(@NonNull final String providerName,
-                           @NonNull Backoff backoff,
+                           @NonNull Operation operation,
                            @NonNull String action) {
-        final long when = System.currentTimeMillis() + backoff.getTryDelay();
+        final long when = System.currentTimeMillis()
+                + backoffManager.getTryDelay(providerName, operation);
         OPFPushLog.d("Post retry provider '%s' at %s", providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
@@ -665,7 +666,7 @@ public final class OPFPushHelper {
 
                 OPFPushLog.d("Successfully register provider '%s'.", providerName);
 
-                registrationBackoff.reset();
+                backoffManager.reset(providerName, REGISTER);
 
                 settings.saveState(REGISTERED);
                 settings.saveLastAndroidId(ANDROID_ID);
@@ -688,7 +689,7 @@ public final class OPFPushHelper {
          */
         public void onUnregistered(@NonNull final String providerName,
                                    @Nullable final String oldRegistrationId) {
-            //TODO is current provider
+            //TODO check is current provider
             synchronized (registrationLock) {
                 OPFPushLog.methodD(ReceivedMessageHandler.class, "onUnregistered",
                         providerName, "oldRegistrationId"); //Don't log registration id.
@@ -698,6 +699,7 @@ public final class OPFPushHelper {
                 currentProvider = null;
                 registerProviderErrors.clear();
                 unregisterPackageChangeReceiver();
+                backoffManager.reset(providerName, UNREGISTER);
                 eventListenerWrapper.onUnregistered(appContext, providerName, oldRegistrationId);
             }
         }
@@ -717,11 +719,11 @@ public final class OPFPushHelper {
 
                     settings.saveState(UNREGISTERED);
                     if (error == SERVICE_NOT_AVAILABLE
-                            && registrationBackoff.hasTries()) {
+                            && backoffManager.hasTries(providerName, REGISTER)) {
                         postRetryRegister(providerName);
                     } else {
                         registerProviderErrors.put(providerName, error);
-                        registrationBackoff.reset();
+                        backoffManager.reset(providerName, REGISTER);
                         registerNextAvailableProvider(providerName);
                     }
                 }
@@ -741,11 +743,10 @@ public final class OPFPushHelper {
                         providerName, error);
 
                 //TODO: check is current provider
-                //TODO: maybe reset registrationBackoff
                 if (isUnregistering() || isUnregistered()) {
                     settings.saveState(REGISTERED);
                     if (error == SERVICE_NOT_AVAILABLE
-                            && unregistrationBackoff.hasTries()) {
+                            && backoffManager.hasTries(providerName, UNREGISTER)) {
                         postRetryUnregister(providerName);
                     } else {
                         OPFPushLog.e("Error while unregister provider %1$s : %2$s",

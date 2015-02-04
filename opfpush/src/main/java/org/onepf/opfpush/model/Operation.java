@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.exception;
+package org.onepf.opfpush.model;
 
 /**
- * Thrown when some operations perform in wrong state.
- *
  * @author Roman Savin
- * @since 05.12.14
+ * @since 04.02.2015
  */
-public class OPFIllegalStateException extends IllegalStateException {
-
-    public OPFIllegalStateException(String detailMessage) {
-        super(detailMessage);
-    }
-
-    public OPFIllegalStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public OPFIllegalStateException(Throwable cause) {
-        super(cause);
-    }
+public enum Operation {
+    REGISTER,
+    UNREGISTER
 }
