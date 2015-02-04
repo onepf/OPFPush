@@ -42,7 +42,13 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.onepf.opfpush.gcm.GCMConstants.ANDROID_RELEASE_4_0_4;
+import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_ACCOUNT_TYPE;
+import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
+import static org.onepf.opfpush.gcm.GCMConstants.MESSAGES_TO_SUFFIX;
+import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_C2D_MESSAGE_SUFFIX;
+import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_RECEIVE;
 import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
@@ -54,15 +60,6 @@ import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
  * @since 04.09.14
  */
 public class GCMProvider extends BasePushProvider implements SenderPushProvider {
-
-    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    private static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
-
-    private static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
-    private static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
-    private static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME
-            = "com.google.android.gms.gcm.GoogleCloudMessaging";
-    private static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 
     private final String senderID;
 
