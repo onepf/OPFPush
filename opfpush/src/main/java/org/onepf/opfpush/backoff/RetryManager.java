@@ -25,8 +25,6 @@ import android.support.annotation.NonNull;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.RetryBroadcastReceiver;
 import org.onepf.opfpush.model.Operation;
-import org.onepf.opfutils.Checkable;
-import org.onepf.opfutils.OPFChecks;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,13 +53,6 @@ public final class RetryManager implements BackoffManager {
     @NonNull
     private AlarmManager alarmManager;
 
-    private static Checkable checkInit = new Checkable() {
-        @Override
-        public boolean check() {
-            return instance != null;
-        }
-    };
-
     private RetryManager(@NonNull final Context context,
                          @NonNull final BackoffManager backoffManager) {
         this.appContext = context.getApplicationContext();
@@ -69,15 +60,12 @@ public final class RetryManager implements BackoffManager {
         this.alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
     }
 
-    public static void init(@NonNull final Context context,
-                            @NonNull final BackoffManager backoffManager) {
-        OPFChecks.checkInit(checkInit, false);
-        instance = new RetryManager(context, backoffManager);
-    }
-
     @NonNull
-    public static RetryManager getInstance() {
-        OPFChecks.checkInit(checkInit, true);
+    public static RetryManager getInstance(@NonNull final Context context,
+                                           @NonNull final BackoffManager backoffManager) {
+        if (instance == null) {
+            instance = new RetryManager(context, backoffManager);
+        }
         return instance;
     }
 

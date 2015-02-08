@@ -102,7 +102,7 @@ public final class OPFPushHelper {
     private final Object initLock = new Object();
 
     @NonNull
-    private final Checkable initDoneCheckable = new Checkable() {
+    private final Checkable checkInit = new Checkable() {
         @Override
         public boolean check() {
             synchronized (initLock) {
@@ -114,9 +114,8 @@ public final class OPFPushHelper {
     OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = Settings.getInstance(context);
-
-        RetryManager.init(appContext, InfinityExponentialBackoffManager.getInstance());
-        retryManager = RetryManager.getInstance();
+        retryManager = RetryManager.getInstance(context,
+                InfinityExponentialBackoffManager.getInstance());
     }
 
     /**
@@ -130,7 +129,7 @@ public final class OPFPushHelper {
     public void register() {
         OPFPushLog.methodD(OPFPushHelper.class, "register");
 
-        OPFChecks.checkInit(initDoneCheckable, true);
+        OPFChecks.checkInit(checkInit, true);
 
         synchronized (registrationLock) {
             final State state = settings.getState();
@@ -159,8 +158,7 @@ public final class OPFPushHelper {
      */
     public void unregister() {
         OPFPushLog.methodD(OPFPushHelper.class, "unregister");
-
-        OPFChecks.checkInit(initDoneCheckable, true);
+        OPFChecks.checkInit(checkInit, true);
 
         synchronized (registrationLock) {
             final State state = settings.getState();
@@ -170,11 +168,14 @@ public final class OPFPushHelper {
                 return;
             }
             final String providerName = currentProvider.getName();
+            final boolean isCurrentProviderRegistered = currentProvider.isRegistered();
 
-            if (state == REGISTERING || state == REGISTERED || currentProvider.isRegistered()) {
+            if (state == REGISTERING || state == REGISTERED || isCurrentProviderRegistered) {
                 retryManager.cancelRetryAllOperations(providerName);
                 currentProvider.unregister();
                 fakeOnUnregistered(currentProvider.getName(), providerName);
+            } else {
+                OPFPushLog.w("Unregistration wasn't performed because already unregistered.");
             }
         }
     }
@@ -232,7 +233,7 @@ public final class OPFPushHelper {
 
     @NonNull
     public ReceivedMessageHandler getReceivedMessageHandler() {
-        OPFChecks.checkInit(initDoneCheckable, true);
+        OPFChecks.checkInit(checkInit, true);
         return receivedMessageHandler;
     }
 
@@ -296,7 +297,7 @@ public final class OPFPushHelper {
      * @return True if init is done, else - false.
      */
     boolean isInitDone() {
-        return initDoneCheckable.check();
+        return checkInit.check();
     }
 
     boolean isRegistered() {
@@ -310,7 +311,7 @@ public final class OPFPushHelper {
     void restartRegisterOnBoot() {
         OPFPushLog.methodD(OPFPushHelper.class, "restartRegisterOnBoot");
 
-        OPFChecks.checkInit(initDoneCheckable, true);
+        OPFChecks.checkInit(checkInit, true);
         settings.clear();
         register();
     }
