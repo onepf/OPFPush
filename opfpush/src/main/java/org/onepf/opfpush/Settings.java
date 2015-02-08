@@ -23,12 +23,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfutils.OPFPreferences;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.onepf.opfpush.model.State.REGISTERED;
-import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
-import static org.onepf.opfpush.model.State.UNREGISTERING;
 
 /**
  * @author Kirill Rozov
@@ -38,12 +33,9 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
 //TODO: thread safe
 final class Settings {
 
-    private static final long STATE_INFINITY_TIMESTAMP = -1L;
-
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
-    private static final String KEY_STATE_TIMESTAMP = "state_timestamp";
 
     private static volatile Settings instance;
 
@@ -78,34 +70,11 @@ final class Settings {
             state = UNREGISTERED;
             saveState(state);
         }
-
-        final long stateTimestamp = preferences.getLong(KEY_STATE_TIMESTAMP, STATE_INFINITY_TIMESTAMP);
-        final long currentTime = System.currentTimeMillis();
-
-        OPFPushLog.d("State timestamp : " + stateTimestamp);
-        if (stateTimestamp != STATE_INFINITY_TIMESTAMP
-                && currentTime - stateTimestamp > TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)) {
-            OPFPushLog.d("state timestamp ");
-
-            if (state == REGISTERING) {
-                state = UNREGISTERED;
-                saveState(state);
-            } else if (state == UNREGISTERING) {
-                state = REGISTERED;
-                saveState(state);
-            }
-        }
-
         return state;
     }
 
     public void saveState(@NonNull final State state) {
         OPFPushLog.methodD(Settings.class, "saveState", state);
-
-        final long stateTimestamp = isInfinityState(state) ? STATE_INFINITY_TIMESTAMP
-                : System.currentTimeMillis();
-
-        preferences.put(KEY_STATE_TIMESTAMP, stateTimestamp);
         preferences.put(KEY_STATE, state.getValue());
     }
 
@@ -141,9 +110,5 @@ final class Settings {
         } else {
             preferences.put(KEY_LAST_ANDROID_ID, androidId);
         }
-    }
-
-    private boolean isInfinityState(@NonNull final State state) {
-        return state == REGISTERED || state == UNREGISTERED;
     }
 }
