@@ -22,18 +22,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.MessageType;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFUtils;
+
+import java.util.Map;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
-import static org.onepf.opfpush.OPFConstants.EXTRA_ERROR;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_COUNT;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_TYPE;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
+import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ERRORS;
 import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ID;
 import static org.onepf.opfpush.OPFConstants.MESSAGES_COUNT_UNKNOWN;
 
@@ -41,33 +44,7 @@ import static org.onepf.opfpush.OPFConstants.MESSAGES_COUNT_UNKNOWN;
  * @author Roman Savin
  * @since 25.12.14
  */
-public abstract class OPFPushReceiver extends BroadcastReceiver {
-
-    protected abstract void onMessage(@NonNull final Context context,
-                                      @NonNull final String providerName,
-                                      @NonNull final Bundle extras);
-
-    protected abstract void onDeletedMessage(@NonNull final Context context,
-                                             @NonNull final String providerName,
-                                             final int messagesCount);
-
-    protected abstract void onRegistered(@NonNull final Context context,
-                                         @NonNull final String providerName,
-                                         @NonNull final String registrationId);
-
-    protected abstract void onUnregistered(@NonNull final Context context,
-                                           @NonNull final String providerName,
-                                           @NonNull final String oldRegistrationId);
-
-    protected abstract void onRegistrationError(@NonNull final Context context,
-                                                @NonNull final String providerName,
-                                                @NonNull final OPFError error);
-
-    protected abstract void onUnregistrationError(@NonNull final Context context,
-                                                  @NonNull final String providerName,
-                                                  @NonNull final OPFError error);
-
-    protected abstract void onNoAvailableProvider(@NonNull final Context context);
+public abstract class OPFPushReceiver extends BroadcastReceiver implements EventListener {
 
     @Override
     public final void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
@@ -76,7 +53,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
         @OPFAction final String action = intent.getAction();
         switch (action) {
             case ACTION_NO_AVAILABLE_PROVIDER:
-                onNoAvailableProvider(context);
+                handleNoAvailableProvider(context, intent);
                 break;
             case ACTION_REGISTRATION:
                 handleRegistrationAction(context, intent);
@@ -90,24 +67,27 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
         }
     }
 
+    private void handleNoAvailableProvider(@NonNull final Context context,
+                                           @NonNull final Intent intent) {
+        OPFPushLog.methodD(OPFPushReceiver.class, "handleNoAvailableProvider", context, OPFUtils.toString(intent));
+
+        final Bundle extras = intent.getExtras();
+        @SuppressWarnings("unchecked")
+        final Map<String, OPFError> registrationErrors =
+                (Map<String, OPFError>) extras.getSerializable(EXTRA_REGISTRATION_ERRORS);
+        onNoAvailableProvider(context, registrationErrors);
+    }
+
     private void handleRegistrationAction(@NonNull final Context context,
                                           @NonNull final Intent intent) {
         OPFPushLog.methodD(OPFPushReceiver.class, "handleRegistrationAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
-        if (intent.hasExtra(EXTRA_ERROR)) {
-            onRegistrationError(
-                    context,
-                    providerName,
-                    (OPFError) intent.getSerializableExtra(EXTRA_ERROR)
-            );
-        } else {
-            onRegistered(
-                    context,
-                    providerName,
-                    intent.getStringExtra(EXTRA_REGISTRATION_ID)
-            );
-        }
+        onRegistered(
+                context,
+                providerName,
+                intent.getStringExtra(EXTRA_REGISTRATION_ID)
+        );
     }
 
     private void handleUnregistrationAction(@NonNull final Context context,
@@ -115,19 +95,11 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
         OPFPushLog.methodD(OPFPushReceiver.class, "handleUnregistrationAction", context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
-        if (intent.hasExtra(EXTRA_ERROR)) {
-            onUnregistrationError(
-                    context,
-                    providerName,
-                    (OPFError) intent.getSerializableExtra(EXTRA_ERROR)
-            );
-        } else {
-            onUnregistered(
-                    context,
-                    providerName,
-                    intent.getStringExtra(EXTRA_REGISTRATION_ID)
-            );
-        }
+        onUnregistered(
+                context,
+                providerName,
+                intent.getStringExtra(EXTRA_REGISTRATION_ID)
+        );
     }
 
     private void handleReceiveAction(@NonNull final Context context,
@@ -138,7 +110,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver {
         final MessageType messageType = (MessageType) intent.getSerializableExtra(EXTRA_MESSAGE_TYPE);
         switch (messageType) {
             case MESSAGE_TYPE_DELETED:
-                onDeletedMessage(
+                onDeletedMessages(
                         context,
                         providerName,
                         intent.getIntExtra(EXTRA_MESSAGE_COUNT, MESSAGES_COUNT_UNKNOWN)

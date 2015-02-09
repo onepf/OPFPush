@@ -104,10 +104,14 @@ public final class OPFPushLog {
         }
     }
 
-    public static void w(@NonNull final String message, @Nullable final Object... args) {
+    public static void w(@NonNull final String messageFormat, @Nullable final Object... args) {
         if (isLogEnable) {
-            Log.w(TAG, String.format(message, args));
+            Log.w(TAG, String.format(messageFormat, args));
         }
+    }
+
+    public static void e(@NonNull final String messageFormat, @Nullable final Object... args) {
+        Log.e(TAG, String.format(messageFormat, args));
     }
 
     public static void e(@Nullable final String message) {

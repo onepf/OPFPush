@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.nokia;
+package org.onepf.opfpush.model;
 
 /**
  * @author Roman Savin
- * @since 17.12.14
+ * @since 04.02.2015
  */
-final class Constants {
-
-    private Constants() {
-        throw new UnsupportedOperationException();
-    }
-
-    static final String NOKIA_MANUFACTURER = "Nokia";
-    static final String NAME = "Nokia Push";
-    static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
+public enum Operation {
+    REGISTER,
+    UNREGISTER
 }

@@ -16,12 +16,15 @@
 
 package org.onepf.opfpush.listener;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.OPFPushHelper;
+
+import java.util.Map;
 
 /**
  * Interface definition for a callback to be invoked when event
@@ -36,58 +39,46 @@ public interface EventListener {
     /**
      * New message received.
      *
+     * @param context      application context.
      * @param providerName Name of provider received event.
      * @param extras       Data associated with message.
      */
-    void onMessage(@NonNull String providerName, @Nullable Bundle extras);
+    void onMessage(@NonNull Context context, @NonNull String providerName, @Nullable Bundle extras);
 
     /**
      * Notification about deleted messages. Not all provider send this data or not send
      * count of deleted messages (in this case this value will be negative).
      *
+     * @param context       application context.
      * @param providerName  Name of provider received event.
      * @param messagesCount Count of messages. Negative value if no info about count.
      */
-    void onDeletedMessages(@NonNull String providerName, int messagesCount);
+    void onDeletedMessages(@NonNull Context context, @NonNull String providerName, int messagesCount);
 
     /**
      * Provider registered successfully.
      *
+     * @param context        application context.
      * @param providerName   Name of registered provider.
      * @param registrationId Registration id for push notification.
      */
-    void onRegistered(@NonNull String providerName, @NonNull String registrationId);
+    void onRegistered(@NonNull Context context, @NonNull String providerName, @NonNull String registrationId);
 
     /**
      * Provider unregistered successfully.
      *
+     * @param context        application context.
      * @param providerName   Name of unregistered provider.
      * @param registrationId Old registration id for push notification.
      */
-    void onUnregistered(@NonNull String providerName, @Nullable String registrationId);
-
-    /**
-     * Provider registration failed. Provider can continue try to register
-     * with exponential backoff (is {@code error} is recoverable) or can try to register next.
-     *
-     * @param providerName Name of provider in what error occur.
-     * @param error        Occurred error
-     */
-    void onRegistrationError(@NonNull String providerName, @NonNull OPFError error);
-
-    /**
-     * Provider unregistration failed. Provider can continue try to unregister
-     * with exponential backoff (is {@code error} is recoverable).
-     *
-     * @param providerName Name of provider in what error occur.
-     * @param error        Occurred error
-     */
-    void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error);
+    void onUnregistered(@NonNull Context context, @NonNull String providerName, @Nullable String registrationId);
 
     /**
      * {@code OpenPushHelper} can't find any available provider for register push.
      * Notify user that push notifications will not be received.
      * Try to add more push providers to opfpush configurations.
+     *
+     * @param context application context.
      */
-    void onNoAvailableProvider();
+    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, OPFError> registerationErrors);
 }

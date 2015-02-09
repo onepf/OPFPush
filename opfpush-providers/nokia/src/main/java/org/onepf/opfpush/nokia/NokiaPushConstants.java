@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.exception;
+package org.onepf.opfpush.nokia;
 
 /**
- * Thrown when some operations perform in wrong state.
- *
  * @author Roman Savin
- * @since 05.12.14
+ * @since 17.12.14
  */
-public class OPFIllegalStateException extends IllegalStateException {
+public final class NokiaPushConstants {
 
-    public OPFIllegalStateException(String detailMessage) {
-        super(detailMessage);
+    private NokiaPushConstants() {
+        throw new UnsupportedOperationException();
     }
 
-    public OPFIllegalStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public static final String PROVIDER_NAME = "Nokia Push";
 
-    public OPFIllegalStateException(Throwable cause) {
-        super(cause);
-    }
+    static final String NOKIA_MANUFACTURER = "Nokia";
+    static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 }

@@ -28,9 +28,9 @@ import org.onepf.opfpush.OPFPushLog;
 
 import java.util.Locale;
 
-import static org.onepf.opfpush.nokia.Constants.NAME;
-import static org.onepf.opfpush.nokia.Constants.NOKIA_MANUFACTURER;
-import static org.onepf.opfpush.nokia.Constants.NOKIA_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE;
 
 /**
  * Nokia Notification push provider implementation.
@@ -46,9 +46,9 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     private final String[] sendersIds;
 
     public NokiaNotificationsProvider(@NonNull final Context context,
-                                      @NonNull final String... sendersID) {
-        super(context, NAME, NOKIA_STORE_APP_PACKAGE);
-        sendersIds = sendersID;
+                                      @NonNull final String... sendersIds) {
+        super(context, PROVIDER_NAME, NOKIA_STORE_APP_PACKAGE);
+        this.sendersIds = sendersIds;
     }
 
     @Override
@@ -157,6 +157,6 @@ public class NokiaNotificationsProvider extends BasePushProvider {
             senderIdsBuilder.append(senderID).append(", ");
         }
         senderIdsBuilder.append("]");
-        return String.format(Locale.US, "%s (senderId: '%s')", NAME, senderIdsBuilder.toString());
+        return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderIdsBuilder.toString());
     }
 }

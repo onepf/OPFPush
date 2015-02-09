@@ -26,14 +26,17 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFUtils;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
-import static org.onepf.opfpush.OPFConstants.EXTRA_ERROR;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_COUNT;
 import static org.onepf.opfpush.OPFConstants.EXTRA_MESSAGE_TYPE;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
+import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ERRORS;
 import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ID;
 import static org.onepf.opfpush.model.MessageType.MESSAGE_TYPE_DELETED;
 import static org.onepf.opfpush.model.MessageType.MESSAGE_TYPE_MESSAGE;
@@ -50,15 +53,14 @@ final class EventListenerWrapperCreator {
 
     @NonNull
     static EventListener getEventListenerWrapper(
-            @NonNull final Context context,
             @Nullable final EventListener eventListener
     ) {
-        OPFPushLog.methodD(EventListenerWrapperCreator.class, "getEventListenerWrapper", context, eventListener);
+        OPFPushLog.methodD(EventListenerWrapperCreator.class, "getEventListenerWrapper", eventListener);
 
         if (eventListener != null) {
             return createMainLooperWrapper(eventListener);
         } else {
-            return createBroadcastSender(context.getApplicationContext());
+            return createBroadcastSender();
         }
     }
 
@@ -69,6 +71,7 @@ final class EventListenerWrapperCreator {
 
             @Override
             public void onMessage(
+                    @NonNull final Context context,
                     @NonNull final String providerName,
                     @Nullable final Bundle extras
             ) {
@@ -76,13 +79,14 @@ final class EventListenerWrapperCreator {
                     @Override
                     public void run() {
                         OPFPushLog.d("Post onMessage(%1$s, %2$s)", providerName, extras);
-                        eventListener.onMessage(providerName, extras);
+                        eventListener.onMessage(context, providerName, extras);
                     }
                 });
             }
 
             @Override
             public void onDeletedMessages(
+                    @NonNull final Context context,
                     @NonNull final String providerName,
                     final int messagesCount
             ) {
@@ -90,13 +94,14 @@ final class EventListenerWrapperCreator {
                     @Override
                     public void run() {
                         OPFPushLog.d("Post onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
-                        eventListener.onDeletedMessages(providerName, messagesCount);
+                        eventListener.onDeletedMessages(context, providerName, messagesCount);
                     }
                 });
             }
 
             @Override
             public void onRegistered(
+                    @NonNull final Context context,
                     @NonNull final String providerName,
                     @NonNull final String registrationId
             ) {
@@ -104,60 +109,35 @@ final class EventListenerWrapperCreator {
                     @Override
                     public void run() {
                         OPFPushLog.d("Post onRegistered(%1$s, %2$s)", providerName, registrationId);
-                        eventListener.onRegistered(providerName, registrationId);
+                        eventListener.onRegistered(context, providerName, registrationId);
                     }
                 });
             }
 
             @Override
             public void onUnregistered(
+                    @NonNull final Context context,
                     @NonNull final String providerName,
-                    @NonNull final String registrationId
+                    @Nullable final String registrationId
             ) {
                 OPFUtils.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFPushLog.d("Post onUnregistered(%1$s, %2$s)", providerName, registrationId);
-                        eventListener.onUnregistered(providerName, registrationId);
+                        eventListener.onUnregistered(context, providerName, registrationId);
                     }
                 });
             }
 
             @Override
-            public void onRegistrationError(
-                    @NonNull final String providerName,
-                    @NonNull final OPFError error
-            ) {
-                OPFUtils.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        OPFPushLog.d("Post onRegistrationError(%1$s, %2$s)", providerName, error);
-                        eventListener.onRegistrationError(providerName, error);
-                    }
-                });
-            }
-
-            @Override
-            public void onUnregistrationError(
-                    @NonNull final String providerName,
-                    @NonNull final OPFError error
-            ) {
-                OPFUtils.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        OPFPushLog.d("Post onUnregistrationError(%1$s, %2$s)", providerName, error);
-                        eventListener.onUnregistrationError(providerName, error);
-                    }
-                });
-            }
-
-            @Override
-            public void onNoAvailableProvider() {
+            public void onNoAvailableProvider(
+                    @NonNull final Context context,
+                    @NonNull final Map<String, OPFError> registrationErrors) {
                 OPFUtils.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFPushLog.d("Post onNoAvailableProvider()");
-                        eventListener.onNoAvailableProvider();
+                        eventListener.onNoAvailableProvider(context, registrationErrors);
                     }
                 });
             }
@@ -165,12 +145,15 @@ final class EventListenerWrapperCreator {
     }
 
     @NonNull
-    private static EventListener createBroadcastSender(@NonNull final Context appContext) {
-        OPFPushLog.methodD(EventListenerWrapperCreator.class, "createBroadcastSender", appContext);
+    private static EventListener createBroadcastSender() {
+        OPFPushLog.methodD(EventListenerWrapperCreator.class, "createBroadcastSender");
         return new EventListener() {
             @Override
-            public void onMessage(@NonNull final String providerName,
-                                  @Nullable final Bundle extras) {
+            public void onMessage(
+                    @NonNull final Context context,
+                    @NonNull final String providerName,
+                    @Nullable final Bundle extras
+            ) {
                 OPFPushLog.d("SendBroadcast onMessage(%1$s, %2$s)", providerName, extras);
 
                 final Intent intent = new Intent(ACTION_RECEIVE);
@@ -180,65 +163,60 @@ final class EventListenerWrapperCreator {
                 intent.putExtra(EXTRA_MESSAGE_TYPE, MESSAGE_TYPE_MESSAGE);
                 intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
 
-                appContext.sendBroadcast(intent);
+                context.sendBroadcast(intent);
             }
 
             @Override
-            public void onDeletedMessages(@NonNull final String providerName,
-                                          final int messagesCount) {
+            public void onDeletedMessages(
+                    @NonNull final Context context,
+                    @NonNull final String providerName,
+                    final int messagesCount
+            ) {
                 OPFPushLog.d("SendBroadcast onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
                 final Intent intent = new Intent(ACTION_RECEIVE);
                 intent.putExtra(EXTRA_MESSAGE_TYPE, MESSAGE_TYPE_DELETED);
                 intent.putExtra(EXTRA_MESSAGE_COUNT, messagesCount);
                 intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
-                appContext.sendBroadcast(intent);
+                context.sendBroadcast(intent);
             }
 
             @Override
-            public void onRegistered(@NonNull final String providerName,
-                                     @NonNull final String registrationId) {
+            public void onRegistered(
+                    @NonNull final Context context,
+                    @NonNull final String providerName,
+                    @NonNull final String registrationId
+            ) {
                 OPFPushLog.d("SendBroadcast onRegistered(%1$s, %2$s)", providerName, registrationId);
                 final Intent intent = new Intent(ACTION_REGISTRATION);
                 intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
                 intent.putExtra(EXTRA_REGISTRATION_ID, registrationId);
-                appContext.sendBroadcast(intent);
+                context.sendBroadcast(intent);
             }
 
             @Override
-            public void onUnregistered(@NonNull final String providerName,
-                                       @NonNull final String registrationId) {
+            public void onUnregistered(
+                    @NonNull final Context context,
+                    @NonNull final String providerName,
+                    @Nullable final String registrationId
+            ) {
                 OPFPushLog.d("SendBroadcast onUnregistered(%1$s, %2$s)", providerName, registrationId);
                 final Intent intent = new Intent(ACTION_UNREGISTRATION);
                 intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
                 intent.putExtra(EXTRA_REGISTRATION_ID, registrationId);
-                appContext.sendBroadcast(intent);
+                context.sendBroadcast(intent);
             }
 
             @Override
-            public void onRegistrationError(@NonNull final String providerName,
-                                            @NonNull final OPFError error) {
-                OPFPushLog.d("SendBroadcast onRegistrationError(%1$s, %2$s)", providerName, error);
-                final Intent intent = new Intent(ACTION_REGISTRATION);
-                intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
-                intent.putExtra(EXTRA_ERROR, error);
-                appContext.sendBroadcast(intent);
-            }
-
-            @Override
-            public void onUnregistrationError(@NonNull final String providerName,
-                                              @NonNull final OPFError error) {
-                OPFPushLog.d("SendBroadcast onUnregistrationError(%1$s, %2$s)", providerName, error);
-                final Intent intent = new Intent(ACTION_UNREGISTRATION);
-                intent.putExtra(EXTRA_PROVIDER_NAME, providerName);
-                intent.putExtra(EXTRA_ERROR, error);
-                appContext.sendBroadcast(intent);
-            }
-
-            @Override
-            public void onNoAvailableProvider() {
+            public void onNoAvailableProvider(
+                    @NonNull final Context context,
+                    @NonNull final Map<String, OPFError> registrationErrors
+            ) {
                 OPFPushLog.d("SendBroadcast onNoAvailableProvider()");
                 final Intent intent = new Intent(ACTION_NO_AVAILABLE_PROVIDER);
-                appContext.sendBroadcast(intent);
+                final Bundle extras = new Bundle();
+                extras.putSerializable(EXTRA_REGISTRATION_ERRORS, (Serializable) registrationErrors);
+                intent.putExtras(extras);
+                context.sendBroadcast(intent);
             }
         };
     }

@@ -32,11 +32,6 @@ public enum State {
     UNREGISTERED(0),
 
     /**
-     * Indicates that unregistration is performed.
-     */
-    UNREGISTERING(1),
-
-    /**
      * Indicates that registration is completed.
      */
     REGISTERED(2),

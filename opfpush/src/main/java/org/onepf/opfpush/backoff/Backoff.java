@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.configuration;
+package org.onepf.opfpush.backoff;
 
 /**
  * @author Kirill Rozov
  * @since 05.09.14.
  */
-public interface Backoff {
+interface Backoff {
 
     /**
      * Maximum number of try to register push provider.

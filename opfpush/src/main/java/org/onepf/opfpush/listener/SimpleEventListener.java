@@ -16,11 +16,14 @@
 
 package org.onepf.opfpush.listener;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.OPFError;
+
+import java.util.Map;
 
 /**
  * @author Roman Savin
@@ -29,37 +32,36 @@ import org.onepf.opfpush.model.OPFError;
 public class SimpleEventListener implements EventListener {
 
     @Override
-    public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
+    public void onMessage(@NonNull Context context,
+                          @NonNull String providerName,
+                          @Nullable Bundle extras) {
 
     }
 
     @Override
-    public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
+    public void onDeletedMessages(@NonNull Context context,
+                                  @NonNull String providerName,
+                                  int messagesCount) {
 
     }
 
     @Override
-    public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
+    public void onRegistered(@NonNull Context context,
+                             @NonNull String providerName,
+                             @NonNull String registrationId) {
 
     }
 
     @Override
-    public void onUnregistered(@NonNull String providerName, @Nullable String registrationId) {
+    public void onUnregistered(@NonNull Context context,
+                               @NonNull String providerName,
+                               @Nullable String registrationId) {
 
     }
 
     @Override
-    public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-
-    }
-
-    @Override
-    public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-
-    }
-
-    @Override
-    public void onNoAvailableProvider() {
+    public void onNoAvailableProvider(@NonNull Context context,
+                                      @NonNull Map<String, OPFError> registrationErrors) {
 
     }
 }

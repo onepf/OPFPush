@@ -29,7 +29,7 @@ import org.onepf.opfutils.OPFUtils;
  * @author Roman Savin
  * @since 01.10.14.
  */
-final class RegIdStorage {
+final class PreferencesProvider {
 
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
@@ -38,19 +38,19 @@ final class RegIdStorage {
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
-    private static volatile RegIdStorage instance;
+    private static volatile PreferencesProvider instance;
 
     private OPFPreferences preferences;
 
-    private RegIdStorage(@NonNull final Context context) {
+    private PreferencesProvider(@NonNull final Context context) {
         preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
-    public static RegIdStorage getInstance(@NonNull final Context context) {
+    public static PreferencesProvider getInstance(@NonNull final Context context) {
         if (instance == null) {
-            synchronized (RegIdStorage.class) {
+            synchronized (PreferencesProvider.class) {
                 if (instance == null) {
-                    instance = new RegIdStorage(context);
+                    instance = new PreferencesProvider(context);
                 }
             }
         }
@@ -60,7 +60,7 @@ final class RegIdStorage {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFPushLog.methodD(RegIdStorage.class, "getRegistrationId");
+        OPFPushLog.methodD(PreferencesProvider.class, "getRegistrationId");
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -70,7 +70,7 @@ final class RegIdStorage {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFPushLog.methodD(RegIdStorage.class, "saveRegistrationId", "registrationId");
+        OPFPushLog.methodD(PreferencesProvider.class, "saveRegistrationId", "registrationId");
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -80,7 +80,7 @@ final class RegIdStorage {
     }
 
     public synchronized void reset() {
-        OPFPushLog.methodD(RegIdStorage.class, "reset");
+        OPFPushLog.methodD(PreferencesProvider.class, "reset");
         preferences.clear();
     }
 
@@ -89,7 +89,7 @@ final class RegIdStorage {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFPushLog.methodD(RegIdStorage.class, "saveAppVersion", appVersion);
+        OPFPushLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 }

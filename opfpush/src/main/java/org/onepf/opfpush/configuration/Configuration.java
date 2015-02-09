@@ -47,19 +47,13 @@ public final class Configuration {
     @Nullable
     private final EventListener eventListener;
 
-    @NonNull
-    private final Backoff backoff;
-
     private final boolean isSelectSystemPreferred;
 
     private Configuration(@NonNull final Collection<? extends PushProvider> providers,
                           @Nullable final EventListener eventListener,
-                          @NonNull final Backoff backoff,
                           final boolean selectSystemPreferred) {
-
         this.providers = Collections.unmodifiableList(new ArrayList<>(providers));
         this.eventListener = eventListener;
-        this.backoff = backoff;
         this.isSelectSystemPreferred = selectSystemPreferred;
     }
 
@@ -81,11 +75,6 @@ public final class Configuration {
     @Nullable
     public EventListener getEventListener() {
         return eventListener;
-    }
-
-    @NonNull
-    public Backoff getBackoff() {
-        return backoff;
     }
 
     public boolean isSelectSystemPreferred() {
@@ -111,10 +100,7 @@ public final class Configuration {
         @Nullable
         private EventListener eventListener;
 
-        @NonNull
-        private Backoff backoff = new ExponentialBackoff();
-
-        private boolean isSelectSystemPreferred = true;
+        private boolean isSelectSystemPreferred = false;
 
         /**
          * Add the providers to the configuration.
@@ -174,11 +160,6 @@ public final class Configuration {
             return this;
         }
 
-        public Builder setBackoff(@NonNull Backoff backoff) {
-            this.backoff = backoff;
-            return this;
-        }
-
         /**
          * Mark for try select the best store for device from added providers.
          * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
@@ -210,7 +191,6 @@ public final class Configuration {
             return new Configuration(
                     providersMap.values(),
                     eventListener,
-                    backoff,
                     isSelectSystemPreferred
             );
         }

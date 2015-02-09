@@ -28,7 +28,7 @@ import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
 
-import static org.onepf.opfpush.nokia.Constants.NAME;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 
 /**
  * Service for handling communication from Nokia Push Notifications service.
@@ -54,7 +54,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
                                 @NonNull final String registrationId) {
         OPFPushLog.methodD(NokiaNotificationService.class, "onRegistered",
                 appContext, registrationId);
-        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(NAME, registrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
     /**
@@ -68,7 +68,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
                                   @NonNull final String oldRegistrationId) {
         OPFPushLog.methodD(NokiaNotificationService.class, "onUnregistered",
                 appContext, oldRegistrationId);
-        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(NAME, oldRegistrationId);
+        OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, oldRegistrationId);
     }
 
     /**
@@ -80,7 +80,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onMessage(@NonNull final Context appContext, @NonNull final Intent intent) {
         OPFPushLog.methodD(NokiaNotificationService.class, "onMessage", appContext, intent);
-        OPFPush.getHelper().getReceivedMessageHandler().onMessage(NAME, intent.getExtras());
+        OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
     }
 
     /**
@@ -93,7 +93,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onDeletedMessages(@NonNull final Context appContext, final int total) {
         OPFPushLog.methodD(NokiaNotificationService.class, "onDeletedMessages", appContext, total);
-        OPFPush.getHelper().getReceivedMessageHandler().onDeletedMessages(NAME, total);
+        OPFPush.getHelper().getReceivedMessageHandler().onDeletedMessages(PROVIDER_NAME, total);
     }
 
     /**
@@ -106,7 +106,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     protected void onError(@NonNull final Context appContext,
                            @NonNull @NokiaNotificationsError final String errorId) {
         OPFPushLog.methodD(NokiaNotificationService.class, "onError", appContext, errorId);
-        OPFPush.getHelper().getReceivedMessageHandler().onError(NAME, convertError(errorId));
+        OPFPush.getHelper().getReceivedMessageHandler().onError(PROVIDER_NAME, convertError(errorId));
     }
 
     /**
@@ -124,7 +124,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
         OPFPushLog.methodD(NokiaNotificationService.class, "onRecoverableError",
                 appContext, errorId);
         OPFPush.getHelper().getReceivedMessageHandler()
-                .onRegistrationError(NAME, convertError(errorId));
+                .onRegistrationError(PROVIDER_NAME, convertError(errorId));
         return false;
     }
 

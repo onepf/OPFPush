@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.configuration;
+package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.OPFPushLog;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,24 +28,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Roman Savin
  * @since 05.09.14.
  */
-public final class ExponentialBackoff implements Backoff {
+final class InfinityExponentialBackoff implements Backoff {
 
-    public static final int DEFAULT_TRY_COUNT = Integer.MAX_VALUE;
-
-    private final int maxTryCount;
+    public static final int MAX_TRY_COUNT = 16;
 
     @NonNull
     private final AtomicInteger tryNumber = new AtomicInteger(0);
 
-    public ExponentialBackoff() {
-        maxTryCount = DEFAULT_TRY_COUNT;
-    }
-
-    public ExponentialBackoff(final int maxTryCount) {
-        if (maxTryCount < 1) {
-            throw new IllegalArgumentException("Try count can't less than 1.");
-        }
-        this.maxTryCount = maxTryCount;
+    public InfinityExponentialBackoff() {
     }
 
     /**
@@ -58,14 +47,14 @@ public final class ExponentialBackoff implements Backoff {
 
     @Override
     public long getTryDelay() {
-        if (tryNumber.get() > maxTryCount) {
-            throw new NoSuchElementException();
+        if (tryNumber.getAndIncrement() >= MAX_TRY_COUNT) {
+            return getTryDelay(tryNumber.getAndSet(0));
         }
         return getTryDelay(tryNumber.get());
     }
 
     private long getTryDelay(int currentTryNumber) {
-        OPFPushLog.methodD(ExponentialBackoff.class, "getTryDelay", currentTryNumber);
+        OPFPushLog.methodD(InfinityExponentialBackoff.class, "getTryDelay", currentTryNumber);
         return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
     }
 
@@ -76,6 +65,6 @@ public final class ExponentialBackoff implements Backoff {
 
     @Override
     public boolean hasTries() {
-        return tryNumber.getAndIncrement() < maxTryCount;
+        return true;
     }
 }

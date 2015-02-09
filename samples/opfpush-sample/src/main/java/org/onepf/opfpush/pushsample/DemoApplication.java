@@ -20,7 +20,6 @@ import android.app.Application;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
-import org.onepf.opfpush.configuration.ExponentialBackoff;
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
@@ -49,7 +48,6 @@ public class DemoApplication extends Application {
                         new ADMProvider(this),
                         new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
                 )
-                .setBackoff(new ExponentialBackoff())
                 .setSelectSystemPreferred(true)
                 .setEventListener(new DemoEventListener(this));
 

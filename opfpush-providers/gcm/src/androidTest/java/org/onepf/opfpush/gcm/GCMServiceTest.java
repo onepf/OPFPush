@@ -83,7 +83,7 @@ public class GCMServiceTest {
                     @Override
                     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
                         OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
-                        assertEquals(GCMConstants.NAME, providerName);
+                        assertEquals(GCMConstants.PROVIDER_NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 
@@ -113,7 +113,7 @@ public class GCMServiceTest {
                     @Override
                     public void onUnregistered(@NonNull String providerName, @NonNull String registrationId) {
                         OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
-                        assertEquals(GCMConstants.NAME, providerName);
+                        assertEquals(GCMConstants.PROVIDER_NAME, providerName);
                         assertEquals(REGISTRATION_ID, registrationId);
                     }
 

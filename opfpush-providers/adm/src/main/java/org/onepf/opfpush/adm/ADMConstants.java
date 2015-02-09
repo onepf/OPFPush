@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
-
-import android.support.annotation.NonNull;
-
-import org.onepf.opfpush.model.OPFError;
+package org.onepf.opfpush.adm;
 
 /**
  * @author Roman Savin
- * @since 23.12.14
+ * @since 17.12.14
  */
-public class UnregistrationErrorEvent {
+public final class ADMConstants {
 
-    private OPFError error;
-
-    public UnregistrationErrorEvent(@NonNull final OPFError error) {
-        this.error = error;
+    private ADMConstants() {
+        throw new UnsupportedOperationException();
     }
 
-    public OPFError getError() {
-        return error;
-    }
+    public static final String PROVIDER_NAME = "Amazon Device Messaging";
+
+    static final String AMAZON_MANUFACTURER = "Amazon";
+    static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
+    static final String ACCOUNT_TYPE = "com.amazon.account";
 }

@@ -20,8 +20,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfpush.configuration.Backoff;
-import org.onepf.opfpush.configuration.ExponentialBackoff;
+import org.onepf.opfpush.backoff.Backoff;
+import org.onepf.opfpush.backoff.InfinityExponentialBackoff;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -41,7 +41,7 @@ public class ExponentialBackoffTest {
     @Test
     public void testDelay() throws Exception {
         final int backoffTryCount = 6;
-        final Backoff backoff = new ExponentialBackoff(backoffTryCount);
+        final Backoff backoff = new InfinityExponentialBackoff(backoffTryCount);
 
         int tryCount = 0;
         for (int expectedDelay = 2000; backoff.hasTries(); expectedDelay *= 2) {
@@ -53,13 +53,13 @@ public class ExponentialBackoffTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateWithZeroTryCount() throws Exception {
-        new ExponentialBackoff(0);
+        new InfinityExponentialBackoff(0);
     }
 
     @Test(expected = NoSuchElementException.class)
     public void test() throws Exception {
         int tryCount = 1;
-        final ExponentialBackoff backoff = new ExponentialBackoff(tryCount);
+        final InfinityExponentialBackoff backoff = new InfinityExponentialBackoff(tryCount);
         for (int i = 0; i <= tryCount; i++) {
             backoff.hasTries();
             backoff.getTryDelay();
@@ -69,7 +69,7 @@ public class ExponentialBackoffTest {
     @Test
     public void testSummaryDelay() {
         final int backoffTryCount = 3;
-        final ExponentialBackoff exponentialBackoff = new ExponentialBackoff(backoffTryCount);
+        final InfinityExponentialBackoff exponentialBackoff = new InfinityExponentialBackoff(backoffTryCount);
 
         int summaryDelay = 0;
         for (int expectedDelay = 2000; exponentialBackoff.hasTries(); expectedDelay *= 2) {

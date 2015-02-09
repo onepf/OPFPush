@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.Operation;
 
 /**
  * @author Roman Savin
- * @since 23.12.14
+ * @since 04.02.2015
  */
-public class RegistrationErrorEvent {
+public interface BackoffManager {
 
-    @NonNull
-    private OPFError error;
+    boolean hasTries(@NonNull final String providerName, @NonNull final Operation operation);
 
-    public RegistrationErrorEvent(@NonNull final OPFError error) {
-        this.error = error;
-    }
+    long getTryDelay(@NonNull final String providerName, @NonNull final Operation operation);
 
-    @NonNull
-    public OPFError getError() {
-        return error;
-    }
+    void reset(@NonNull final String providerName, @NonNull final Operation operation);
 }
