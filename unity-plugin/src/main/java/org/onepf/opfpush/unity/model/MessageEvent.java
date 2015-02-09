@@ -14,4 +14,25 @@
  * limitations under the License.
  */
 
-include ':opfpush', ':opfpush-providers:gcm', ':opfpush-providers:nokia', ':opfpush-providers:adm', 'samples:opfpush-sample', ':unity-plugin'
+package org.onepf.opfpush.unity.model;
+
+import android.support.annotation.NonNull;
+
+/**
+ * @author Roman Savin
+ * @since 10.12.14
+ */
+public class MessageEvent {
+
+    @NonNull
+    private String message;
+
+    public MessageEvent(@NonNull final String message) {
+        this.message = message;
+    }
+
+    @NonNull
+    public String getMessage() {
+        return message;
+    }
+}
