@@ -31,6 +31,14 @@ public class UnityHelper {
             @Override
             public void run() {
                 OPFPush.init(context, config);
+            }
+        });
+    }
+
+    public static void register() {
+        UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
                 OPFPush.getHelper().register();
             }
         });
