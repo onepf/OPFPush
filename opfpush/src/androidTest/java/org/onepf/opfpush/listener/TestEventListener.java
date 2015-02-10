@@ -20,8 +20,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.OPFPushLog;
 
 /**
  * @author Roman Savin
@@ -31,36 +31,36 @@ public class TestEventListener implements EventListener {
 
     @Override
     public void onMessage(@NonNull String providerName, @Nullable Bundle extras) {
-        OPFPushLog.d("onMessage(%1$s, %2$s)", providerName, extras);
+        OPFLog.d("onMessage(%1$s, %2$s)", providerName, extras);
     }
 
     @Override
     public void onDeletedMessages(@NonNull String providerName, int messagesCount) {
-        OPFPushLog.d("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
+        OPFLog.d("onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull String providerName, @NonNull String registrationId) {
-        OPFPushLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
+        OPFLog.d("onRegistered(%1$s, %2$s)", providerName, registrationId);
     }
 
     @Override
     public void onUnregistered(@NonNull String providerName, @Nullable String registrationId) {
-        OPFPushLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
+        OPFLog.d("onUnregistered(%1$s, %2$s)", providerName, registrationId);
     }
 
     @Override
     public void onRegistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        OPFPushLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
+        OPFLog.d("onRegistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onUnregistrationError(@NonNull String providerName, @NonNull OPFError error) {
-        OPFPushLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
+        OPFLog.d("onUnregistrationError(%1$s, %2$s)", providerName, error);
     }
 
     @Override
     public void onNoAvailableProvider() {
-        OPFPushLog.d("onNoAvailableProvider()");
+        OPFLog.d("onNoAvailableProvider()");
     }
 }

@@ -23,8 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.RetryBroadcastReceiver;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
@@ -40,12 +40,12 @@ public class LoginAccountsChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(LoginAccountsChangedReceiver.class, "onReceive", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         final PreferencesProvider preferencesProvider = PreferencesProvider.getInstance(context);
         final Account[] amazonAccounts = AccountManager.get(context).getAccountsByType(ACCOUNT_TYPE);
         if (amazonAccounts.length != 0 && preferencesProvider.isAuthenticationFailed()) {
-            OPFPushLog.d("Retry unregister");
+            OPFLog.d("Retry unregister");
             preferencesProvider.removeAuthenticationFailedFlag();
 
             final Intent retryUnregisterIntent = new Intent(context, RetryBroadcastReceiver.class);

@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.MessageType;
 import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.Map;
@@ -48,7 +49,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     @Override
     public final void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "onReceive", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         @OPFAction final String action = intent.getAction();
         switch (action) {
@@ -69,7 +70,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleNoAvailableProvider(@NonNull final Context context,
                                            @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleNoAvailableProvider", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         final Bundle extras = intent.getExtras();
         @SuppressWarnings("unchecked")
@@ -80,7 +81,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleRegistrationAction(@NonNull final Context context,
                                           @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleRegistrationAction", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         onRegistered(
@@ -92,7 +93,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleUnregistrationAction(@NonNull final Context context,
                                             @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleUnregistrationAction", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         onUnregistered(
@@ -104,7 +105,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleReceiveAction(@NonNull final Context context,
                                      @NonNull final Intent intent) {
-        OPFPushLog.methodD(OPFPushReceiver.class, "handleReceiveAction", context, OPFUtils.toString(intent));
+        OPFLog.methodD(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         final MessageType messageType = (MessageType) intent.getSerializableExtra(EXTRA_MESSAGE_TYPE);

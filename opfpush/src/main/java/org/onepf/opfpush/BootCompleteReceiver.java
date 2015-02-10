@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfutils.OPFLog;
+
 import static android.provider.Settings.Secure.ANDROID_ID;
 
 /**
@@ -32,18 +34,18 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(BootCompleteReceiver.class, "onReceive", context, intent);
+        OPFLog.methodD(context, intent);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {
-            OPFPushLog.d("Helper is registered");
+            OPFLog.d("Helper is registered");
             if (isAndroidIDChanged(context)) {
-                OPFPushLog.d("Android ID changed.");
+                OPFLog.d("Android ID changed.");
                 helper.onNeedRetryRegister();
             }
         } else if (helper.isRegistering()) {
-            OPFPushLog.d("Registration in progress");
-            OPFPushLog.d("Retry register after reboot.");
+            OPFLog.d("Registration in progress");
+            OPFLog.d("Retry register after reboot.");
             helper.restartRegisterOnBoot();
         }
     }

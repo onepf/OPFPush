@@ -18,9 +18,9 @@ package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
 
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.nokia.NokiaNotificationsProvider;
@@ -39,8 +39,8 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        OPFPushLog.setLogEnable(true);
-        OPFPushLog.methodD(DemoApplication.class, "onCreate");
+        OPFLog.setEnabled(true);
+        OPFLog.methodD();
 
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(

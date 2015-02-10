@@ -18,7 +18,7 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,7 +54,7 @@ final class InfinityExponentialBackoff implements Backoff {
     }
 
     private long getTryDelay(int currentTryNumber) {
-        OPFPushLog.methodD(InfinityExponentialBackoff.class, "getTryDelay", currentTryNumber);
+        OPFLog.methodD(currentTryNumber);
         return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
     }
 

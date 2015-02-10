@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.activity.DemoActivity;
 
@@ -45,8 +45,7 @@ public final class NotificationUtils {
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final String notificationTitle,
                                         @NonNull final String notificationText) {
-        OPFPushLog.methodD(NotificationUtils.class, "showNotification",
-                context, notificationTitle, notificationText);
+        OPFLog.methodD(context, notificationTitle, notificationText);
 
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(

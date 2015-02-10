@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
@@ -58,7 +58,7 @@ public class DemoEventListener implements EventListener {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFPushLog.methodD(DemoEventListener.class, "onMessage", providerName, OPFUtils.toString(extras));
+        OPFLog.methodD(providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -79,7 +79,7 @@ public class DemoEventListener implements EventListener {
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
-                OPFPushLog.e(e.getCause().toString());
+                OPFLog.e(e.getCause().toString());
             }
         }
     }
@@ -88,14 +88,14 @@ public class DemoEventListener implements EventListener {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFPushLog.methodD(DemoEventListener.class, "onDeletedMessages", providerName, messagesCount);
+        OPFLog.methodD(providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFPushLog.methodD(DemoEventListener.class, "onRegistered", providerName, registrationId);
+        OPFLog.methodD(providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
@@ -103,14 +103,14 @@ public class DemoEventListener implements EventListener {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
-        OPFPushLog.methodD(DemoEventListener.class, "onUnregistered", providerName, registrationId);
+        OPFLog.methodD(providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, OPFError> registrationErrors) {
-        OPFPushLog.methodD(DemoEventListener.class, "onNoAvailableProvider", context, registrationErrors);
+        OPFLog.methodD(context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

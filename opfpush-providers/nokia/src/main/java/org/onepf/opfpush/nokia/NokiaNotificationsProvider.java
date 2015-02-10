@@ -24,13 +24,13 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
 
-import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 
 /**
  * Nokia Notification push provider implementation.
@@ -53,13 +53,13 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "isAvailable");
+        OPFLog.methodD();
         if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
             try {
                 PushRegistrar.checkDevice(getContext());
                 return true;
             } catch (UnsupportedOperationException exception) {
-                OPFPushLog.e(exception.toString());
+                OPFLog.e(exception.toString());
                 return false;
             }
         } else {
@@ -69,12 +69,12 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "checkManifest");
+        OPFLog.methodD();
         try {
             PushRegistrar.checkManifest(getContext());
             return super.checkManifest();
         } catch (UnsupportedOperationException exception) {
-            OPFPushLog.e(exception.toString());
+            OPFLog.e(exception.toString());
             return false;
         }
     }
@@ -93,7 +93,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
      * Sets whether the device was successfully registered in the server side.
      */
     public void setRegisteredOnServer(@NonNull final Context context, final boolean flag) {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "setRegisteredOnServer", context, flag);
+        OPFLog.methodD(context, flag);
         PushRegistrar.setRegisteredOnServer(context, flag);
     }
 
@@ -101,8 +101,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
      * Sets how long (in milliseconds) the {@link #isRegistered()} flag is valid.
      */
     public void setRegisterOnServerLifespan(@NonNull final Context context, final long lifespan) {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "setRegisterOnServerLifespan",
-                context, lifespan);
+        OPFLog.methodD(context, lifespan);
         PushRegistrar.setRegisterOnServerLifespan(context, lifespan);
     }
 
@@ -126,26 +125,26 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "isRegistered");
+        OPFLog.methodD();
         return PushRegistrar.isRegistered(getContext());
     }
 
     @Override
     public void register() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "register");
+        OPFLog.methodD();
         PushRegistrar.register(getContext(), sendersIds);
     }
 
     @Override
     public void unregister() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "unregister");
+        OPFLog.methodD();
         PushRegistrar.unregister(getContext());
         PushRegistrar.onDestroy(getContext());
     }
 
     @Override
     public void onUnavailable() {
-        OPFPushLog.methodD(NokiaNotificationsProvider.class, "onUnavailable");
+        OPFLog.methodD();
         PushRegistrar.onDestroy(getContext());
     }
 

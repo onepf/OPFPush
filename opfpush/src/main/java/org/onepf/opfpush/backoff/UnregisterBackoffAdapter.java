@@ -18,7 +18,7 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.model.Operation;
 
 import java.util.HashMap;
@@ -45,10 +45,10 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "hasTries", providerName, operation);
+        OPFLog.methodD(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
-            OPFPushLog.d("Backoff map contains key for provider " + providerName);
+            OPFLog.d("Backoff map contains key for provider " + providerName);
             return backoffMap.get(providerName).hasTries();
         }
 
@@ -60,10 +60,10 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "getTryDelay", providerName, operation);
+        OPFLog.methodD(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
-            OPFPushLog.d("Backoff map contains key for provider " + providerName);
+            OPFLog.d("Backoff map contains key for provider " + providerName);
             return backoffMap.get(providerName).getTryDelay();
         }
 
@@ -74,10 +74,10 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "reset", providerName, operation);
+        OPFLog.methodD(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
-            OPFPushLog.d("Backoff map contains key for provider " + providerName);
+            OPFLog.d("Backoff map contains key for provider " + providerName);
             backoffMap.remove(providerName);
         }
     }
@@ -87,8 +87,8 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
         try {
             return backoffClass.newInstance();
         } catch (Exception e) {
-            OPFPushLog.w("Exception while instantiating class " + backoffClass + " : " + e);
-            OPFPushLog.w("Use " + InfinityExponentialBackoff.class.getSimpleName());
+            OPFLog.w("Exception while instantiating class " + backoffClass + " : " + e);
+            OPFLog.w("Use " + InfinityExponentialBackoff.class.getSimpleName());
             return new InfinityExponentialBackoff();
         }
     }
