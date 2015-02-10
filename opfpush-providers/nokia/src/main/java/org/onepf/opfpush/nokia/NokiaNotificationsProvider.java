@@ -53,7 +53,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
             try {
                 PushRegistrar.checkDevice(getContext());
@@ -69,7 +69,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         try {
             PushRegistrar.checkManifest(getContext());
             return super.checkManifest();
@@ -125,26 +125,26 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         return PushRegistrar.isRegistered(getContext());
     }
 
     @Override
     public void register() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         PushRegistrar.register(getContext(), sendersIds);
     }
 
     @Override
     public void unregister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         PushRegistrar.unregister(getContext());
         PushRegistrar.onDestroy(getContext());
     }
 
     @Override
     public void onUnavailable() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         PushRegistrar.onDestroy(getContext());
     }
 

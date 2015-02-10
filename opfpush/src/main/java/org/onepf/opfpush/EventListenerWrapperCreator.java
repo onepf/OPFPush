@@ -147,7 +147,7 @@ final class EventListenerWrapperCreator {
 
     @NonNull
     private static EventListener createBroadcastSender() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         return new EventListener() {
             @Override
             public void onMessage(

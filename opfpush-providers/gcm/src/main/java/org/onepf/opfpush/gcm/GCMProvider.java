@@ -77,18 +77,18 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     public synchronized void register() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         executeTask(new RegisterTask());
     }
 
     public synchronized void unregister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
     }
 
     @Override
     public boolean checkManifest() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         final Context context = getContext();
         return super.checkManifest()
                 && (!needGoogleAccounts() || hasRequestedPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
@@ -128,19 +128,19 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         return !TextUtils.isEmpty(preferencesProvider.getRegistrationId());
     }
 
     @Override
     public void onRegistrationInvalid() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         preferencesProvider.reset();
     }
 
     @Override
     public void onUnavailable() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         close();
     }
 
@@ -171,7 +171,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private boolean checkGoogleAccount() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         if (needGoogleAccounts()) {
             OPFLog.d("Need google account");
             // On device with version of Android less than "4.0.4"
@@ -186,7 +186,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private void close() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         preferencesProvider.reset();
         if (registrationExecutor != null) {
@@ -212,7 +212,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         @Override
         public void run() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             try {
                 final String registrationId =
@@ -242,7 +242,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -259,7 +259,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onAuthError() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
@@ -279,7 +279,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         @Override
         public void run() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             try {
                 GoogleCloudMessaging.getInstance(getContext()).unregister();
@@ -303,7 +303,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -311,7 +311,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onUnregistrationSuccess() {
-            OPFLog.methodD("");
+            OPFLog.methodD();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);

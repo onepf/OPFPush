@@ -40,7 +40,7 @@ public final class OPFPush {
 
     @NonNull
     public static OPFPushHelper getHelper() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         if (helper == null) {
             throw new OPFPushException("OPFPush doesn't init");
         }

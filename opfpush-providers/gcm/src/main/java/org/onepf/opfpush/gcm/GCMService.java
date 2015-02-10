@@ -85,7 +85,7 @@ public class GCMService extends IntentService {
     }
 
     private void onDeletedMessages() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         OPFPush.getHelper().getReceivedMessageHandler()
                 .onDeletedMessages(PROVIDER_NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
     }

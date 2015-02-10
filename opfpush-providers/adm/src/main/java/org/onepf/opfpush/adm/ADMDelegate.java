@@ -46,7 +46,7 @@ final class ADMDelegate {
     }
 
     public boolean isSupported() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (adm != null) {
             OPFLog.d("ADM isn't null");
@@ -57,7 +57,7 @@ final class ADMDelegate {
     }
 
     public void startRegister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (adm != null) {
             OPFLog.d("ADM isn't null");
@@ -66,7 +66,7 @@ final class ADMDelegate {
     }
 
     public void startUnregister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (adm != null) {
             OPFLog.d("ADM isn't null");
@@ -76,7 +76,7 @@ final class ADMDelegate {
 
     @Nullable
     public String getRegistrationId() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (adm != null) {
             OPFLog.d("ADM isn't null");

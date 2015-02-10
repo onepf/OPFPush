@@ -61,7 +61,7 @@ final class Settings {
 
     @NonNull
     public State getState() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
         State state = State.fromValue(stateValue);

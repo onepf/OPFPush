@@ -60,7 +60,7 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -80,7 +80,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void reset() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         preferences.clear();
     }
 

@@ -40,7 +40,7 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         OPFLog.setEnabled(true);
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(

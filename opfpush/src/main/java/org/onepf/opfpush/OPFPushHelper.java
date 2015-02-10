@@ -128,7 +128,7 @@ public final class OPFPushHelper {
      * @throws OPFPushException When try call this method while init not done.
      */
     public void register() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         OPFChecks.checkInit(checkInit, true);
 
@@ -158,7 +158,7 @@ public final class OPFPushHelper {
      * @throws OPFPushException When try call this method while init not done.
      */
     public void unregister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         OPFChecks.checkInit(checkInit, true);
 
         synchronized (registrationLock) {
@@ -310,7 +310,7 @@ public final class OPFPushHelper {
     }
 
     void restartRegisterOnBoot() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         OPFChecks.checkInit(checkInit, true);
         settings.clear();
@@ -359,7 +359,7 @@ public final class OPFPushHelper {
     }
 
     private void restoreLastProvider() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         final PushProvider lastProvider = getLastProvider();
         if (lastProvider == null) {
@@ -385,7 +385,7 @@ public final class OPFPushHelper {
      * Register first available provider.
      */
     private void registerFirstAvailableProvider() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         registerNextAvailableProvider(null);
     }
 
@@ -457,7 +457,7 @@ public final class OPFPushHelper {
     }
 
     private void unregisterPackageChangeReceiver() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (packageReceiver != null) {
             appContext.unregisterReceiver(packageReceiver);
@@ -506,7 +506,7 @@ public final class OPFPushHelper {
 
     @Nullable
     private PushProvider getLastProvider() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         final String storedProviderName = settings.getLastProviderName();
         if (!TextUtils.isEmpty(storedProviderName)) {
@@ -523,7 +523,7 @@ public final class OPFPushHelper {
     }
 
     private void initSortedProviderList() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         sortedProvidersList = new ArrayList<>(configuration.getProviders());
         if (!configuration.isSelectSystemPreferred()) {
             OPFLog.d("No system preferred");

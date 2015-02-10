@@ -66,7 +66,7 @@ public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OPFLog.methodD("");
+        OPFLog.methodD();
         setContentView(R.layout.activity_demo);
 
         infoText = (TextView) findViewById(R.id.info_text);
@@ -91,25 +91,25 @@ public class DemoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        OPFLog.methodD("");
+        OPFLog.methodD();
         EventBus.getDefault().registerSticky(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        OPFLog.methodD("");
+        OPFLog.methodD();
         EventBus.getDefault().unregister(this);
     }
 
     public void onRegisterClick(@NonNull final View view) {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         initViewsRegisteringState();
         helper.register();
     }
 
     public void onUnregisterClick(@NonNull final View view) {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         initViewsUnregisteringState();
         helper.unregister();
     }
@@ -155,7 +155,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsRegisteringState() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         infoText.setText(getString(R.string.registration));
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(false);
@@ -179,7 +179,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsUnregisteringState() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         infoText.setText(getString(R.string.unregistration));
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);

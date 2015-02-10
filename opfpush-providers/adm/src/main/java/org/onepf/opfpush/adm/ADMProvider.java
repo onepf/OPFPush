@@ -54,7 +54,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void register() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
 
         if (!isRegistered()) {
             OPFLog.d("Start register ADMProvider.");
@@ -64,7 +64,7 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean checkManifest() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         try {
             ADMManifest.checkManifestAuthoredProperly(getContext());
         } catch (IllegalStateException e) {
@@ -76,13 +76,13 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         return !TextUtils.isEmpty(getRegistrationId());
     }
 
     @Override
     public void unregister() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         adm.startUnregister();
     }
 
@@ -94,7 +94,7 @@ public class ADMProvider extends BasePushProvider {
     @Override
     @Nullable
     public String getRegistrationId() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         if (!TextUtils.isEmpty(adm.getRegistrationId())) {
             OPFLog.d("ADM registration id is not empty");
             return adm.getRegistrationId();

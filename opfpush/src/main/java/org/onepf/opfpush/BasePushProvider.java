@@ -85,7 +85,7 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public boolean checkManifest() {
-        OPFLog.methodD("");
+        OPFLog.methodD();
         return hasRequestedPermission(appContext, INTERNET)
                 && hasRequestedPermission(appContext, RECEIVE_BOOT_COMPLETED);
     }
