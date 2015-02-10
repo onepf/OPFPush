@@ -25,7 +25,7 @@ import android.text.TextUtils;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfpush.adm.ADMConstants.AMAZON_MANUFACTURER;
 import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
@@ -54,21 +54,21 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void register() {
-        OPFPushLog.methodD(ADMProvider.class, "register");
+        OPFLog.methodD(ADMProvider.class, "register");
 
         if (!isRegistered()) {
-            OPFPushLog.d("Start register ADMProvider.");
+            OPFLog.d("Start register ADMProvider.");
             adm.startRegister();
         }
     }
 
     @Override
     public boolean checkManifest() {
-        OPFPushLog.methodD(ADMProvider.class, "checkManifest");
+        OPFLog.methodD(ADMProvider.class, "checkManifest");
         try {
             ADMManifest.checkManifestAuthoredProperly(getContext());
         } catch (IllegalStateException e) {
-            OPFPushLog.d("Error while check manifest: " + e);
+            OPFLog.d("Error while check manifest: " + e);
             return false;
         }
         return super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
@@ -76,13 +76,13 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean isRegistered() {
-        OPFPushLog.methodD(ADMProvider.class, "isRegistered");
+        OPFLog.methodD(ADMProvider.class, "isRegistered");
         return !TextUtils.isEmpty(getRegistrationId());
     }
 
     @Override
     public void unregister() {
-        OPFPushLog.methodD(ADMProvider.class, "unregister");
+        OPFLog.methodD(ADMProvider.class, "unregister");
         adm.startUnregister();
     }
 
@@ -94,9 +94,9 @@ public class ADMProvider extends BasePushProvider {
     @Override
     @Nullable
     public String getRegistrationId() {
-        OPFPushLog.methodD(ADMProvider.class, "getRegistrationId");
+        OPFLog.methodD(ADMProvider.class, "getRegistrationId");
         if (!TextUtils.isEmpty(adm.getRegistrationId())) {
-            OPFPushLog.d("ADM registration id is not empty");
+            OPFLog.d("ADM registration id is not empty");
             return adm.getRegistrationId();
         }
 

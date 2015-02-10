@@ -22,9 +22,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.RetryBroadcastReceiver;
 import org.onepf.opfpush.model.Operation;
+import org.onepf.opfutils.OPFLog;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -87,12 +87,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void postRetryRegister(@NonNull final String providerName) {
-        OPFPushLog.methodD(RetryManager.class, "postRetryRegister", providerName);
+        OPFLog.methodD(RetryManager.class, "postRetryRegister", providerName);
         postRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void postRetryUnregister(@NonNull final String providerName) {
-        OPFPushLog.methodD(RetryManager.class, "postRetryUnregister", providerName);
+        OPFLog.methodD(RetryManager.class, "postRetryUnregister", providerName);
         postRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -102,12 +102,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void cancelRetryRegister(@NonNull final String providerName) {
-        OPFPushLog.methodD(RetryManager.class, "cancelRetryRegister", providerName);
+        OPFLog.methodD(RetryManager.class, "cancelRetryRegister", providerName);
         cancelRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void cancelRetryUnregister(@NonNull final String providerName) {
-        OPFPushLog.methodD(RetryManager.class, "cancelRetryUnregister", providerName);
+        OPFLog.methodD(RetryManager.class, "cancelRetryUnregister", providerName);
         cancelRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -115,7 +115,7 @@ public final class RetryManager implements BackoffManager {
                            @NonNull final Operation operation,
                            @NonNull final String action) {
         final long when = System.currentTimeMillis() + getTryDelay(providerName, operation);
-        OPFPushLog.d("Post retry provider '%s' at %s", providerName,
+        OPFLog.d("Post retry provider '%s' at %s", providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);

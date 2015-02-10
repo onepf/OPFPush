@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
@@ -37,12 +38,12 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(RetryBroadcastReceiver.class, "onReceive",
+        OPFLog.methodD(RetryBroadcastReceiver.class, "onReceive",
                 context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {
-            OPFPushLog.d("Initialisation is done");
+            OPFLog.d("Initialisation is done");
 
             final String action = intent.getAction();
             switch (action) {

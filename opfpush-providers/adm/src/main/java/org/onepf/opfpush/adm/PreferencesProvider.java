@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
@@ -60,13 +60,13 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFPushLog.methodD(PreferencesProvider.class, "getRegistrationId");
+        OPFLog.methodD(PreferencesProvider.class, "getRegistrationId");
         updateAppVersion();
         return preferences.getString(KEY_REGISTRATION_ID);
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFPushLog.methodD(PreferencesProvider.class, "saveRegistrationId");
+        OPFLog.methodD(PreferencesProvider.class, "saveRegistrationId");
         updateAppVersion();
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -81,21 +81,21 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveAuthenticationFailedFlag() {
-        OPFPushLog.methodD(PreferencesProvider.class, "saveAuthenticationFailedFlag");
+        OPFLog.methodD(PreferencesProvider.class, "saveAuthenticationFailedFlag");
 
         updateAppVersion();
         preferences.put(KEY_AUTHENTICATION_FAILED_FLAG, true);
     }
 
     public synchronized void removeAuthenticationFailedFlag() {
-        OPFPushLog.methodD(PreferencesProvider.class, "removeAuthenticationFailedFlag");
+        OPFLog.methodD(PreferencesProvider.class, "removeAuthenticationFailedFlag");
 
         updateAppVersion();
         preferences.remove(KEY_AUTHENTICATION_FAILED_FLAG);
     }
 
     public synchronized void reset() {
-        OPFPushLog.methodD(PreferencesProvider.class, "reset");
+        OPFLog.methodD(PreferencesProvider.class, "reset");
         preferences.clear();
     }
 
@@ -107,7 +107,7 @@ final class PreferencesProvider {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFPushLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
+        OPFLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 

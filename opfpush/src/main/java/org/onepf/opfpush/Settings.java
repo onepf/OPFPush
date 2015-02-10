@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.State;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 
 import static org.onepf.opfpush.model.State.UNREGISTERED;
@@ -60,12 +61,12 @@ final class Settings {
 
     @NonNull
     public State getState() {
-        OPFPushLog.methodD(Settings.class, "getState");
+        OPFLog.methodD(Settings.class, "getState");
 
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
         State state = State.fromValue(stateValue);
 
-        OPFPushLog.d("State : " + state);
+        OPFLog.d("State : " + state);
         if (state == null) {
             state = UNREGISTERED;
             saveState(state);
@@ -74,7 +75,7 @@ final class Settings {
     }
 
     public void saveState(@NonNull final State state) {
-        OPFPushLog.methodD(Settings.class, "saveState", state);
+        OPFLog.methodD(Settings.class, "saveState", state);
         preferences.put(KEY_STATE, state.getValue());
     }
 
@@ -88,7 +89,7 @@ final class Settings {
     }
 
     public void saveLastProvider(@Nullable final PushProvider provider) {
-        OPFPushLog.methodD(Settings.class, "saveLastProvider", provider);
+        OPFLog.methodD(Settings.class, "saveLastProvider", provider);
 
         if (provider == null) {
             preferences.remove(KEY_LAST_PROVIDER_NAME);
@@ -103,7 +104,7 @@ final class Settings {
     }
 
     public void saveLastAndroidId(@Nullable final String androidId) {
-        OPFPushLog.methodD(Settings.class, "saveLastAndroidId", androidId);
+        OPFLog.methodD(Settings.class, "saveLastAndroidId", androidId);
 
         if (androidId == null) {
             preferences.remove(KEY_LAST_ANDROID_ID);
