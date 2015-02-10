@@ -18,8 +18,8 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Operation;
+import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfpush.model.Operation.REGISTER;
 
@@ -38,21 +38,21 @@ final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager 
 
     @Override
     public boolean hasTries(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "hasTries", providerName, operation);
+        OPFLog.methodD(getClass(), "hasTries", providerName, operation);
         checkOperation(operation);
         return registerBackoff.hasTries();
     }
 
     @Override
     public long getTryDelay(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "getTryDelay", providerName, operation);
+        OPFLog.methodD(getClass(), "getTryDelay", providerName, operation);
         checkOperation(operation);
         return registerBackoff.getTryDelay();
     }
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "reset", providerName, operation);
+        OPFLog.methodD(getClass(), "reset", providerName, operation);
         checkOperation(operation);
         registerBackoff.reset();
     }
@@ -62,8 +62,8 @@ final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager 
         try {
             return backoffClass.newInstance();
         } catch (Exception e) {
-            OPFPushLog.w("Exception while instantiating class " + backoffClass + " : " + e);
-            OPFPushLog.w("Use " + InfinityExponentialBackoff.class.getSimpleName());
+            OPFLog.w("Exception while instantiating class " + backoffClass + " : " + e);
+            OPFLog.w("Use " + InfinityExponentialBackoff.class.getSimpleName());
             return new InfinityExponentialBackoff();
         }
     }

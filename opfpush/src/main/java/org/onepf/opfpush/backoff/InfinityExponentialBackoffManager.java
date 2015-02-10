@@ -18,8 +18,8 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.model.Operation;
+import org.onepf.opfutils.OPFLog;
 
 /**
  * @author Roman Savin
@@ -50,19 +50,19 @@ public final class InfinityExponentialBackoffManager implements BackoffManager {
 
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "hasTries", providerName, operation);
+        OPFLog.methodD(getClass(), "hasTries", providerName, operation);
         return getManagerByOperation(operation).hasTries(providerName, operation);
     }
 
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "getTryDelay", providerName, operation);
+        OPFLog.methodD(getClass(), "getTryDelay", providerName, operation);
         return getManagerByOperation(operation).getTryDelay(providerName, operation);
     }
 
     public void reset(@NonNull final String providerName,
                       @NonNull final Operation operation) {
-        OPFPushLog.methodD(getClass(), "reset", providerName, operation);
+        OPFLog.methodD(getClass(), "reset", providerName, operation);
         getManagerByOperation(operation).reset(providerName, operation);
     }
 

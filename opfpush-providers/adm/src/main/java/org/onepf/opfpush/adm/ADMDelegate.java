@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.amazon.device.messaging.ADM;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
@@ -37,19 +37,19 @@ final class ADMDelegate {
     private ADM adm;
 
     public ADMDelegate(@NonNull final Context context) {
-        OPFPushLog.methodD(ADMDelegate.class, "ADMDelegate", context);
+        OPFLog.methodD(ADMDelegate.class, "ADMDelegate", context);
 
         if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)) {
-            OPFPushLog.d("Kindle store app is installed");
+            OPFLog.d("Kindle store app is installed");
             adm = new ADM(context.getApplicationContext());
         }
     }
 
     public boolean isSupported() {
-        OPFPushLog.methodD(ADMDelegate.class, "isSupported");
+        OPFLog.methodD(ADMDelegate.class, "isSupported");
 
         if (adm != null) {
-            OPFPushLog.d("ADM isn't null");
+            OPFLog.d("ADM isn't null");
             return adm.isSupported();
         }
 
@@ -57,29 +57,29 @@ final class ADMDelegate {
     }
 
     public void startRegister() {
-        OPFPushLog.methodD(ADMDelegate.class, "startRegister");
+        OPFLog.methodD(ADMDelegate.class, "startRegister");
 
         if (adm != null) {
-            OPFPushLog.d("ADM isn't null");
+            OPFLog.d("ADM isn't null");
             adm.startRegister();
         }
     }
 
     public void startUnregister() {
-        OPFPushLog.methodD(ADMDelegate.class, "startUnregister");
+        OPFLog.methodD(ADMDelegate.class, "startUnregister");
 
         if (adm != null) {
-            OPFPushLog.d("ADM isn't null");
+            OPFLog.d("ADM isn't null");
             adm.startUnregister();
         }
     }
 
     @Nullable
     public String getRegistrationId() {
-        OPFPushLog.methodD(ADMDelegate.class, "getRegistrationId");
+        OPFLog.methodD(ADMDelegate.class, "getRegistrationId");
 
         if (adm != null) {
-            OPFPushLog.d("ADM isn't null");
+            OPFLog.d("ADM isn't null");
             return adm.getRegistrationId();
         }
 

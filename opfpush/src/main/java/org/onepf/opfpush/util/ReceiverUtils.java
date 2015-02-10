@@ -24,9 +24,9 @@ import android.content.pm.ResolveInfo;
 import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.PackageChangeReceiver;
 import org.onepf.opfpush.PushProvider;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public final class ReceiverUtils {
             @NonNull final Context context,
             @NonNull final PushProvider provider
     ) {
-        OPFPushLog.methodD(ReceiverUtils.class, "registerPackageChangeReceiver", context, provider);
+        OPFLog.methodD(ReceiverUtils.class, "registerPackageChangeReceiver", context, provider);
 
         final PackageChangeReceiver packageChangeReceiver = new PackageChangeReceiver(provider);
 
@@ -74,7 +74,7 @@ public final class ReceiverUtils {
 
         final String hostAppPackage = provider.getHostAppPackage();
         if (hostAppPackage != null) {
-            OPFPushLog.d("Host app package isn't null");
+            OPFLog.d("Host app package isn't null");
 
             final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
             hostAppRemovedFilter.addDataScheme(ReceiverUtils.PACKAGE_DATA_SCHEME);
@@ -86,7 +86,7 @@ public final class ReceiverUtils {
     }
 
     public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
-        OPFPushLog.methodD(ReceiverUtils.class, "isOPFReceiverRegistered", context);
+        OPFLog.methodD(ReceiverUtils.class, "isOPFReceiverRegistered", context);
 
         final Intent intent = new Intent(ACTION_RECEIVE);
         final List<ResolveInfo> resolveInfos = context.getPackageManager()

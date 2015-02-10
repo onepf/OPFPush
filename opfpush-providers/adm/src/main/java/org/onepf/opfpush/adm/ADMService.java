@@ -25,10 +25,10 @@ import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.PushProvider;
-import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
@@ -60,14 +60,14 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NonNull final Intent intent) {
-        OPFPushLog.methodD(ADMService.class, "onMessage", OPFUtils.toString(intent));
+        OPFLog.methodD(ADMService.class, "onMessage", OPFUtils.toString(intent));
         //ADM can receive messages even if it's unregistered. So we have to check ADM state.
         final PushProvider currentProvider = OPFPush.getHelper().getCurrentProvider();
 
         if (currentProvider != null
                 && PROVIDER_NAME.equals(currentProvider.getName())
                 && currentProvider.isRegistered()) {
-            OPFPushLog.d("ADMProvider is registered");
+            OPFLog.d("ADMProvider is registered");
             OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
         }
     }
@@ -84,7 +84,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
-        OPFPushLog.methodD(ADMService.class, "onRegistered", "registrationId");
+        OPFLog.methodD(ADMService.class, "onRegistered", "registrationId");
         final PreferencesProvider preferencesProvider = PreferencesProvider
                 .getInstance(getApplicationContext());
         preferencesProvider.saveRegistrationId(registrationId);
@@ -106,7 +106,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
-        OPFPushLog.methodD(ADMService.class, "onUnregistered", "admRegistrationId");
+        OPFLog.methodD(ADMService.class, "onUnregistered", "admRegistrationId");
         final PreferencesProvider settings = PreferencesProvider.getInstance(getApplicationContext());
         final String registrationId = admRegistrationId == null
                 ? settings.getRegistrationId()
@@ -128,9 +128,9 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistrationError(@NonNull @ADMError final String errorId) {
-        OPFPushLog.methodD(ADMService.class, "onRegistrationError", errorId);
+        OPFLog.methodD(ADMService.class, "onRegistrationError", errorId);
         final OPFError error = convertError(errorId);
-        OPFPushLog.d("Converted error : " + error);
+        OPFLog.d("Converted error : " + error);
 
         final PreferencesProvider preferencesProvider = PreferencesProvider
                 .getInstance(getApplicationContext());

@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.OPFPushLog;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
@@ -60,7 +60,7 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFPushLog.methodD(PreferencesProvider.class, "getRegistrationId");
+        OPFLog.methodD(PreferencesProvider.class, "getRegistrationId");
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -70,7 +70,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFPushLog.methodD(PreferencesProvider.class, "saveRegistrationId", "registrationId");
+        OPFLog.methodD(PreferencesProvider.class, "saveRegistrationId", "registrationId");
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -80,7 +80,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void reset() {
-        OPFPushLog.methodD(PreferencesProvider.class, "reset");
+        OPFLog.methodD(PreferencesProvider.class, "reset");
         preferences.clear();
     }
 
@@ -89,7 +89,7 @@ final class PreferencesProvider {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFPushLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
+        OPFLog.methodD(PreferencesProvider.class, "saveAppVersion", appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 }

@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 /**
@@ -41,20 +42,20 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFPushLog.methodD(PackageChangeReceiver.class, "onReceive",
+        OPFLog.methodD(PackageChangeReceiver.class, "onReceive",
                 context, OPFUtils.toString(intent));
 
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             final String hostAppPackage = provider.getHostAppPackage();
             if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
-                OPFPushLog.d("Host app '%s' of provider '%s' removed.",
+                OPFLog.d("Host app '%s' of provider '%s' removed.",
                         hostAppPackage, provider.getName());
                 OPFPush.getHelper().onProviderUnavailable(provider);
             }
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
             if (context.getPackageName().equals(getAppPackage(intent))) {
-                OPFPushLog.d("Application updated.");
+                OPFLog.d("Application updated.");
                 OPFPush.getHelper().onNeedRetryRegister();
             }
         }
