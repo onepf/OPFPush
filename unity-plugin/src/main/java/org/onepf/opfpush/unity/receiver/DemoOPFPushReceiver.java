@@ -68,7 +68,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
             try {
                 NotificationUtils.showNotification(
                         context,
-                        context.getString(R.string.message_notification_title),
+                        "Message",
                         message
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));

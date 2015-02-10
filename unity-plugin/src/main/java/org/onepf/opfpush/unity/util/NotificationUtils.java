@@ -59,7 +59,7 @@ public final class NotificationUtils {
 
         final NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.notification_icon)
+                        .setSmallIcon(android.R.drawable.ic_notification_overlay)
                         .setContentTitle(notificationTitle)
                         .setContentText(notificationText)
                         .setAutoCancel(true)
