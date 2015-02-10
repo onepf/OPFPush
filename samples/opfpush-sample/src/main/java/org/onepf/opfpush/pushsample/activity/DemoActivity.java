@@ -27,9 +27,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.adm.ADMConstants;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
@@ -66,7 +66,7 @@ public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OPFPushLog.methodD(DemoActivity.class, "onCreate");
+        OPFLog.methodD("");
         setContentView(R.layout.activity_demo);
 
         infoText = (TextView) findViewById(R.id.info_text);
@@ -76,7 +76,7 @@ public class DemoActivity extends Activity {
 
         final String registrationId = helper.getRegistrationId();
         if (!TextUtils.isEmpty(registrationId)) {
-            OPFPushLog.d("Registration Id : " + registrationId);
+            OPFLog.d("Registration Id : " + registrationId);
             initViewsRegisteredState(registrationId);
         } else {
             initViewsRegisteringState();
@@ -91,32 +91,32 @@ public class DemoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        OPFPushLog.methodD(DemoActivity.class, "onResume");
+        OPFLog.methodD("");
         EventBus.getDefault().registerSticky(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        OPFPushLog.methodD(DemoActivity.class, "onPause");
+        OPFLog.methodD("");
         EventBus.getDefault().unregister(this);
     }
 
     public void onRegisterClick(@NonNull final View view) {
-        OPFPushLog.methodD(DemoActivity.class, "onRegisterClick");
+        OPFLog.methodD("");
         initViewsRegisteringState();
         helper.register();
     }
 
     public void onUnregisterClick(@NonNull final View view) {
-        OPFPushLog.methodD(DemoActivity.class, "onUnregisterClick");
+        OPFLog.methodD("");
         initViewsUnregisteringState();
         helper.unregister();
     }
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final MessageEvent messageEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", messageEvent);
+        OPFLog.methodD(messageEvent);
         final String messageString = messageEvent.getMessage();
         if (!TextUtils.isEmpty(messageString)) {
             adapter.add(messageString);
@@ -126,7 +126,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final RegisteredEvent registeredEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", registeredEvent);
+        OPFLog.methodD(registeredEvent);
         final String registrationIdString = registeredEvent.getRegistrationId();
         if (!TextUtils.isEmpty(registrationIdString)) {
             initViewsRegisteredState(registrationIdString);
@@ -136,7 +136,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final UnregisteredEvent unregisteredEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", unregisteredEvent);
+        OPFLog.methodD(unregisteredEvent);
         final String registrationIdString = unregisteredEvent.getRegistrationId();
         initViewsUnregisteredState(registrationIdString);
         EventBus.getDefault().removeStickyEvent(unregisteredEvent);
@@ -144,7 +144,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
-        OPFPushLog.methodD(DemoActivity.class, "onEventMainThread", noAvailableProviderEvent);
+        OPFLog.methodD(noAvailableProviderEvent);
         final Map<String, OPFError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
         if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
             final OPFError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
@@ -155,7 +155,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsRegisteringState() {
-        OPFPushLog.methodD(DemoActivity.class, "initViewsRegisteringState");
+        OPFLog.methodD("");
         infoText.setText(getString(R.string.registration));
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(false);
@@ -163,7 +163,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsRegisteredState(@NonNull final String registrationId) {
-        OPFPushLog.methodD(DemoActivity.class, "initViewsRegisteredState", registrationId);
+        OPFLog.methodD(registrationId);
         infoText.setText(getString(R.string.registered_state_fmt, registrationId));
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);
@@ -171,7 +171,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsUnregisteredState(@Nullable final String registrationId) {
-        OPFPushLog.methodD(DemoActivity.class, "initViewsUnregisteredState", registrationId);
+        OPFLog.methodD(registrationId);
         infoText.setText(getString(R.string.unregistered_state_fmt, registrationId));
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(true);
@@ -179,7 +179,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsUnregisteringState() {
-        OPFPushLog.methodD(DemoActivity.class, "initViewsUnregisteringState");
+        OPFLog.methodD("");
         infoText.setText(getString(R.string.unregistration));
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);

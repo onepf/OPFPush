@@ -20,9 +20,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.listener.TestEventListener;
 import org.onepf.opfpush.mock.MockPushProvider;
-import org.onepf.opfpush.configuration.Configuration;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 

@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 
 /**
  * @author Roman Savin
@@ -39,7 +40,7 @@ public final class OPFPush {
 
     @NonNull
     public static OPFPushHelper getHelper() {
-        OPFPushLog.methodD(OPFPush.class, "getHelper");
+        OPFLog.methodD("");
         if (helper == null) {
             throw new OPFPushException("OPFPush doesn't init");
         }
@@ -48,7 +49,7 @@ public final class OPFPush {
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        OPFPushLog.methodD(OPFPush.class, "init", context, configuration);
+        OPFLog.methodD(context, configuration);
         OPFChecks.checkThread(true);
         if (helper == null) {
             helper = new OPFPushHelper(context);

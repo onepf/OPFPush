@@ -18,8 +18,8 @@ package org.onepf.opfpush.mock;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.SenderPushProvider;
+import org.onepf.opfpush.model.Message;
 
 /**
  * @author Roman Savin
