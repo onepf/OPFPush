@@ -28,9 +28,9 @@ import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
 
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE;
-import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 
 /**
  * Nokia Notification push provider implementation.
@@ -132,12 +132,14 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     @Override
     public void register() {
         OPFLog.methodD();
+        OPFLog.i("Start register NokiaNotificationsProvider.");
         PushRegistrar.register(getContext(), sendersIds);
     }
 
     @Override
     public void unregister() {
         OPFLog.methodD();
+        OPFLog.i("Start unregister NokiaNotificationsProvider.");
         PushRegistrar.unregister(getContext());
         PushRegistrar.onDestroy(getContext());
     }

@@ -125,7 +125,8 @@ public final class RetryManager implements BackoffManager {
         alarmManager.set(
                 AlarmManager.RTC,
                 when,
-                PendingIntent.getBroadcast(appContext, providerName.hashCode(), intent, 0)
+                //TODO: Use providerName.hashCode() as requestCode
+                PendingIntent.getBroadcast(appContext, 0, intent, 0)
         );
     }
 

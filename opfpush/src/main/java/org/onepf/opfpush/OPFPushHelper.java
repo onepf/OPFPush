@@ -174,7 +174,7 @@ public final class OPFPushHelper {
             if (state == REGISTERING || state == REGISTERED || isCurrentProviderRegistered) {
                 retryManager.cancelRetryAllOperations(providerName);
                 currentProvider.unregister();
-                fakeOnUnregistered(currentProvider.getName(), providerName);
+                fakeOnUnregistered(providerName, currentProvider.getRegistrationId());
             } else {
                 OPFLog.w("Unregistration wasn't performed because already unregistered.");
             }
@@ -406,6 +406,7 @@ public final class OPFPushHelper {
                 OPFLog.d("Provider is available.");
                 retryManager.cancelRetryAllOperations(provider.getName());
                 register(provider);
+                return;
             }
         }
 
