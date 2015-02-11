@@ -25,10 +25,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  */
 public final class GCMConstants {
 
-    private GCMConstants() {
-        throw new UnsupportedOperationException();
-    }
-
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 
     static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
@@ -49,4 +45,8 @@ public final class GCMConstants {
     static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME = "com.google.android.gms.gcm.GoogleCloudMessaging";
     static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
+
+    private GCMConstants() {
+        throw new UnsupportedOperationException();
+    }
 }

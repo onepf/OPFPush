@@ -22,13 +22,13 @@ package org.onepf.opfpush.adm;
  */
 public final class ADMConstants {
 
-    private ADMConstants() {
-        throw new UnsupportedOperationException();
-    }
-
     public static final String PROVIDER_NAME = "Amazon Device Messaging";
 
     static final String AMAZON_MANUFACTURER = "Amazon";
     static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
     static final String ACCOUNT_TYPE = "com.amazon.account";
+
+    private ADMConstants() {
+        throw new UnsupportedOperationException();
+    }
 }

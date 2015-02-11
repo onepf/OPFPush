@@ -23,10 +23,6 @@ package org.onepf.opfpush;
  */
 public final class OPFConstants {
 
-    private OPFConstants() {
-        throw new UnsupportedOperationException();
-    }
-
     public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
 
     public static final String EXTRA_PROVIDER_NAME = "org.onepf.opfpush.intent.EXTRA_PROVIDER_NAME";
@@ -42,4 +38,8 @@ public final class OPFConstants {
 
     public static final String ACTION_RETRY_REGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_REGISTER";
     public static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
+
+    private OPFConstants() {
+        throw new UnsupportedOperationException();
+    }
 }

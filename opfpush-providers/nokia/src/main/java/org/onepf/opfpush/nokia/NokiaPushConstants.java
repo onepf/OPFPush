@@ -22,12 +22,12 @@ package org.onepf.opfpush.nokia;
  */
 public final class NokiaPushConstants {
 
-    private NokiaPushConstants() {
-        throw new UnsupportedOperationException();
-    }
-
     public static final String PROVIDER_NAME = "Nokia Push";
 
     static final String NOKIA_MANUFACTURER = "Nokia";
     static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
+
+    private NokiaPushConstants() {
+        throw new UnsupportedOperationException();
+    }
 }
