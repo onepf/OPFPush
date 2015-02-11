@@ -55,5 +55,7 @@ public enum OPFError {
      * <p/>
      * Non recoverable error.
      */
-    AUTHENTICATION_FAILED
+    AUTHENTICATION_FAILED,
+
+    UNKNOWN_ERROR
 }

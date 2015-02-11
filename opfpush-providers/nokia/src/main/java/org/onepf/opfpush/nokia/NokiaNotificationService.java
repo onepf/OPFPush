@@ -25,7 +25,6 @@ import com.nokia.push.PushConstants;
 
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.model.OPFError;
 
 import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
@@ -135,7 +134,8 @@ public class NokiaNotificationService extends PushBaseIntentService {
             case PushConstants.ERROR_INVALID_SENDER:
                 return OPFError.INVALID_SENDER;
             default:
-                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+                OPFLog.e("Unknown Nokia Notification error : " + errorId);
+                return OPFError.UNKNOWN_ERROR;
         }
     }
 }

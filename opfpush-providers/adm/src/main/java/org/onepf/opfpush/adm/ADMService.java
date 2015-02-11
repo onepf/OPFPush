@@ -26,7 +26,6 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.PushProvider;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -147,20 +146,16 @@ public class ADMService extends ADMMessageHandlerBase {
 
     @NonNull
     private OPFError convertError(@NonNull @ADMError final String errorId) {
-        final OPFError error;
         switch (errorId) {
             case ADMConstants.ERROR_SERVICE_NOT_AVAILABLE:
-                error = OPFError.SERVICE_NOT_AVAILABLE;
-                break;
+                return OPFError.SERVICE_NOT_AVAILABLE;
             case ADMConstants.ERROR_INVALID_SENDER:
-                error = OPFError.INVALID_SENDER;
-                break;
+                return OPFError.INVALID_SENDER;
             case ADMConstants.ERROR_AUTHENTICATION_FAILED:
-                error = OPFError.AUTHENTICATION_FAILED;
-                break;
+                return OPFError.AUTHENTICATION_FAILED;
             default:
-                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+                OPFLog.e("Unknown ADM error : " + errorId);
+                return OPFError.UNKNOWN_ERROR;
         }
-        return error;
     }
 }

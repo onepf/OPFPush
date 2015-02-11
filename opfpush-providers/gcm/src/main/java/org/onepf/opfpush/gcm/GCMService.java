@@ -25,7 +25,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.OPFConstants;
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -118,18 +117,14 @@ public class GCMService extends IntentService {
     }
 
     private OPFError convertError(@NonNull @GCMError final String errorId) {
-        final OPFError error;
         switch (errorId) {
             case GCMConstants.ERROR_SERVICE_NOT_AVAILABLE:
-                error = OPFError.SERVICE_NOT_AVAILABLE;
-                break;
+                return OPFError.SERVICE_NOT_AVAILABLE;
             case GCMConstants.ERROR_AUTHENTICATION_FAILED:
-                error = OPFError.AUTHENTICATION_FAILED;
-                break;
+                return OPFError.AUTHENTICATION_FAILED;
             default:
-                throw new OPFPushException(String.format("Unknown error '%s'.", errorId));
+                OPFLog.e("Unknown GCM error : " + errorId);
+                return OPFError.UNKNOWN_ERROR;
         }
-
-        return error;
     }
 }
