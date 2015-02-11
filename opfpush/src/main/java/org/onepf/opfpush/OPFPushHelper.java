@@ -32,10 +32,9 @@ import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.util.ReceiverUtils;
-import org.onepf.opfutils.Checkable;
-import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
+import org.onepf.opfutils.exception.InitException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,16 +101,6 @@ public final class OPFPushHelper {
     @NonNull
     private final Object initLock = new Object();
 
-    @NonNull
-    private final Checkable checkInit = new Checkable() {
-        @Override
-        public boolean check() {
-            synchronized (initLock) {
-                return configuration != null;
-            }
-        }
-    };
-
     OPFPushHelper(@NonNull final Context context) {
         appContext = context.getApplicationContext();
         settings = Settings.getInstance(context);
@@ -130,8 +119,7 @@ public final class OPFPushHelper {
     public void register() {
         OPFLog.methodD();
 
-        OPFChecks.checkInit(checkInit, true);
-
+        checkInit(true);
         synchronized (registrationLock) {
             final State state = settings.getState();
             OPFLog.d("Register state : " + state.toString());
@@ -159,8 +147,8 @@ public final class OPFPushHelper {
      */
     public void unregister() {
         OPFLog.methodD();
-        OPFChecks.checkInit(checkInit, true);
 
+        checkInit(true);
         synchronized (registrationLock) {
             final State state = settings.getState();
             OPFLog.i("Registration state = " + state.toString());
@@ -234,7 +222,7 @@ public final class OPFPushHelper {
 
     @NonNull
     public ReceivedMessageHandler getReceivedMessageHandler() {
-        OPFChecks.checkInit(checkInit, true);
+        checkInit(true);
         return receivedMessageHandler;
     }
 
@@ -262,10 +250,6 @@ public final class OPFPushHelper {
     void init(@NonNull final Configuration initialConfiguration) {
         OPFLog.methodD(initialConfiguration);
 
-        if (isInitDone()) {
-            throw new OPFPushException("You can init OpenPushHelper only one time.");
-        }
-
         if (this.configuration == null) {
             synchronized (initLock) {
                 if (this.configuration == null) {
@@ -292,13 +276,17 @@ public final class OPFPushHelper {
         OPFLog.i("Init done.");
     }
 
-    /**
-     * Is init done and you may work with {@code OpenPushHelper}.
-     *
-     * @return True if init is done, else - false.
-     */
+    void checkInit(final boolean needInit) {
+        final boolean isInit = isInitDone();
+        if (needInit != isInit) {
+            throw new InitException(isInit);
+        }
+    }
+
     boolean isInitDone() {
-        return checkInit.check();
+        synchronized (initLock) {
+            return configuration != null;
+        }
     }
 
     boolean isRegistered() {
@@ -312,7 +300,7 @@ public final class OPFPushHelper {
     void restartRegisterOnBoot() {
         OPFLog.methodD();
 
-        OPFChecks.checkInit(checkInit, true);
+        checkInit(true);
         settings.clear();
         register();
     }

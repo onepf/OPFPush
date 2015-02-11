@@ -54,6 +54,7 @@ public final class OPFPush {
         if (helper == null) {
             helper = new OPFPushHelper(context);
         }
+        helper.checkInit(false);
         helper.init(configuration);
     }
 }

@@ -55,6 +55,8 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
                 default:
                     throw new OPFPushException("Unknown action '%s'.", action);
             }
+        } else {
+            OPFLog.e("OPFPush must be initialized");
         }
     }
 }
