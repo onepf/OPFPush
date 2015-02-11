@@ -39,7 +39,8 @@ final class ADMDelegate {
     public ADMDelegate(@NonNull final Context context) {
         OPFLog.methodD(context);
 
-        if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)) {
+        if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)
+                && isAdmClassExists()) {
             OPFLog.d("Kindle store app is installed");
             adm = new ADM(context.getApplicationContext());
         }
@@ -84,5 +85,16 @@ final class ADMDelegate {
         }
 
         return null;
+    }
+
+    private boolean isAdmClassExists() {
+        try {
+            ADM.class.getCanonicalName();
+            return true;
+        } catch (NoClassDefFoundError e) {
+            OPFLog.w("ADM class not found");
+        }
+
+        return false;
     }
 }
