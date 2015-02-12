@@ -145,13 +145,15 @@ public class DemoActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
         OPFLog.methodD(noAvailableProviderEvent);
+        initViewsUnregisteredState("");
         final Map<String, OPFError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
         if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
             final OPFError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
-            initViewsUnregisteredState("");
             infoText.setText(getString(R.string.registration_error_fmt, error.name()));
-            EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
+        } else {
+            infoText.setText(getString(R.string.no_available_provider));
         }
+        EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
     }
 
     private void initViewsRegisteringState() {
