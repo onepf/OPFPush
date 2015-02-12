@@ -610,10 +610,8 @@ public final class OPFPushHelper {
                                  @NonNull final String registrationId) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, "registrationId"); //Don't log registration id.
-
                 OPFLog.i("Successfully register provider '%s'.", providerName);
-
-                retryManager.reset(providerName, REGISTER);
+                retryManager.cancelRetryAllOperations(providerName);
 
                 settings.saveState(REGISTERED);
                 settings.saveLastAndroidId(ANDROID_ID);
@@ -637,9 +635,8 @@ public final class OPFPushHelper {
                                    @Nullable final String oldRegistrationId) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, "oldRegistrationId"); //Don't log registration id.
-
                 OPFLog.i("Successfully unregister provider '%s'.", providerName);
-                retryManager.reset(providerName, UNREGISTER);
+                retryManager.cancelRetryAllOperations(providerName);
             }
         }
 
@@ -653,18 +650,21 @@ public final class OPFPushHelper {
                                         @NonNull final OPFError error) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, error);
-                if (!isRegistered()) {
-                    OPFLog.d("Registration state isn't REGISTERED");
+                retryManager.cancelRetryUnregister(providerName);
 
-                    settings.saveState(UNREGISTERED);
-                    if (error == SERVICE_NOT_AVAILABLE
-                            && retryManager.hasTries(providerName, REGISTER)) {
-                        retryManager.postRetryRegister(providerName);
-                    } else {
-                        registerProviderErrors.put(providerName, error);
-                        retryManager.reset(providerName, REGISTER);
-                        registerNextAvailableProvider(providerName);
-                    }
+                if (isRegistered()) {
+                    OPFLog.d("Registration state is REGISTERED");
+                    return;
+                }
+
+                settings.saveState(UNREGISTERED);
+                if (error == SERVICE_NOT_AVAILABLE
+                        && retryManager.hasTries(providerName, REGISTER)) {
+                    retryManager.postRetryRegister(providerName);
+                } else {
+                    registerProviderErrors.put(providerName, error);
+                    retryManager.reset(providerName, REGISTER);
+                    registerNextAvailableProvider(providerName);
                 }
             }
         }
@@ -679,6 +679,13 @@ public final class OPFPushHelper {
                                           @NonNull final OPFError error) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, error);
+                retryManager.cancelRetryRegister(providerName);
+
+                final PushProvider provider = getProviderWithException(providerName);
+                if (!provider.isRegistered()) {
+                    OPFLog.i("Provider already unregistered.");
+                    return;
+                }
 
                 if (error == SERVICE_NOT_AVAILABLE
                         && retryManager.hasTries(providerName, UNREGISTER)) {
