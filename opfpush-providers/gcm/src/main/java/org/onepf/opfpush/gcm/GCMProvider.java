@@ -42,10 +42,12 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static org.onepf.opfpush.gcm.GCMConstants.ANDROID_RELEASE_4_0_4;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_ACCOUNT_TYPE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
+import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_SERVICES_FRAMEWORK_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.MESSAGES_TO_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_C2D_MESSAGE_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_RECEIVE;
@@ -101,6 +103,13 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isAvailable() {
+        OPFLog.methodD();
+        final Context context = getContext();
+        if (!isReceivePermissionDeclared()) {
+            OPFLog.i("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
+            return false;
+        }
+
         //Need verify that GCM classes present, because dependency provided.
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
@@ -111,7 +120,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         if (super.isAvailable()) {
             final int conResult = GooglePlayServicesUtil
-                    .isGooglePlayServicesAvailable(getContext());
+                    .isGooglePlayServicesAvailable(context);
             if (conResult == ConnectionResult.SUCCESS) {
                 return !needGoogleAccounts() || checkGoogleAccount();
             } else {
@@ -208,6 +217,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             registrationExecutor = Executors.newSingleThreadExecutor();
         }
         registrationExecutor.execute(runnable);
+    }
+
+    private boolean isReceivePermissionDeclared() {
+        final int permissionState = getContext().getPackageManager()
+                .checkPermission(PERMISSION_RECEIVE, GOOGLE_SERVICES_FRAMEWORK_PACKAGE);
+        return permissionState == PERMISSION_GRANTED;
     }
 
     private final class RegisterTask implements Runnable {

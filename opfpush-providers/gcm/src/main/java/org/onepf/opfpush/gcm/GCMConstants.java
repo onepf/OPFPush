@@ -46,6 +46,8 @@ public final class GCMConstants {
     static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME = "com.google.android.gms.gcm.GoogleCloudMessaging";
     static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 
+    static final String GOOGLE_SERVICES_FRAMEWORK_PACKAGE = "com.google.android.gsf";
+
     private GCMConstants() {
         throw new UnsupportedOperationException();
     }
