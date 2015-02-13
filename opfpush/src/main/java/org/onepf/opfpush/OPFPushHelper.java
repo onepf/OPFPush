@@ -45,6 +45,7 @@ import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.model.Operation.REGISTER;
@@ -614,7 +615,9 @@ public final class OPFPushHelper {
                 retryManager.cancelRetryAllOperations(providerName);
 
                 settings.saveState(REGISTERED);
-                settings.saveLastAndroidId(ANDROID_ID);
+                settings.saveLastAndroidId(
+                        Secure.getString(appContext.getContentResolver(), ANDROID_ID)
+                );
                 currentProvider = getProviderWithException(providerName);
                 settings.saveLastProvider(currentProvider);
                 registerProviderErrors.clear();

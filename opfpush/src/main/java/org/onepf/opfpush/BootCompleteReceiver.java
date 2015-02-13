@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfutils.OPFLog;
 
+import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 
 /**
@@ -50,7 +51,8 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         }
     }
 
-    public static boolean isAndroidIDChanged(@NonNull Context context) {
-        return !ANDROID_ID.equals(Settings.getInstance(context).getLastAndroidId());
+    private boolean isAndroidIDChanged(@NonNull final Context context) {
+        return !Secure.getString(context.getContentResolver(), ANDROID_ID)
+                .equals(Settings.getInstance(context).getLastAndroidId());
     }
 }
