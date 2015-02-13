@@ -115,7 +115,7 @@ public final class RetryManager implements BackoffManager {
                            @NonNull final Operation operation,
                            @NonNull final String action) {
         final long when = System.currentTimeMillis() + getTryDelay(providerName, operation);
-        OPFLog.d("Post retry provider '%s' at %s", providerName,
+        OPFLog.d("Post retry %s provider '%s' at %s", operation, providerName,
                 SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
