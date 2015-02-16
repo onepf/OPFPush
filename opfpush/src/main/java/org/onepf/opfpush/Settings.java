@@ -80,6 +80,7 @@ final class Settings {
     }
 
     public void clear() {
+        OPFLog.methodD();
         preferences.clear();
     }
 
