@@ -267,7 +267,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
-            OPFLog.methodD("registrationId");
+            OPFLog.methodD(registrationId);
             preferencesProvider.saveRegistrationId(registrationId);
 
             //For finish registration we catch intent with action

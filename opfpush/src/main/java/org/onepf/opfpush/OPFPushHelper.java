@@ -612,7 +612,7 @@ public final class OPFPushHelper {
         public void onRegistered(@NonNull final String providerName,
                                  @NonNull final String registrationId) {
             synchronized (registrationLock) {
-                OPFLog.methodD(providerName, "registrationId"); //Don't log registration id.
+                OPFLog.methodD(providerName, registrationId);
                 OPFLog.i("Successfully register provider '%s'.", providerName);
                 retryManager.cancelRetryAllOperations(providerName);
 
@@ -639,7 +639,7 @@ public final class OPFPushHelper {
         public void onUnregistered(@NonNull final String providerName,
                                    @Nullable final String oldRegistrationId) {
             synchronized (registrationLock) {
-                OPFLog.methodD(providerName, "oldRegistrationId"); //Don't log registration id.
+                OPFLog.methodD(providerName, oldRegistrationId);
                 OPFLog.i("Successfully unregister provider '%s'.", providerName);
                 retryManager.cancelRetryAllOperations(providerName);
             }

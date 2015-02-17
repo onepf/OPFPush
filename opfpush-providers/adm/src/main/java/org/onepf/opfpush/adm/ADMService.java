@@ -83,7 +83,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
-        OPFLog.methodD("registrationId");
+        OPFLog.methodD(registrationId);
         final PreferencesProvider preferencesProvider = PreferencesProvider
                 .getInstance(getApplicationContext());
         preferencesProvider.saveRegistrationId(registrationId);
@@ -105,7 +105,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
-        OPFLog.methodD("admRegistrationId");
+        OPFLog.methodD(admRegistrationId);
         final PreferencesProvider settings = PreferencesProvider.getInstance(getApplicationContext());
         final String registrationId = admRegistrationId == null
                 ? settings.getRegistrationId()

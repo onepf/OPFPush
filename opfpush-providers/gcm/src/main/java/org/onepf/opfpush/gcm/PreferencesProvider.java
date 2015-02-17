@@ -70,7 +70,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFLog.methodD("registrationId");
+        OPFLog.methodD(registrationId);
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);

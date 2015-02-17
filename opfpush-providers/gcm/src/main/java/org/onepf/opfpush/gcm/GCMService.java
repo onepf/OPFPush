@@ -90,12 +90,12 @@ public class GCMService extends IntentService {
     }
 
     private void onRegistered(@NonNull final String registrationId) {
-        OPFLog.methodD("registrationId");
+        OPFLog.methodD(registrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
     private void onUnregistered(@Nullable final String oldRegistrationId) {
-        OPFLog.methodD("oldRegistrationId");
+        OPFLog.methodD(oldRegistrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, oldRegistrationId);
     }
 
