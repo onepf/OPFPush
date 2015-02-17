@@ -162,8 +162,10 @@ public final class OPFPushHelper {
 
             if (state == REGISTERING || state == REGISTERED || isCurrentProviderRegistered) {
                 retryManager.cancelRetryAllOperations(providerName);
+
+                final String oldRegistrationId = currentProvider.getRegistrationId();
                 currentProvider.unregister();
-                fakeOnUnregistered(providerName, currentProvider.getRegistrationId());
+                fakeOnUnregistered(providerName, oldRegistrationId);
             } else {
                 OPFLog.w("Unregistration wasn't performed because already unregistered.");
             }
