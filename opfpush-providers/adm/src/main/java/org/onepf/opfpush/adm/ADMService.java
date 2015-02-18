@@ -19,12 +19,12 @@ package org.onepf.opfpush.adm;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.amazon.device.messaging.ADMConstants;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
+import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.PushProvider;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFLog;
@@ -131,9 +131,10 @@ public class ADMService extends ADMMessageHandlerBase {
         final OPFError error = convertError(errorId);
         OPFLog.d("Converted error : " + error);
 
+        final OPFPushHelper helper = OPFPush.getHelper();
         final PreferencesProvider preferencesProvider = PreferencesProvider
                 .getInstance(getApplicationContext());
-        if (!TextUtils.isEmpty(preferencesProvider.getRegistrationId())) {
+        if (helper.isRegistering()) {
             //Registration Error
             preferencesProvider.removeAuthenticationFailedFlag();
         } else if (error == OPFError.AUTHENTICATION_FAILED) {
@@ -141,7 +142,7 @@ public class ADMService extends ADMMessageHandlerBase {
             preferencesProvider.saveAuthenticationFailedFlag();
         }
 
-        OPFPush.getHelper().getReceivedMessageHandler().onError(PROVIDER_NAME, error);
+        helper.getReceivedMessageHandler().onError(PROVIDER_NAME, error);
     }
 
     @NonNull

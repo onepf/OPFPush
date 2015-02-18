@@ -24,7 +24,7 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 21
         versionCode 2
         versionName "2.0"
@@ -41,8 +41,7 @@ android {
 dependencies {
     androidTestCompile 'org.robolectric:robolectric:2.4'
     androidTestCompile 'junit:junit:4.12'
-
     compile 'com.android.support:support-annotations:19.1.0'
     compile 'com.google.code.findbugs:annotations:3.0.0'
-    compile 'org.onepf:opfutils:0.1.9-SNAPSHOT'
+    compile 'org.onepf:opfutils:0.1.11-SNAPSHOT'
 }

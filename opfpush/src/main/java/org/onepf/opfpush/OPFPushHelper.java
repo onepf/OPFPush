@@ -229,6 +229,14 @@ public final class OPFPushHelper {
         return receivedMessageHandler;
     }
 
+    public boolean isRegistered() {
+        return settings.getState() == REGISTERED;
+    }
+
+    public boolean isRegistering() {
+        return settings.getState() == REGISTERING;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -290,14 +298,6 @@ public final class OPFPushHelper {
         synchronized (initLock) {
             return configuration != null;
         }
-    }
-
-    boolean isRegistered() {
-        return settings.getState() == REGISTERED;
-    }
-
-    boolean isRegistering() {
-        return settings.getState() == REGISTERING;
     }
 
     void restartRegisterOnBoot() {

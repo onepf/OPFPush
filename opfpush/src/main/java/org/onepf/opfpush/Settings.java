@@ -31,7 +31,6 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
  * @author Roman Savin
  * @since 01.10.14.
  */
-//TODO: thread safe
 final class Settings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
@@ -44,7 +43,7 @@ final class Settings {
     private final OPFPreferences preferences;
 
     private Settings(@NonNull final Context context) {
-        preferences = new OPFPreferences(context);
+        preferences = new OPFPreferences(context, Context.MODE_MULTI_PROCESS);
     }
 
     public static Settings getInstance(@NonNull final Context context) {
@@ -60,7 +59,7 @@ final class Settings {
     }
 
     @NonNull
-    public State getState() {
+    public synchronized State getState() {
         OPFLog.methodD();
 
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
@@ -74,22 +73,22 @@ final class Settings {
         return state;
     }
 
-    public void saveState(@NonNull final State state) {
+    public synchronized void saveState(@NonNull final State state) {
         OPFLog.methodD(state);
         preferences.put(KEY_STATE, state.getValue());
     }
 
-    public void clear() {
+    public synchronized void clear() {
         OPFLog.methodD();
         preferences.clear();
     }
 
     @Nullable
-    public String getLastProviderName() {
+    public synchronized String getLastProviderName() {
         return preferences.getString(KEY_LAST_PROVIDER_NAME);
     }
 
-    public void saveLastProvider(@Nullable final PushProvider provider) {
+    public synchronized void saveLastProvider(@Nullable final PushProvider provider) {
         OPFLog.methodD(provider);
 
         if (provider == null) {
@@ -100,11 +99,11 @@ final class Settings {
     }
 
     @Nullable
-    public String getLastAndroidId() {
+    public synchronized String getLastAndroidId() {
         return preferences.getString(KEY_LAST_ANDROID_ID);
     }
 
-    public void saveLastAndroidId(@Nullable final String androidId) {
+    public synchronized void saveLastAndroidId(@Nullable final String androidId) {
         OPFLog.methodD(androidId);
 
         if (androidId == null) {
