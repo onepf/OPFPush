@@ -377,6 +377,15 @@ public final class OPFPushHelper {
         }
     }
 
+    void registerPackageChangeReceiver() {
+        OPFLog.methodD();
+        OPFLog.d("currentProvider == " + currentProvider);
+        if (currentProvider != null) {
+            packageReceiver = ReceiverUtils
+                    .registerPackageChangeReceiver(appContext, currentProvider);
+        }
+    }
+
     private void restoreLastProvider() {
         OPFLog.methodD();
 
@@ -627,8 +636,7 @@ public final class OPFPushHelper {
                 currentProvider = getProviderWithException(providerName);
                 settings.saveLastProvider(currentProvider);
                 registerProviderErrors.clear();
-                packageReceiver = ReceiverUtils
-                        .registerPackageChangeReceiver(appContext, currentProvider);
+                registerPackageChangeReceiver();
 
                 eventListenerWrapper.onRegistered(appContext, providerName, registrationId);
             }

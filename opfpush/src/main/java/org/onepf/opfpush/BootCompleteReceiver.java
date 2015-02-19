@@ -43,6 +43,9 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             if (isAndroidIDChanged(context)) {
                 OPFLog.d("Android ID changed.");
                 helper.onNeedRetryRegister();
+            } else {
+                OPFLog.d("Android ID hasn't been changed");
+                helper.registerPackageChangeReceiver();
             }
         } else if (helper.isRegistering()) {
             OPFLog.d("Registration in progress");
