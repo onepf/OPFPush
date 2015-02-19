@@ -125,8 +125,10 @@ public final class OPFPushHelper {
             final State state = settings.getState();
             OPFLog.d("Register state : " + state.toString());
             switch (state) {
-                case REGISTERING:
                 case REGISTERED:
+                    registerPackageChangeReceiver();
+                    break;
+                case REGISTERING:
                     break;
                 case UNREGISTERED:
                     settings.saveState(REGISTERING);
@@ -380,7 +382,7 @@ public final class OPFPushHelper {
     void registerPackageChangeReceiver() {
         OPFLog.methodD();
         OPFLog.d("currentProvider == " + currentProvider);
-        if (currentProvider != null) {
+        if (currentProvider != null && packageReceiver == null) {
             packageReceiver = ReceiverUtils
                     .registerPackageChangeReceiver(appContext, currentProvider);
         }
