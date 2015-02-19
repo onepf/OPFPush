@@ -349,6 +349,34 @@ public final class OPFPushHelper {
         }
     }
 
+    void registerNextAvailableProvider(@Nullable final String prevProviderName) {
+        synchronized (registrationLock) {
+            OPFLog.methodD(prevProviderName);
+
+            final int providersCount = sortedProvidersList.size();
+            final int prevProviderPosition = getProviderPosition(sortedProvidersList, prevProviderName);
+
+            for (int i = (prevProviderPosition + 1) % providersCount, j = 0;
+                 j < providersCount;
+                 i = (i + 1) % providersCount, j++) {
+
+                final PushProvider provider = sortedProvidersList.get(i);
+                final String providerName = provider.getName();
+                OPFLog.d("Provider name : " + providerName);
+                if (provider.isAvailable() && !registerProviderErrors.containsKey(providerName)) {
+                    OPFLog.d("Provider is available.");
+                    retryManager.cancelRetryAllOperations(provider.getName());
+                    register(provider);
+                    return;
+                }
+            }
+
+            settings.saveState(UNREGISTERED);
+            OPFLog.w("No more available providers.");
+            eventListenerWrapper.onNoAvailableProvider(appContext, registerProviderErrors);
+        }
+    }
+
     private void restoreLastProvider() {
         OPFLog.methodD();
 
@@ -380,32 +408,6 @@ public final class OPFPushHelper {
         registerNextAvailableProvider(null);
     }
 
-    private void registerNextAvailableProvider(@Nullable final String prevProviderName) {
-        OPFLog.methodD(prevProviderName);
-
-        final int providersCount = sortedProvidersList.size();
-        final int prevProviderPosition = getProviderPosition(sortedProvidersList, prevProviderName);
-
-        for (int i = (prevProviderPosition + 1) % providersCount, j = 0;
-             j < providersCount;
-             i = (i + 1) % providersCount, j++) {
-
-            final PushProvider provider = sortedProvidersList.get(i);
-            final String providerName = provider.getName();
-            OPFLog.d("Provider name : " + providerName);
-            if (provider.isAvailable() && !registerProviderErrors.containsKey(providerName)) {
-                OPFLog.d("Provider is available.");
-                retryManager.cancelRetryAllOperations(provider.getName());
-                register(provider);
-                return;
-            }
-        }
-
-        settings.saveState(UNREGISTERED);
-        OPFLog.w("No more available providers.");
-        eventListenerWrapper.onNoAvailableProvider(appContext, registerProviderErrors);
-    }
-
     private int getProviderPosition(@NonNull final List<PushProvider> providers,
                                     @Nullable final String providerName) {
         OPFLog.methodD(providers, providerName);
@@ -432,6 +434,8 @@ public final class OPFPushHelper {
 
         final String regId = provider.getRegistrationId();
         if (!provider.isRegistered() || TextUtils.isEmpty(regId)) {
+            RegisteringTimeoutController.setTimeout(appContext, provider.getName());
+            settings.saveState(REGISTERING);
             provider.register();
         } else {
             receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());

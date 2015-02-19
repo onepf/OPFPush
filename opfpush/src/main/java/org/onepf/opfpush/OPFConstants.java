@@ -39,6 +39,8 @@ public final class OPFConstants {
     public static final String ACTION_RETRY_REGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_REGISTER";
     public static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
 
+    static final String ACTION_CHECK_REGISTERING_TIMEOUT = BuildConfig.APPLICATION_ID + "intent.CHECK_REGISTERING_TIMEOUT";
+
     private OPFConstants() {
         throw new UnsupportedOperationException();
     }

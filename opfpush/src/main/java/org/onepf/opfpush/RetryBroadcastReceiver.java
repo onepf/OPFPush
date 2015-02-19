@@ -22,9 +22,11 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfpush.model.State;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
+import static org.onepf.opfpush.OPFConstants.ACTION_CHECK_REGISTERING_TIMEOUT;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
@@ -45,18 +47,32 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
             OPFLog.d("Initialisation is done");
 
             final String action = intent.getAction();
+            final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
             switch (action) {
                 case ACTION_RETRY_REGISTER:
-                    helper.register(intent.getStringExtra(EXTRA_PROVIDER_NAME));
+                    helper.register(providerName);
                     break;
                 case ACTION_RETRY_UNREGISTER:
-                    helper.unregister(intent.getStringExtra(EXTRA_PROVIDER_NAME));
+                    helper.unregister(providerName);
+                    break;
+                case ACTION_CHECK_REGISTERING_TIMEOUT:
+                    checkRegistering(context, helper, providerName);
                     break;
                 default:
                     throw new OPFPushException("Unknown action '%s'.", action);
             }
         } else {
             OPFLog.e("OPFPush must be initialized");
+        }
+    }
+
+    private void checkRegistering(@NonNull final Context context,
+                                  @NonNull final OPFPushHelper helper,
+                                  @NonNull final String providerName) {
+        OPFLog.methodD(context, helper, providerName);
+        if (helper.isRegistering()) {
+            Settings.getInstance(context).saveState(State.UNREGISTERED);
+            helper.registerNextAvailableProvider(providerName);
         }
     }
 }
