@@ -19,23 +19,60 @@ package org.onepf.opfpush;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+
+import org.onepf.opfpush.exception.OPFPushException;
+import org.onepf.opfpush.model.State;
+import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
+
+import static org.onepf.opfpush.OPFConstants.ACTION_CHECK_REGISTERING_TIMEOUT;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
+import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 01.10.14.
  */
 public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        final OPFPushHelper helper = OPFPushHelper.getInstance(context);
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
+        OPFLog.methodD(context, OPFUtils.toString(intent));
+
+        final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {
+            OPFLog.d("Initialisation is done");
+
             final String action = intent.getAction();
-            if (Constants.ACTION_REGISTER.equals(action)) {
-                helper.register(intent.getStringExtra(Constants.EXTRA_PROVIDER_NAME));
-            } else {
-                throw new OPFPushException("Unknown action '%s'.", action);
+            final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
+            switch (action) {
+                case ACTION_RETRY_REGISTER:
+                    helper.register(providerName);
+                    break;
+                case ACTION_RETRY_UNREGISTER:
+                    helper.unregister(providerName);
+                    break;
+                case ACTION_CHECK_REGISTERING_TIMEOUT:
+                    checkRegistering(context, helper, providerName);
+                    break;
+                default:
+                    throw new OPFPushException("Unknown action '%s'.", action);
             }
+        } else {
+            OPFLog.e("OPFPush must be initialized");
+        }
+    }
+
+    private void checkRegistering(@NonNull final Context context,
+                                  @NonNull final OPFPushHelper helper,
+                                  @NonNull final String providerName) {
+        OPFLog.methodD(context, helper, providerName);
+        if (helper.isRegistering()) {
+            Settings.getInstance(context).saveState(State.UNREGISTERED);
+            helper.registerNextAvailableProvider(providerName);
         }
     }
 }

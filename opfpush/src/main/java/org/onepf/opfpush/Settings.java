@@ -17,71 +17,99 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.State;
+import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFPreferences;
+
+import static org.onepf.opfpush.model.State.UNREGISTERED;
+
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 01.10.14.
  */
-class Settings {
+final class Settings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
 
-    private static final String PREF_NAME = "org.onepf.openpush";
+    private static volatile Settings instance;
 
     @NonNull
-    private final SharedPreferences mPreferences;
+    private final OPFPreferences preferences;
 
-    public Settings(@NonNull Context context) {
-        mPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    private Settings(@NonNull final Context context) {
+        preferences = new OPFPreferences(context, Context.MODE_MULTI_PROCESS);
     }
 
-    @OPFPushHelper.State
-    public int getState() {
-        @OPFPushHelper.State int state =
-                mPreferences.getInt(KEY_STATE, OPFPushHelper.STATE_UNREGISTERED);
+    public static Settings getInstance(@NonNull final Context context) {
+        if (instance == null) {
+            synchronized (Settings.class) {
+                if (instance == null) {
+                    instance = new Settings(context);
+                }
+            }
+        }
+
+        return instance;
+    }
+
+    @NonNull
+    public synchronized State getState() {
+        OPFLog.methodD();
+
+        final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
+        State state = State.fromValue(stateValue);
+
+        OPFLog.d("State : " + state);
+        if (state == null) {
+            state = UNREGISTERED;
+            saveState(state);
+        }
         return state;
     }
 
-    public void saveState(@OPFPushHelper.State int state) {
-        mPreferences.edit().putInt(KEY_STATE, state).apply();
+    public synchronized void saveState(@NonNull final State state) {
+        OPFLog.methodD(state);
+        preferences.put(KEY_STATE, state.getValue());
     }
 
-    public void clear() {
-        mPreferences.edit().clear().apply();
+    public synchronized void clear() {
+        OPFLog.methodD();
+        preferences.clear();
     }
 
     @Nullable
-    public String getLastProviderName() {
-        return mPreferences.getString(KEY_LAST_PROVIDER_NAME, null);
+    public synchronized String getLastProviderName() {
+        return preferences.getString(KEY_LAST_PROVIDER_NAME);
     }
 
-    public void saveLastProvider(@Nullable PushProvider provider) {
-        SharedPreferences.Editor editor = mPreferences.edit();
+    public synchronized void saveLastProvider(@Nullable final PushProvider provider) {
+        OPFLog.methodD(provider);
+
         if (provider == null) {
-            editor.remove(KEY_LAST_PROVIDER_NAME);
+            preferences.remove(KEY_LAST_PROVIDER_NAME);
         } else {
-            editor.putString(KEY_LAST_PROVIDER_NAME, provider.getName());
+            preferences.put(KEY_LAST_PROVIDER_NAME, provider.getName());
         }
-        editor.apply();
     }
 
     @Nullable
-    public String getLastAndroidId() {
-        return mPreferences.getString(KEY_LAST_ANDROID_ID, null);
+    public synchronized String getLastAndroidId() {
+        return preferences.getString(KEY_LAST_ANDROID_ID);
     }
 
-    public void saveLastAndroidId(@Nullable String androidId) {
-        SharedPreferences.Editor editor = mPreferences.edit();
+    public synchronized void saveLastAndroidId(@Nullable final String androidId) {
+        OPFLog.methodD(androidId);
+
         if (androidId == null) {
-            editor.remove(KEY_LAST_ANDROID_ID);
+            preferences.remove(KEY_LAST_ANDROID_ID);
         } else {
-            editor.putString(KEY_LAST_ANDROID_ID, androidId);
+            preferences.put(KEY_LAST_ANDROID_ID, androidId);
         }
-        editor.apply();
     }
 }

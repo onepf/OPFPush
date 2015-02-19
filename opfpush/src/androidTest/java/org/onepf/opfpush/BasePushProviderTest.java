@@ -18,6 +18,7 @@ package org.onepf.opfpush;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfpush.mock.MockPushProvider;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 10/9/14.
  */
 @Config(emulateSdk = 18, manifest = Config.NONE)
@@ -36,7 +38,7 @@ public class BasePushProviderTest {
 
     @Test
     public void testIsAvailable_HostAppInstalled() {
-        PushProvider mockPushProvider = new MockPushProvider();
+        final PushProvider mockPushProvider = new MockPushProvider();
         Robolectric.packageManager.addPackage(mockPushProvider.getHostAppPackage());
         assertTrue(mockPushProvider.isAvailable());
     }
@@ -48,7 +50,7 @@ public class BasePushProviderTest {
 
     @Test
     public void testIsAvailable() {
-        PushProvider mockPushProvider = new MockPushProvider();
+        final PushProvider mockPushProvider = new MockPushProvider();
         assertFalse(mockPushProvider.isAvailable());
 
         final String hostAppPackage = mockPushProvider.getHostAppPackage();
@@ -62,9 +64,15 @@ public class BasePushProviderTest {
 
     @Test
     public void testCreate() {
-        PushProvider provider = new MockPushProvider();
+        final PushProvider provider = new MockPushProvider();
         assertFalse(provider.isAvailable());
         assertEquals(MockPushProvider.DEFAULT_NAME, provider.getName());
         assertEquals(MockPushProvider.DEFAULT_HOST_APP_PACKAGE, provider.getHostAppPackage());
+    }
+
+    @Test
+    public void testCheckManifest() {
+        final PushProvider provider = new MockPushProvider();
+        assertTrue(provider.checkManifest());
     }
 }

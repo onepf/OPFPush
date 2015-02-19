@@ -15,8 +15,8 @@
  */
 
 
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply plugin: 'robolectric'
 apply from: '../maven_push.gradle'
 
 android {
@@ -24,34 +24,24 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 19
+        minSdkVersion 14
+        targetSdkVersion 21
         versionCode 2
         versionName "2.0"
-
-        applicationId 'org.onepf.opfpush'
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
 }
 
-robolectric {
-    // configure the set of classes for JUnit tests
-    include '**/*Test.class'
-    exclude '**/espresso/**/*.class'
-
-    // configure max heap size of the test JVM
-    maxHeapSize = '2048m'
-
-    // configure whether failing tests should fail the build
-    ignoreFailures true
-}
-
 dependencies {
-    androidTestCompile 'org.robolectric:robolectric:2.3'
-    androidTestCompile 'junit:junit:4.11'
-
+    androidTestCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'junit:junit:4.12'
     compile 'com.android.support:support-annotations:19.1.0'
+    compile 'com.google.code.findbugs:annotations:3.0.0'
+    compile 'org.onepf:opfutils:0.1.11-SNAPSHOT'
 }

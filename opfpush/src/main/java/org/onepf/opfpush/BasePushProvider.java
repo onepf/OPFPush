@@ -17,25 +17,32 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
+
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
+import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
  * Base class for create {@code PushProvider}.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 05.09.14
  */
 public abstract class BasePushProvider implements PushProvider {
 
     @NonNull
-    private final Context mAppContext;
+    private final Context appContext;
 
     @NonNull
-    private final String mName;
+    private final String name;
 
-    private final String mHostAppPackage;
+    @NonNull
+    private final String hostAppPackage;
 
     /**
      * Base constructor for subclass.
@@ -45,51 +52,26 @@ public abstract class BasePushProvider implements PushProvider {
      * @param hostAppPackage Package of application that handle push message from server
      *                       and deliver it to applications.
      */
-    protected BasePushProvider(@NonNull Context context,
-                               @NonNull String name,
-                               String hostAppPackage) {
-        mAppContext = context.getApplicationContext();
-        mName = name;
-        mHostAppPackage = hostAppPackage;
-    }
-
-    /**
-     * Verify is manifest contains permission.
-     *
-     * @param ctx        Any instance of {@code Context}.
-     * @param permission Permission for verify.
-     */
-    protected static boolean checkPermission(@NonNull Context ctx, @NonNull String permission) {
-        switch (ctx.getPackageManager().checkPermission(permission, ctx.getPackageName())) {
-            case PackageManager.PERMISSION_GRANTED:
-                return true;
-
-            default:
-                throw new OPFPushException("Your manifest doesn't contain permission '"
-                        + permission + ".' Check your AndroidManifest.xml.");
-        }
-    }
-
-    /**
-     * Get {@code Context} instance.
-     */
-    @NonNull
-    protected Context getContext() {
-        return mAppContext;
+    protected BasePushProvider(@NonNull final Context context,
+                               @NonNull final String name,
+                               @NonNull final String hostAppPackage) {
+        this.appContext = context.getApplicationContext();
+        this.name = name;
+        this.hostAppPackage = hostAppPackage;
     }
 
     @Override
     public boolean isAvailable() {
-        return PackageUtils.isInstalled(mAppContext, mHostAppPackage);
+        return OPFUtils.isInstalled(appContext, hostAppPackage);
     }
 
     @Override
     public String toString() {
-        return mName + "(hostAppPackage='" + mHostAppPackage + ')';
+        return name + "(hostAppPackage='" + hostAppPackage + ')';
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -97,37 +79,47 @@ public abstract class BasePushProvider implements PushProvider {
             return false;
         }
 
-        BasePushProvider that = (BasePushProvider) o;
-        return mName.equals(that.mName);
+        final BasePushProvider that = (BasePushProvider) o;
+        return name.equals(that.name);
     }
 
     @Override
     public boolean checkManifest() {
-        return checkPermission(mAppContext, android.Manifest.permission.INTERNET);
+        OPFLog.methodD();
+        return hasRequestedPermission(appContext, INTERNET)
+                && hasRequestedPermission(appContext, RECEIVE_BOOT_COMPLETED);
     }
 
     @Override
     public int hashCode() {
-        return mName.hashCode();
+        return name.hashCode();
     }
 
     @NonNull
     @Override
     public String getName() {
-        return mName;
+        return name;
     }
 
     @Override
     public void onUnavailable() {
     }
 
-    @Nullable
+    @NonNull
     @Override
     public String getHostAppPackage() {
-        return mHostAppPackage;
+        return hostAppPackage;
     }
 
     @Override
     public void onRegistrationInvalid() {
+    }
+
+    /**
+     * Get {@code Context} instance.
+     */
+    @NonNull
+    protected Context getContext() {
+        return appContext;
     }
 }

@@ -21,31 +21,41 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import static org.onepf.opfpush.OPFPushLog.LOGD;
-import static org.onepf.opfpush.OPFPushLog.LOGI;
+import org.onepf.opfutils.OPFLog;
+
+import static android.provider.Settings.Secure;
+import static android.provider.Settings.Secure.ANDROID_ID;
 
 /**
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 09.09.14.
  */
 public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
-    public void onReceive(@NonNull Context context, Intent intent) {
-        LOGD("OpenPush receive boot complete.");
-        final OPFPushHelper helper = OPFPushHelper.getInstance(context);
+    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
+        OPFLog.methodD(context, intent);
+
+        final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {
+            OPFLog.d("Helper is registered");
             if (isAndroidIDChanged(context)) {
-                LOGI("Android ID changed.");
+                OPFLog.d("Android ID changed.");
                 helper.onNeedRetryRegister();
+            } else {
+                OPFLog.d("Android ID hasn't been changed");
+                helper.registerPackageChangeReceiver();
             }
         } else if (helper.isRegistering()) {
-            LOGI("Retry register after reboot.");
+            OPFLog.d("Registration in progress");
+            OPFLog.d("Retry register after reboot.");
             helper.restartRegisterOnBoot();
         }
     }
 
-    public static boolean isAndroidIDChanged(@NonNull Context context) {
-        return !android.provider.Settings.Secure.ANDROID_ID.equals(new Settings(context).getLastAndroidId());
+    private boolean isAndroidIDChanged(@NonNull final Context context) {
+        return !Secure.getString(context.getContentResolver(), ANDROID_ID)
+                .equals(Settings.getInstance(context).getLastAndroidId());
     }
 }

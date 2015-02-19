@@ -118,7 +118,7 @@ You can setup `OPFPushHelper` following steps:
 You can enable logging by call (by default it off):
 
 ```java
-OPFPushLog.setLogEnable(true);
+OPFLog.setEnabled(true);
 ```
 
 

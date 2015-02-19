@@ -19,6 +19,8 @@ package org.onepf.opfpush;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.exception.OPFPushException;
+
 /**
  * {@code PushProvider} represent provider for push notification from server to client app.
  *

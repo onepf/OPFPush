@@ -26,8 +26,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.0'
-        classpath 'org.robolectric:robolectric-gradle-plugin:0.13.0'
+        //noinspection GradleDependency
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.13.2'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
 
@@ -49,7 +51,7 @@ allprojects {
     }
 
     ext {
-        compileSdkVersion = 19
-        buildToolsVersion = "20.0.0"
+        compileSdkVersion = 21
+        buildToolsVersion = "21.1"
     }
 }
