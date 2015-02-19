@@ -14,4 +14,8 @@
  * limitations under the License.
  */
 
-include ':opfpush', ':opfpush-providers:gcm', ':opfpush-providers:nokia', ':opfpush-providers:adm', 'samples:opfpush-sample'
+include ':opfpush',
+        ':opfpush-providers:gcm',
+        ':opfpush-providers:nokia',
+        ':opfpush-providers:adm',
+        'samples:opfpush-sample'
