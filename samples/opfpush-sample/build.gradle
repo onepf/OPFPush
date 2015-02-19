@@ -32,10 +32,10 @@ android {
 }
 
 dependencies {
-    compile 'org.onepf:opfpush-adm:0.1.0-SNAPSHOT@aar'
-    compile 'org.onepf:opfpush-gcm:0.1.0-SNAPSHOT@aar'
-    compile 'org.onepf:opfpush-nokia:0.1.0-SNAPSHOT@aar'
-    compile ('org.onepf:opfpush:0.1.0-SNAPSHOT@aar') {
+    compile 'org.onepf:opfpush-adm:0.1.0@aar'
+    compile 'org.onepf:opfpush-gcm:0.1.0@aar'
+    compile 'org.onepf:opfpush-nokia:0.1.0@aar'
+    compile ('org.onepf:opfpush:0.1.0@aar') {
         transitive = true
     }
 

@@ -26,7 +26,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
-        versionName "0.1.0-SNAPSHOT"
+        versionName "0.1.0"
     }
 
     lintOptions {
@@ -39,7 +39,7 @@ android {
 
 dependencies {
     provided 'com.amazon:amazon-device-messaging:1.0.1'
-    provided ('org.onepf:opfpush:0.1.0-SNAPSHOT@aar') {
+    provided ('org.onepf:opfpush:0.1.0@aar') {
         transitive = true
     }
 }
