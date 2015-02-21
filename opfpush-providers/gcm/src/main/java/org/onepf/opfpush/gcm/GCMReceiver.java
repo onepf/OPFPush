@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfutils.OPFLog;
@@ -36,17 +35,6 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFLog.methodD(context, OPFUtils.toString(intent));
-
-        if (GCMConstants.ACTION_REGISTRATION.equals(intent.getAction())) {
-            final Bundle extras = intent.getExtras();
-            if (extras != null
-                    && extras.size() == 1
-                    && extras.containsKey(GCMConstants.EXTRA_REGISTRATION_ID)) {
-                intent.setAction(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            } else {
-                return;
-            }
-        }
 
         intent.setComponent(new ComponentName(context, GCMService.class));
         startWakefulService(context, intent);

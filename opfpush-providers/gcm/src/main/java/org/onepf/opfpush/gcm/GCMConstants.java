@@ -27,7 +27,6 @@ public final class GCMConstants {
 
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 
-    static final String ACTION_REGISTRATION = "com.google.android.c2dm.intent.REGISTRATION";
     static final String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
     static final String ACTION_UNREGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.UNREGISTRATION";
 

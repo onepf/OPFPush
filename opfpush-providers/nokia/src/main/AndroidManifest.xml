@@ -20,11 +20,6 @@
 
     <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE"/>
 
-    <!--<uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>-->
-    <!--<permission-->
-        <!--android:name="${applicationId}.permission.C2D_MESSAGE"-->
-        <!--android:protectionLevel="signature"/>-->
-
     <application>
         <service
             android:name=".NokiaNotificationService"
