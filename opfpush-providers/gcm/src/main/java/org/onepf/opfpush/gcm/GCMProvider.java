@@ -270,9 +270,11 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             OPFLog.methodD(registrationId);
             preferencesProvider.saveRegistrationId(registrationId);
 
-            //For finish registration we catch intent with action
-            //GCMConstant.ACTION_REGISTRATION in GCMReceiver.
-            //No need to send another intent.
+            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, registrationId);
+
+            OPFLog.d("Send broadcast intent : " + OPFUtils.toString(intent));
+            getContext().sendBroadcast(intent);
         }
 
         private void onAuthError() {
