@@ -27,7 +27,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
-        versionName "0.1.0-SNAPSHOT"
+        versionName "0.1.1-SNAPSHOT"
     }
 
     lintOptions {
@@ -43,5 +43,5 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     compile 'com.android.support:support-annotations:19.1.0'
     compile 'com.google.code.findbugs:annotations:3.0.0'
-    compile 'org.onepf:opfutils:0.1.11-SNAPSHOT'
+    compile 'org.onepf:opfutils:0.1.11'
 }
