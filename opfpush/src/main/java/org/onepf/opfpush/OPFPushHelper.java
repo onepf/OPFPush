@@ -221,6 +221,15 @@ public final class OPFPushHelper {
     }
 
     @Nullable
+    public String getProviderName() {
+        if (currentProvider != null) {
+            return currentProvider.getName();
+        }
+
+        return null;
+    }
+
+    @Nullable
     public PushProvider getCurrentProvider() {
         return currentProvider;
     }
