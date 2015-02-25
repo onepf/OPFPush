@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.unity3d.player.UnityPlayer;
+
 import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.OPFPushReceiver;
 import org.onepf.opfpush.model.OPFError;
@@ -46,6 +48,10 @@ import static org.onepf.opfpush.unity.util.Constants.PAYLOAD_EXTRA_KEY;
  * @since 25.12.14
  */
 public class DemoOPFPushReceiver extends OPFPushReceiver {
+
+    private static final String EVENT_RECEIVER = "OPFPush";
+    private static final String INIT_SUCCEEDED_CALLBACK = "OnInitSucceeded";
+    private static final String INIT_FAILED_CALLBACK = "OnInitFailed";
 
     @Override
     public void onMessage(@NonNull final Context context,
@@ -91,6 +97,8 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
                              @NonNull final String registrationId) {
         OPFPushLog.methodD(DemoOPFPushReceiver.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
+
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, "");
     }
 
     @Override
