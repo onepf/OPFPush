@@ -43,7 +43,7 @@ final class Settings {
     private final OPFPreferences preferences;
 
     private Settings(@NonNull final Context context) {
-        preferences = new OPFPreferences(context, Context.MODE_MULTI_PROCESS);
+        preferences = new OPFPreferences(context);
     }
 
     public static Settings getInstance(@NonNull final Context context) {

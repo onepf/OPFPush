@@ -43,7 +43,7 @@ final class PreferencesProvider {
     private OPFPreferences preferences;
 
     private PreferencesProvider(@NonNull final Context context) {
-        preferences = new OPFPreferences(context, ADM_POSTFIX, Context.MODE_MULTI_PROCESS);
+        preferences = new OPFPreferences(context, ADM_POSTFIX);
     }
 
     public static PreferencesProvider getInstance(@NonNull final Context context) {
