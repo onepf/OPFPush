@@ -23,7 +23,7 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "0.1.0-SNAPSHOT"
@@ -39,5 +39,5 @@ android {
 
 dependencies {
     compile project(':opfpush')
-    provided 'com.amazon:amazon-device-messaging:1.0.1'
+    compile 'com.amazon:amazon-device-messaging:1.0.1'
 }
