@@ -33,7 +33,9 @@ android {
 
 dependencies {
     compile project(':opfpush-providers:adm')
-    compile project(':opfpush-providers:gcm')
+    compile(project(':opfpush-providers:gcm')) {
+        transitive = false
+    }
     compile project(':opfpush-providers:nokia')
 
     compile 'com.google.android.gms:play-services:6.5.87'
