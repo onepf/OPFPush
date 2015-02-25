@@ -42,6 +42,5 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
 
     compile project(':opfpush')
-    //noinspection GradleDependency
-    compile 'com.google.android.gms:play-services:3.1.36'
+    compile 'com.google.android.gms:play-services:6.5.87'
 }
