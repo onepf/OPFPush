@@ -12,7 +12,7 @@ import org.robolectric.Robolectric;
 public class MockNamePushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
-    public static final String DEFAULT_NAME = MockPushProvider.class.getName();
+    public static final String DEFAULT_NAME = MockNamePushProvider.class.getName();
 
     public MockNamePushProvider(@NonNull String name) {
         this(name, DEFAULT_HOST_APP_PACKAGE);
