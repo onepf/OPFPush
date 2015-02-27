@@ -13,7 +13,7 @@ For more information see [the website][openpush-site].
 
 - [Download](#user-content-download)
 - [How To Use](#user-content-how-to-use)
-- [Using of OPFPushReceiver](#user-content-using-of-opfpush-receiver)
+- [Using of OPFPushReceiver](#user-content-using-of-opfpushreceiver)
 - [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Implemented Push Services](#user-content-implemented-push-services)
 - [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
