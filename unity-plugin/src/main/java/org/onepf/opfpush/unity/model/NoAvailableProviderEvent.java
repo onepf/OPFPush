@@ -14,9 +14,29 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':opfpush-providers:gcm',
-        ':opfpush-providers:nokia',
-        ':opfpush-providers:adm',
-        ':unity-plugin',
-        'samples:opfpush-sample'
+package org.onepf.opfpush.unity.model;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfpush.model.OPFError;
+
+import java.util.Map;
+
+/**
+ * @author Roman Savin
+ * @since 02.02.2015
+ */
+public class NoAvailableProviderEvent {
+
+    @NonNull
+    private Map<String, OPFError> registrationErrors;
+
+    public NoAvailableProviderEvent(@NonNull final Map<String, OPFError> registrationErrors) {
+        this.registrationErrors = registrationErrors;
+    }
+
+    @NonNull
+    public Map<String, OPFError> getRegistrationErrors() {
+        return registrationErrors;
+    }
+}
