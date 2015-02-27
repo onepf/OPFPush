@@ -18,5 +18,5 @@ include ':opfpush',
         ':opfpush-providers:gcm',
         ':opfpush-providers:nokia',
         ':opfpush-providers:adm',
-        ':unity-plugin',
+        /*':unity-plugin',*/
         'samples:opfpush-sample'

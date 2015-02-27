@@ -10,7 +10,6 @@
       <module fileurl="file://$PROJECT_DIR$/opfpush-providers/opfpush-providers.iml" filepath="$PROJECT_DIR$/opfpush-providers/opfpush-providers.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/opfpush-sample/opfpush-sample.iml" filepath="$PROJECT_DIR$/samples/opfpush-sample/opfpush-sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/samples.iml" filepath="$PROJECT_DIR$/samples/samples.iml" />
-      <module fileurl="file://$PROJECT_DIR$/unity-plugin/unity-plugin.iml" filepath="$PROJECT_DIR$/unity-plugin/unity-plugin.iml" />
     </modules>
   </component>
 </project>

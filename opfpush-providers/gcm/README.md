@@ -1,108 +1,57 @@
-# Google Cloud Messaging provider for OPFPush
+[Google Cloud Messaging][1] implementation for OPFPush.
 
-[Google Cloud Messaging][1] implementation for Open Push.
-See [guide how to porting GCM to OPFPUsh][2]
+## How To Use
 
+Add following permissions to your AndroidManifest.xml file:
 
-## Integrate in application
+```xml
+<uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+<permission
+    android:name="${applicationId}.permission.C2D_MESSAGE"
+    android:protectionLevel="signature" />
+```
 
-For work this module do the following steps:
-1. Add Google Play Services 3.1.36 or higher dependency to your application.
+also add following receiver:
 
-2. If you use JAR dependency add to AndroidManifest.xml of your application:
+```xml
+<receiver
+    android:name="org.onepf.opfpush.gcm.GCMReceiver"
+    android:exported="true"
+    android:permission="com.google.android.c2dm.permission.SEND">
+    <intent-filter>
+        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        <category android:name="${applicationId}" />
+    </intent-filter>
+    <intent-filter>
+        <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION" />
+        <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION" />
+    </intent-filter>
+</receiver>
+```
 
-    ````xml
-    <uses-permission android:name="(your_application_package).permission.C2D_MESSAGE"/>
-    <permission
-        android:name="(your_application_package).permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
+If you use JAR dependency, you also must add to your application AndroidManifest.xml file following:
 
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission
-        android:name="android.permission.GET_ACCOUNTS"
-        android:maxSdkVersion="15"/>
+```xml
+<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-    <application>
-        <receiver
-            android:name="org.onepf.openpush.gcm.GCMReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="(your_application_package)"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
-                <category android:name="(your_application_package)"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="org.onepf.openpush.gcm.intent.UNREGISTRATION"/>
-                <action android:name="org.onepf.openpush.gcm.intent.REGISTRATION"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name="org.onepf.openpush.BootCompleteReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
+<application>
+    <service
+        android:name=".GCMService"
+        android:exported="false" />
 
-        <service
-            android:name="org.onepf.openpush.gcm.GCMService"
-            android:exported="false"/>
+    <service
+        android:name=".SendMessageService"
+        android:exported="false" />
 
-        <service
-            android:name="org.onepf.opfpush.gcm.SendMessageService"
-            android:exported="false"/>
-    </application>
-    ````
+</application>
+```
 
-For working this provider require Google Play Service. This is very large library with more than
-22K methods, but we need only GCM source. For remove unused source you can add the
-following code in `build.gradle` in your app:
+To use `GCMProvider` just add it to `Configuration` when building new instance, like this:
 
-````groovy
-afterEvaluate { project ->
-    android.applicationVariants.each { variant ->
-        variant.javaCompile.dependsOn stripPlayServices
-    }
-}
-
-task stripPlayServices << {
-    def playServiceRootFolder = new File(rootProject.buildDir, "intermediates/exploded-aar/com.google.android.gms/play-services/")
-    playServiceRootFolder.list().each { versionName ->
-        def versionFolder = new File(playServiceRootFolder, versionName)
-
-        copy {
-            from (file(new File(versionFolder, "classes.jar")))
-            into (file(versionFolder))
-            rename { fileName ->
-                fileName = "classes_orig.jar"
-            }
-        }
-
-        tasks.create(name: "strip" + versionName, type: Jar) {
-            destinationDir = versionFolder
-            archiveName = "classes.jar"
-            from (zipTree(new File(versionFolder, "classes_orig.jar"))) {
-                exclude "com/google/ads/**"
-                exclude "com/google/android/gms/analytics/**"
-                exclude "com/google/android/gms/games/**"
-                exclude "com/google/android/gms/maps/**"
-                exclude "com/google/android/gms/panorama/**"
-                exclude "com/google/android/gms/plus/**"
-                exclude "com/google/android/gms/drive/**"
-                exclude "com/google/android/gms/ads/**"
-                exclude "com/google/android/gms/wallet/**"
-                exclude "com/google/android/gms/wearable/**"
-            }
-        }.execute()
-
-        delete {
-            delete (file(new File(versionFolder, "classes_orig.jar")))
-        }
-    }
-}
-````
+```java
+Configuration.Builder builder = new Configuration.Builder();
+builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
+```
 
 [1]: https://developer.android.com/google/gcm/index.html
-[2]: ../../README.md#user-content-porting-google-cloud-messaging-to-opfpush
