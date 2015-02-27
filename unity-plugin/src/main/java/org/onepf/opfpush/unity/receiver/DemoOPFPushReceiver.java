@@ -23,15 +23,14 @@ import android.support.annotation.Nullable;
 
 import com.unity3d.player.UnityPlayer;
 
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.OPFPushReceiver;
 import org.onepf.opfpush.model.OPFError;
-import org.onepf.opfpush.unity.R;
 import org.onepf.opfpush.unity.model.MessageEvent;
 import org.onepf.opfpush.unity.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.unity.model.RegisteredEvent;
 import org.onepf.opfpush.unity.model.UnregisteredEvent;
 import org.onepf.opfpush.unity.util.NotificationUtils;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -57,7 +56,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onMessage",
+        OPFLog.methodD(DemoOPFPushReceiver.class, "onMessage",
                 context, providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
@@ -79,7 +78,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
-                OPFPushLog.e(e.getCause().toString());
+                OPFLog.e(e.getCause().toString());
             }
         }
     }
@@ -88,31 +87,31 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onDeletedMessages", providerName, messagesCount);
+        OPFLog.methodD(DemoOPFPushReceiver.class, "onDeletedMessages", providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onRegistered", providerName, registrationId);
+        OPFLog.methodD(DemoOPFPushReceiver.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
 
-        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, "");
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, registrationId);
     }
 
     @Override
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onUnregistered", providerName, oldRegistrationId);
+        OPFLog.methodD(DemoOPFPushReceiver.class, "onUnregistered", providerName, oldRegistrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, OPFError> registrationErrors) {
-        OPFPushLog.methodD(DemoOPFPushReceiver.class, "onNoAvailableProvider", context, registrationErrors);
+        OPFLog.methodD(DemoOPFPushReceiver.class, "onNoAvailableProvider", context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

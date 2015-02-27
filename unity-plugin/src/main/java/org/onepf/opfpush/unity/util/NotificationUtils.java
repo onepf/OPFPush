@@ -23,11 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-
 import com.unity3d.player.UnityPlayerNativeActivity;
 
-import org.onepf.opfpush.OPFPushLog;
-import org.onepf.opfpush.unity.R;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,7 +44,7 @@ public final class NotificationUtils {
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final String notificationTitle,
                                         @NonNull final String notificationText) {
-        OPFPushLog.methodD(NotificationUtils.class, "showNotification",
+        OPFLog.methodD(NotificationUtils.class, "showNotification",
                 context, notificationTitle, notificationText);
 
 
