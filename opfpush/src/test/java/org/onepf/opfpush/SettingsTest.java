@@ -7,7 +7,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.mock.MockNamePushProvider;
@@ -59,16 +58,14 @@ public class SettingsTest extends Assert {
                 instanceField.setAccessible(true);
                 instanceField.set(null, null);
 
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
     }
     
     @Test
-    public void testGetState() {
+    public void getState_commonSituation() {
         // first is always UNREGISTERED
         assertEquals(State.UNREGISTERED, settings.getState());
 
@@ -80,14 +77,13 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testGetState2() {
-        // test null situation
+    public void getState_nullIsTreatedAsUnregistered() {
         sharedPreferences.edit().putInt(KEY_STATE, -1).commit();
         assertEquals(State.UNREGISTERED, settings.getState());
     }
 
     @Test
-    public void testSaveState() {
+    public void saveState() {
         // check all states set correctly
         State actualState;
         State expectedState;
@@ -102,7 +98,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testSaveStateAndGetState() {
+    public void saveState_and_getState() {
         // check saveState/getState consistency
         for (State state : State.values()) {
             settings.saveState(state);
@@ -111,7 +107,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testSaveLastProviderName() {
+    public void saveLastProviderName() {
         PushProvider expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)];
@@ -121,7 +117,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testGetLastProviderName() {
+    public void getLastProviderName() {
         String expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)].getName();
@@ -131,7 +127,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testSaveLastProviderNameAndGetLastProviderName() {
+    public void saveLastProviderName_and_getLastProviderName() {
         PushProvider expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)];
@@ -155,7 +151,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testSaveLastAndroidId() {
+    public void saveLastAndroidId_commonSituation() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, 16);
         for (int i = 0; i < NUM_TESTS; ++i) {
             settings.saveLastAndroidId(randomStrings[i]);
@@ -164,7 +160,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testSaveLastAndroidId2() {
+    public void saveLastAndroidId_passingNullClearsPreferences() {
         // test null case
         sharedPreferences.edit().putString(KEY_LAST_ANDROID_ID, "notNull").commit();
         settings.saveLastAndroidId(null);
@@ -172,7 +168,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testGetLastAndroidId() {
+    public void getLastAndroidId() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, 16);
         for (int i = 0; i < NUM_TESTS; ++i) {
             sharedPreferences.edit().putString(KEY_LAST_ANDROID_ID, randomStrings[i]).commit();
@@ -181,7 +177,7 @@ public class SettingsTest extends Assert {
     }
 
     @Test
-    public void testGetLastAndroidIdAndSaveLastAndroidId() {
+    public void getLastAndroidId_and_saveLastAndroidId() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, 16);
         for (int i = 0; i < NUM_TESTS; ++i) {
             settings.saveLastAndroidId(randomStrings[i]);
