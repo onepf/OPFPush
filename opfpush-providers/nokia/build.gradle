@@ -23,10 +23,10 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "0.1.0-SNAPSHOT"
+        versionCode 4
+        versionName "0.1.4-SNAPSHOT"
     }
 
     lintOptions {
@@ -39,5 +39,5 @@ android {
 
 dependencies {
     compile project(':opfpush')
-    provided 'com.nokia:push:1.0'
+    compile 'com.nokia:push:1.0'
 }

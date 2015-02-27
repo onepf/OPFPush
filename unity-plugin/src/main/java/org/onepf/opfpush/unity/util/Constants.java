@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':opfpush-providers:gcm',
-        ':opfpush-providers:nokia',
-        ':opfpush-providers:adm',
-        /*':unity-plugin',*/
-        'samples:opfpush-sample'
+package org.onepf.opfpush.unity.util;
+
+/**
+ * @author Roman Savin
+ * @since 10.12.14
+ */
+public final class Constants {
+
+    private Constants() {
+        throw new UnsupportedOperationException();
+    }
+
+    //for GCM
+    public static final String MESSAGE_EXTRA_KEY = "message";
+
+    //for Nokia
+    public static final String PAYLOAD_EXTRA_KEY = "payload";
+}

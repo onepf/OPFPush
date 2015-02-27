@@ -16,31 +16,33 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
+//apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 9
         targetSdkVersion 21
-        versionCode 4
-        versionName "0.1.4-SNAPSHOT"
+        versionCode 2
+        versionName "2.0"
     }
 
-    lintOptions {
-        abortOnError true
-        checkAllWarnings true
-        warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+    android {
+        lintOptions {
+            abortOnError false
+        }
     }
 }
 
 dependencies {
-    androidTestCompile 'org.robolectric:robolectric:2.4'
-    androidTestCompile 'junit:junit:4.12'
+    provided files('libs/unity-engine.jar')
+    compile project(':opfpush-providers:adm')
+    compile project(':opfpush-providers:gcm')
+    compile project(':opfpush-providers:nokia')
 
-    compile project(':opfpush')
-    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'de.greenrobot:eventbus:2.4.0'
 }
