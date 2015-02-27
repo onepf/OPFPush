@@ -80,7 +80,7 @@ If you use JAR dependencies:
     ```
 
     Also add for each used providers specific changes that you can find in provider README.md file.
-    See section `Implemented Push Services`.
+    See section [Implemented Push Services](#user-content-implemented-push-services).
 
 You can setup `OPFPush` following steps:
 
