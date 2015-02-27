@@ -1,15 +1,12 @@
 package org.onepf.opfpush;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 
 import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +15,8 @@ import org.onepf.opfpush.model.State;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowPreferenceManager;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -31,11 +26,11 @@ import java.util.Random;
 @RunWith(RobolectricTestRunner.class)
 public class SettingsTest extends Assert {
 
-    private static final String KEY_LAST_PROVIDER_NAME      = "last_provider_name";
-    private static final String KEY_STATE                   = "state";
-    private static final String KEY_LAST_ANDROID_ID         = "android_id";
-    private static final int NUM_TESTS                      = 100;
-    private static final int NUM_PROVIDERS                  = 100;
+    private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
+    private static final String KEY_STATE = "state";
+    private static final String KEY_LAST_ANDROID_ID = "android_id";
+    private static final int NUM_TESTS = 100;
+    private static final int NUM_PROVIDERS = 100;
 
     private static final Random RND = new Random();
 
@@ -43,18 +38,18 @@ public class SettingsTest extends Assert {
     private Context ctx;
     private SharedPreferences sharedPreferences;
     private Settings settings;
-    
+
     @Before
     public void setup() {
         ctx = Robolectric.application.getApplicationContext();
         sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_MULTI_PROCESS);
         settings = Settings.getInstance(ctx);
         pushProviders = new MockNamePushProvider[NUM_PROVIDERS];
-        for (int i = 0;i < NUM_PROVIDERS; ++i) {
+        for (int i = 0; i < NUM_PROVIDERS; ++i) {
             pushProviders[i] = new MockNamePushProvider(String.format("provider%d", i + 1));
         }
     }
-    
+
     @After
     public void eraseSettingsInstance() {
         Field instanceField;
@@ -76,7 +71,7 @@ public class SettingsTest extends Assert {
     public void testGetState() {
         // first is always UNREGISTERED
         assertEquals(State.UNREGISTERED, settings.getState());
-        
+
         // check all states get correctly
         for (State state : State.values()) {
             sharedPreferences.edit().putInt(KEY_STATE, state.getValue()).commit();
@@ -90,7 +85,7 @@ public class SettingsTest extends Assert {
         sharedPreferences.edit().putInt(KEY_STATE, -1).commit();
         assertEquals(State.UNREGISTERED, settings.getState());
     }
-    
+
     @Test
     public void testSaveState() {
         // check all states set correctly
@@ -105,7 +100,7 @@ public class SettingsTest extends Assert {
             assertEquals(expectedState, actualState);
         }
     }
-    
+
     @Test
     public void testSaveStateAndGetState() {
         // check saveState/getState consistency
@@ -118,17 +113,17 @@ public class SettingsTest extends Assert {
     @Test
     public void testSaveLastProviderName() {
         PushProvider expected;
-        for (int i = 0;i < NUM_TESTS; ++i) {
+        for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)];
             settings.saveLastProvider(expected);
             assertEquals(expected.getName(), sharedPreferences.getString(KEY_LAST_PROVIDER_NAME, null));
         }
     }
-    
+
     @Test
     public void testGetLastProviderName() {
         String expected;
-        for (int i = 0;i < NUM_TESTS; ++i) {
+        for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)].getName();
             sharedPreferences.edit().putString(KEY_LAST_PROVIDER_NAME, expected).commit();
             assertEquals(expected, settings.getLastProviderName());
@@ -138,7 +133,7 @@ public class SettingsTest extends Assert {
     @Test
     public void testSaveLastProviderNameAndGetLastProviderName() {
         PushProvider expected;
-        for (int i = 0;i < NUM_TESTS; ++i) {
+        for (int i = 0; i < NUM_TESTS; ++i) {
             expected = pushProviders[RND.nextInt(NUM_PROVIDERS)];
             settings.saveLastProvider(expected);
             assertEquals(expected.getName(), settings.getLastProviderName());
@@ -158,7 +153,7 @@ public class SettingsTest extends Assert {
         }
         return strings;
     }
-    
+
     @Test
     public void testSaveLastAndroidId() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, 16);
@@ -175,7 +170,7 @@ public class SettingsTest extends Assert {
         settings.saveLastAndroidId(null);
         assertFalse(sharedPreferences.contains(KEY_LAST_ANDROID_ID));
     }
-    
+
     @Test
     public void testGetLastAndroidId() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, 16);
