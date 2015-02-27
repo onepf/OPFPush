@@ -56,9 +56,11 @@ for JAR dependency:
 
 ## How To Use
 
-Before setup `OPFPush` you must setup your project files.
-If you use JAR dependencies add to your AndroidManifest.xml file the following permissions:
+**Project files setup**
 
+Before setup `OPFPush` you must setup your project files.
+
+1. If you use JAR dependencies add to your AndroidManifest.xml file the following permissions:
     ```xml   
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -67,7 +69,7 @@ If you use JAR dependencies add to your AndroidManifest.xml file the following p
     <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
     ```
     
-and the following receivers:
+   and the following receivers:
     ```xml
     <receiver android:name="org.onepf.opfpush.BootCompleteReceiver">
         <intent-filter>
@@ -77,8 +79,9 @@ and the following receivers:
     <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
     ```
 
-Also add for each used providers specific changes that you can find in provider README.md file.
-See section [Implemented Push Services](#user-content-implemented-push-services).
+2. Add for each used providers specific changes that you can find in provider README.md file. See section [Implemented Push Services](#user-content-implemented-push-services).
+
+**OPFPush setup**
 
 You can setup `OPFPush` following steps:
 
@@ -106,20 +109,19 @@ You can setup `OPFPush` following steps:
 
     Preferred place to init `OPFPush` is the `Application` class of your app.
 
-4. Register `OPFPushHelper`:
+3. Register `OPFPushHelper`:
 
     ```java
     //Start registration.
     OPFPush.getHelper().register();
     ```
 
-You can enable logging by call (by default it off):
+4. You can enable logging by call (by default it off):
+    ```java
+    OPFLog.setEnabled(true);
+    ```
 
-```java
-OPFLog.setEnabled(true);
-```
-
-##Using of `OPFPushReceiver`
+##Using of OPFPushReceiver
 
 You can use `BroadcastReceiver` instead of `EventListener` for receiving push events. 
 Just extend `OPFPushReceiver` and add your receiver to AndroidManifest.xml with the following intent filter:
