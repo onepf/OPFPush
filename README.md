@@ -5,9 +5,6 @@ The project is under development.
 Currently OPFPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
 Android Device Messaging and has possibility to integrate new push service.
 
-For more information see [the website][openpush-site].
-
-
 
 ## Table Of Contents
 
