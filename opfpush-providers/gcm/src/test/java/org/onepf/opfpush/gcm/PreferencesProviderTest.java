@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.adm;
+package org.onepf.opfpush.gcm;
 
 import android.content.Context;
 
@@ -38,7 +38,7 @@ import java.lang.reflect.Field;
 @RunWith(RobolectricTestRunner.class)
 public class PreferencesProviderTest {
 
-    private static final String ADM_POSTFIX = "adm";
+    private static final String GCM_POSTFIX = "gcm";
     private static final String KEY_APP_VERSION = "app_version";
 
     private Context ctx;
@@ -49,7 +49,7 @@ public class PreferencesProviderTest {
     public void setup() {
         ctx = Robolectric.application.getApplicationContext();
         preferencesProvider = PreferencesProvider.getInstance(ctx);
-        preferences = new OPFPreferences(ctx, ADM_POSTFIX);
+        preferences = new OPFPreferences(ctx, GCM_POSTFIX);
     }
 
     @After
