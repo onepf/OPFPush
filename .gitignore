@@ -28,6 +28,7 @@ gradle-app.setting
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+.idea/misc.xml
 
 # Gradle:
 .idea/gradle.xml
