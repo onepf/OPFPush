@@ -17,7 +17,6 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply plugin: 'org.robolectric'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -38,41 +37,17 @@ android {
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
 
-    sourceSets{
-        androidTest.setRoot('src/test')
-    }
-}
+    sourceSets {
+        androidTest.java.srcDirs += 'src/test/java'
 
-robolectric {
-    // Configure includes / excludes
-    include '**/*Test.class'
-    exclude '**/espresso/**/*.class'
-
-    // Configure max heap size of the test JVM
-    maxHeapSize = '2048m'
-
-    // Configure the test JVM arguments - Does not apply to Java 8
-    jvmArgs '-XX:MaxPermSize=512m', '-XX:-UseSplitVerifier'
-
-    // Specify max number of processes (default is 1)
-    maxParallelForks = 4
-
-    // Specify max number of test classes to execute in a test process
-    // before restarting the process (default is unlimited)
-    forkEvery = 150
-
-    // configure whether failing tests should fail the build
-    ignoreFailures true
-
-    // use afterTest to listen to the test execution results
-    afterTest { descriptor, result ->
-        println "Executing test for ${descriptor.name} with result: ${result.resultType}"
     }
 }
 
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
     
     compile 'com.android.support:support-annotations:19.1.0'
     compile 'com.google.code.findbugs:annotations:3.0.0'

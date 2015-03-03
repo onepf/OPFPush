@@ -35,9 +35,17 @@ android {
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
-}
 
+    sourceSets {
+        androidTest.java.srcDirs += 'src/test/java'
+    }
+}
 dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
+
     compile project(':opfpush')
     provided 'com.amazon:amazon-device-messaging:1.0.1'
 }
