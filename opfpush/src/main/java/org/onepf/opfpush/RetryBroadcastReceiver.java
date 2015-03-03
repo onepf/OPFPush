@@ -21,10 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
+
+import java.util.Locale;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_CHECK_REGISTERING_TIMEOUT;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
@@ -59,7 +60,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
                     checkRegistering(context, helper, providerName);
                     break;
                 default:
-                    throw new OPFPushException("Unknown action '%s'.", action);
+                    throw new IllegalStateException(String.format(Locale.US, "Unknown action '%s'.", action));
             }
         } else {
             OPFLog.e("OPFPush must be initialized");

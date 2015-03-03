@@ -19,8 +19,6 @@ package org.onepf.opfpush;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.exception.OPFPushException;
-
 /**
  * The {@code PushProvider} interface represent the provider for push notification from the server to
  * the client app.
@@ -92,9 +90,7 @@ public interface PushProvider {
     /**
      * Verify that application manifest contains all needed permissions.
      *
-     * @return {@code true} If all required permissions described in manifest, else {@code false}.
-     * @throws OPFPushException If AndroidManifest.xml file doesn't contain all
-     *                          required permissions for provider.
+     * @return {@code true} If all required permissions described in the manifest, else {@code false}.
      */
     boolean checkManifest();
 

@@ -26,7 +26,6 @@ import android.text.TextUtils;
 import org.onepf.opfpush.backoff.InfinityExponentialBackoffManager;
 import org.onepf.opfpush.backoff.RetryManager;
 import org.onepf.opfpush.configuration.Configuration;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.OPFError;
@@ -41,6 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -123,7 +123,7 @@ public final class OPFPushHelper {
      * If you set {@code true} as an argument of {@link org.onepf.opfpush.configuration.Configuration.Builder#setSelectSystemPreferred(boolean)}
      * method, the system push provider will get the highest priority.
      *
-     * @throws org.onepf.opfutils.exception.InitException If {@link org.onepf.opfpush.OPFPush} isn't initialized.
+     * @throws java.lang.IllegalStateException If {@code OPFPush} haven't been initialized.
      */
     public void register() {
         OPFLog.methodD();
@@ -156,7 +156,7 @@ public final class OPFPushHelper {
      * A better approach is to simply have your server stop sending messages.
      * Only use unregister if you want to change your sender ID.
      *
-     * @throws org.onepf.opfutils.exception.InitException If {@link org.onepf.opfpush.OPFPush} isn't initialized.
+     * @throws java.lang.IllegalStateException If {@code OPFPush} haven't been initialized.
      */
     public void unregister() {
         OPFLog.methodD();
@@ -310,9 +310,9 @@ public final class OPFPushHelper {
         OPFLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
                 + "; eventListenerWrapper == " + eventListener);
         if (isOPFReceiverRegistered && eventListener != null) {
-            throw new OPFPushException("You can't register OPFReceiver and set event listener");
+            throw new IllegalStateException("You can't register OPFReceiver and set event listener");
         } else if (!isOPFReceiverRegistered && eventListener == null) {
-            throw new OPFPushException("You must register OPFReceiver or set event listener");
+            throw new IllegalStateException("You must register OPFReceiver or set event listener");
         }
 
         initSortedProviderList();
@@ -516,7 +516,11 @@ public final class OPFPushHelper {
 
         final PushProvider provider = getProvider(providerName);
         if (provider == null) {
-            throw new OPFPushException("Provider with name '%s' not found.", providerName);
+            throw new IllegalStateException(String.format(
+                    Locale.US,
+                    "Provider with name '%s' not found.",
+                    providerName
+            ));
         }
         return provider;
     }

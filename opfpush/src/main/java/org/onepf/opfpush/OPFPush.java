@@ -21,9 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.configuration.Configuration;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.exception.InitException;
 
 /**
  * The {@link org.onepf.opfpush.OPFPushHelper} instance holder.
@@ -48,13 +48,13 @@ public final class OPFPush {
      * Returns the {@link org.onepf.opfpush.OPFPushHelper} instance.
      *
      * @return The {@link org.onepf.opfpush.OPFPushHelper} instance.
-     * @throws org.onepf.opfpush.exception.OPFPushException If {@code OPFPush} wasn't initialized.
+     * @throws org.onepf.opfutils.exception.InitException If {@code OPFPush} wasn't initialized.
      */
     @NonNull
     public static OPFPushHelper getHelper() {
         OPFLog.methodD();
         if (helper == null) {
-            throw new OPFPushException("OPFPush doesn't init");
+            throw new InitException(false);
         }
         return helper;
     }
