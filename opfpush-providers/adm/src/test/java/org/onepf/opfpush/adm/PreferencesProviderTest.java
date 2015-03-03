@@ -46,7 +46,7 @@ public class PreferencesProviderTest extends Assert {
     private static final String ADM_POSTFIX = "adm";
 
     private static final Random RND = new Random();
-    
+
     private static final int NUM_TESTS = 100;
 
     private Context ctx;
@@ -63,7 +63,7 @@ public class PreferencesProviderTest extends Assert {
     private void postSetupUpdateAppVersion() {
         preferences.put(KEY_APP_VERSION, OPFUtils.getAppVersion(ctx));
     }
-    
+
     @After
     public void erasePreferencesProviderInstance() {
         Field instanceField;
@@ -99,7 +99,7 @@ public class PreferencesProviderTest extends Assert {
     @Test
     public void testGetRegistrationId() {
         postSetupUpdateAppVersion();
-        
+
         String expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
             expected = String.format("id%d", i);
@@ -107,23 +107,23 @@ public class PreferencesProviderTest extends Assert {
             assertEquals(expected, preferencesProvider.getRegistrationId());
         }
     }
-    
+
     @Test
     public void testGetRegistrationIdNullCase() {
         postSetupUpdateAppVersion();
-        
+
         // registration id must be null if it is not set
         assertNull(preferencesProvider.getRegistrationId());
-        
+
         // registration Id after reset must be null
         preferencesProvider.saveRegistrationId("notNullRegistrationId");
         preferencesProvider.reset();
         assertNull(preferencesProvider.getRegistrationId());
     }
-    
+
     @Test
     public void testSaveRegistrationId() {
-        
+
         // not null registration id should be saved
         String expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
@@ -131,16 +131,16 @@ public class PreferencesProviderTest extends Assert {
             preferencesProvider.saveRegistrationId(expected);
             assertEquals(expected, preferences.getString(KEY_REGISTRATION_ID));
         }
-        
+
         // null registration id must erase previous value
         preferencesProvider.saveRegistrationId(null);
         assertFalse(preferences.contains(KEY_REGISTRATION_ID));
     }
-    
+
     @Test
     public void testReset() {
         postSetupUpdateAppVersion();
-        
+
         for (int i = 0; i < NUM_TESTS; ++i) {
             preferences.put(KEY_APP_VERSION, RND.nextInt());
             preferences.put(KEY_REGISTRATION_ID, String.format("regId%d", RND.nextInt()));
@@ -151,11 +151,11 @@ public class PreferencesProviderTest extends Assert {
             assertNull(preferences.getInt(KEY_APP_VERSION));
         }
     }
-    
+
     @Test
     public void testRemoveAuthenticationFailedFlag() {
         postSetupUpdateAppVersion();
-        
+
         preferences.put(KEY_AUTHENTICATION_FAILED_FLAG, true);
         preferencesProvider.removeAuthenticationFailedFlag();
         assertNull(preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG));
@@ -164,14 +164,14 @@ public class PreferencesProviderTest extends Assert {
         preferencesProvider.removeAuthenticationFailedFlag();
         assertNull(preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG));
     }
-    
+
     @Test
     public void testSaveAuthenticationFailedFlag() {
         postSetupUpdateAppVersion();
 
         preferencesProvider.saveAuthenticationFailedFlag();
         assertTrue(preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG));
-        
+
         preferences.put(KEY_AUTHENTICATION_FAILED_FLAG, false);
         preferencesProvider.saveAuthenticationFailedFlag();
         assertTrue(preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG));
@@ -180,16 +180,16 @@ public class PreferencesProviderTest extends Assert {
         preferencesProvider.saveAuthenticationFailedFlag();
         assertTrue(preferences.getBoolean(KEY_AUTHENTICATION_FAILED_FLAG));
     }
-    
+
     @Test
     public void testIsAuthenticationFailed() {
         postSetupUpdateAppVersion();
-        
+
         assertFalse(preferencesProvider.isAuthenticationFailed());
-        
+
         preferencesProvider.saveAuthenticationFailedFlag();
         assertTrue(preferencesProvider.isAuthenticationFailed());
-        
+
         preferencesProvider.removeAuthenticationFailedFlag();
         assertFalse(preferencesProvider.isAuthenticationFailed());
     }
