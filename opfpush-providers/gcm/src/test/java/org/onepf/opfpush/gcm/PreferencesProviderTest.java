@@ -57,9 +57,6 @@ public class PreferencesProviderTest extends Assert {
         ctx = Robolectric.application.getApplicationContext();
         preferencesProvider = PreferencesProvider.getInstance(ctx);
         preferences = new OPFPreferences(ctx, GCM_POSTFIX);
-    }
-
-    private void postSetupUpdateAppVersion() {
         preferences.put(KEY_APP_VERSION, OPFUtils.getAppVersion(ctx));
     }
 
@@ -71,7 +68,6 @@ public class PreferencesProviderTest extends Assert {
                 instanceField = PreferencesProvider.class.getDeclaredField("instance");
                 instanceField.setAccessible(true);
                 instanceField.set(null, null);
-
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -80,25 +76,21 @@ public class PreferencesProviderTest extends Assert {
 
     @Test
     public void testChangeApplicationVersion() {
-        final int appVersion1 = 1;
-        final int appVersion2 = 2;
+        final int changedAppVersion = OPFUtils.getAppVersion(ctx) + 1;
         final String registrationIdBefore = "id1";
 
-        // save registration Id with one appVersion
-        preferences.put(KEY_APP_VERSION, appVersion1);
+        // save registration Id with version "OPFUtils.getAppVersion(ctx)"
         preferencesProvider.saveRegistrationId(registrationIdBefore);
 
-        // get registration Id with another appVersion
-        preferences.put(KEY_APP_VERSION, appVersion2);
+        // get registration Id with version "OPFUtils.getAppVersion(ctx) + 1"
+        preferences.put(KEY_APP_VERSION, changedAppVersion);
         final String registrarionIdAfter = preferencesProvider.getRegistrationId();
 
-        Assert.assertNotSame(registrationIdBefore, registrarionIdAfter);
+        assertNull(registrarionIdAfter);
     }
 
     @Test
     public void testGetRegistrationId() {
-        postSetupUpdateAppVersion();
-
         String expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
             expected = String.format("id%d", i);
@@ -109,8 +101,6 @@ public class PreferencesProviderTest extends Assert {
 
     @Test
     public void testGetRegistrationIdNullCase() {
-        postSetupUpdateAppVersion();
-
         // registration id must be null if it is not set
         assertNull(preferencesProvider.getRegistrationId());
 
@@ -122,7 +112,6 @@ public class PreferencesProviderTest extends Assert {
 
     @Test
     public void testSaveRegistrationId() {
-
         // not null registration id should be saved
         String expected;
         for (int i = 0; i < NUM_TESTS; ++i) {
@@ -138,8 +127,6 @@ public class PreferencesProviderTest extends Assert {
 
     @Test
     public void testReset() {
-        postSetupUpdateAppVersion();
-
         for (int i = 0; i < NUM_TESTS; ++i) {
             preferences.put(KEY_APP_VERSION, RND.nextInt());
             preferences.put(KEY_REGISTRATION_ID, String.format("regId%d", RND.nextInt()));
