@@ -42,6 +42,10 @@ import static org.onepf.opfpush.OPFConstants.EXTRA_REGISTRATION_ID;
 import static org.onepf.opfpush.OPFConstants.MESSAGES_COUNT_UNKNOWN;
 
 /**
+ * Delivers messages that are received by {@link org.onepf.opfpush.OPFPushHelper}.
+ * Can be used instead of {@link org.onepf.opfpush.listener.EventListener} for handling
+ * push messages and registration / unregistration results.
+ *
  * @author Roman Savin
  * @since 25.12.14
  */

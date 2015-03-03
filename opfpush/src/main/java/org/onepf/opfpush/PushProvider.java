@@ -23,6 +23,10 @@ import org.onepf.opfpush.exception.OPFPushException;
 
 /**
  * {@code PushProvider} represent provider for push notification from server to client app.
+ * <p/>
+ * Don't invoke {@link #register()} and {@link #unregister()} directly from your app.
+ * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} for start registration
+ * or unregistration.
  *
  * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
  * @since 14.05.14
@@ -55,24 +59,20 @@ public interface PushProvider {
     boolean isRegistered();
 
     /**
-     * Gets the registration id. If registration not done will return null.
+     * Returns the registration ID or null if provider isn't registered.
      */
     @Nullable
     String getRegistrationId();
 
     /**
-     * Get name of the provider. Must be unique for all providers.
-     *
-     * @return Provider name.
+     * Returns name of the provider. Must be unique for all providers.
      */
     @NonNull
     String getName();
 
     /**
-     * Get package of application that contains API of the provider.
+     * Returns package of application that contains API of the provider.
      * Usually, this is store application.
-     *
-     * @return Host application package.
      */
     @Nullable
     String getHostAppPackage();
@@ -81,8 +81,8 @@ public interface PushProvider {
      * Verify does application manifest contains all needed permissions.
      *
      * @return {@code true} if all required permissions described in manifest, else {@code false}.
-     * @throws OPFPushException When application's AndroidManifest.xml file doesn't contain all
-     *                           needed permission for provider.
+     * @throws OPFPushException If AndroidManifest.xml file doesn't contain all
+     *                          required permissions for provider.
      */
     boolean checkManifest();
 
@@ -90,14 +90,14 @@ public interface PushProvider {
      * Callback method, that called when the application state change, like update to new version,
      * or system state changed, like update firmware to a newer version.
      * <p/>
-     * When this method call you registration is invalid
-     * and you need reset all saved registration data.
+     * If this method is called, your registration became invalid
+     * and you have to reset all saved registration data.
      */
     void onRegistrationInvalid();
 
     /**
-     * Callback method for notify that the provider become unavailable.
-     * In this method you must reset all saved registration data.
+     * Callback method for notify that the provider became unavailable.
+     * In this method you have to reset all saved registration data.
      */
     void onUnavailable();
 }

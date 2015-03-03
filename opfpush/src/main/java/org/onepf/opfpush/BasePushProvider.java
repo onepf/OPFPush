@@ -27,7 +27,8 @@ import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
- * Base class for create {@code PushProvider}.
+ * Implements common functionality of {@link org.onepf.opfpush.PushProvider} interface.
+ * This class is recommended for implementation custom {@code PushProvider}.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -63,11 +64,6 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public boolean isAvailable() {
         return OPFUtils.isInstalled(appContext, hostAppPackage);
-    }
-
-    @Override
-    public String toString() {
-        return name + "(hostAppPackage='" + hostAppPackage + ')';
     }
 
     @Override
@@ -115,8 +111,14 @@ public abstract class BasePushProvider implements PushProvider {
     public void onRegistrationInvalid() {
     }
 
+
+    @Override
+    public String toString() {
+        return name + "(hostAppPackage='" + hostAppPackage + ')';
+    }
+
     /**
-     * Get {@code Context} instance.
+     * Returns the instance of application context.
      */
     @NonNull
     protected Context getContext() {

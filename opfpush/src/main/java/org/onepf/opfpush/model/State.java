@@ -19,7 +19,8 @@ package org.onepf.opfpush.model;
 import android.support.annotation.Nullable;
 
 /**
- * Indicates state of registration / unregistration.
+ * Indicates state of {@link org.onepf.opfpush.OPFPushHelper}.
+ * Is used internally by library. Don't use this directly in an application.
  *
  * @author Roman Savin
  * @since 08.12.14
@@ -27,17 +28,17 @@ import android.support.annotation.Nullable;
 public enum State {
 
     /**
-     * Indicates that unregistration is completed.
+     * Indicates that unregistration has been completed.
      */
     UNREGISTERED(0),
 
     /**
-     * Indicates that registration is completed.
+     * Indicates that registration has been completed.
      */
     REGISTERED(2),
 
     /**
-     * Indicates that registration is performed.
+     * Indicates that registration is being performed.
      */
     REGISTERING(3);
 

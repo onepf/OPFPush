@@ -17,6 +17,8 @@
 package org.onepf.opfpush.model;
 
 /**
+ * Registration or unregistration operation that is performed by {@link org.onepf.opfpush.OPFPushHelper}
+ *
  * @author Roman Savin
  * @since 04.02.2015
  */

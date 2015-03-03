@@ -17,11 +17,16 @@
 package org.onepf.opfpush.adm;
 
 /**
+ * This class contains {@code ADMProvider} specific constants.
+ *
  * @author Roman Savin
  * @since 17.12.14
  */
 public final class ADMConstants {
 
+    /**
+     * The name of {@code ADMProvider}
+     */
     public static final String PROVIDER_NAME = "Amazon Device Messaging";
 
     static final String AMAZON_MANUFACTURER = "Amazon";

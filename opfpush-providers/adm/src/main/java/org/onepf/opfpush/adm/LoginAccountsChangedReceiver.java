@@ -33,6 +33,9 @@ import static org.onepf.opfpush.adm.ADMConstants.ACCOUNT_TYPE;
 import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
 
 /**
+ * Is used for retrying unregister operation if there was
+ * {@link com.amazon.device.messaging.ADMConstants#ERROR_AUTHENTICATION_FAILED} error while unregistration.
+ *
  * @author Roman Savin
  * @since 03.02.2015
  */

@@ -19,12 +19,17 @@ package org.onepf.opfpush.gcm;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
+ * This class contains {@code GCMProvider} specific constants.
+ *
  * @author Kirill Rozov
  * @author Roman Savin
  * @since 06.09.14.
  */
 public final class GCMConstants {
 
+    /**
+     * The name of {@code GCMProvider}
+     */
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 
     static final String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
