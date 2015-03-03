@@ -25,7 +25,7 @@ package org.onepf.opfpush.nokia;
 public final class NokiaPushConstants {
 
     /**
-     * The name of {@code NokiaNotificationProvider}
+     * The name of the {@code NokiaNotificationProvider}
      */
     public static final String PROVIDER_NAME = "Nokia Push";
 

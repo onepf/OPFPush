@@ -26,7 +26,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 /**
- * Forward Google Cloud Messaging (GCM) messages to the {@link GCMService}.
+ * Forwards the Google Cloud Messaging (GCM) messages to {@link GCMService}.
  *
  * @author Roman Savin
  */

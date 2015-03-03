@@ -30,7 +30,7 @@ import org.onepf.opfutils.OPFLog;
  * <p/>
  * Use {@link #init(android.content.Context, org.onepf.opfpush.configuration.Configuration)} for the
  * initialization of {@link org.onepf.opfpush.OPFPushHelper} global singleton instance.
- * Use {@link #getHelper()} for getting initialized {@link org.onepf.opfpush.OPFPushHelper} instance.
+ * Use {@link #getHelper()} to get initialized {@link org.onepf.opfpush.OPFPushHelper} instance.
  *
  * @author Roman Savin
  * @since 12.01.15
@@ -47,8 +47,8 @@ public final class OPFPush {
     /**
      * Returns the {@link org.onepf.opfpush.OPFPushHelper} instance.
      *
-     * @return {@link org.onepf.opfpush.OPFPushHelper} instance.
-     * @throws org.onepf.opfpush.exception.OPFPushException if {@code OPFPush} wasn't initialized.
+     * @return The {@link org.onepf.opfpush.OPFPushHelper} instance.
+     * @throws org.onepf.opfpush.exception.OPFPushException If {@code OPFPush} wasn't initialized.
      */
     @NonNull
     public static OPFPushHelper getHelper() {
@@ -60,12 +60,12 @@ public final class OPFPush {
     }
 
     /**
-     * Initializes OPFPush library and creates {@link org.onepf.opfpush.OPFPushHelper} singleton instance.
+     * Initializes the OPFPush library and creates {@link org.onepf.opfpush.OPFPushHelper} singleton instance.
      *
      * @param context       {@link android.content.Context} instance.
      * @param configuration {@link org.onepf.opfpush.configuration.Configuration} instance.
-     * @throws org.onepf.opfutils.exception.WrongThreadException if this method is called from not main thread.
-     * @throws org.onepf.opfutils.exception.InitException        if {@code OPFPush} was already initialized.
+     * @throws org.onepf.opfutils.exception.WrongThreadException If this method is not called from the main thread.
+     * @throws org.onepf.opfutils.exception.InitException        If {@code OPFPush} has already been initialized.
      */
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {

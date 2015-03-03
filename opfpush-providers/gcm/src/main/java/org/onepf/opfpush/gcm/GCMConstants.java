@@ -28,7 +28,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 public final class GCMConstants {
 
     /**
-     * The name of {@code GCMProvider}
+     * The name of the {@code GCMProvider}
      */
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 

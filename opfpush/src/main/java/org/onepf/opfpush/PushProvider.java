@@ -24,8 +24,8 @@ import org.onepf.opfpush.exception.OPFPushException;
 /**
  * {@code PushProvider} represent provider for push notification from server to client app.
  * <p/>
- * Don't invoke {@link #register()} and {@link #unregister()} directly from your app.
- * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} for start registration
+ * The {@link #register()} and {@link #unregister()} methods intended for internal use, should never be called directly.
+ * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} to start registration
  * or unregistration.
  *
  * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
@@ -34,53 +34,63 @@ import org.onepf.opfpush.exception.OPFPushException;
 public interface PushProvider {
     /**
      * Initiate registration of the provider. Must be async.
-     * For start registration call {@link OPFPushHelper#register()}.
+     * To start registration call {@link OPFPushHelper#register()}.
      * <p/>
-     * <b>Don't call this method manually.</b>
+     * Intended for internal use, should never be called directly.
      */
     void register();
 
     /**
      * Unregister the provider from receive push notification. Must be async.
-     * For start registration call {@link OPFPushHelper#unregister()}.
+     * To start registration call {@link OPFPushHelper#unregister()}.
      * <p/>
-     * <b>Don't call this method manually.</b>
+     * Intended for internal use, should never be called directly.
      */
     void unregister();
 
     /**
      * Checks whether the provider is available.
+     *
+     * @return {@code true} if the provider is available, otherwise false.
      */
     boolean isAvailable();
 
     /**
      * Checks whether the application was successfully registered on the service.
+     *
+     * @return {@code true} if the application was successfully registered on the service, otherwise false.
      */
     boolean isRegistered();
 
     /**
      * Returns the registration ID or null if provider isn't registered.
+     *
+     * @return The registration ID or null if provider isn't registered.
      */
     @Nullable
     String getRegistrationId();
 
     /**
-     * Returns name of the provider. Must be unique for all providers.
+     * Returns the name of the provider. Must be unique for all providers.
+     *
+     * @return The name of the provider.
      */
     @NonNull
     String getName();
 
     /**
-     * Returns package of application that contains API of the provider.
-     * Usually, this is store application.
+     * Returns the package of the application that contains API of the provider.
+     * Usually, this is a store application.
+     *
+     * @return The package of the application that contains API of the provider.
      */
     @Nullable
     String getHostAppPackage();
 
     /**
-     * Verify does application manifest contains all needed permissions.
+     * Verify that application manifest contains all needed permissions.
      *
-     * @return {@code true} if all required permissions described in manifest, else {@code false}.
+     * @return {@code true} If all required permissions described in manifest, else {@code false}.
      * @throws OPFPushException If AndroidManifest.xml file doesn't contain all
      *                          required permissions for provider.
      */
@@ -90,7 +100,7 @@ public interface PushProvider {
      * Callback method, that called when the application state change, like update to new version,
      * or system state changed, like update firmware to a newer version.
      * <p/>
-     * If this method is called, your registration became invalid
+     * If this method is called, your registration becomes invalid
      * and you have to reset all saved registration data.
      */
     void onRegistrationInvalid();

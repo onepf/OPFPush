@@ -57,8 +57,8 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
 /**
  * A helper class to manage push providers.
  * <p/>
- * Use {@link #register()} for start registration and {@link #unregister()} for start unregistration.
- * Registration and unregistration operations are asynchronous. You can handle result of these operations
+ * Use {@link #register()} to start a registration and {@link #unregister()} for start an unregistration.
+ * Registration and unregistration operations are asynchronous. You can handle results of these operations
  * via implementation of {@link org.onepf.opfpush.listener.EventListener} interface or extension of
  * {@link org.onepf.opfpush.OPFPushReceiver} class.
  * <p/>
@@ -113,12 +113,12 @@ public final class OPFPushHelper {
     }
 
     /**
-     * If {@code OPFPushHelper} is unregistered, chooses the most priority push provider and starts registration.
+     * If {@code OPFPushHelper} is unregistered, it chooses push provider with highest priority and starts registration.
      * Does nothing in another case.
      * Registration result can be handled via implementation of {@link org.onepf.opfpush.listener.EventListener}
      * interface or extension of {@link org.onepf.opfpush.OPFPushReceiver} class.
      * <p/>
-     * The priority of providers corresponds the order in which they was added to the {@link org.onepf.opfpush.configuration.Configuration}
+     * The priority of providers corresponds to the order in which they was added to the {@link org.onepf.opfpush.configuration.Configuration}
      * before initialization.
      * If you set {@code true} as argument of {@link org.onepf.opfpush.configuration.Configuration.Builder#setSelectSystemPreferred(boolean)}
      * method, the system push provider will get the highest priority.
@@ -147,16 +147,16 @@ public final class OPFPushHelper {
     }
 
     /**
-     * If {@code OPFPushHelper} is registered for pushes or registration in process,
+     * If {@code OPFPushHelper} is registered or registration is in process,
      * starts asynchronous unregistration of current push provider. Does nothing if {@code OPFPushHelper}
-     * already unregistered.
+     * has already been unregistered.
      * <p/>
      * You should rarely (if ever) need to call this method. Not only is it expensive in terms of resources,
      * but it invalidates your registration ID, which you should never change unnecessarily.
      * A better approach is to simply have your server stop sending messages.
      * Only use unregister if you want to change your sender ID.
      *
-     * @throws org.onepf.opfutils.exception.InitException if {@link org.onepf.opfpush.OPFPush} isn't initialized.
+     * @throws org.onepf.opfutils.exception.InitException If {@link org.onepf.opfpush.OPFPush} isn't initialized.
      */
     public void unregister() {
         OPFLog.methodD();
@@ -210,9 +210,9 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Returns the registration ID of current provider or {@code null} if there isn't current provider.
+     * Returns the registration ID if there's registered push provider, null otherwise.
      *
-     * @return registration ID of current provider.
+     * @return The registration ID if there's registered push provider, null otherwise.
      */
     @Nullable
     public String getRegistrationId() {
@@ -224,9 +224,9 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Returns the name of current provider or {@code null} if there isn't current provider.
+     * Returns the current provider name if there's registered push provider, null otherwise.
      *
-     * @return current provider name.
+     * @return The current provider name if there's registered push provider, null otherwise.
      */
     @Nullable
     public String getProviderName() {
@@ -238,7 +238,9 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Returns current provider.
+     * Returns the registered push provider.
+     *
+     * @return The registered push provider. Can be null.
      */
     @Nullable
     public PushProvider getCurrentProvider() {
@@ -246,11 +248,10 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Returns {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
-     * It used only by push providers for notify {@code OPFPushHelper} about received messages and results of operations.
-     * You haven't to use it in the application.
+     * Returns the {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
+     * Intended for internal use, should never be called directly.
      *
-     * @return {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
+     * @return The {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
      */
     @NonNull
     public ReceivedMessageHandler getReceivedMessageHandler() {
@@ -259,7 +260,9 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Returns {@code true} if {@code OPFPushHelper} is registered and false otherwise.
+     * Returns {@code true} if {@code OPFPushHelper} is registered, false otherwise.
+     *
+     * @return {@code true} if {@code OPFPushHelper} is registered, false otherwise.
      */
     public boolean isRegistered() {
         return settings.getState() == REGISTERED;
@@ -267,6 +270,8 @@ public final class OPFPushHelper {
 
     /**
      * Returns {@code true} if registration operation is being performed at the moment.
+     *
+     * @return {@code true} if registration operation is being performed at the moment.
      */
     public boolean isRegistering() {
         return settings.getState() == REGISTERING;

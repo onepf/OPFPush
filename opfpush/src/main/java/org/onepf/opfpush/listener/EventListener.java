@@ -21,14 +21,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.model.OPFError;
 
 import java.util.Map;
 
 /**
- * Interface definition for a callback to be invoked when an event
- * in {@link OPFPushHelper} is occurred.
+ * The interface definition to handle {@link org.onepf.opfpush.OPFPushHelper} events.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -39,39 +37,39 @@ public interface EventListener {
     /**
      * Called when a new message has been received.
      *
-     * @param context      application context.
+     * @param context      The application context.
      * @param providerName Name of provider which has received event.
-     * @param extras       Data associated with message.
+     * @param extras       Data associated with the message.
      */
     void onMessage(@NonNull Context context, @NonNull String providerName, @Nullable Bundle extras);
 
     /**
-     * Called when notification about deleted messages has been received.
-     * Some providers doesn't send the count of deleted messages. In this case message count will be equals
+     * Called when a notification about deleted messages has been received.
+     * Some providers don't send the count of deleted messages. In this case message count will equal to
      * {@link org.onepf.opfpush.OPFConstants#MESSAGES_COUNT_UNKNOWN}
      *
-     * @param context       application context.
+     * @param context       The application context.
      * @param providerName  Name of provider which has received event.
      * @param messagesCount Count of messages. {@link org.onepf.opfpush.OPFConstants#MESSAGES_COUNT_UNKNOWN} value
-     *                      if there isn't information about count.
+     *                      if there is no information about count.
      */
     void onDeletedMessages(@NonNull Context context, @NonNull String providerName, int messagesCount);
 
     /**
-     * Called when message about successful registration has been received.
+     * Called when a message about successful registration has been received.
      *
-     * @param context        application context.
+     * @param context        The application context.
      * @param providerName   Name of provider which has received event.
      * @param registrationId Registration ID for push notifications.
      */
     void onRegistered(@NonNull Context context, @NonNull String providerName, @NonNull String registrationId);
 
     /**
-     * Called when {@link org.onepf.opfpush.OPFPushHelper} become to {@code UNREGISTERED} state.
-     * Calling of this method doesn't mean that provider is already unregistered. Unregistration
+     * Called when {@link org.onepf.opfpush.OPFPushHelper} becomes {@code UNREGISTERED}.
+     * Calling this method doesn't mean that a provider is already unregistered. Unregistration
      * is performed in the background and is retried if unregistration error is occurred.
      *
-     * @param context        application context.
+     * @param context        The application context.
      * @param providerName   Name of provider which has received event.
      * @param registrationId Old registration ID for push notification.
      */
@@ -79,18 +77,21 @@ public interface EventListener {
 
     /**
      * {@code OpenPushHelper} can't find any available provider for register push.
-     * You should notify user that push notifications will not be received.
+     * You should notify the user that push notifications will not be received.
      * <p/>
      * A push provider can be unavailable in two common reasons:
-     * 1) {@link org.onepf.opfpush.PushProvider#isAvailable()} method has returned false value.
-     * 2) Some unrecoverable registration error has been occurred.
+     * <ol>
+     * <li>{@link org.onepf.opfpush.PushProvider#isAvailable()} method has returned false value.</li>
+     * <li>Some unrecoverable registration error has occurred.</li>
+     * </ol>
+     * <p/>
      * In the second case you can get {@link org.onepf.opfpush.model.OPFError} object from {@code registrationErrors}
-     * map. You can notify user about occurred error, if the error can be resolved by user.
+     * map. You can notify the user about occurred error if the error can be resolved by user.
      * For example if you get {@link org.onepf.opfpush.model.OPFError#AUTHENTICATION_FAILED} for GCM push provider,
-     * you can ask user add the google account.
+     * you can ask user whether he wants to add the google account.
      *
-     * @param context            application context.
-     * @param registrationErrors map that stores registration errors by names of push providers.
+     * @param context            The application context.
+     * @param registrationErrors A map in which registration errors are stored with a push providers' name as a key
      *                           If there isn't any registration errors, the map is empty.
      */
     void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, OPFError> registrationErrors);

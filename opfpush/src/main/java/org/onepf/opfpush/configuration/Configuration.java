@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Instance of this class is used as argument of {@link org.onepf.opfpush.OPFPush#init(android.content.Context, Configuration)}
+ * Instance of this class is used as an argument of {@link org.onepf.opfpush.OPFPush#init(android.content.Context, Configuration)}
  * method for configuring {@link org.onepf.opfpush.OPFPushHelper} instance.
  *
  * @author Kirill Rozov
@@ -59,6 +59,8 @@ public final class Configuration {
 
     /**
      * Returns all available push providers.
+     *
+     * @return All available push providers.
      */
     @NonNull
     public List<PushProvider> getProviders() {
@@ -67,6 +69,8 @@ public final class Configuration {
 
     /**
      * Returns the instance of {@link org.onepf.opfpush.listener.EventListener}.
+     *
+     * @return The instance of {@link org.onepf.opfpush.listener.EventListener}.
      */
     @Nullable
     public EventListener getEventListener() {
@@ -74,7 +78,9 @@ public final class Configuration {
     }
 
     /**
-     * Returns {@code true} if system push provider is preferred and false otherwise.
+     * Returns {@code true} if the system push provider is preferred, false otherwise.
+     *
+     * @return {@code true} if the system push provider is preferred, false otherwise.
      */
     public boolean isSelectSystemPreferred() {
         return isSelectSystemPreferred;
@@ -89,7 +95,7 @@ public final class Configuration {
     }
 
     /**
-     * Builder class that creates instance of {@code Configuration}.
+     * Builder class that creates an instance of {@code Configuration}.
      */
     public static final class Builder {
 
@@ -105,7 +111,7 @@ public final class Configuration {
          * See {@link #addProviders(java.util.List)}
          *
          * @return The current {@code Builder} instance.
-         * @throws java.lang.IllegalArgumentException If try to add some provider that was already added.
+         * @throws java.lang.IllegalArgumentException If a provider was already added
          */
         @NonNull
         public Builder addProviders(@NonNull final PushProvider... providers) {
@@ -117,11 +123,11 @@ public final class Configuration {
         }
 
         /**
-         * Add push providers to the configuration. The priority of providers corresponds the order
+         * Add push providers to the configuration. The priority of providers corresponds to the order
          * in which they were added.
          *
          * @return The current {@code Builder} instance.
-         * @throws java.lang.IllegalArgumentException If try to add some provider that was already added.
+         * @throws java.lang.IllegalArgumentException If a provider was already added.
          */
         @NonNull
         public Builder addProviders(@NonNull final List<? extends PushProvider> providers) {

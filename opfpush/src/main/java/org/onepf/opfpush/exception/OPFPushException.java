@@ -16,12 +16,6 @@
 
 package org.onepf.opfpush.exception;
 
-/**
- * Thrown when try to work with OPFPush in wrong way.
- *
- * @author Kirill Rozov
- * @since 05.09.14.
- */
 public class OPFPushException extends RuntimeException {
 
     public OPFPushException(String detailMessage) {

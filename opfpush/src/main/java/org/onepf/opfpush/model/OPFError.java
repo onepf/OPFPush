@@ -19,16 +19,16 @@ package org.onepf.opfpush.model;
 import org.onepf.opfpush.listener.EventListener;
 
 /**
- * Error of registration or unregistration operation.
- * Divided on two categories: <b>recoverable</b> and <b>unrecoverable</b>.
+ * Registration or unregistration operation error.
+ * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
  * <p/>
  * <b>Recoverable</b> error means that service can't handle registration or unregistration
  * at the moment. {@link org.onepf.opfpush.OPFPushHelper} retries operation that cause
  * the recoverable error in the background.
  * <p/>
- * <b>Unrecoverable</b> error means that error is fatal and {@link org.onepf.opfpush.OPFPushHelper}
+ * <b>Unrecoverable</b> error means that the error is fatal and {@link org.onepf.opfpush.OPFPushHelper}
  * can't register this provider. In this case {@link org.onepf.opfpush.OPFPushHelper} chooses next
- * available provider. If there aren't anymore available providers,
+ * available provider. If there aren't any other available providers,
  * {@link EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
  *
  * @author Kirill Rozov
@@ -38,7 +38,7 @@ import org.onepf.opfpush.listener.EventListener;
 public enum OPFError {
 
     /**
-     * Service not available at the moment. Most popular reason of this error is internet
+     * Service is not available at the moment. Most popular reason of this error is the internet
      * connection unavailability.
      * <p/>
      * Recoverable error.
@@ -67,7 +67,7 @@ public enum OPFError {
     AUTHENTICATION_FAILED,
 
     /**
-     * Some provider specific error has been occurred.
+     * Some provider specific error has occurred.
      * <p/>
      * Unrecoverable error.
      */
