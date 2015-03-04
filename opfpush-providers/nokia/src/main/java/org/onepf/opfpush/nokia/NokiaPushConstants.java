@@ -17,11 +17,16 @@
 package org.onepf.opfpush.nokia;
 
 /**
+ * This class contains the {@code NokiaNotificationProvider} specific constants.
+ *
  * @author Roman Savin
  * @since 17.12.14
  */
 public final class NokiaPushConstants {
 
+    /**
+     * The name of the {@code NokiaNotificationProvider}
+     */
     public static final String PROVIDER_NAME = "Nokia Push";
 
     static final String NOKIA_MANUFACTURER = "Nokia";

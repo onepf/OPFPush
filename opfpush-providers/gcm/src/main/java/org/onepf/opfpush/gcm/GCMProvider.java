@@ -78,12 +78,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         preferencesProvider = PreferencesProvider.getInstance(context);
     }
 
+    @Override
     public synchronized void register() {
         OPFLog.methodD();
         OPFLog.i("Start register GCMProvider.");
         executeTask(new RegisterTask());
     }
 
+    @Override
     public synchronized void unregister() {
         OPFLog.methodD();
         OPFLog.i("Start unregister GCMProvider.");

@@ -16,46 +16,60 @@
 
 package org.onepf.opfpush.model;
 
+import org.onepf.opfpush.listener.EventListener;
+
 /**
- * Error of registration or unregistration.
- * Divided on two categories: <b>recoverable</b> and <b>non recoverable</b>.
+ * Registration or unregistering operation error.
+ * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
  * <p/>
- * <b>Recoverable</b> error means that service in this moment can't handle registration
- * or unregistration and after some period of time you can try register on unregister again.
- * <b>Not recoverable</b> error means that error is fatal and you can't register this provider.
+ * The <b>recoverable</b> error means that the service can't handle an operation
+ * at the moment. The {@link org.onepf.opfpush.OPFPushHelper} retries an operation that cause
+ * the recoverable error in the background.
+ * <p/>
+ * <b>Unrecoverable</b> error means that the error is fatal and the {@link org.onepf.opfpush.OPFPushHelper}
+ * can't register this provider. In this case the {@link org.onepf.opfpush.OPFPushHelper} chooses the next
+ * available provider. If there are no any other available providers,
+ * the {@link EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 09.09.14.
  */
 public enum OPFError {
+
     /**
-     * Service not available at this moment. Most popular reason of this error that no internet
-     * connection available.
+     * A service is not available at the moment. Most popular reason of this error is the internet
+     * connection unavailability.
      * <p/>
      * Recoverable error.
      */
     SERVICE_NOT_AVAILABLE,
 
     /**
-     * Invalid params send to register provider.
+     * Invalid parameters have been sent to register provider.
      * <p/>
-     * Non recoverable error.
+     * Unrecoverable error.
      */
     INVALID_PARAMETERS,
 
     /**
-     * Invalid sender ID.
+     * An invalid sender ID has been used for the registration.
      * <p/>
-     * Non recoverable error.
+     * Unrecoverable error.
      */
     INVALID_SENDER,
 
     /**
-     * Credential that you use for registration is not valid.
+     * The authentication failure.
      * <p/>
-     * Non recoverable error.
+     * Unrecoverable error.
      */
     AUTHENTICATION_FAILED,
 
+    /**
+     * A provider specific error has occurred.
+     * <p/>
+     * Unrecoverable error.
+     */
     UNKNOWN_ERROR
 }

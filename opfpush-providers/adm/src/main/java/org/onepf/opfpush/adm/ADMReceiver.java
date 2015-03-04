@@ -19,7 +19,7 @@ package org.onepf.opfpush.adm;
 import com.amazon.device.messaging.ADMMessageReceiver;
 
 /**
- * Forward Amazon Device Messaging (ADM) messages to your {@link ADMService}.
+ * Forwards the Amazon Device Messaging (ADM) messages to {@link ADMService}.
  * The ADM client on the device uses broadcast intents to dispatch messages to your app.
  *
  * @author Kirill Rozov

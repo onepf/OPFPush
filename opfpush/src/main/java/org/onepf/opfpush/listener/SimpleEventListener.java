@@ -26,6 +26,8 @@ import org.onepf.opfpush.model.OPFError;
 import java.util.Map;
 
 /**
+ * The default implementation of the {@link org.onepf.opfpush.listener.EventListener} interface.
+ *
  * @author Roman Savin
  * @since 03.12.14
  */

@@ -55,11 +55,14 @@ import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
 
 /**
- * Main class for manage push providers.
+ * The helper class to manage push providers.
  * <p/>
- * Before do any operations with {@code OpenPushHelper} you must call {@link #init(org.onepf.opfpush.configuration.Configuration)}.
+ * Use {@link #register()} to start a registration and {@link #unregister()} for start an unregistration.
+ * The registration and unregistration operations are asynchronous. You can handle results of these operations
+ * via the implementation of the {@link org.onepf.opfpush.listener.EventListener} interface or the extension of
+ * the {@link org.onepf.opfpush.OPFPushReceiver} class.
  * <p/>
- * For start select provider for registerWithNext call {@link #register()}.
+ * You must initialize the {@link org.onepf.opfpush.OPFPush} class before start using the {@code OPFPushHelper}.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -110,12 +113,17 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Start select push provider and registered it.
+     * If the {@code OPFPushHelper} is unregistered, it chooses a push provider with
+     * the highest priority and starts the registration. Does nothing in another case.
+     * The registration result can be handled via the implementation of the {@link org.onepf.opfpush.listener.EventListener}
+     * interface or the extension of the {@link org.onepf.opfpush.OPFPushReceiver} class.
      * <p/>
-     * If you want to modify current registered provider, you must call unregister() first.
-     * <p/>
+     * The priority of providers corresponds to the order in which they was added to the
+     * {@link org.onepf.opfpush.configuration.Configuration} before the initialization.
+     * If you set {@code true} as an argument of {@link org.onepf.opfpush.configuration.Configuration.Builder#setSelectSystemPreferred(boolean)}
+     * method, the system push provider will get the highest priority.
      *
-     * @throws OPFPushException When try call this method while init not done.
+     * @throws org.onepf.opfutils.exception.InitException If {@link org.onepf.opfpush.OPFPush} isn't initialized.
      */
     public void register() {
         OPFLog.methodD();
@@ -139,14 +147,16 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Unregister the application. Calling unregister() stops any messages from the server.
-     * This is a not blocking call. You should rarely (if ever) need to call this method.
-     * Not only is it expensive in terms of resources, but it invalidates your registration ID,
-     * which you should never change unnecessarily.
+     * If the {@code OPFPushHelper} is registered or registration is in process,
+     * starts the asynchronous unregistration of the current push provider. Does nothing
+     * if the {@code OPFPushHelper} has already been unregistered.
+     * <p/>
+     * You should rarely (if ever) need to call this method. Not only is it expensive in terms of resources,
+     * but it invalidates your registration ID, which you should never change unnecessarily.
      * A better approach is to simply have your server stop sending messages.
      * Only use unregister if you want to change your sender ID.
      *
-     * @throws OPFPushException When try call this method while init not done.
+     * @throws org.onepf.opfutils.exception.InitException If {@link org.onepf.opfpush.OPFPush} isn't initialized.
      */
     public void unregister() {
         OPFLog.methodD();
@@ -174,24 +184,12 @@ public final class OPFPushHelper {
         }
     }
 
-    /**
-     * Check can you send message in current time. This method return only if provider is registered
-     * and it is implement {@link SenderPushProvider} interface.
-     */
     @SuppressWarnings("UnusedDeclaration")
     private boolean canSendMessages() {
         throw new UnsupportedOperationException("Not supported in current version");
         /*return currentProvider instanceof SenderPushProvider;*/
     }
 
-    /**
-     * Send message to server. Before send message check that you can send messages with
-     * {@link #canSendMessages()} method.
-     *
-     * @param message Message to send.
-     * @throws OPFPushException When try send message when any provider isn't registered
-     *                          or registered provider doesn't support send messages.
-     */
     @SuppressWarnings("UnusedDeclaration")
     private void sendMessage(@NonNull final Message message) {
         throw new UnsupportedOperationException("Not supported in current version");
@@ -211,6 +209,11 @@ public final class OPFPushHelper {
         }*/
     }
 
+    /**
+     * Returns the registration ID if there's the registered push provider, null otherwise.
+     *
+     * @return The registration ID if there's the registered push provider, null otherwise.
+     */
     @Nullable
     public String getRegistrationId() {
         if (currentProvider != null) {
@@ -220,6 +223,11 @@ public final class OPFPushHelper {
         return null;
     }
 
+    /**
+     * Returns the current provider name if there's the registered push provider, null otherwise.
+     *
+     * @return The current provider name if there's the registered push provider, null otherwise.
+     */
     @Nullable
     public String getProviderName() {
         if (currentProvider != null) {
@@ -229,21 +237,42 @@ public final class OPFPushHelper {
         return null;
     }
 
+    /**
+     * Returns the registered push provider.
+     *
+     * @return The registered push provider. Can be null.
+     */
     @Nullable
     public PushProvider getCurrentProvider() {
         return currentProvider;
     }
 
+    /**
+     * Returns the {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
+     * Intended for the internal use, should never be called directly.
+     *
+     * @return The {@link org.onepf.opfpush.OPFPushHelper.ReceivedMessageHandler} instance.
+     */
     @NonNull
     public ReceivedMessageHandler getReceivedMessageHandler() {
         checkInit(true);
         return receivedMessageHandler;
     }
 
+    /**
+     * Returns {@code true} if the {@code OPFPushHelper} is registered, false otherwise.
+     *
+     * @return {@code true} if the {@code OPFPushHelper} is registered, false otherwise.
+     */
     public boolean isRegistered() {
         return settings.getState() == REGISTERED;
     }
 
+    /**
+     * Returns {@code true} if the registration operation is being performed at the moment.
+     *
+     * @return {@code true} if the registration operation is being performed at the moment.
+     */
     public boolean isRegistering() {
         return settings.getState() == REGISTERING;
     }
@@ -263,11 +292,6 @@ public final class OPFPushHelper {
                 + '}';
     }
 
-    /**
-     * Init {@code OpenPushHelper}. You must call this method before do any operation.
-     *
-     * @param initialConfiguration Instance of {@code Options}.
-     */
     @SuppressFBWarnings({"DC_DOUBLECHECK", "DC_DOUBLECHECK"})
     void init(@NonNull final Configuration initialConfiguration) {
         OPFLog.methodD(initialConfiguration);
@@ -327,10 +351,6 @@ public final class OPFPushHelper {
         unregister(getProviderWithException(providerName));
     }
 
-    /**
-     * Call this method when device state changed and need retry registration.
-     * May be call only when the helper in registered state.
-     */
     void onNeedRetryRegister() {
         OPFLog.methodD(currentProvider);
         OPFLog.d("Current provider : " + currentProvider);
@@ -341,11 +361,6 @@ public final class OPFPushHelper {
         register();
     }
 
-    /**
-     * Call this method when provider become unavailable.
-     *
-     * @param provider Provider that become unavailable.
-     */
     void onProviderUnavailable(@NonNull final PushProvider provider) {
         OPFLog.methodD(provider);
 
@@ -421,7 +436,7 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Register first available provider.
+     * Registers a first available provider.
      */
     private void registerFirstAvailableProvider() {
         OPFLog.methodD();
@@ -445,7 +460,7 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Start register provider.
+     * Starts register the provider.
      *
      * @param provider Provider for registration.
      */
@@ -481,13 +496,6 @@ public final class OPFPushHelper {
         }
     }
 
-    /**
-     * Search provider by name in {@code options} and return in.
-     * If {@code} doesn't contain provider with described name return null.
-     *
-     * @param providerName Name of provider for search.
-     * @return Provider with described name or null if nothing have found.
-     */
     @Nullable
     private PushProvider getProvider(@NonNull final String providerName) {
         OPFLog.methodD(providerName);
@@ -502,13 +510,6 @@ public final class OPFPushHelper {
         return null;
     }
 
-    /**
-     * Same that {@link #getProvider(String)} but if provider not found throw exception.
-     *
-     * @param providerName Name of provider for search.
-     * @return Provider with name {@code providerName}.
-     * @throws OPFPushException When {@code PushProvider} with name {@code providerName} not found.
-     */
     @NonNull
     private PushProvider getProviderWithException(@NonNull final String providerName) {
         OPFLog.methodD(providerName);
@@ -583,7 +584,7 @@ public final class OPFPushHelper {
     }
 
     /**
-     * Is used for handle received messages by broadcast receivers of concrete providers.
+     * Handles messages that were received by a push provider receiver.
      */
     @SuppressWarnings("UnusedDeclaration")
     public final class ReceivedMessageHandler {
@@ -592,10 +593,10 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when new message received.
+         * A push provider calls this method when a new message is received.
          *
-         * @param providerName Name of provider from what message received.
-         * @param extras       Message extras.
+         * @param providerName The name of the provider which has received the message.
+         * @param extras       The message extras.
          */
         public void onMessage(@NonNull final String providerName,
                               @Nullable final Bundle extras) {
@@ -610,10 +611,13 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when new message deleted.
+         * A push provider calls this method when the server have deleted some pending messages
+         * because they were collapsible.
          *
-         * @param providerName  Name of provider from what message deleted.
-         * @param messagesCount Deleted messages count. If messages count is unknown pass -1.
+         * @param providerName  The name of the provider which has received the message.
+         * @param messagesCount Deleted messages count. If the messages count is unknown, than
+         *                      the {@link org.onepf.opfpush.OPFConstants#MESSAGES_COUNT_UNKNOWN} value
+         *                      is passed as an argument.
          */
         public void onDeletedMessages(@NonNull final String providerName,
                                       final int messagesCount) {
@@ -628,9 +632,9 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when a registration request succeeds.
+         * A push provider calls this method when the message about successful registration is received.
          *
-         * @param providerName   Name of provider that was registered.
+         * @param providerName   The name of the provider which has been registered for pushes.
          * @param registrationId The new registration ID for the instance of your app.
          */
         public void onRegistered(@NonNull final String providerName,
@@ -654,9 +658,9 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method on successful unregistration.
+         * A push provider calls this method when the message about successful unregistration is received.
          *
-         * @param providerName      Name of provider that was unregistered.
+         * @param providerName      The name of the provider which has been unregistered for pushes.
          * @param oldRegistrationId The registration ID for the instance of your app that is now unregistered.
          */
         public void onUnregistered(@NonNull final String providerName,
@@ -669,10 +673,10 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when a registration request fails.
+         * A push providers calls this method when a registration error is received.
          *
-         * @param providerName Name of provider the registration of which caused the error.
-         * @param error        Instance of occurred error.
+         * @param providerName The name of the provider which has received the registration error.
+         * @param error        The instance of the occurred error.
          */
         public void onRegistrationError(@NonNull final String providerName,
                                         @NonNull final OPFError error) {
@@ -698,10 +702,10 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when a unregistration request fails.
+         * A push provider calls this method when an unregistration error is received.
          *
-         * @param providerName Name of provider the unregistration of which caused the error.
-         * @param error        Instance of occurred error.
+         * @param providerName The name of the provider which has received the unregistration error.
+         * @param error        The instance of the occurred error.
          */
         public void onUnregistrationError(@NonNull final String providerName,
                                           @NonNull final OPFError error) {
@@ -728,10 +732,11 @@ public final class OPFPushHelper {
         }
 
         /**
-         * Receiver must call this method when the error occurred by unknown reason.
+         * A push provider calls this method when an error of unknown operation is received.
+         * The right callback method is chosen depends on the current {@code OPFPushHelper} state.
          *
-         * @param providerName Name of provider the registration or unregistration of which caused the error.
-         * @param error        Instance of occurred error.
+         * @param providerName The name of the provider which has received the error.
+         * @param error        The instance of the occurred error.
          */
         public void onError(@NonNull final String providerName, @NonNull final OPFError error) {
             synchronized (registrationLock) {

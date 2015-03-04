@@ -26,7 +26,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 /**
- * Receiver for events from Google Cloud Messaging and {@link GCMProvider}.
+ * Forwards the Google Cloud Messaging (GCM) messages to {@link GCMService}.
  *
  * @author Roman Savin
  */

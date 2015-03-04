@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Configuration object for {@link org.onepf.opfpush.OPFPushHelper}.
- * You can create instance of this class with {@link Configuration.Builder}.
+ * The instance of this class is used as an argument of the {@link org.onepf.opfpush.OPFPush#init(android.content.Context, Configuration)}
+ * method for configuring the {@link org.onepf.opfpush.OPFPushHelper} instance.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -58,9 +58,9 @@ public final class Configuration {
     }
 
     /**
-     * Get all available push providers.
+     * Returns all available push providers.
      *
-     * @return List of all available push providers.
+     * @return All available push providers.
      */
     @NonNull
     public List<PushProvider> getProviders() {
@@ -68,15 +68,20 @@ public final class Configuration {
     }
 
     /**
-     * Get the {@code EventListener}.
+     * Returns the instance of the {@link org.onepf.opfpush.listener.EventListener}.
      *
-     * @return event listener of push providers.
+     * @return The instance of the {@link org.onepf.opfpush.listener.EventListener}.
      */
     @Nullable
     public EventListener getEventListener() {
         return eventListener;
     }
 
+    /**
+     * Returns {@code true} if the system push provider is preferred, false otherwise.
+     *
+     * @return {@code true} if the system push provider is preferred, false otherwise.
+     */
     public boolean isSelectSystemPreferred() {
         return isSelectSystemPreferred;
     }
@@ -90,7 +95,7 @@ public final class Configuration {
     }
 
     /**
-     * Helper class to create instance of {@link Configuration}.
+     * The builder class that creates an instance of the {@code Configuration} class.
      */
     public static final class Builder {
 
@@ -103,11 +108,10 @@ public final class Configuration {
         private boolean isSelectSystemPreferred = false;
 
         /**
-         * Add the providers to the configuration.
+         * See {@link #addProviders(java.util.List)}
          *
-         * @param providers Providers to add.
-         * @return The current {@code Builder}.
-         * @throws java.lang.IllegalArgumentException If try to add already added providers.
+         * @return The current {@code Builder} instance.
+         * @throws java.lang.IllegalArgumentException If a provider was already added
          */
         @NonNull
         public Builder addProviders(@NonNull final PushProvider... providers) {
@@ -119,11 +123,11 @@ public final class Configuration {
         }
 
         /**
-         * Add the providers to the configuration.
+         * Add push providers to the configuration. The priority of the providers corresponds to the order
+         * in which they were added.
          *
-         * @param providers Providers to add.
-         * @return The current {@code Builder}.
-         * @throws java.lang.IllegalArgumentException If try to add already added providers.
+         * @return The current {@code Builder} instance.
+         * @throws java.lang.IllegalArgumentException If a provider was already added.
          */
         @NonNull
         public Builder addProviders(@NonNull final List<? extends PushProvider> providers) {
@@ -161,14 +165,11 @@ public final class Configuration {
         }
 
         /**
-         * Mark for try select the best store for device from added providers.
-         * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
-         * If system has no preferred store or it isn't available push provider will be selected
-         * be default algorithm.
-         * <p/>
-         * By default false.
+         * If you set {@code true}, the system push provider will get the highest priority.
+         * For Google devices this is Google Cloud Messaging, for Kindle devices - ADM.
+         * False by default.
          *
-         * @param isSelectSystemPreferred Does select system preferred store.
+         * @param isSelectSystemPreferred {@code true} if the system provider is preferred, {@code false} otherwise.
          * @return The current {@code Builder}.
          */
         public Builder setSelectSystemPreferred(final boolean isSelectSystemPreferred) {
@@ -177,10 +178,10 @@ public final class Configuration {
         }
 
         /**
-         * Create instance of {@link Configuration} with data from the builder.
+         * Create the instance of the {@link Configuration} class.
          *
-         * @return New {@link Configuration} object.
-         * @throws java.lang.IllegalArgumentException If no one provider added.
+         * @return The new {@link Configuration} object.
+         * @throws java.lang.IllegalArgumentException If there are no any added providers.
          */
         @NonNull
         public Configuration build() {
