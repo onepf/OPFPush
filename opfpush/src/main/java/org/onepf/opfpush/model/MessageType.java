@@ -17,10 +17,20 @@
 package org.onepf.opfpush.model;
 
 /**
+ * The type of messages that are received by {@link org.onepf.opfpush.OPFPushReceiver}.
+ *
  * @author Roman Savin
  * @since 25.12.14
  */
 public enum MessageType {
+
+    /**
+     * Indicates that the server deleted some pending messages because they were collapsible.
+     */
     MESSAGE_TYPE_DELETED,
+
+    /**
+     * Indicates a regular message.
+     */
     MESSAGE_TYPE_MESSAGE
 }

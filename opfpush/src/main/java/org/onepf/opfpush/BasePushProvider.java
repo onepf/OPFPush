@@ -27,7 +27,8 @@ import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
- * Base class for create {@code PushProvider}.
+ * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
+ * This class in intended to simplify the {@code PushProvider} implementation.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -45,12 +46,12 @@ public abstract class BasePushProvider implements PushProvider {
     private final String hostAppPackage;
 
     /**
-     * Base constructor for subclass.
+     * Creates a push provider.
      *
-     * @param context        Any instance of {@code Context}.
-     * @param name           Provider name.
-     * @param hostAppPackage Package of application that handle push message from server
-     *                       and deliver it to applications.
+     * @param context        The {@link android.content.Context} instance.
+     * @param name           The name of the provider.
+     * @param hostAppPackage The package of the application that handle push messages from the server
+     *                       and deliver it to the user application.
      */
     protected BasePushProvider(@NonNull final Context context,
                                @NonNull final String name,
@@ -63,11 +64,6 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public boolean isAvailable() {
         return OPFUtils.isInstalled(appContext, hostAppPackage);
-    }
-
-    @Override
-    public String toString() {
-        return name + "(hostAppPackage='" + hostAppPackage + ')';
     }
 
     @Override
@@ -115,8 +111,14 @@ public abstract class BasePushProvider implements PushProvider {
     public void onRegistrationInvalid() {
     }
 
+
+    @Override
+    public String toString() {
+        return name + "(hostAppPackage='" + hostAppPackage + ')';
+    }
+
     /**
-     * Get {@code Context} instance.
+     * @return The instance of the application context.
      */
     @NonNull
     protected Context getContext() {

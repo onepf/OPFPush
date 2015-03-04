@@ -32,10 +32,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.SenderPushProvider;
-import org.onepf.opfpush.exception.OPFPushException;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
+import org.onepf.opfutils.exception.WrongThreadException;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -78,12 +78,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         preferencesProvider = PreferencesProvider.getInstance(context);
     }
 
+    @Override
     public synchronized void register() {
         OPFLog.methodD();
         OPFLog.i("Start register GCMProvider.");
         executeTask(new RegisterTask());
     }
 
+    @Override
     public synchronized void unregister() {
         OPFLog.methodD();
         OPFLog.i("Start unregister GCMProvider.");
@@ -250,7 +252,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                         onServicesNotAvailable();
                         break;
                     case GoogleCloudMessaging.ERROR_MAIN_THREAD:
-                        throw new OPFPushException("GCM register crash", e);
+                        throw new WrongThreadException(false);
                     default:
                         onAuthError();
                         break;
@@ -314,7 +316,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                         onServicesNotAvailable();
                         break;
                     case GoogleCloudMessaging.ERROR_MAIN_THREAD:
-                        throw new OPFPushException("GCM unregister crash.", e);
+                        throw new WrongThreadException(false);
                     default:
                         OPFLog.e("Error while unregister : " + e);
                 }

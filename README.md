@@ -5,17 +5,14 @@ The project is under development.
 Currently OPFPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
 Android Device Messaging and has possibility to integrate new push service.
 
-For more information see [the website][openpush-site].
-
-
 
 ## Table Of Contents
 
 - [Download](#user-content-download)
 - [How To Use](#user-content-how-to-use)
 - [Using of OPFPushReceiver](#user-content-using-of-opfpushreceiver)
-- [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Implemented Push Services](#user-content-implemented-push-services)
+- [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
 - [License](#user-content-license)
 
@@ -56,11 +53,11 @@ for JAR dependency:
 
 ## How To Use
 
+**Project files setup**
+
 Before setup `OPFPush` you must setup your project files.
-If you use JAR dependencies:
 
-0. Add to AndroidManifest.xml file of your app the following permissions:
-
+1. If you use JAR dependencies add to your AndroidManifest.xml file the following permissions:
     ```xml   
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -69,7 +66,7 @@ If you use JAR dependencies:
     <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
     ```
     
-    and the following receivers:
+   and the following receivers:
     ```xml
     <receiver android:name="org.onepf.opfpush.BootCompleteReceiver">
         <intent-filter>
@@ -79,8 +76,9 @@ If you use JAR dependencies:
     <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
     ```
 
-    Also add for each used providers specific changes that you can find in provider README.md file.
-    See section `Implemented Push Services`.
+2. Add for each used providers specific changes that you can find in provider README.md file. See section [Implemented Push Services](#user-content-implemented-push-services).
+
+**OPFPush setup**
 
 You can setup `OPFPush` following steps:
 
@@ -108,20 +106,19 @@ You can setup `OPFPush` following steps:
 
     Preferred place to init `OPFPush` is the `Application` class of your app.
 
-4. Register `OPFPushHelper`:
+3. Register `OPFPushHelper`:
 
     ```java
     //Start registration.
     OPFPush.getHelper().register();
     ```
 
-You can enable logging by call (by default it off):
+4. You can enable logging by call (by default it off):
+    ```java
+    OPFLog.setEnabled(true);
+    ```
 
-```java
-OPFLog.setEnabled(true);
-```
-
-##Using of `OPFPushReceiver`
+##Using of OPFPushReceiver
 
 You can use `BroadcastReceiver` instead of `EventListener` for receiving push events. 
 Just extend `OPFPushReceiver` and add your receiver to AndroidManifest.xml with the following intent filter:
@@ -142,6 +139,14 @@ Just extend `OPFPushReceiver` and add your receiver to AndroidManifest.xml with 
 ```
 
 **IMPORTANT** You can't use `EventListener` and `OPFPushReceiver` in the same project.
+
+
+## Implemented Push Services
+
+1. [Google Cloud Messaging][google-cloud-messaging]. See [GCM provider][opfpush-gcm].
+2. [Amazon Device Messaging][amazon-device-messaging]. See [ADM provider][opfpush-adm].
+3. [Nokia Notifications][nokia-notifications]. See [Nokia Notifications provider][opfpush-nokia].
+
 
 ## Create Custom Push Provider
 
@@ -182,14 +187,6 @@ For notify about receive new message call `ReceivedMessageHandler.onMessage()`.
 Some provider can notify about deleted messages with call `ReceivedMessageHandler.onDeletedMessages()`.
 Not all providers that can notify about this event can provide delete messages count.
 For unknown count pass value `OPFConstants.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
-
-
-## Implemented Push Services
-
-1. [Google Cloud Messaging][google-cloud-messaging]. See [GCM provider][opfpush-gcm].
-2. [Amazon Device Messaging][amazon-device-messaging]. See [ADM provider][opfpush-adm].
-3. [Nokia Notifications][nokia-notifications]. See [Nokia Notifications provider][opfpush-nokia].
-
 
 
 ## Comparison of most popular push services

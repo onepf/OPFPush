@@ -19,70 +19,78 @@ package org.onepf.opfpush;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.exception.OPFPushException;
-
 /**
- * {@code PushProvider} represent provider for push notification from server to client app.
+ * The {@code PushProvider} interface represent the provider for push notification from the server to
+ * the client app.
+ * <p/>
+ * The {@link #register()} and {@link #unregister()} methods intended for the internal use,
+ * should never be called directly.
+ * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} to start registration
+ * or unregistration.
  *
  * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
  * @since 14.05.14
  */
 public interface PushProvider {
     /**
-     * Initiate registration of the provider. Must be async.
-     * For start registration call {@link OPFPushHelper#register()}.
+     * Initiates the registration of the provider. Must be async.
      * <p/>
-     * <b>Don't call this method manually.</b>
+     * Intended for the internal use, should never be called directly.
+     * To start the registration call {@link OPFPushHelper#register()}.
      */
     void register();
 
     /**
-     * Unregister the provider from receive push notification. Must be async.
-     * For start registration call {@link OPFPushHelper#unregister()}.
+     * Initiates the unregistering of the provider. Must be async.
      * <p/>
-     * <b>Don't call this method manually.</b>
+     * Intended for internal use, should never be called directly.
+     * To start registration call {@link OPFPushHelper#unregister()}.
      */
     void unregister();
 
     /**
      * Checks whether the provider is available.
+     *
+     * @return {@code true} if the provider is available, otherwise false.
      */
     boolean isAvailable();
 
     /**
      * Checks whether the application was successfully registered on the service.
+     *
+     * @return {@code true} if the application was successfully registered on the service, otherwise false.
      */
     boolean isRegistered();
 
     /**
-     * Gets the registration id. If registration not done will return null.
+     * Returns the registration ID or null if provider isn't registered.
+     *
+     * @return The registration ID or null if provider isn't registered.
      */
     @Nullable
     String getRegistrationId();
 
     /**
-     * Get name of the provider. Must be unique for all providers.
+     * Returns the name of the provider. Must be unique for all providers.
      *
-     * @return Provider name.
+     * @return The name of the provider.
      */
     @NonNull
     String getName();
 
     /**
-     * Get package of application that contains API of the provider.
-     * Usually, this is store application.
+     * Returns the package of the application that contains API of the provider.
+     * Usually, this is a store application.
      *
-     * @return Host application package.
+     * @return The package of the application that contains API of the provider.
      */
     @Nullable
     String getHostAppPackage();
 
     /**
-     * Verify does application manifest contains all needed permissions.
+     * Verify that application manifest contains all needed permissions.
      *
-     * @return {@code true} if all required permissions described in manifest, else {@code false}.
-     * @throws OPFPushException When application's AndroidManifest.xml file doesn't contain all
-     *                           needed permission for provider.
+     * @return {@code true} If all required permissions described in the manifest, else {@code false}.
      */
     boolean checkManifest();
 
@@ -90,14 +98,14 @@ public interface PushProvider {
      * Callback method, that called when the application state change, like update to new version,
      * or system state changed, like update firmware to a newer version.
      * <p/>
-     * When this method call you registration is invalid
-     * and you need reset all saved registration data.
+     * If this method is called, your registration becomes invalid
+     * and you have to reset all saved registration data.
      */
     void onRegistrationInvalid();
 
     /**
-     * Callback method for notify that the provider become unavailable.
-     * In this method you must reset all saved registration data.
+     * Callback method for notify that the provider became unavailable.
+     * In this method you have to reset all saved registration data.
      */
     void onUnavailable();
 }

@@ -36,11 +36,18 @@ android {
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
+
+    sourceSets {
+        androidTest.java.srcDirs += 'src/test/java'
+    }
 }
 
 dependencies {
-    androidTestCompile 'org.robolectric:robolectric:2.4'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:2.4'
     androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.robolectric:robolectric:2.4'
+    
     compile 'com.android.support:support-annotations:19.1.0'
     compile 'com.google.code.findbugs:annotations:3.0.0'
     compile 'org.onepf:opfutils:0.1.12'

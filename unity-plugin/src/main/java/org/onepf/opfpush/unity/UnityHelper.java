@@ -20,9 +20,7 @@ import android.content.Context;
 import com.unity3d.player.UnityPlayer;
 
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.OPFPushLog;
 import org.onepf.opfpush.configuration.Configuration;
-import org.onepf.opfpush.unity.listener.UnityEventListener;
 
 public class UnityHelper {
 

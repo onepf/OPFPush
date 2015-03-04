@@ -31,7 +31,7 @@ import static android.provider.Settings.Secure.ANDROID_ID;
  * @author Roman Savin
  * @since 09.09.14.
  */
-public class BootCompleteReceiver extends BroadcastReceiver {
+public final class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {

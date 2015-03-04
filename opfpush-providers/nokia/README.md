@@ -2,50 +2,49 @@
 
 ## How To Use
 
-If you use JAR dependency, you must to add to your application AndroidManifest.xml file following:
+Add following permissions to your AndroidManifest.xml file:
 
 ```xml
+<uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 <permission
-       android:name="(your_application_package).permission.C2D_MESSAGE"
-       android:protectionLevel="signature"/>
+    android:name="${applicationId}.permission.C2D_MESSAGE"
+    android:protectionLevel="signature" />
+```
 
-<uses-permission android:name="(your_application_package).permission.C2D_MESSAGE"/>
+also add following receiver:
+
+```xml
+<receiver
+    android:name="org.onepf.opfpush.nokia.NokiaNotificationsReceiver"
+    android:permission="com.nokia.pushnotifications.permission.SEND">
+        <intent-filter>
+            <!-- Receives the actual messages. -->
+            <action android:name="com.nokia.pushnotifications.intent.RECEIVE" />
+            <!-- Receives the registration id. -->
+            <action android:name="com.nokia.pushnotifications.intent.REGISTRATION" />
+            
+            <category android:name="${applicationId}" />
+        </intent-filter>
+</receiver>
+```
+
+If you use JAR dependency, you also must add to your application AndroidManifest.xml file following:
+
+```xml
 <uses-permission android:name="com.nokia.pushnotifications.permission.RECEIVE"/>
 
 <application>
-   <receiver
-       android:name="org.onepf.openpush.nokia.NokiaNotificationReceiver"
-       android:permission="com.nokia.pushnotifications.permission.SEND">
-       <intent-filter>
-           <action android:name="com.nokia.pushnotifications.intent.RECEIVE"/>
-           <action android:name="com.nokia.pushnotifications.intent.REGISTRATION"/>
-       </intent-filter>
-   </receiver>
-
-   <service
-       android:name="org.onepf.openpush.nokia.NokiaNotificationService"
-       android:exported="false"/>
-
+    <service
+        android:name=".NokiaNotificationService"
+        android:exported="false"/>
 </application>
 ```
 
-If you use AAR dependency and NBS add the next code:
-
-```groovy
-android {
-  defaultConfig {
-    ...
-    manifestPlaceholders = [packageId : "\${applicationId}".toString()]
-    ...
-  }
-}
-```
-
-To use `NokiaNotificationsProvider` simple add it to `Options` when building new instance, like this:
+To use `NokiaNotificationsProvider` just add it to `Configuration` when building new instance, like this:
 
 ```java
-Options.Builder builder = new Options.Builder();
-builder.addProviders(new NokiaNotificationsProvider(this, NOKIA_NOTIFICATION_SENDER_ID))
+Configuration.Builder builder = new Configuration.Builder();
+builder.addProviders(new NokiaNotificationsProvider(this, NOKIA_NOTIFICATION_SENDER_ID));
 ```
 
 [Nokia Notifications Page]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html

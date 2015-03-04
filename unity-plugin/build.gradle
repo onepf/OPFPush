@@ -16,6 +16,7 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+//apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -26,6 +27,12 @@ android {
         targetSdkVersion 21
         versionCode 2
         versionName "2.0"
+    }
+
+    android {
+        lintOptions {
+            abortOnError false
+        }
     }
 }
 

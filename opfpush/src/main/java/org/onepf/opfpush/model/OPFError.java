@@ -16,46 +16,60 @@
 
 package org.onepf.opfpush.model;
 
+import org.onepf.opfpush.listener.EventListener;
+
 /**
- * Error in registration or unregistration.
- * Divided into two categories: <b>recoverable</b> and <b>nonrecoverable</b>.
+ * Registration or unregistering operation error.
+ * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
  * <p/>
- * <b>Recoverable</b> error: service can't handle registration
- * or unregistration, you can try register on unregister later again.
+ * The <b>recoverable</b> error means that the service can't handle an operation
+ * at the moment. The {@link org.onepf.opfpush.OPFPushHelper} retries an operation that cause
+ * the recoverable error in the background.
  * <p/>
- * <b>Not recoverable</b> error: error is fatal, you can't register this provider.
+ * <b>Unrecoverable</b> error means that the error is fatal and the {@link org.onepf.opfpush.OPFPushHelper}
+ * can't register this provider. In this case the {@link org.onepf.opfpush.OPFPushHelper} chooses the next
+ * available provider. If there are no any other available providers,
+ * the {@link EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
  *
  * @author Kirill Rozov
+ * @author Roman Savin
  * @since 09.09.14.
  */
 public enum OPFError {
+
     /**
-     * Service not available. E.g. no internet connections.
+     * A service is not available at the moment. Most popular reason of this error is the internet
+     * connection unavailability.
      * <p/>
      * Recoverable error.
      */
     SERVICE_NOT_AVAILABLE,
 
     /**
-     * Invalid params were sent to a register provider.
+     * Invalid parameters have been sent to register provider.
      * <p/>
-     * Nonrecoverable error.
+     * Unrecoverable error.
      */
     INVALID_PARAMETERS,
 
     /**
-     * Invalid sender ID.
+     * An invalid sender ID has been used for the registration.
      * <p/>
-     * Nonrecoverable error.
+     * Unrecoverable error.
      */
     INVALID_SENDER,
 
     /**
-     * Credentials for registration are not valid.
+     * The authentication failure.
      * <p/>
-     * Nonrecoverable error.
+     * Unrecoverable error.
      */
     AUTHENTICATION_FAILED,
 
+    /**
+     * A provider specific error has occurred.
+     * <p/>
+     * Unrecoverable error.
+     */
     UNKNOWN_ERROR
 }

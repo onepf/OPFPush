@@ -17,12 +17,17 @@
 package org.onepf.opfpush;
 
 /**
+ * This class contains library specific constants.
+ *
  * @author Kirill Rozov
  * @author Roman Savin
  * @since 02.10.14.
  */
 public final class OPFConstants {
 
+    /**
+     * Indicates unknown count of deleted messages.
+     */
     public static final int MESSAGES_COUNT_UNKNOWN = Integer.MIN_VALUE;
 
     public static final String EXTRA_PROVIDER_NAME = "org.onepf.opfpush.intent.EXTRA_PROVIDER_NAME";
