@@ -17,7 +17,7 @@
 package org.onepf.opfpush.model;
 
 /**
- * Type of messages that are received by {@link org.onepf.opfpush.OPFPushReceiver}.
+ * The type of messages that are received by {@link org.onepf.opfpush.OPFPushReceiver}.
  *
  * @author Roman Savin
  * @since 25.12.14
@@ -30,7 +30,7 @@ public enum MessageType {
     MESSAGE_TYPE_DELETED,
 
     /**
-     * Indicates regular message.
+     * Indicates a regular message.
      */
     MESSAGE_TYPE_MESSAGE
 }

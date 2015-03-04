@@ -20,7 +20,7 @@ import android.support.annotation.Nullable;
 
 /**
  * Indicates the state of {@link org.onepf.opfpush.OPFPushHelper}.
- * Intended for internal use, should never be called directly.
+ * Intended for the internal use, should never be called directly.
  *
  * @author Roman Savin
  * @since 08.12.14

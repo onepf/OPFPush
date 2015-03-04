@@ -22,9 +22,11 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.exception.OPFPushException;
 
 /**
- * {@code PushProvider} represent provider for push notification from server to client app.
+ * The {@code PushProvider} interface represent the provider for push notification from the server to
+ * the client app.
  * <p/>
- * The {@link #register()} and {@link #unregister()} methods intended for internal use, should never be called directly.
+ * The {@link #register()} and {@link #unregister()} methods intended for the internal use,
+ * should never be called directly.
  * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} to start registration
  * or unregistration.
  *
@@ -33,18 +35,18 @@ import org.onepf.opfpush.exception.OPFPushException;
  */
 public interface PushProvider {
     /**
-     * Initiate registration of the provider. Must be async.
-     * To start registration call {@link OPFPushHelper#register()}.
+     * Initiates the registration of the provider. Must be async.
      * <p/>
-     * Intended for internal use, should never be called directly.
+     * Intended for the internal use, should never be called directly.
+     * To start the registration call {@link OPFPushHelper#register()}.
      */
     void register();
 
     /**
-     * Unregister the provider from receive push notification. Must be async.
-     * To start registration call {@link OPFPushHelper#unregister()}.
+     * Initiates the unregistering of the provider. Must be async.
      * <p/>
      * Intended for internal use, should never be called directly.
+     * To start registration call {@link OPFPushHelper#unregister()}.
      */
     void unregister();
 

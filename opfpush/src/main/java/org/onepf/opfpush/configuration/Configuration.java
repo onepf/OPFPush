@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Instance of this class is used as an argument of {@link org.onepf.opfpush.OPFPush#init(android.content.Context, Configuration)}
- * method for configuring {@link org.onepf.opfpush.OPFPushHelper} instance.
+ * The instance of this class is used as an argument of the {@link org.onepf.opfpush.OPFPush#init(android.content.Context, Configuration)}
+ * method for configuring the {@link org.onepf.opfpush.OPFPushHelper} instance.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -68,9 +68,9 @@ public final class Configuration {
     }
 
     /**
-     * Returns the instance of {@link org.onepf.opfpush.listener.EventListener}.
+     * Returns the instance of the {@link org.onepf.opfpush.listener.EventListener}.
      *
-     * @return The instance of {@link org.onepf.opfpush.listener.EventListener}.
+     * @return The instance of the {@link org.onepf.opfpush.listener.EventListener}.
      */
     @Nullable
     public EventListener getEventListener() {
@@ -95,7 +95,7 @@ public final class Configuration {
     }
 
     /**
-     * Builder class that creates an instance of {@code Configuration}.
+     * The builder class that creates an instance of the {@code Configuration} class.
      */
     public static final class Builder {
 
@@ -123,7 +123,7 @@ public final class Configuration {
         }
 
         /**
-         * Add push providers to the configuration. The priority of providers corresponds to the order
+         * Add push providers to the configuration. The priority of the providers corresponds to the order
          * in which they were added.
          *
          * @return The current {@code Builder} instance.
@@ -166,10 +166,10 @@ public final class Configuration {
 
         /**
          * If you set {@code true}, the system push provider will get the highest priority.
-         * For Google device this is Google Cloud Messaging, for Kindle device - ADM.
+         * For Google devices this is Google Cloud Messaging, for Kindle devices - ADM.
          * False by default.
          *
-         * @param isSelectSystemPreferred Does select system preferred store.
+         * @param isSelectSystemPreferred {@code true} if the system provider is preferred, {@code false} otherwise.
          * @return The current {@code Builder}.
          */
         public Builder setSelectSystemPreferred(final boolean isSelectSystemPreferred) {
@@ -178,10 +178,10 @@ public final class Configuration {
         }
 
         /**
-         * Create the instance of {@link Configuration}.
+         * Create the instance of the {@link Configuration} class.
          *
-         * @return New {@link Configuration} object.
-         * @throws java.lang.IllegalArgumentException If there aren't any added providers.
+         * @return The new {@link Configuration} object.
+         * @throws java.lang.IllegalArgumentException If there are no any added providers.
          */
         @NonNull
         public Configuration build() {

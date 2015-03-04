@@ -26,11 +26,11 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 /**
- * {@link org.onepf.opfpush.OPFPushHelper} instance holder.
+ * The {@link org.onepf.opfpush.OPFPushHelper} instance holder.
  * <p/>
- * Use {@link #init(android.content.Context, org.onepf.opfpush.configuration.Configuration)} for the
- * initialization of {@link org.onepf.opfpush.OPFPushHelper} global singleton instance.
- * Use {@link #getHelper()} to get initialized {@link org.onepf.opfpush.OPFPushHelper} instance.
+ * Use the {@link #init(android.content.Context, org.onepf.opfpush.configuration.Configuration)} method to
+ * initialize the {@link org.onepf.opfpush.OPFPushHelper} global singleton instance.
+ * Use the {@link #getHelper()} to get the initialized {@link org.onepf.opfpush.OPFPushHelper} instance.
  *
  * @author Roman Savin
  * @since 12.01.15
@@ -60,12 +60,12 @@ public final class OPFPush {
     }
 
     /**
-     * Initializes the OPFPush library and creates {@link org.onepf.opfpush.OPFPushHelper} singleton instance.
+     * Initializes the OPFPush library and creates the {@link org.onepf.opfpush.OPFPushHelper} singleton instance.
      *
-     * @param context       {@link android.content.Context} instance.
-     * @param configuration {@link org.onepf.opfpush.configuration.Configuration} instance.
+     * @param context       The {@link android.content.Context} instance.
+     * @param configuration The {@link org.onepf.opfpush.configuration.Configuration} instance.
      * @throws org.onepf.opfutils.exception.WrongThreadException If this method is not called from the main thread.
-     * @throws org.onepf.opfutils.exception.InitException        If {@code OPFPush} has already been initialized.
+     * @throws org.onepf.opfutils.exception.InitException        If the {@code OPFPush} has already been initialized.
      */
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {

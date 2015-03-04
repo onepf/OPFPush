@@ -27,8 +27,8 @@ import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
- * Implements common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
- * This class in intended to simplify {@code PushProvider} implementation.
+ * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
+ * This class in intended to simplify the {@code PushProvider} implementation.
  *
  * @author Kirill Rozov
  * @author Roman Savin
@@ -48,9 +48,9 @@ public abstract class BasePushProvider implements PushProvider {
     /**
      * Creates a push provider.
      *
-     * @param context        An instance of the {@code Context}.
-     * @param name           The name of provider.
-     * @param hostAppPackage Package of the application that handle push messages from server
+     * @param context        The {@link android.content.Context} instance.
+     * @param name           The name of the provider.
+     * @param hostAppPackage The package of the application that handle push messages from the server
      *                       and deliver it to the user application.
      */
     protected BasePushProvider(@NonNull final Context context,

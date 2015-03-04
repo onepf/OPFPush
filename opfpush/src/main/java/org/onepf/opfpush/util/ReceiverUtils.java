@@ -37,8 +37,6 @@ import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
 import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
 
 /**
- * Different utils for check info about installed packages on device.
- *
  * @author Kirill Rozov
  * @author Roman Savin
  * @since 07.09.14
@@ -51,14 +49,6 @@ public final class ReceiverUtils {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Register {@code BroadcastReceiver} for listen changes associated with {@code PushProvider}.
-     * Listen update of current application and remove host application package.
-     *
-     * @param context  The current context.
-     * @param provider Provider for what listen package changes.
-     * @return Created {@code BroadcastReceiver}.
-     */
     public static BroadcastReceiver registerPackageChangeReceiver(
             @NonNull final Context context,
             @NonNull final PushProvider provider

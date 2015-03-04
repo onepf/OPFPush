@@ -25,7 +25,7 @@ package org.onepf.opfpush.adm;
 public final class ADMConstants {
 
     /**
-     * The name of {@code ADMProvider}
+     * The name of the {@code ADMProvider}
      */
     public static final String PROVIDER_NAME = "Amazon Device Messaging";
 
