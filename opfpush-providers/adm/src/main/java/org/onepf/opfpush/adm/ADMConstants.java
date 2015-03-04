@@ -17,7 +17,7 @@
 package org.onepf.opfpush.adm;
 
 /**
- * This class contains {@code ADMProvider} specific constants.
+ * This class contains the {@code ADMProvider} specific constants.
  *
  * @author Roman Savin
  * @since 17.12.14

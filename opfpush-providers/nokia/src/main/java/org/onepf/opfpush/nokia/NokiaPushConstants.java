@@ -17,7 +17,7 @@
 package org.onepf.opfpush.nokia;
 
 /**
- * This class contains {@code NokiaNotificationProvider} specific constants.
+ * This class contains the {@code NokiaNotificationProvider} specific constants.
  *
  * @author Roman Savin
  * @since 17.12.14

@@ -19,7 +19,7 @@ package org.onepf.opfpush.gcm;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
- * This class contains {@code GCMProvider} specific constants.
+ * This class contains the {@code GCMProvider} specific constants.
  *
  * @author Kirill Rozov
  * @author Roman Savin
