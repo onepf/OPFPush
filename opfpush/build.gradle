@@ -60,8 +60,8 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
-    compile 'com.android.support:support-annotations:19.1.0'
-    compile 'com.google.code.findbugs:annotations:3.0.0'
+    provided 'com.android.support:support-annotations:19.1.0'
+    provided 'com.google.code.findbugs:annotations:3.0.0'
     //noinspection NewerVersionAvailable
-    compile 'org.onepf:opfutils:0.1.14-SNAPSHOT'
+    provided 'org.onepf:opfutils:0.1.14-SNAPSHOT'
 }
