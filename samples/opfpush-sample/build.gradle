@@ -32,11 +32,11 @@ android {
 }
 
 dependencies {
-    compile project(':opfpush-providers:adm')
-    compile(project(':opfpush-providers:gcm')) {
+    compile project(':adm')
+    compile(project(':gcm')) {
         transitive = false
     }
-    compile project(':opfpush-providers:nokia')
+    compile project(':nokia')
 
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.nokia:push:1.0'
