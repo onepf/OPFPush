@@ -16,6 +16,7 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply plugin: 'com.noveogroup.android.check'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -40,6 +41,19 @@ android {
         androidTest.java.srcDirs += 'src/test/java'
     }
 }
+
+check {
+    abortOnError false
+
+    checkstyle {
+        config rootProject.file('config/checkstyle.xml')
+    }
+
+    pmd {
+        config rootProject.file('config/pmd.xml')
+    }
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'

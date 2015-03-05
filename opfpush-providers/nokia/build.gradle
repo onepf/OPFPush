@@ -16,6 +16,7 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply plugin: 'com.noveogroup.android.check'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -34,6 +35,18 @@ android {
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+    }
+}
+
+check {
+    abortOnError false
+
+    checkstyle {
+        config rootProject.file('config/checkstyle.xml')
+    }
+
+    pmd {
+        config rootProject.file('config/pmd.xml')
     }
 }
 

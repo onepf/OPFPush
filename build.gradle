@@ -29,6 +29,7 @@ buildscript {
         //noinspection GradleDependency
         classpath 'com.android.tools.build:gradle:1.1.2'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'com.noveogroup.android:check:1.1.2'
     }
 }
 
