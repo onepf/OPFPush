@@ -97,20 +97,11 @@ public abstract class BasePushProvider implements PushProvider {
         return name;
     }
 
-    @Override
-    public void onUnavailable() {
-    }
-
     @NonNull
     @Override
     public String getHostAppPackage() {
         return hostAppPackage;
     }
-
-    @Override
-    public void onRegistrationInvalid() {
-    }
-
 
     @Override
     public String toString() {

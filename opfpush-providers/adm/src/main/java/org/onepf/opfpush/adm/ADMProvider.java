@@ -72,6 +72,16 @@ public class ADMProvider extends BasePushProvider {
     }
 
     @Override
+    public void onRegistrationInvalid() {
+        //nothing
+    }
+
+    @Override
+    public void onUnavailable() {
+        //nothing
+    }
+
+    @Override
     public boolean isRegistered() {
         OPFLog.methodD();
         return !TextUtils.isEmpty(getRegistrationId());

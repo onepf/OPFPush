@@ -46,6 +46,7 @@ import static org.onepf.opfpush.model.MessageType.MESSAGE_TYPE_MESSAGE;
  * @author Roman Savin
  * @since 26.12.14
  */
+@SuppressWarnings({"PMD.StdCyclomaticComplexity", "PMD.ModifiedCyclomaticComplexity"})
 final class EventListenerWrapperCreator {
 
     private EventListenerWrapperCreator() {

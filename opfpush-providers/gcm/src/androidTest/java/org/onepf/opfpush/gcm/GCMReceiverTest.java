@@ -54,6 +54,7 @@ import static org.onepf.opfpush.gcm.util.TestConstants.REGISTRATION_ID;
         emulateSdk = Build.VERSION_CODES.JELLY_BEAN_MR2
 )
 @RunWith(RobolectricTestRunner.class)
+@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions"})
 public class GCMReceiverTest {
 
     private static final String ACTION_RECEIVE = "com.google.android.c2dm.intent.RECEIVE";

@@ -33,10 +33,12 @@ import org.robolectric.annotation.Config;
 import java.lang.reflect.Field;
 import java.util.Random;
 
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
+
 /**
  * Created by antonpp on 02.03.15.
  */
-@Config(emulateSdk = 18, manifest = Config.NONE)
+@Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class PreferencesProviderTest extends Assert {
 

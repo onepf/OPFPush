@@ -79,6 +79,11 @@ public class NokiaNotificationsProvider extends BasePushProvider {
         }
     }
 
+    @Override
+    public void onRegistrationInvalid() {
+        //nothing
+    }
+
     /**
      * Gets how long (in milliseconds) the {@link #isRegistered()} property is valid.
      *
