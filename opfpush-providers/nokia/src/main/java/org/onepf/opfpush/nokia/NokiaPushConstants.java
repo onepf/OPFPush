@@ -32,6 +32,9 @@ public final class NokiaPushConstants {
     static final String NOKIA_MANUFACTURER = "Nokia";
     static final String NOKIA_STORE_APP_PACKAGE = "com.nokia.store";
 
+    static final String PERMISSION_RECEIVE = "com.nokia.pushnotifications.permission.RECEIVE";
+    static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
+
     private NokiaPushConstants() {
         throw new UnsupportedOperationException();
     }

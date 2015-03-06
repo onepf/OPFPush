@@ -84,6 +84,7 @@
             </intent-filter>
         </receiver>
 
+        <!--nokia-->
         <receiver
             android:name="org.onepf.opfpush.nokia.NokiaNotificationsReceiver"
             android:permission="com.nokia.pushnotifications.permission.SEND">

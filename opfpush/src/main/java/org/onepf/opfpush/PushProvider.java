@@ -90,9 +90,10 @@ public interface PushProvider {
     /**
      * Verify that application manifest contains all needed permissions.
      *
-     * @return {@code true} If all required permissions described in the manifest, else {@code false}.
+     * @throws java.lang.IllegalStateException If not all required permissions and components have been
+     *                                         described in the AndroidManifest.xml file.
      */
-    boolean checkManifest();
+    void checkManifest();
 
     /**
      * Callback method, that called when the application state change, like update to new version,
