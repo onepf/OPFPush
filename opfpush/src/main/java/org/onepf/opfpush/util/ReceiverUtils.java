@@ -33,7 +33,6 @@ import org.onepf.opfutils.OPFUtils;
 
 import java.util.List;
 
-import static android.content.pm.PackageManager.GET_RESOLVED_FILTER;
 import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
 import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
@@ -80,27 +79,25 @@ public final class ReceiverUtils {
 
     public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
         OPFLog.methodD(context);
+        final Intent intentBroadcastReceive = new Intent(ACTION_RECEIVE);
+        final Intent intentBroadcastRegistration = new Intent(ACTION_REGISTRATION);
+        final Intent intentBroadcastUnregistration = new Intent(ACTION_UNREGISTRATION);
+        final Intent intentBroadcastNoAvailableProvider = new Intent(ACTION_NO_AVAILABLE_PROVIDER);
 
-        final Intent intent = new Intent(ACTION_RECEIVE);
-        final List<ResolveInfo> resolveInfos = context.getPackageManager()
-                .queryBroadcastReceivers(intent, GET_RESOLVED_FILTER);
-
-        for (ResolveInfo resolveInfo : resolveInfos) {
-            final IntentFilter intentFilter = resolveInfo.filter;
-            if (intentFilter != null && intentFilter.hasAction(ACTION_RECEIVE)
-                    && intentFilter.hasAction(ACTION_REGISTRATION)
-                    && intentFilter.hasAction(ACTION_UNREGISTRATION)
-                    && intentFilter.hasAction(ACTION_NO_AVAILABLE_PROVIDER)) {
-                return true;
-            }
+        try {
+            checkReceiver(context, intentBroadcastReceive, null, null);
+            checkReceiver(context, intentBroadcastRegistration, null, null);
+            checkReceiver(context, intentBroadcastUnregistration, null, null);
+            checkReceiver(context, intentBroadcastNoAvailableProvider, null, null);
+        } catch (RuntimeException e) {
+            return false;
         }
-
-        return false;
+        return true;
     }
 
     public static void checkReceiver(@NonNull final Context context,
                                      @NonNull final Intent broadcastIntent,
-                                     @NonNull final String receiverName,
+                                     @Nullable final String receiverName,
                                      @Nullable final String permission) {
         final PackageManager packageManager = context.getPackageManager();
         final String packageName = context.getPackageName();
@@ -114,7 +111,7 @@ public final class ReceiverUtils {
 
         ResolveInfo neededReceiver = null;
         for (ResolveInfo receiver : receivers) {
-            if (receiver.activityInfo.name.equals(receiverName)
+            if ((receiverName == null || receiver.activityInfo.name.equals(receiverName))
                     && receiver.activityInfo.packageName.equals(packageName)) {
                 neededReceiver = receiver;
                 break;
