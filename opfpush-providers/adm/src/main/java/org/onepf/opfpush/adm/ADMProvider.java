@@ -16,7 +16,10 @@
 
 package org.onepf.opfpush.adm;
 
+import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,11 +28,18 @@ import android.text.TextUtils;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.util.ManifestUtils;
+import org.onepf.opfpush.util.ReceiverUtils;
 import org.onepf.opfutils.OPFLog;
 
+import static android.Manifest.permission.GET_ACCOUNTS;
+import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_APP_REGISTRATION_EVENT;
+import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_RECEIVE_ADM_MESSAGE;
+import static com.amazon.device.messaging.development.ADMManifest.PERMISSION_RECEIVE_MESSAGES;
 import static org.onepf.opfpush.adm.ADMConstants.AMAZON_MANUFACTURER;
 import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
 import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
+import static org.onepf.opfpush.adm.ADMConstants.RECEIVE_MESSAGE_PERMISSION_SUFFIX;
 
 /**
  * Amazon Device Messaging push provider implementation.
@@ -60,15 +70,40 @@ public class ADMProvider extends BasePushProvider {
     }
 
     @Override
-    public boolean checkManifest() {
+    public void checkManifest() {
         OPFLog.methodD();
-        try {
-            ADMManifest.checkManifestAuthoredProperly(getContext());
-        } catch (IllegalStateException e) {
-            OPFLog.d("Error while check manifest: " + e);
-            return false;
-        }
-        return super.checkManifest() && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
+        super.checkManifest();
+        final Context context = getContext();
+        ADMManifest.checkManifestAuthoredProperly(context);
+        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE_MESSAGES,
+                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE_MESSAGES));
+        context.enforceCallingOrSelfPermission(GET_ACCOUNTS,
+                ManifestUtils.getSecurityExceptionMessage(GET_ACCOUNTS));
+        final String admMessagePermission = context.getPackageName() + RECEIVE_MESSAGE_PERMISSION_SUFFIX;
+        context.enforceCallingOrSelfPermission(admMessagePermission,
+                ManifestUtils.getSecurityExceptionMessage(admMessagePermission));
+
+        ManifestUtils.checkService(context, new ComponentName(context, ADMService.class));
+        
+        final Intent registrationBroadcastIntent = new Intent(ACTION_APP_REGISTRATION_EVENT);
+        final Intent receiveBroadcastIntent = new Intent(ACTION_RECEIVE_ADM_MESSAGE);
+        final Intent loginChangedBroadcastIntent = new Intent(AccountManager.LOGIN_ACCOUNTS_CHANGED_ACTION);
+        ReceiverUtils.checkReceiver(context, registrationBroadcastIntent,
+                ADMReceiver.class.getName(), ADMManifest.PERMISSION_SEND_MESSAGES);
+        ReceiverUtils.checkReceiver(context, receiveBroadcastIntent,
+                ADMReceiver.class.getName(), ADMManifest.PERMISSION_SEND_MESSAGES);
+        ReceiverUtils.checkReceiver(context, loginChangedBroadcastIntent,
+                LoginAccountsChangedReceiver.class.getName(), null);
+    }
+
+    @Override
+    public void onRegistrationInvalid() {
+        //nothing
+    }
+
+    @Override
+    public void onUnavailable() {
+        //nothing
     }
 
     @Override
@@ -86,7 +121,9 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public boolean isAvailable() {
-        return super.isAvailable() && adm.isSupported();
+        return super.isAvailable()
+                && adm.isSupported()
+                && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
     }
 
     @Override

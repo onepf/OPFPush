@@ -16,9 +16,9 @@
 
 package org.onepf.opfpush.gcm;
 
-import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -33,6 +33,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.util.ManifestUtils;
+import org.onepf.opfpush.util.ReceiverUtils;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.WrongThreadException;
@@ -42,7 +44,11 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
+import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
+import static org.onepf.opfpush.gcm.GCMConstants.C2DM_ACTION_RECEIVE;
 import static org.onepf.opfpush.gcm.GCMConstants.ANDROID_RELEASE_4_0_4;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_ACCOUNT_TYPE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
@@ -51,8 +57,8 @@ import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_SERVICES_FRAMEWORK_PACKA
 import static org.onepf.opfpush.gcm.GCMConstants.MESSAGES_TO_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_C2D_MESSAGE_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_RECEIVE;
+import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_SEND;
 import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
-import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
 
 /**
  * Google Cloud Messaging push provider implementation.
@@ -93,14 +99,33 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     @Override
-    public boolean checkManifest() {
+    public void checkManifest() {
         OPFLog.methodD();
+        super.checkManifest();
         final Context context = getContext();
-        return super.checkManifest()
-                && (!needGoogleAccounts() || hasRequestedPermission(getContext(), Manifest.permission.GET_ACCOUNTS))
-                && hasRequestedPermission(context, Manifest.permission.WAKE_LOCK)
-                && hasRequestedPermission(context, PERMISSION_RECEIVE)
-                && hasRequestedPermission(context, context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX);
+        if (needGoogleAccounts()) {
+            context.enforceCallingOrSelfPermission(GET_ACCOUNTS,
+                    ManifestUtils.getSecurityExceptionMessage(GET_ACCOUNTS));
+        }
+        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE,
+                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE));
+        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
+        context.enforceCallingOrSelfPermission(c2dmPermission,
+                ManifestUtils.getSecurityExceptionMessage(c2dmPermission));
+
+        ManifestUtils.checkService(context, new ComponentName(context, GCMService.class));
+        ManifestUtils.checkService(context, new ComponentName(context, SendMessageService.class));
+
+        final Intent c2dmReceiveBroadcastIntent = new Intent(C2DM_ACTION_RECEIVE);
+        final Intent registrationBroadcastIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
+        final Intent unregistrationBroadcastIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
+
+        ReceiverUtils.checkReceiver(context, c2dmReceiveBroadcastIntent,
+                GCMReceiver.class.getName(), PERMISSION_SEND);
+        ReceiverUtils.checkReceiver(context, registrationBroadcastIntent,
+                GCMReceiver.class.getName(), PERMISSION_SEND);
+        ReceiverUtils.checkReceiver(context, unregistrationBroadcastIntent,
+                GCMReceiver.class.getName(), PERMISSION_SEND);
     }
 
     @Override

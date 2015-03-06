@@ -66,6 +66,7 @@ import static org.onepf.opfpush.model.State.UNREGISTERING;
 )
 @RunWith(RobolectricTestRunner.class)
 //TODO look how messageType is stored in intent and implement tests for onMessage and onDeletedMessage functionality
+@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions"})
 public class GCMServiceTest {
 
     private static final String PREF_NAME = "org.onepf.openpush";

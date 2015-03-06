@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
         reportSdk = Build.VERSION_CODES.JELLY_BEAN
 )
 @RunWith(RobolectricTestRunner.class)
+@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions"})
 public class GCMProviderTest extends GCMProviderTestBase {
 
     @Test

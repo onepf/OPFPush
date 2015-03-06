@@ -16,8 +16,6 @@
 
 package org.onepf.opfpush.model;
 
-import org.onepf.opfpush.listener.EventListener;
-
 /**
  * Registration or unregistering operation error.
  * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
@@ -29,7 +27,7 @@ import org.onepf.opfpush.listener.EventListener;
  * <b>Unrecoverable</b> error means that the error is fatal and the {@link org.onepf.opfpush.OPFPushHelper}
  * can't register this provider. In this case the {@link org.onepf.opfpush.OPFPushHelper} chooses the next
  * available provider. If there are no any other available providers,
- * the {@link EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
+ * the {@link org.onepf.opfpush.listener.EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
  *
  * @author Kirill Rozov
  * @author Roman Savin

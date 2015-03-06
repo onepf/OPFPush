@@ -37,6 +37,8 @@ public abstract class GCMProviderTestBase {
     private static final Account TEST_GOOGLE_ACCOUNT
             = new Account("OnePF Test", GOOGLE_ACCOUNT_TYPE);
 
+    private static final int LATEST_GCM_SERVICE_VERSION_CODE = 4030000;
+
     @Before
     public void addGooglePlayApp() {
         ShadowLog.stream = System.out;
@@ -67,7 +69,7 @@ public abstract class GCMProviderTestBase {
     }
 
     protected static void addLatestGMSServiceApp() {
-        addGMSServiceApp("4.0.30", 4030000);
+        addGMSServiceApp("4.0.30", LATEST_GCM_SERVICE_VERSION_CODE);
     }
 
     @After

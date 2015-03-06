@@ -17,26 +17,30 @@ public class MockNamePushProvider extends BasePushProvider {
     public MockNamePushProvider(@NonNull String name) {
         this(name, DEFAULT_HOST_APP_PACKAGE);
     }
-    
+
     public MockNamePushProvider(@NonNull String name,
-                            @NonNull String hotAppPackage) {
+                                @NonNull String hotAppPackage) {
         super(Robolectric.application, name, hotAppPackage);
     }
 
     @Override
     public void register() {
+        //nothing
     }
 
     @Override
     public void unregister() {
+        //nothing
     }
 
     @Override
     public void onRegistrationInvalid() {
+        //nothing
     }
 
     @Override
     public void onUnavailable() {
+        //nothing
     }
 
     @Override

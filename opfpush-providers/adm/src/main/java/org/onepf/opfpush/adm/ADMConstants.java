@@ -33,6 +33,8 @@ public final class ADMConstants {
     static final String KINDLE_STORE_APP_PACKAGE = "com.amazon.venezia";
     static final String ACCOUNT_TYPE = "com.amazon.account";
 
+    static final String RECEIVE_MESSAGE_PERMISSION_SUFFIX = ".permission.RECEIVE_ADM_MESSAGE";
+
     private ADMConstants() {
         throw new UnsupportedOperationException();
     }

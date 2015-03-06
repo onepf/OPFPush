@@ -17,14 +17,17 @@
 package org.onepf.opfpush;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfutils.OPFLog;
+import org.onepf.opfpush.util.ManifestUtils;
+import org.onepf.opfpush.util.ReceiverUtils;
 import org.onepf.opfutils.OPFUtils;
 
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
-import static org.onepf.opfutils.OPFUtils.hasRequestedPermission;
+import static android.Manifest.permission.WAKE_LOCK;
 
 /**
  * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
@@ -80,10 +83,18 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
-    public boolean checkManifest() {
-        OPFLog.methodD();
-        return hasRequestedPermission(appContext, INTERNET)
-                && hasRequestedPermission(appContext, RECEIVE_BOOT_COMPLETED);
+    public void checkManifest() {
+        appContext.enforceCallingOrSelfPermission(INTERNET, ManifestUtils.getSecurityExceptionMessage(INTERNET));
+        appContext.enforceCallingOrSelfPermission(RECEIVE_BOOT_COMPLETED,
+                ManifestUtils.getSecurityExceptionMessage(RECEIVE_BOOT_COMPLETED));
+        appContext.enforceCallingOrSelfPermission(WAKE_LOCK, ManifestUtils.getSecurityExceptionMessage(WAKE_LOCK));
+        appContext.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE,
+                ManifestUtils.getSecurityExceptionMessage(ACCESS_NETWORK_STATE));
+
+        ReceiverUtils.checkReceiver(appContext, new Intent(Intent.ACTION_BOOT_COMPLETED),
+                BootCompleteReceiver.class.getName(), null);
+        ReceiverUtils.checkReceiver(appContext, new Intent(appContext, RetryBroadcastReceiver.class),
+                RetryBroadcastReceiver.class.getName(), null);
     }
 
     @Override
@@ -97,20 +108,11 @@ public abstract class BasePushProvider implements PushProvider {
         return name;
     }
 
-    @Override
-    public void onUnavailable() {
-    }
-
     @NonNull
     @Override
     public String getHostAppPackage() {
         return hostAppPackage;
     }
-
-    @Override
-    public void onRegistrationInvalid() {
-    }
-
 
     @Override
     public String toString() {

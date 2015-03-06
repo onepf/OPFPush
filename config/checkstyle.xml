@@ -32,7 +32,12 @@
         <property name="severity" value="info" />
     </module>
 
+    <module name="SuppressWarningsFilter" />
     <module name="TreeWalker">
+
+        <!--Necessary for SuppressionCommentFilter-->
+        <module name="FileContentsHolder"/>
+        <module name="SuppressWarningsHolder" />
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
@@ -77,6 +82,8 @@
         <module name="IllegalImport" />
         <!-- defaults to sun.* packages -->
         <module name="RedundantImport" />
+        <module name="UnusedImports" />
+
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
@@ -88,7 +95,10 @@
             <property name="severity" value="info" />
         </module>
         <module name="MethodLength" />
-        <module name="ParameterNumber" />
+        <module name="ParameterNumber">
+            <!--<property name="id" value="maxParameterNumber"/>-->
+            <property name="max" value="7"/>
+        </module>
 
 
         <!-- Checks for whitespace                               -->
@@ -125,8 +135,15 @@
         <!-- See http://checkstyle.sf.net/config_coding.html -->
         <module name="EmptyStatement" />
         <module name="EqualsHashCode" />
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true" />
+            <property name="ignoreSetter" value="true" />
+            <property name="severity" value="ignore" />
+        </module>
         <module name="IllegalInstantiation" />
-        <module name="InnerAssignment" />
+        <module name="InnerAssignment" >
+            <property name="severity" value="ignore" />
+        </module>
         <module name="MagicNumber">
             <property name="severity" value="info" />
             <property name="ignoreNumbers" value="-1, 0, 1, 2, 10, 60, 100, 256, 1000" />
@@ -148,7 +165,9 @@
         <module name="FinalClass" />
         <module name="HideUtilityClassConstructor" />
         <module name="InterfaceIsType" />
-        <module name="VisibilityModifier" />
+        <module name="VisibilityModifier" >
+            <property name="protectedAllowed" value="true"/>
+        </module>
 
 
         <!-- Miscellaneous other checks.                   -->
@@ -164,10 +183,8 @@
         </module>
         <module name="UpperEll" />
 
-        <module name="FileContentsHolder"/>
     </module>
 
     <!-- Enable suppression comments -->
     <module name="SuppressionCommentFilter"/>
-
 </module>

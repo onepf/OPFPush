@@ -32,15 +32,14 @@ android {
 }
 
 dependencies {
-    compile 'org.onepf:opfpush-adm:0.1.4@aar'
-    compile 'org.onepf:opfpush-gcm:0.1.4@aar'
-    compile 'org.onepf:opfpush-nokia:0.1.4@aar'
-    compile ('org.onepf:opfpush:0.1.4@aar') {
-        transitive = true
-    }
+    compile 'org.onepf:opfpush-adm:0.1.5-SNAPSHOT@aar'
+    compile 'org.onepf:opfpush-gcm:0.1.5-SNAPSHOT@aar'
+    compile 'org.onepf:opfpush-nokia:0.1.5-SNAPSHOT@aar'
+    compile 'org.onepf:opfpush:0.1.5-SNAPSHOT@aar'
 
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.nokia:push:1.0'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'org.onepf:opfutils:0.1.15'
 }

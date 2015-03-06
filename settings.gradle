@@ -15,8 +15,14 @@
  */
 
 include ':opfpush',
-        ':opfpush-providers:gcm',
-        ':opfpush-providers:nokia',
-        ':opfpush-providers:adm',
+        ':gcm',
+        ':nokia',
+        ':adm',
         /*':unity-plugin',*/
-        'samples:opfpush-sample'
+        ':opfpush-sample'
+
+project(':gcm').projectDir = new File('opfpush-providers/gcm')
+project(':nokia').projectDir = new File('opfpush-providers/nokia')
+project(':adm').projectDir = new File('opfpush-providers/adm')
+
+project(':opfpush-sample').projectDir = new File('samples/opfpush-sample')

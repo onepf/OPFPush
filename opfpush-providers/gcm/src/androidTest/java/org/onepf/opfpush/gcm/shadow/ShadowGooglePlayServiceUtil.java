@@ -32,7 +32,7 @@ import org.robolectric.annotation.Implements;
  * @since 10/9/14.
  */
 @Implements(GooglePlayServicesUtil.class)
-public class ShadowGooglePlayServiceUtil {
+public final class ShadowGooglePlayServiceUtil {
 
     @Implementation
     public static int isGooglePlayServicesAvailable(Context context) {
@@ -42,5 +42,9 @@ public class ShadowGooglePlayServiceUtil {
         } catch (PackageManager.NameNotFoundException e) {
             return ConnectionResult.SERVICE_MISSING;
         }
+    }
+    
+    private ShadowGooglePlayServiceUtil() {
+        throw new UnsupportedOperationException();
     }
 }

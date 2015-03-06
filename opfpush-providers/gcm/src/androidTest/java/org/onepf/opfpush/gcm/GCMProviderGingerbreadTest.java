@@ -39,6 +39,7 @@ import static org.onepf.opfpush.gcm.util.TestConstants.SENDER_ID;
         reportSdk = Build.VERSION_CODES.GINGERBREAD_MR1
 )
 @RunWith(RobolectricTestRunner.class)
+@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions"})
 public class GCMProviderGingerbreadTest extends GCMProviderTestBase {
 
     @Test

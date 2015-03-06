@@ -16,6 +16,7 @@
 
 package org.onepf.opfpush.nokia;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -24,10 +25,13 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.util.ManifestUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
 
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PERMISSION_C2D_MESSAGE_SUFFIX;
+import static org.onepf.opfpush.nokia.NokiaPushConstants.PERMISSION_RECEIVE;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE;
@@ -68,15 +72,24 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     }
 
     @Override
-    public boolean checkManifest() {
+    public void checkManifest() {
         OPFLog.methodD();
-        try {
-            PushRegistrar.checkManifest(getContext());
-            return super.checkManifest();
-        } catch (UnsupportedOperationException exception) {
-            OPFLog.e(exception.toString());
-            return false;
-        }
+        super.checkManifest();
+        final Context context = getContext();
+        PushRegistrar.checkManifest(context);
+
+        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE,
+                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE));
+        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
+        context.enforceCallingOrSelfPermission(c2dmPermission,
+                ManifestUtils.getSecurityExceptionMessage(c2dmPermission));
+
+        ManifestUtils.checkService(context, new ComponentName(context, NokiaNotificationService.class));
+    }
+
+    @Override
+    public void onRegistrationInvalid() {
+        //nothing
     }
 
     /**
