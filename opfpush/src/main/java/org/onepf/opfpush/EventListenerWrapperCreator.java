@@ -19,13 +19,14 @@ package org.onepf.opfpush;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -71,13 +72,15 @@ final class EventListenerWrapperCreator {
         OPFLog.methodD(eventListener);
         return new EventListener() {
 
+            private final Handler handler = new Handler(Looper.getMainLooper());
+            
             @Override
             public void onMessage(
                     @NonNull final Context context,
                     @NonNull final String providerName,
                     @Nullable final Bundle extras
             ) {
-                OPFUtils.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onMessage(%1$s, %2$s)", providerName, extras);
@@ -92,7 +95,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     final int messagesCount
             ) {
-                OPFUtils.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
@@ -107,7 +110,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     @NonNull final String registrationId
             ) {
-                OPFUtils.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onRegistered(%1$s, %2$s)", providerName, registrationId);
@@ -122,7 +125,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     @Nullable final String registrationId
             ) {
-                OPFUtils.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onUnregistered(%1$s, %2$s)", providerName, registrationId);
@@ -135,7 +138,7 @@ final class EventListenerWrapperCreator {
             public void onNoAvailableProvider(
                     @NonNull final Context context,
                     @NonNull final Map<String, OPFError> registrationErrors) {
-                OPFUtils.post(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onNoAvailableProvider()");

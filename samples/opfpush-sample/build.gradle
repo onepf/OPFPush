@@ -42,5 +42,5 @@ dependencies {
     compile 'com.nokia:push:1.0'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.14-SNAPSHOT'
+    compile 'org.onepf:opfutils:0.1.15-SNAPSHOT'
 }
