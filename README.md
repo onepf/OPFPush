@@ -23,13 +23,13 @@ Android Device Messaging and has possibility to integrate new push service.
 Download [the latest AAR][opfpush-latest-aar] or [the latest JAR][opfpush-latest-jar]. Also you can grab it via Gradle.
 For AAR dependency:
 ```groovy
-compile ('org.onepf:opfpush:0.1.4@aar') {
+compile ('org.onepf:opfpush:0.1.5@aar') {
     transitive = true
 }
 ```
 for JAR dependency:
 ```groovy
-compile 'org.onepf:opfpush:0.1.4'
+compile 'org.onepf:opfpush:0.1.5'
 ```
 
 or Maven:
@@ -37,7 +37,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
     <type>aar</type>
 </dependency>
 ```
@@ -46,7 +46,7 @@ for JAR dependency:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 
@@ -227,8 +227,8 @@ For unknown count pass value `OPFConstants.MESSAGES_COUNT_UNKNOWN` as argument `
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
 [new-build-system]: http://tools.android.com/tech-docs/new-build-system
-[opfpush-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.1.4/opfpush-0.1.4.jar
+[opfpush-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.jar
 [openpush-site]: http://www.onepf.org/openpush/
-[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.1.4/opfpush-0.1.4.aar
+[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.aar
 [aar-format-docs]: http://tools.android.com/tech-docs/new-build-system/aar-format
 [BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush/gcm_migrate_sample/BroadcastMessageListener.java
