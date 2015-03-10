@@ -22,7 +22,8 @@ import java.util.Random;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 
 /**
- * Created by antonpp on 24.02.15.
+ * @author antonpp
+ * @since 24.02.2015
  */
 @Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
