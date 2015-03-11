@@ -63,7 +63,6 @@ Before setup `OPFPush` you must setup your project files.
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
     ```
     
    and the following receivers:
