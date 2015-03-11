@@ -26,7 +26,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
-        versionName "0.1.5-SNAPSHOT"
+        versionName "0.1.6-SNAPSHOT"
     }
 
     lintOptions {
