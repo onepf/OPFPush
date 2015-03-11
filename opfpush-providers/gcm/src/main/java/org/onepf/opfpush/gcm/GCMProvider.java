@@ -84,6 +84,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
         OPFLog.methodD();
         OPFLog.i("Start register GCMProvider.");
@@ -91,6 +92,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     @Override
+    @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
         OPFLog.methodD();
         OPFLog.i("Start unregister GCMProvider.");
@@ -127,7 +129,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public boolean isAvailable() {
         OPFLog.methodD();
-        final Context context = getContext();
         if (!isReceivePermissionDeclared()) {
             OPFLog.i("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
             return false;
@@ -143,7 +144,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         if (super.isAvailable()) {
             final int conResult = GooglePlayServicesUtil
-                    .isGooglePlayServicesAvailable(context);
+                    .isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
                 return !needGoogleAccounts() || checkGoogleAccount();
             } else {
@@ -233,6 +234,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         GoogleCloudMessaging.getInstance(getContext()).close();
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void executeTask(@NonNull final Runnable runnable) {
         OPFLog.methodD(runnable);
 
@@ -251,6 +253,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private final class RegisterTask implements Runnable {
 
         @Override
+        @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
             OPFLog.methodD();
 
@@ -320,6 +323,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         @Override
+        @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
             OPFLog.methodD();
 
@@ -340,6 +344,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                         throw new WrongThreadException(false);
                     default:
                         OPFLog.e("Error while unregister : " + e);
+                        break;
                 }
             }
         }

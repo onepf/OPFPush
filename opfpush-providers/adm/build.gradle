@@ -42,7 +42,7 @@ android {
 }
 
 check {
-    abortOnError false
+    abortOnError true
 
     checkstyle {
         config rootProject.file('config/checkstyle.xml')

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
@@ -29,6 +30,7 @@ import org.onepf.opfutils.OPFUtils;
  * @author Roman Savin
  * @since 01.10.14.
  */
+@SuppressWarnings({"PMD.NonThreadSafeSingleton", "PMD.AvoidSynchronizedAtMethodLevel"})
 final class PreferencesProvider {
 
     private static final String KEY_REGISTRATION_ID = "registration_id";
@@ -40,19 +42,16 @@ final class PreferencesProvider {
 
     private static volatile PreferencesProvider instance;
 
-    private OPFPreferences preferences;
+    private final OPFPreferences preferences;
 
     private PreferencesProvider(@NonNull final Context context) {
         preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
     public static PreferencesProvider getInstance(@NonNull final Context context) {
+        OPFChecks.checkThread(true);
         if (instance == null) {
-            synchronized (PreferencesProvider.class) {
-                if (instance == null) {
-                    instance = new PreferencesProvider(context);
-                }
-            }
+            instance = new PreferencesProvider(context);
         }
 
         return instance;

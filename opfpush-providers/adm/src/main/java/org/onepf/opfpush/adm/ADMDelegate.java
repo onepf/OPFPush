@@ -31,6 +31,7 @@ import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
  * @author Roman Savin
  * @since 17.12.14
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 final class ADMDelegate {
 
     @Nullable

@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 import org.robolectric.Robolectric;
@@ -72,7 +73,7 @@ public class PreferencesProviderTest extends Assert {
                 instanceField.setAccessible(true);
                 instanceField.set(null, null);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
+                OPFLog.e(e.getMessage());
             }
         }
     }

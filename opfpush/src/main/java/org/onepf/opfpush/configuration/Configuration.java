@@ -39,6 +39,7 @@ import java.util.Map;
  * @author Roman Savin
  * @since 04.09.2014
  */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
     @NonNull
@@ -105,7 +106,7 @@ public final class Configuration {
         @Nullable
         private EventListener eventListener;
 
-        private boolean isSelectSystemPreferred = false;
+        private boolean isSelectSystemPreferred;
 
         /**
          * See {@link #addProviders(java.util.List)}
@@ -184,6 +185,7 @@ public final class Configuration {
          * @throws java.lang.IllegalArgumentException If there are no any added providers.
          */
         @NonNull
+        @SuppressWarnings("PMD.AccessorClassGeneration")
         public Configuration build() {
             if (providersMap == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");

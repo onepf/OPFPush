@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.State;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 
@@ -31,6 +32,7 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
  * @author Roman Savin
  * @since 01.10.14.
  */
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class Settings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
@@ -46,13 +48,11 @@ final class Settings {
         preferences = new OPFPreferences(context);
     }
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static Settings getInstance(@NonNull final Context context) {
+        OPFChecks.checkThread(true);
         if (instance == null) {
-            synchronized (Settings.class) {
-                if (instance == null) {
-                    instance = new Settings(context);
-                }
-            }
+            instance = new Settings(context);
         }
 
         return instance;

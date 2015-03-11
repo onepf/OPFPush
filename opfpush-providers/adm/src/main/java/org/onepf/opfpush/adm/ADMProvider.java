@@ -51,9 +51,9 @@ import static org.onepf.opfpush.adm.ADMConstants.RECEIVE_MESSAGE_PERMISSION_SUFF
 public class ADMProvider extends BasePushProvider {
 
     @NonNull
-    private ADMDelegate adm;
+    private final ADMDelegate adm;
 
-    private PreferencesProvider preferencesProvider;
+    private final PreferencesProvider preferencesProvider;
 
     public ADMProvider(@NonNull final Context context) {
         super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE);

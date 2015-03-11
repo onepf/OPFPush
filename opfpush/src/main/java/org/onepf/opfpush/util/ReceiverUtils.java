@@ -72,6 +72,7 @@ public final class ReceiverUtils {
         return packageChangeReceiver;
     }
 
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
         OPFLog.methodD(context);
         final Intent intentBroadcastReceive = new Intent(ACTION_RECEIVE);

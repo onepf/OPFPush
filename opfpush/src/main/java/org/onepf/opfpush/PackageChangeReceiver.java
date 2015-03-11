@@ -34,9 +34,10 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
     private static final String PACKAGE_URI_PREFIX = "package:";
 
     @NonNull
-    private PushProvider provider;
+    private final PushProvider provider;
 
     public PackageChangeReceiver(@NonNull final PushProvider provider) {
+        super();
         this.provider = provider;
     }
 
@@ -53,11 +54,10 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
                         hostAppPackage, provider.getName());
                 helper.registerNextAvailableProvider(provider.getName());
             }
-        } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
-            if (context.getPackageName().equals(getAppPackage(intent))) {
-                OPFLog.d("Application updated.");
-                helper.onNeedRetryRegister();
-            }
+        } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)
+                && context.getPackageName().equals(getAppPackage(intent))) {
+            OPFLog.d("Application updated.");
+            helper.onNeedRetryRegister();
         }
     }
 

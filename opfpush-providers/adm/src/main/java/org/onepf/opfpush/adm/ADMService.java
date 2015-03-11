@@ -44,8 +44,12 @@ import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
  */
 public class ADMService extends ADMMessageHandlerBase {
 
+    @NonNull
+    private final PreferencesProvider preferencesProvider;
+
     public ADMService() {
         super("ADMService");
+        preferencesProvider = PreferencesProvider.getInstance(getApplicationContext());
     }
 
     /**
@@ -84,8 +88,6 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
         OPFLog.methodD(registrationId);
-        final PreferencesProvider preferencesProvider = PreferencesProvider
-                .getInstance(getApplicationContext());
         preferencesProvider.saveRegistrationId(registrationId);
         preferencesProvider.removeAuthenticationFailedFlag();
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
@@ -106,11 +108,10 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
         OPFLog.methodD(admRegistrationId);
-        final PreferencesProvider settings = PreferencesProvider.getInstance(getApplicationContext());
         final String registrationId = admRegistrationId == null
-                ? settings.getRegistrationId()
+                ? preferencesProvider.getRegistrationId()
                 : admRegistrationId;
-        settings.reset();
+        preferencesProvider.reset();
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, registrationId);
     }
 
@@ -132,8 +133,6 @@ public class ADMService extends ADMMessageHandlerBase {
         OPFLog.d("Converted error : " + error);
 
         final OPFPushHelper helper = OPFPush.getHelper();
-        final PreferencesProvider preferencesProvider = PreferencesProvider
-                .getInstance(getApplicationContext());
         if (helper.isRegistering()) {
             //Registration Error
             preferencesProvider.removeAuthenticationFailedFlag();
