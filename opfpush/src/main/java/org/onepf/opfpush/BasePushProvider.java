@@ -20,8 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.util.ManifestUtils;
-import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFUtils;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
@@ -84,17 +83,15 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public void checkManifest() {
-        appContext.enforceCallingOrSelfPermission(INTERNET, ManifestUtils.getSecurityExceptionMessage(INTERNET));
-        appContext.enforceCallingOrSelfPermission(RECEIVE_BOOT_COMPLETED,
-                ManifestUtils.getSecurityExceptionMessage(RECEIVE_BOOT_COMPLETED));
-        appContext.enforceCallingOrSelfPermission(WAKE_LOCK, ManifestUtils.getSecurityExceptionMessage(WAKE_LOCK));
-        appContext.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE,
-                ManifestUtils.getSecurityExceptionMessage(ACCESS_NETWORK_STATE));
+        OPFChecks.checkPermission(appContext, INTERNET);
+        OPFChecks.checkPermission(appContext, RECEIVE_BOOT_COMPLETED);
+        OPFChecks.checkPermission(appContext, WAKE_LOCK);
+        OPFChecks.checkPermission(appContext, ACCESS_NETWORK_STATE);
 
-        ReceiverUtils.checkReceiver(appContext, new Intent(Intent.ACTION_BOOT_COMPLETED),
-                BootCompleteReceiver.class.getName(), null);
-        ReceiverUtils.checkReceiver(appContext, new Intent(appContext, RetryBroadcastReceiver.class),
-                RetryBroadcastReceiver.class.getName(), null);
+        OPFChecks.checkReceiver(appContext, BootCompleteReceiver.class.getName(),
+                new Intent(Intent.ACTION_BOOT_COMPLETED));
+        OPFChecks.checkReceiver(appContext, RetryBroadcastReceiver.class.getName(),
+                new Intent(appContext, RetryBroadcastReceiver.class));
     }
 
     @Override

@@ -33,8 +33,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
-import org.onepf.opfpush.util.ManifestUtils;
-import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.WrongThreadException;
@@ -104,28 +103,25 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         super.checkManifest();
         final Context context = getContext();
         if (needGoogleAccounts()) {
-            context.enforceCallingOrSelfPermission(GET_ACCOUNTS,
-                    ManifestUtils.getSecurityExceptionMessage(GET_ACCOUNTS));
+            OPFChecks.checkPermission(context, GET_ACCOUNTS);
         }
-        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE,
-                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE));
-        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
-        context.enforceCallingOrSelfPermission(c2dmPermission,
-                ManifestUtils.getSecurityExceptionMessage(c2dmPermission));
+        OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
 
-        ManifestUtils.checkService(context, new ComponentName(context, GCMService.class));
-        ManifestUtils.checkService(context, new ComponentName(context, SendMessageService.class));
+        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
+        OPFChecks.checkPermission(context, c2dmPermission);
+
+        OPFChecks.checkService(context, new ComponentName(context, GCMService.class));
+        OPFChecks.checkService(context, new ComponentName(context, SendMessageService.class));
 
         final Intent c2dmReceiveBroadcastIntent = new Intent(C2DM_ACTION_RECEIVE);
         final Intent registrationBroadcastIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
         final Intent unregistrationBroadcastIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
 
-        ReceiverUtils.checkReceiver(context, c2dmReceiveBroadcastIntent,
-                GCMReceiver.class.getName(), PERMISSION_SEND);
-        ReceiverUtils.checkReceiver(context, registrationBroadcastIntent,
-                GCMReceiver.class.getName(), PERMISSION_SEND);
-        ReceiverUtils.checkReceiver(context, unregistrationBroadcastIntent,
-                GCMReceiver.class.getName(), PERMISSION_SEND);
+        final String gcmReceiverName = GCMReceiver.class.getName();
+
+        OPFChecks.checkReceiver(context, gcmReceiverName, c2dmReceiveBroadcastIntent, PERMISSION_SEND);
+        OPFChecks.checkReceiver(context, gcmReceiverName, registrationBroadcastIntent, PERMISSION_SEND);
+        OPFChecks.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent, PERMISSION_SEND);
     }
 
     @Override

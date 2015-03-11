@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.util.ManifestUtils;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
@@ -78,13 +78,12 @@ public class NokiaNotificationsProvider extends BasePushProvider {
         final Context context = getContext();
         PushRegistrar.checkManifest(context);
 
-        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE,
-                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE));
-        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
-        context.enforceCallingOrSelfPermission(c2dmPermission,
-                ManifestUtils.getSecurityExceptionMessage(c2dmPermission));
+        OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
 
-        ManifestUtils.checkService(context, new ComponentName(context, NokiaNotificationService.class));
+        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
+        OPFChecks.checkPermission(context, c2dmPermission);
+
+        OPFChecks.checkService(context, new ComponentName(context, NokiaNotificationService.class));
     }
 
     @Override
