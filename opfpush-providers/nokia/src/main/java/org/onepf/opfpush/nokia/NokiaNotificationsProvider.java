@@ -44,6 +44,7 @@ import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE
  * @see <a href="http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html">Nokia Notification</a>
  * @since 06.09.14
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class NokiaNotificationsProvider extends BasePushProvider {
 
     @NonNull
