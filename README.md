@@ -21,11 +21,10 @@ Amazon Device Messaging and has possibility to integrate new push service.
 ## Download
 
 Download [the latest AAR][opfpush-latest-aar] or [the latest JAR][opfpush-latest-jar]. Also you can grab it via Gradle.
-For AAR dependency:
+For AAR dependency (you also must add OPFUtils dependency):
 ```groovy
-compile ('org.onepf:opfpush:0.1.5@aar') {
-    transitive = true
-}
+compile 'org.onepf:opfpush:0.1.5@aar'
+compile 'org.onepf:opfutils:0.1.15@aar'
 ```
 for JAR dependency:
 ```groovy
