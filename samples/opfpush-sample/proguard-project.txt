@@ -16,7 +16,7 @@
 #   public *;
 #}
 
--dontwarn -dontwarn edu.umd.cs.findbugs.annotations.*
+-dontwarn edu.umd.cs.findbugs.annotations.*
 
 #adm
 -dontwarn com.amazon.device.messaging.**

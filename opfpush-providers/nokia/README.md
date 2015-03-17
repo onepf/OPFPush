@@ -2,6 +2,8 @@
 
 ## How To Use
 
+**`AndroidManifest.xml` preparing**
+
 Add following permissions to your AndroidManifest.xml file:
 
 ```xml
@@ -39,6 +41,8 @@ If you use JAR dependency, you also must add to your application AndroidManifest
         android:exported="false"/>
 </application>
 ```
+
+**Usage**
 
 To use `NokiaNotificationsProvider` just add it to `Configuration` when building new instance, like this:
 
