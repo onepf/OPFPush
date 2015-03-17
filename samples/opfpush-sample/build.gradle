@@ -23,7 +23,7 @@ ext {
 
     storeFile = file(getLocalProperty('opfpush-sample.signing'))
     storePassword = getLocalProperty('StorePassword')
-    keyAlias = getLocalProperty('KeyAilas')
+    keyAlias = getLocalProperty('KeyAlias')
     keyPassword = getLocalProperty('KeyPassword')
 }
 
