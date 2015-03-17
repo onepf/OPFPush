@@ -17,6 +17,28 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 
+ext {
+    projectLocalPropertiesFile = project.rootProject.file('local.properties')
+    projectLocalProperties = loadLocalProperties(projectLocalPropertiesFile)
+
+    storeFile = file(getLocalProperty('opfpush-sample.signing'))
+    storePassword = getLocalProperty('StorePassword')
+    keyAlias = getLocalProperty('KeyAilas')
+    keyPassword = getLocalProperty('KeyPassword')
+}
+
+def loadLocalProperties(propertiesFile) {
+    def localProperties = new Properties()
+    if (propertiesFile.exists()) {
+        localProperties.load(propertiesFile.newDataInputStream())
+    }
+    return localProperties
+}
+
+def getLocalProperty(propertyName) {
+    return project.projectLocalProperties.getProperty(propertyName)
+}
+
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
@@ -28,6 +50,30 @@ android {
         versionName "2.0"
 
         applicationId 'org.onepf.opfpush.pushsample'
+    }
+
+    signingConfigs {
+        release {
+            storeFile project.storeFile
+            storePassword project.storePassword
+            keyAlias project.keyAlias
+            keyPassword project.keyPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-project.txt'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
 }
 
@@ -43,4 +89,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.16-SNAPSHOT'
+    compile 'com.amazon:amazon-device-messaging:1.0.1'
 }
