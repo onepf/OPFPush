@@ -63,8 +63,6 @@ public class RegisteringTimeoutControllerTest {
         for (ShadowAlarmManager.ScheduledAlarm alarm : alarms) {
             final PendingIntent operation = alarm.operation;
             final int creatorUid = operation.getCreatorUid();
-            System.out.println(creatorUid);
-            System.out.println(ctx.getApplicationInfo().uid);
             if (creatorUid == ctx.getApplicationInfo().uid) {
                 Assert.assertTrue(Math.abs(whenExpected - alarm.triggerAtTime) < TIME_DELTA_MILLISECONDS);
                 return;
