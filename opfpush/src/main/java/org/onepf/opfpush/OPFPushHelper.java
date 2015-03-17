@@ -68,6 +68,7 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
  * @author Roman Savin
  * @since 04.09.2014
  */
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public final class OPFPushHelper {
 
     @NonNull
@@ -86,7 +87,7 @@ public final class OPFPushHelper {
     private List<PushProvider> sortedProvidersList;
 
     @NonNull
-    private Map<String, OPFError> registerProviderErrors = new HashMap<>();
+    private final Map<String, OPFError> registerProviderErrors = new HashMap<>();
 
     private volatile Configuration configuration;
 
@@ -184,29 +185,14 @@ public final class OPFPushHelper {
         }
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({"UnusedDeclaration", "PMD.UnusedPrivateMethod"})
     private boolean canSendMessages() {
         throw new UnsupportedOperationException("Not supported in current version");
-        /*return currentProvider instanceof SenderPushProvider;*/
     }
 
-    @SuppressWarnings("UnusedDeclaration")
+    @SuppressWarnings({"UnusedDeclaration", "PMD.UnusedPrivateMethod", "PMD.UnusedFormalParameter"})
     private void sendMessage(@NonNull final Message message) {
         throw new UnsupportedOperationException("Not supported in current version");
-        /*synchronized (registrationLock) {
-            OPFLog.methodD(OPFPushHelper.class, "sendMessage", message);
-
-            if (currentProvider instanceof SenderPushProvider) {
-                ((SenderPushProvider) currentProvider).send(message);
-            } else if (isRegistered()) {
-                throw new OPFPushException(
-                        "Current provider '%s' not support send messages.",
-                        currentProvider
-                );
-            } else {
-                throw new IllegalStateException("Provider not registered.");
-            }
-        }*/
     }
 
     /**
@@ -382,7 +368,8 @@ public final class OPFPushHelper {
             final int providersCount = sortedProvidersList.size();
             final int prevProviderPosition = getProviderPosition(sortedProvidersList, prevProviderName);
 
-            for (int i = (prevProviderPosition + 1) % providersCount, j = 0;
+            for (int i = (prevProviderPosition + 1) % providersCount,
+                         j = 0;
                  j < providersCount;
                  i = (i + 1) % providersCount, j++) {
 
@@ -592,9 +579,6 @@ public final class OPFPushHelper {
      */
     @SuppressWarnings("UnusedDeclaration")
     public final class ReceivedMessageHandler {
-
-        ReceivedMessageHandler() {
-        }
 
         /**
          * A push provider calls this method when a new message is received.

@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.RetryBroadcastReceiver;
 import org.onepf.opfpush.model.Operation;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 import java.text.SimpleDateFormat;
@@ -42,16 +43,16 @@ import static org.onepf.opfpush.model.Operation.UNREGISTER;
  */
 public final class RetryManager implements BackoffManager {
 
-    private static RetryManager instance = null;
+    private static volatile RetryManager instance;
 
     @NonNull
-    private Context appContext;
+    private final Context appContext;
 
     @NonNull
-    private BackoffManager backoffManager;
+    private final BackoffManager backoffManager;
 
     @NonNull
-    private AlarmManager alarmManager;
+    private final AlarmManager alarmManager;
 
     private RetryManager(@NonNull final Context context,
                          @NonNull final BackoffManager backoffManager) {
@@ -61,8 +62,10 @@ public final class RetryManager implements BackoffManager {
     }
 
     @NonNull
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static RetryManager getInstance(@NonNull final Context context,
                                            @NonNull final BackoffManager backoffManager) {
+        OPFChecks.checkThread(true);
         if (instance == null) {
             instance = new RetryManager(context, backoffManager);
         }

@@ -2,7 +2,9 @@ Implementation of [Amazon Device Messaging][1] for OPFPush.
 
 ## How To Use
 
-Add following permissions to your AndroidManifest.xml file:
+**AndroidManifest**
+
+Add the following permissions to your AndroidManifest.xml file:
 
 ```xml
 <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" />
@@ -11,7 +13,7 @@ Add following permissions to your AndroidManifest.xml file:
     android:protectionLevel="signature" />
 ```
 
-also add following receiver:
+also add the following receiver:
 
 ```xml
 <receiver
@@ -57,6 +59,18 @@ If you use JAR dependency, you also must add to your application AndroidManifest
     </application>
 </manifest>
 ```
+
+**Proguard**
+
+Add the following lines to your `proguard-project.txt` file:
+```java
+-dontwarn com.amazon.device.messaging.**
+-keep class com.amazon.device.messaging.** {*;}
+-keep public class * extends com.amazon.device.messaging.ADMMessageReceiver
+-keep public class * extends com.amazon.device.messaging.ADMMessageHandlerBase
+```
+
+**Usage**
 
 To use `ADMProvider` just add it to `Configuration` when building new instance, like this:
 

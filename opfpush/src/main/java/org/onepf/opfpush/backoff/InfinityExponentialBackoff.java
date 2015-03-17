@@ -35,12 +35,10 @@ final class InfinityExponentialBackoff implements Backoff {
     @NonNull
     private final AtomicInteger tryNumber = new AtomicInteger(0);
 
-    public InfinityExponentialBackoff() {
-    }
-
     /**
      * Compute summary delay for all tries.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public int summaryDelay() {
         return Integer.MAX_VALUE;
     }

@@ -33,7 +33,7 @@ import static org.onepf.opfpush.model.Operation.UNREGISTER;
 final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManager {
 
     @NonNull
-    private Class<T> backoffClass;
+    private final Class<T> backoffClass;
 
     @NonNull
     private final Map<String, Backoff> backoffMap = new HashMap<>();
@@ -83,6 +83,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     }
 
     @NonNull
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private Backoff createBackoff() {
         try {
             return backoffClass.newInstance();

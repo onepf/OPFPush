@@ -18,6 +18,7 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.model.Operation;
 
@@ -27,7 +28,7 @@ import org.onepf.opfpush.model.Operation;
  */
 public final class InfinityExponentialBackoffManager implements BackoffManager {
 
-    private static InfinityExponentialBackoffManager instance = null;
+    private static volatile InfinityExponentialBackoffManager instance;
 
     @NonNull
     private final BackoffManager registerBackoffAdapter;
@@ -40,7 +41,9 @@ public final class InfinityExponentialBackoffManager implements BackoffManager {
         unregisterBackoffAdapter = new UnregisterBackoffAdapter<>(InfinityExponentialBackoff.class);
     }
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static InfinityExponentialBackoffManager getInstance() {
+        OPFChecks.checkThread(true);
         if (instance == null) {
             instance = new InfinityExponentialBackoffManager();
         }

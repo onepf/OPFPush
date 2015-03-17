@@ -21,15 +21,14 @@ Amazon Device Messaging and has possibility to integrate new push service.
 ## Download
 
 Download [the latest AAR][opfpush-latest-aar] or [the latest JAR][opfpush-latest-jar]. Also you can grab it via Gradle.
-For AAR dependency:
+For AAR dependency (you also must add OPFUtils dependency):
 ```groovy
-compile ('org.onepf:opfpush:0.1.4@aar') {
-    transitive = true
-}
+compile 'org.onepf:opfpush:0.1.5@aar'
+compile 'org.onepf:opfutils:0.1.15@aar'
 ```
 for JAR dependency:
 ```groovy
-compile 'org.onepf:opfpush:0.1.4'
+compile 'org.onepf:opfpush:0.1.5'
 ```
 
 or Maven:
@@ -37,7 +36,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
     <type>aar</type>
 </dependency>
 ```
@@ -46,7 +45,7 @@ for JAR dependency:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 
@@ -63,7 +62,6 @@ Before setup `OPFPush` you must setup your project files.
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED"/>
     ```
     
    and the following receivers:
@@ -78,6 +76,13 @@ Before setup `OPFPush` you must setup your project files.
 
 2. Add for each used providers specific changes that you can find in provider README.md file. See section [Implemented Push Services](#user-content-implemented-push-services).
 
+3. Add the following line to your `proguard-project.txt` file:
+    ```
+    -dontwarn edu.umd.cs.findbugs.annotations.*
+    ```
+   Also add the proguard rules specific for the each used provider that you can find in provider README.md file.
+   See section [Implemented Push Services](#user-content-implemented-push-services).
+   
 **OPFPush setup**
 
 You can setup `OPFPush` following steps:
@@ -227,8 +232,8 @@ For unknown count pass value `OPFConstants.MESSAGES_COUNT_UNKNOWN` as argument `
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
 [new-build-system]: http://tools.android.com/tech-docs/new-build-system
-[opfpush-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.1.4/opfpush-0.1.4.jar
+[opfpush-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.jar
 [openpush-site]: http://www.onepf.org/openpush/
-[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.1.4/opfpush-0.1.4.aar
+[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.aar
 [aar-format-docs]: http://tools.android.com/tech-docs/new-build-system/aar-format
 [BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush/gcm_migrate_sample/BroadcastMessageListener.java

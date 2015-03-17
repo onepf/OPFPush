@@ -18,7 +18,6 @@ package org.onepf.opfpush;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfutils.OPFChecks;
@@ -37,8 +36,7 @@ import org.onepf.opfutils.exception.InitException;
  */
 public final class OPFPush {
 
-    @Nullable
-    private static OPFPushHelper helper;
+    private static volatile OPFPushHelper helper;
 
     private OPFPush() {
         throw new UnsupportedOperationException();
@@ -71,10 +69,14 @@ public final class OPFPush {
                             @NonNull final Configuration configuration) {
         OPFLog.methodD(context, configuration);
         OPFChecks.checkThread(true);
-        if (helper == null) {
-            helper = new OPFPushHelper(context);
+
+        if (helper != null) {
+            throw new InitException(false);
         }
-        helper.checkInit(false);
-        helper.init(configuration);
+
+        final OPFPushHelper newHelper = new OPFPushHelper(context);
+        newHelper.init(configuration);
+
+        helper = newHelper;
     }
 }

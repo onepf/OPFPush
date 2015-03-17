@@ -30,7 +30,7 @@ import static org.onepf.opfpush.model.Operation.REGISTER;
 final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager {
 
     @NonNull
-    private Backoff registerBackoff;
+    private final Backoff registerBackoff;
 
     public RegisterBackoffAdapter(@NonNull final Class<T> backoffClass) {
         this.registerBackoff = createBackoff(backoffClass);
@@ -58,6 +58,7 @@ final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager 
     }
 
     @NonNull
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private Backoff createBackoff(@NonNull final Class<T> backoffClass) {
         try {
             return backoffClass.newInstance();

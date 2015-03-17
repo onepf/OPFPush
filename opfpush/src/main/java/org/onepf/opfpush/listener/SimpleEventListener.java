@@ -37,33 +37,33 @@ public class SimpleEventListener implements EventListener {
     public void onMessage(@NonNull Context context,
                           @NonNull String providerName,
                           @Nullable Bundle extras) {
-
+        //nothing
     }
 
     @Override
     public void onDeletedMessages(@NonNull Context context,
                                   @NonNull String providerName,
                                   int messagesCount) {
-
+        //nothing
     }
 
     @Override
     public void onRegistered(@NonNull Context context,
                              @NonNull String providerName,
                              @NonNull String registrationId) {
-
+        //nothing
     }
 
     @Override
     public void onUnregistered(@NonNull Context context,
                                @NonNull String providerName,
                                @Nullable String registrationId) {
-
+        //nothing
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull Context context,
                                       @NonNull Map<String, OPFError> registrationErrors) {
-
+        //nothing
     }
 }

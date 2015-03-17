@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.util.ManifestUtils;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
@@ -44,6 +44,7 @@ import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_STORE_APP_PACKAGE
  * @see <a href="http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html">Nokia Notification</a>
  * @since 06.09.14
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class NokiaNotificationsProvider extends BasePushProvider {
 
     @NonNull
@@ -78,13 +79,12 @@ public class NokiaNotificationsProvider extends BasePushProvider {
         final Context context = getContext();
         PushRegistrar.checkManifest(context);
 
-        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE,
-                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE));
-        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
-        context.enforceCallingOrSelfPermission(c2dmPermission,
-                ManifestUtils.getSecurityExceptionMessage(c2dmPermission));
+        OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
 
-        ManifestUtils.checkService(context, new ComponentName(context, NokiaNotificationService.class));
+        final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
+        OPFChecks.checkPermission(context, c2dmPermission);
+
+        OPFChecks.checkService(context, new ComponentName(context, NokiaNotificationService.class));
     }
 
     @Override
@@ -98,6 +98,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
      * @return Value set by {@link #setRegisteredOnServer(android.content.Context, boolean)}
      * or {@link PushRegistrar#DEFAULT_ON_SERVER_LIFESPAN_MS} if not set.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public long getRegisterOnServerLifespan() {
         return PushRegistrar.getRegisterOnServerLifespan(getContext());
     }
@@ -105,6 +106,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     /**
      * Sets whether the device was successfully registered in the server side.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public void setRegisteredOnServer(@NonNull final Context context, final boolean flag) {
         OPFLog.methodD(context, flag);
         PushRegistrar.setRegisteredOnServer(context, flag);
@@ -113,6 +115,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
     /**
      * Sets how long (in milliseconds) the {@link #isRegistered()} flag is valid.
      */
+    @SuppressWarnings("UnusedDeclaration")
     public void setRegisterOnServerLifespan(@NonNull final Context context, final long lifespan) {
         OPFLog.methodD(context, lifespan);
         PushRegistrar.setRegisterOnServerLifespan(context, lifespan);
@@ -126,6 +129,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
      * which is DEFAULT_ON_SERVER_LIFESPAN_MS by default (but can be changed
      * by {@link #setRegisterOnServerLifespan(android.content.Context, long)}).
      */
+    @SuppressWarnings("UnusedDeclaration")
     public boolean isRegisterOnServer() {
         return PushRegistrar.isRegisteredOnServer(getContext());
     }
@@ -170,7 +174,7 @@ public class NokiaNotificationsProvider extends BasePushProvider {
         for (String senderID : sendersIds) {
             senderIdsBuilder.append(senderID).append(", ");
         }
-        senderIdsBuilder.append("]");
+        senderIdsBuilder.append(']');
         return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderIdsBuilder.toString());
     }
 }

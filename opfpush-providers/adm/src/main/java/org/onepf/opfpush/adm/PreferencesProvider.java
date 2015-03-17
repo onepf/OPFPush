@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
@@ -28,6 +29,7 @@ import org.onepf.opfutils.OPFUtils;
  * @author Roman Savin
  * @since 27.01.2015
  */
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class PreferencesProvider {
 
     public static final int NO_SAVED_APP_VERSION = -1;
@@ -40,19 +42,17 @@ final class PreferencesProvider {
 
     private static volatile PreferencesProvider instance;
 
-    private OPFPreferences preferences;
+    private final OPFPreferences preferences;
 
     private PreferencesProvider(@NonNull final Context context) {
         preferences = new OPFPreferences(context, ADM_POSTFIX);
     }
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static PreferencesProvider getInstance(@NonNull final Context context) {
+        OPFChecks.checkThread(true);
         if (instance == null) {
-            synchronized (PreferencesProvider.class) {
-                if (instance == null) {
-                    instance = new PreferencesProvider(context);
-                }
-            }
+            instance = new PreferencesProvider(context);
         }
 
         return instance;
