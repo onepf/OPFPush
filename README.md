@@ -76,6 +76,13 @@ Before setup `OPFPush` you must setup your project files.
 
 2. Add for each used providers specific changes that you can find in provider README.md file. See section [Implemented Push Services](#user-content-implemented-push-services).
 
+3. Add the following line to your `proguard-project.txt` file:
+    ```
+    -dontwarn -dontwarn edu.umd.cs.findbugs.annotations.*
+    ```
+   Also add the proguard rules specific for the each used provider that you can find in provider README.md file.
+   See section [Implemented Push Services](#user-content-implemented-push-services).
+   
 **OPFPush setup**
 
 You can setup `OPFPush` following steps:
