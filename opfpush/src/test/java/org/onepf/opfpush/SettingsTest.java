@@ -14,6 +14,7 @@ import org.onepf.opfpush.mock.MockNamePushProvider;
 import org.onepf.opfpush.model.State;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
@@ -47,7 +48,7 @@ public class SettingsTest extends Assert {
 
     @Before
     public void setup() {
-        Context ctx = Robolectric.application.getApplicationContext();
+        Context ctx = RuntimeEnvironment.application.getApplicationContext();
         sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_MULTI_PROCESS);
         settings = Settings.getInstance(ctx);
         pushProviders = new MockNamePushProvider[NUM_PROVIDERS];

@@ -5,14 +5,15 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.BasePushProvider;
 import org.robolectric.Robolectric;
+import org.robolectric.RuntimeEnvironment;
 
 /**
- * Created by antonpp on 24.02.15.
+ * @author antonpp
+ * @since 16.03.2015
  */
 public class MockNamePushProvider extends BasePushProvider {
 
     public static final String DEFAULT_HOST_APP_PACKAGE = "org.onepf.store";
-    public static final String DEFAULT_NAME = MockNamePushProvider.class.getName();
 
     public MockNamePushProvider(@NonNull String name) {
         this(name, DEFAULT_HOST_APP_PACKAGE);
@@ -20,7 +21,7 @@ public class MockNamePushProvider extends BasePushProvider {
 
     public MockNamePushProvider(@NonNull String name,
                                 @NonNull String hotAppPackage) {
-        super(Robolectric.application, name, hotAppPackage);
+        super(RuntimeEnvironment.application, name, hotAppPackage);
     }
 
     @Override
