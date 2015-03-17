@@ -2,7 +2,7 @@ Implementation of [Amazon Device Messaging][1] for OPFPush.
 
 ## How To Use
 
-**`AndroidManifest.xml` preparing**
+**AndroidManifest**
 
 Add the following permissions to your AndroidManifest.xml file:
 

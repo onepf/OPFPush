@@ -2,7 +2,7 @@
 
 ## How To Use
 
-**`AndroidManifest.xml` preparing**
+**AndroidManifest**
 
 Add following permissions to your AndroidManifest.xml file:
 
