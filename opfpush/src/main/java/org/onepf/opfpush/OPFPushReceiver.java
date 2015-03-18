@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.MessageType;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -78,8 +78,8 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
         final Bundle extras = intent.getExtras();
         @SuppressWarnings("unchecked")
-        final Map<String, OPFError> registrationErrors =
-                (Map<String, OPFError>) extras.getSerializable(EXTRA_REGISTRATION_ERRORS);
+        final Map<String, UnrecoverablePushError> registrationErrors =
+                (Map<String, UnrecoverablePushError>) extras.getSerializable(EXTRA_REGISTRATION_ERRORS);
         onNoAvailableProvider(context, registrationErrors);
     }
 

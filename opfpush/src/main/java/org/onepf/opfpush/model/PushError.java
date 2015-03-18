@@ -16,6 +16,8 @@
 
 package org.onepf.opfpush.model;
 
+import android.support.annotation.NonNull;
+
 /**
  * Registration or unregistering operation error.
  * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
@@ -29,45 +31,43 @@ package org.onepf.opfpush.model;
  * available provider. If there are no any other available providers,
  * the {@link org.onepf.opfpush.listener.EventListener#onNoAvailableProvider(android.content.Context, java.util.Map)} method will be called.
  *
- * @author Kirill Rozov
  * @author Roman Savin
- * @since 09.09.14.
+ * @since 18.03.2015
  */
-public enum OPFError {
+//todo javadoc
+public abstract class PushError<T extends ErrorType> {
 
-    /**
-     * A service is not available at the moment. Most popular reason of this error is the internet
-     * connection unavailability.
-     * <p/>
-     * Recoverable error.
-     */
-    SERVICE_NOT_AVAILABLE,
+    @NonNull
+    private final T type;
 
-    /**
-     * Invalid parameters have been sent to register provider.
-     * <p/>
-     * Unrecoverable error.
-     */
-    INVALID_PARAMETERS,
+    @NonNull
+    private final String providerName;
 
-    /**
-     * An invalid sender ID has been used for the registration.
-     * <p/>
-     * Unrecoverable error.
-     */
-    INVALID_SENDER,
+    @NonNull
+    private final String errorId;
 
-    /**
-     * The authentication failure.
-     * <p/>
-     * Unrecoverable error.
-     */
-    AUTHENTICATION_FAILED,
+    protected PushError(@NonNull final T type,
+                        @NonNull final String providerName,
+                        @NonNull final String errorId) {
+        this.type = type;
+        this.providerName = providerName;
+        this.errorId = errorId;
+    }
 
-    /**
-     * A provider specific error has occurred.
-     * <p/>
-     * Unrecoverable error.
-     */
-    UNKNOWN_ERROR
+    public abstract boolean isRecoverable();
+
+    @NonNull
+    public T getType() {
+        return type;
+    }
+
+    @NonNull
+    public String getProviderName() {
+        return providerName;
+    }
+
+    @NonNull
+    public String getErrorId() {
+        return errorId;
+    }
 }

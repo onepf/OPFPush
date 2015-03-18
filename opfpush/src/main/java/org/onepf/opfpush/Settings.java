@@ -25,6 +25,8 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 
+import java.util.Locale;
+
 import static org.onepf.opfpush.model.State.UNREGISTERED;
 
 /**
@@ -38,6 +40,8 @@ final class Settings {
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
+    private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
+    private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
 
     private static volatile Settings instance;
 
@@ -111,5 +115,52 @@ final class Settings {
         } else {
             preferences.put(KEY_LAST_ANDROID_ID, androidId);
         }
+    }
+
+    public synchronized void saveUnregisteringProvider(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        preferences.put(
+                getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
+                true
+        );
+    }
+
+    public synchronized void removeUnregisteringProvider(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        preferences.remove(getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName));
+    }
+
+    public synchronized boolean isProviderUnregistrationPerforming(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        return preferences.getBoolean(
+                getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
+                false
+        );
+    }
+
+    public synchronized void saveRegisteringProvider(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        preferences.put(
+                getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
+                true
+        );
+    }
+
+    public synchronized void removeRegisteringProvider(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        preferences.remove(getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName));
+    }
+
+    public synchronized boolean isProviderRegistrationPerforming(@NonNull final String providerName) {
+        OPFLog.methodD(providerName);
+        return preferences.getBoolean(
+                getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
+                false
+        );
+    }
+
+    private String getProviderPreferenceKey(@NonNull final String prefix,
+                                            @NonNull final String providerName) {
+        return prefix + providerName.toLowerCase(Locale.US);
     }
 }

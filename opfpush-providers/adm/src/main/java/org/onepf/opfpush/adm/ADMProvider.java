@@ -63,9 +63,22 @@ public class ADMProvider extends BasePushProvider {
 
     @Override
     public void register() {
+        super.register();
         OPFLog.methodD();
-        OPFLog.d("Start register ADMProvider.");
-        adm.startRegister();
+        if (!isUnregistrationPerforming()) {
+            OPFLog.i("Start register ADMProvider.");
+            adm.startRegister();
+        }
+    }
+
+    @Override
+    public void unregister() {
+        super.unregister();
+        OPFLog.methodD();
+        if (!isRegistrationPerforming()) {
+            OPFLog.i("Start unregister ADMProvider.");
+            adm.startUnregister();
+        }
     }
 
     @Override
@@ -108,13 +121,6 @@ public class ADMProvider extends BasePushProvider {
     public boolean isRegistered() {
         OPFLog.methodD();
         return !TextUtils.isEmpty(getRegistrationId());
-    }
-
-    @Override
-    public void unregister() {
-        OPFLog.methodD();
-        OPFLog.i("Start unregister ADMProvider.");
-        adm.startUnregister();
     }
 
     @Override

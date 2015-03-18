@@ -27,11 +27,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.adm.ADMConstants;
-import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
@@ -146,10 +146,10 @@ public class DemoActivity extends Activity {
     public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
         OPFLog.methodD(noAvailableProviderEvent);
         initViewsUnregisteredState("");
-        final Map<String, OPFError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
+        final Map<String, UnrecoverablePushError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
         if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
-            final OPFError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
-            infoText.setText(getString(R.string.registration_error_fmt, error.name()));
+            final UnrecoverablePushError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
+            infoText.setText(getString(R.string.registration_error_fmt, error.getErrorId()));
         } else {
             infoText.setText(getString(R.string.no_available_provider));
         }

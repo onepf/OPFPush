@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
-
-import android.support.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package org.onepf.opfpush.model;
 
 /**
- * @author Kirill Rozov
- * @since 24.09.14.
+ * @author Roman Savin
+ * @since 18.03.2015
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        GCMConstants.ERROR_AUTHENTICATION_FAILED,
-        GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
-})
-@interface GCMError {
+//todo add javadoc
+public interface ErrorType {
 }

@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 
 import java.util.Map;
 
@@ -63,7 +63,7 @@ public class SimpleEventListener implements EventListener {
 
     @Override
     public void onNoAvailableProvider(@NonNull Context context,
-                                      @NonNull Map<String, OPFError> registrationErrors) {
+                                      @NonNull Map<String, UnrecoverablePushError> registrationErrors) {
         //nothing
     }
 }

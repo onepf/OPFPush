@@ -148,17 +148,24 @@ public class NokiaNotificationsProvider extends BasePushProvider {
 
     @Override
     public void register() {
+        super.register();
         OPFLog.methodD();
-        OPFLog.i("Start register NokiaNotificationsProvider.");
-        PushRegistrar.register(getContext(), sendersIds);
+        if (!isUnregistrationPerforming()) {
+            OPFLog.i("Start register NokiaNotificationsProvider.");
+            PushRegistrar.register(getContext(), sendersIds);
+        }
     }
 
     @Override
     public void unregister() {
+        super.unregister();
         OPFLog.methodD();
-        OPFLog.i("Start unregister NokiaNotificationsProvider.");
-        PushRegistrar.unregister(getContext());
-        PushRegistrar.onDestroy(getContext());
+        if (!isRegistrationPerforming()) {
+            OPFLog.i("Start unregister NokiaNotificationsProvider.");
+            final Context context = getContext();
+            PushRegistrar.unregister(context);
+            PushRegistrar.onDestroy(context);
+        }
     }
 
     @Override

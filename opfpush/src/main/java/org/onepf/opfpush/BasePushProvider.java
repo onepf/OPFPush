@@ -20,13 +20,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.model.RecoverablePushError;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static android.Manifest.permission.WAKE_LOCK;
+import static org.onepf.opfpush.model.RecoverablePushError.Type.REGISTERING_PERFORMING;
+import static org.onepf.opfpush.model.RecoverablePushError.Type.UNREGISTERING_PERFORMING;
 
 /**
  * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
@@ -82,6 +86,26 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
+    public void register() {
+        if (!isUnregistrationPerforming()) {
+            OPFPush.getHelper().getSettings().saveRegisteringProvider(name);
+        } else {
+            OPFLog.i("Unregistering is performing.");
+            sendUnregisteringPerformingError();
+        }
+    }
+
+    @Override
+    public void unregister() {
+        if (!isRegistrationPerforming()) {
+            OPFPush.getHelper().getSettings().saveUnregisteringProvider(name);
+        } else {
+            OPFLog.i("Registration is performing.");
+            sendRegistrationPerformingError();
+        }
+    }
+
+    @Override
     public void checkManifest() {
         OPFChecks.checkPermission(appContext, INTERNET);
         OPFChecks.checkPermission(appContext, RECEIVE_BOOT_COMPLETED);
@@ -114,6 +138,30 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public String toString() {
         return name + "(hostAppPackage='" + hostAppPackage + ')';
+    }
+
+    //todo javadoc
+    protected boolean isRegistrationPerforming() {
+        return OPFPush.getHelper().getSettings().isProviderRegistrationPerforming(name);
+    }
+
+    //todo javadoc
+    protected boolean isUnregistrationPerforming() {
+        return OPFPush.getHelper().getSettings().isProviderUnregistrationPerforming(name);
+    }
+
+    private void sendRegistrationPerformingError() {
+        OPFPush.getHelper().getReceivedMessageHandler().onUnregistrationError(
+                name,
+                new RecoverablePushError(REGISTERING_PERFORMING, name, REGISTERING_PERFORMING.name())
+        );
+    }
+
+    private void sendUnregisteringPerformingError() {
+        OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(
+                name,
+                new RecoverablePushError(UNREGISTERING_PERFORMING, name, UNREGISTERING_PERFORMING.name())
+        );
     }
 
     /**

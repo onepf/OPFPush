@@ -86,17 +86,24 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
+        super.register();
         OPFLog.methodD();
-        OPFLog.i("Start register GCMProvider.");
-        executeTask(new RegisterTask());
+        if (!isUnregistrationPerforming()) {
+            OPFLog.i("Start register GCMProvider.");
+            executeTask(new RegisterTask());
+        }
     }
 
     @Override
     @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
+        super.unregister();
         OPFLog.methodD();
-        OPFLog.i("Start unregister GCMProvider.");
-        executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
+        if (!isRegistrationPerforming()) {
+            OPFLog.i("Start unregister GCMProvider.");
+            preferencesProvider.reset();
+            executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
+        }
     }
 
     @Override
@@ -223,7 +230,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private void close() {
         OPFLog.methodD();
 
-        preferencesProvider.reset();
         if (registrationExecutor != null) {
             OPFLog.d("Registration executor is not null");
 
@@ -278,7 +284,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                     case GoogleCloudMessaging.ERROR_MAIN_THREAD:
                         throw new WrongThreadException(false);
                     default:
-                        onAuthError();
+                        onError(error);
                         break;
                 }
             }
@@ -305,10 +311,13 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         private void onAuthError() {
             OPFLog.methodD();
+            onError(GCMConstants.ERROR_AUTHENTICATION_FAILED);
+        }
 
+        private void onError(@NonNull final String errorId) {
+            OPFLog.methodD(errorId);
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID,
-                    GCMConstants.ERROR_AUTHENTICATION_FAILED);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
             getContext().sendBroadcast(intent);
         }
     }

@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 
 import java.util.Map;
 
@@ -85,14 +85,15 @@ public interface EventListener {
      * <li>An unrecoverable registration error has occurred.</li>
      * </ol>
      * <p/>
-     * In the second case you can get the {@link org.onepf.opfpush.model.OPFError} object from the {@code registrationErrors}
-     * map. You can notify the user about the occurred error if the error can be resolved by user.
-     * For example if you get the {@link org.onepf.opfpush.model.OPFError#AUTHENTICATION_FAILED} for the GCM push provider,
-     * you can ask the user whether he wants to add the google account.
+     * In the second case you can get the {@link org.onepf.opfpush.model.UnrecoverablePushError} object
+     * from the {@code registrationErrors} map.
+     * You can notify the user about the occurred error if the error can be resolved by user.
+     * For example if you get the {@link org.onepf.opfpush.model.UnrecoverablePushError.Type#AUTHENTICATION_FAILED}
+     * for the GCM push provider, you can ask the user whether he wants to add the google account.
      *
      * @param context            The application context.
      * @param registrationErrors The map in which registration errors are stored with a push providers' name as a key
      *                           If there is no registration errors, the map is empty.
      */
-    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, OPFError> registrationErrors);
+    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, UnrecoverablePushError> registrationErrors);
 }

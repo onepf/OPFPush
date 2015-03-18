@@ -26,11 +26,17 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.PushProvider;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.model.RecoverablePushError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
+import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AUTHENTICATION_FAILED;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.INVALID_SENDER;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.UNKNOWN_ERROR;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -129,14 +135,14 @@ public class ADMService extends ADMMessageHandlerBase {
     @Override
     protected void onRegistrationError(@NonNull @ADMError final String errorId) {
         OPFLog.methodD(errorId);
-        final OPFError error = convertError(errorId);
+        final PushError error = convertError(errorId);
         OPFLog.d("Converted error : " + error);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistering()) {
             //Registration Error
             preferencesProvider.removeAuthenticationFailedFlag();
-        } else if (error == OPFError.AUTHENTICATION_FAILED) {
+        } else if (error.getType() == AUTHENTICATION_FAILED) {
             //Unregistration Error
             preferencesProvider.saveAuthenticationFailedFlag();
         }
@@ -145,17 +151,17 @@ public class ADMService extends ADMMessageHandlerBase {
     }
 
     @NonNull
-    private OPFError convertError(@NonNull @ADMError final String errorId) {
+    private PushError convertError(@NonNull @ADMError final String errorId) {
         switch (errorId) {
             case ADMConstants.ERROR_SERVICE_NOT_AVAILABLE:
-                return OPFError.SERVICE_NOT_AVAILABLE;
+                return new RecoverablePushError(SERVICE_NOT_AVAILABLE, PROVIDER_NAME, errorId);
             case ADMConstants.ERROR_INVALID_SENDER:
-                return OPFError.INVALID_SENDER;
+                return new UnrecoverablePushError(INVALID_SENDER, PROVIDER_NAME, errorId);
             case ADMConstants.ERROR_AUTHENTICATION_FAILED:
-                return OPFError.AUTHENTICATION_FAILED;
+                return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
                 OPFLog.e("Unknown ADM error : " + errorId);
-                return OPFError.UNKNOWN_ERROR;
+                return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
         }
     }
 }

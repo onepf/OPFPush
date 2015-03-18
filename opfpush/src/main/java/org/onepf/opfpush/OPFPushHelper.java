@@ -27,9 +27,10 @@ import org.onepf.opfpush.backoff.InfinityExponentialBackoffManager;
 import org.onepf.opfpush.backoff.RetryManager;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.Message;
-import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.util.ReceiverUtils;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -47,7 +48,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
-import static org.onepf.opfpush.model.OPFError.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.model.Operation.REGISTER;
 import static org.onepf.opfpush.model.Operation.UNREGISTER;
 import static org.onepf.opfpush.model.State.REGISTERED;
@@ -87,7 +87,7 @@ public final class OPFPushHelper {
     private List<PushProvider> sortedProvidersList;
 
     @NonNull
-    private final Map<String, OPFError> registerProviderErrors = new HashMap<>();
+    private final Map<String, UnrecoverablePushError> registerProviderErrors = new HashMap<>();
 
     private volatile Configuration configuration;
 
@@ -266,7 +266,7 @@ public final class OPFPushHelper {
     @NonNull
     @Override
     public String toString() {
-        return "OpenPushHelper{"
+        return "OPFPushHelper{"
                 + "options="
                 + configuration
                 + ", currentProvider="
@@ -397,6 +397,11 @@ public final class OPFPushHelper {
             packageReceiver = ReceiverUtils
                     .registerPackageChangeReceiver(appContext, currentProvider);
         }
+    }
+
+    Settings getSettings() {
+        checkInit(true);
+        return settings;
     }
 
     private void restoreLastProvider() {
@@ -568,7 +573,8 @@ public final class OPFPushHelper {
                                     @Nullable final String registrationId) {
         OPFLog.methodD(providerName, registrationId);
         currentProvider = null;
-        settings.clear();
+        settings.saveState(UNREGISTERED);
+        settings.saveLastProvider(null);
         registerProviderErrors.clear();
         unregisterPackageChangeReceiver();
         eventListenerWrapper.onUnregistered(appContext, providerName, registrationId);
@@ -641,6 +647,7 @@ public final class OPFPushHelper {
                 registerProviderErrors.clear();
                 registerPackageChangeReceiver();
 
+                settings.removeRegisteringProvider(providerName);
                 eventListenerWrapper.onRegistered(appContext, providerName, registrationId);
             }
         }
@@ -656,7 +663,8 @@ public final class OPFPushHelper {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, oldRegistrationId);
                 OPFLog.i("Successfully unregister provider '%s'.", providerName);
-                retryManager.cancelRetryAllOperations(providerName);
+                retryManager.cancelRetryUnregister(providerName);
+                settings.removeUnregisteringProvider(providerName);
             }
         }
 
@@ -667,10 +675,9 @@ public final class OPFPushHelper {
          * @param error        The instance of the occurred error.
          */
         public void onRegistrationError(@NonNull final String providerName,
-                                        @NonNull final OPFError error) {
+                                        @NonNull final PushError error) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, error);
-                retryManager.cancelRetryUnregister(providerName);
 
                 if (isRegistered()) {
                     OPFLog.d("Registration state is REGISTERED");
@@ -678,12 +685,14 @@ public final class OPFPushHelper {
                 }
 
                 settings.saveState(UNREGISTERED);
-                if (error == SERVICE_NOT_AVAILABLE
+                if (error.isRecoverable()
                         && retryManager.hasTries(providerName, REGISTER)) {
                     retryManager.postRetryRegister(providerName);
                 } else {
-                    registerProviderErrors.put(providerName, error);
+                    registerProviderErrors.put(providerName, (UnrecoverablePushError) error);
                     retryManager.reset(providerName, REGISTER);
+                    retryManager.cancelRetryUnregister(providerName);
+                    settings.removeRegisteringProvider(providerName);
                     registerNextAvailableProvider(providerName);
                 }
             }
@@ -696,10 +705,9 @@ public final class OPFPushHelper {
          * @param error        The instance of the occurred error.
          */
         public void onUnregistrationError(@NonNull final String providerName,
-                                          @NonNull final OPFError error) {
+                                          @NonNull final PushError error) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, error);
-                retryManager.cancelRetryRegister(providerName);
 
                 final PushProvider provider = getProviderWithException(providerName);
                 if (!provider.isRegistered()) {
@@ -707,14 +715,16 @@ public final class OPFPushHelper {
                     return;
                 }
 
-                if (error == SERVICE_NOT_AVAILABLE
+                if (error.isRecoverable()
                         && retryManager.hasTries(providerName, UNREGISTER)) {
-                    OPFLog.w("Error while unregister provider %1$s : %2$s. Unregistration will be retried",
+                    OPFLog.i("Error while unregister provider %1$s : %2$s. Unregistration will be retried",
                             providerName, error);
                     retryManager.postRetryUnregister(providerName);
                 } else {
                     OPFLog.e("Error while unregister provider %1$s : %2$s",
                             providerName, error);
+                    retryManager.cancelRetryRegister(providerName);
+                    settings.removeUnregisteringProvider(providerName);
                 }
             }
         }
@@ -726,7 +736,7 @@ public final class OPFPushHelper {
          * @param providerName The name of the provider which has received the error.
          * @param error        The instance of the occurred error.
          */
-        public void onError(@NonNull final String providerName, @NonNull final OPFError error) {
+        public void onError(@NonNull final String providerName, @NonNull final PushError error) {
             synchronized (registrationLock) {
                 OPFLog.methodD(providerName, error);
 
