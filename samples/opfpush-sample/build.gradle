@@ -21,7 +21,7 @@ ext {
     projectLocalPropertiesFile = project.rootProject.file('local.properties')
     projectLocalProperties = loadLocalProperties(projectLocalPropertiesFile)
 
-    storeFile = file(getLocalProperty('opfpush-sample.signing'))
+    storeFile = getFile(getLocalProperty('opfpush-sample.signing'))
     storePassword = getLocalProperty('StorePassword')
     keyAlias = getLocalProperty('KeyAlias')
     keyPassword = getLocalProperty('KeyPassword')
@@ -37,6 +37,16 @@ def loadLocalProperties(propertiesFile) {
 
 def getLocalProperty(propertyName) {
     return project.projectLocalProperties.getProperty(propertyName)
+}
+
+def getFile(path) {
+    if (path != null) {
+        return file(path)
+    }
+}
+
+def isSigningKeySpecified() {
+    return project.storeFile != null && project.storePassword != null && project.keyAlias != null && project.keyPassword != null
 }
 
 android {
@@ -65,7 +75,9 @@ android {
         release {
             minifyEnabled true
             proguardFiles 'proguard-project.txt'
-            signingConfig signingConfigs.release
+            if (isSigningKeySpecified()) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
