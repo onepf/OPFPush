@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.InitException;
 
 /**
@@ -74,9 +75,12 @@ public final class OPFPush {
             throw new InitException(false);
         }
 
-        final OPFPushHelper newHelper = new OPFPushHelper(context);
-        newHelper.init(configuration);
-
-        helper = newHelper;
+        if (OPFUtils.isMainProcess(context)) {
+            final OPFPushHelper newHelper = new OPFPushHelperImpl(context);
+            newHelper.init(configuration);
+            helper = newHelper;
+        } else {
+            helper = new OPFPushHelperStub();
+        }
     }
 }
