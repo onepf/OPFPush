@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
  * Registration or unregistering operation error.
  * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
  * <p/>
- * The <b>recoverable</b> error means that the service can't handle an operation
+ * The <b>recoverable</b> error means that the {@link org.onepf.opfpush.OPFPushHelper} can't handle an operation
  * at the moment. The {@link org.onepf.opfpush.OPFPushHelper} retries an operation that cause
  * the recoverable error in the background.
  * <p/>
@@ -34,7 +34,6 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 18.03.2015
  */
-//todo javadoc
 public abstract class PushError<T extends ErrorType> {
 
     @NonNull
@@ -54,18 +53,40 @@ public abstract class PushError<T extends ErrorType> {
         this.errorId = errorId;
     }
 
+    /**
+     * Returns {@code true} if the error is recoverable, {@code false} otherwise.
+     *
+     * @return {@code true} if the error is recoverable, {@code false} otherwise.
+     */
     public abstract boolean isRecoverable();
 
+    /**
+     * Returns the type of the error.
+     *
+     * @return The type of the error.
+     */
     @NonNull
     public T getType() {
         return type;
     }
 
+    /**
+     * Returns the name of the provider that occurs the error.
+     *
+     * @return The name of the provider that occurs the error.
+     */
     @NonNull
     public String getProviderName() {
         return providerName;
     }
 
+    /**
+     * Returns the error id.
+     * Error id is a {@code String} that is returned by a specific push provider.
+     * This {@code String} usually is described in the documentation of a push provider.
+     *
+     * @return The error id.
+     */
     @NonNull
     public String getErrorId() {
         return errorId;

@@ -19,12 +19,13 @@ package org.onepf.opfpush.model;
 import android.support.annotation.NonNull;
 
 /**
+ * The recoverable {@link org.onepf.opfpush.model.PushError}.
+ * <p/>
  * Intended for the internal use, should never be called directly.
  *
  * @author Roman Savin
  * @since 18.03.2015
  */
-//todo add javadoc
 public class RecoverablePushError extends PushError<RecoverablePushError.Type> {
 
     public RecoverablePushError(@NonNull final Type type,

@@ -140,12 +140,20 @@ public abstract class BasePushProvider implements PushProvider {
         return name + "(hostAppPackage='" + hostAppPackage + ')';
     }
 
-    //todo javadoc
+    /**
+     * Returns {@code true} if the provider performs the registration operation at the moment.
+     *
+     * @return {@code true} if the provider performs the registration operation at the moment.
+     */
     protected boolean isRegistrationPerforming() {
         return OPFPush.getHelper().getSettings().isProviderRegistrationPerforming(name);
     }
 
-    //todo javadoc
+    /**
+     * Returns {@code true} if the provider performs the unregistration operation at the moment.
+     *
+     * @return {@code true} if the provider performs the unregistration operation at the moment.
+     */
     protected boolean isUnregistrationPerforming() {
         return OPFPush.getHelper().getSettings().isProviderUnregistrationPerforming(name);
     }

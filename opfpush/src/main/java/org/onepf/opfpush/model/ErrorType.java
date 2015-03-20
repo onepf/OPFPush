@@ -17,9 +17,10 @@
 package org.onepf.opfpush.model;
 
 /**
+ * This (empty) interface must be implemented by all classes that wish to be used as type of {@link org.onepf.opfpush.model.PushError}.
+ *
  * @author Roman Savin
  * @since 18.03.2015
  */
-//todo add javadoc
 public interface ErrorType {
 }

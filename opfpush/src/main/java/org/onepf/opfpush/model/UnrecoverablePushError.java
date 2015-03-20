@@ -19,10 +19,11 @@ package org.onepf.opfpush.model;
 import android.support.annotation.NonNull;
 
 /**
+ * The unrecoverable {@link org.onepf.opfpush.model.PushError}.
+ *
  * @author Roman Savin
  * @since 18.03.2015
  */
-//todo javadoc
 public class UnrecoverablePushError extends PushError<UnrecoverablePushError.Type> {
 
     public UnrecoverablePushError(@NonNull final Type type,
