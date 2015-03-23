@@ -24,8 +24,10 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfutils.OPFLog;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static org.onepf.opfpush.OPFConstants.ACTION_CHECK_REGISTERING_TIMEOUT;
@@ -46,8 +48,12 @@ final class RegisteringTimeoutController {
     static void setTimeout(@NonNull final Context context, @NonNull final String providerName) {
         OPFLog.methodD(context, providerName);
         final long when = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(TIMEOUT_MINUTES);
-        OPFLog.d("Set registering timeout : %s",
-                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
+        OPFLog.d(
+                "Set registering timeout : %s",
+                SimpleDateFormat.getDateTimeInstance(
+                        DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US
+                ).format(new Date(when))
+        );
 
         final AlarmManager alarmManager = (AlarmManager) context
                 .getSystemService(Context.ALARM_SERVICE);

@@ -27,8 +27,10 @@ import org.onepf.opfpush.model.Operation;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Context.ALARM_SERVICE;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
@@ -118,8 +120,13 @@ public final class RetryManager implements BackoffManager {
                            @NonNull final Operation operation,
                            @NonNull final String action) {
         final long when = System.currentTimeMillis() + getTryDelay(providerName, operation);
-        OPFLog.d("Post retry %s provider '%s' at %s", operation, providerName,
-                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
+        OPFLog.d("Post retry %s provider '%s' at %s",
+                operation,
+                providerName,
+                SimpleDateFormat.getDateTimeInstance(
+                        DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US
+                ).format(new Date(when))
+        );
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
         intent.setAction(action);
