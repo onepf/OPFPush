@@ -53,7 +53,7 @@ final class InfinityExponentialBackoff implements Backoff {
 
     private long getTryDelay(int currentTryNumber) {
         OPFLog.methodD(currentTryNumber);
-        return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
+        return TimeUnit.SECONDS.toMillis(2 << currentTryNumber);
     }
 
     @Override
