@@ -300,6 +300,11 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             }
         }
 
+        final List<PushProvider> providers = configuration.getProviders();
+        for (PushProvider provider : providers) {
+            provider.checkManifest();
+        }
+
         final EventListener eventListener = configuration.getEventListener();
         final boolean isOPFReceiverRegistered = ReceiverUtils.isOPFReceiverRegistered(appContext);
 

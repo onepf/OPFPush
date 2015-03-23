@@ -136,12 +136,6 @@ public final class Configuration {
                 return this;
             }
 
-            for (PushProvider provider : providers) {
-                if (provider.isAvailable()) {
-                    provider.checkManifest();
-                }
-            }
-
             if (this.providersMap == null) {
                 this.providersMap = new LinkedHashMap<>();
             }
