@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.EventListener;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -138,7 +138,7 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, OPFError> registrationErrors) {
+                    @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
                 post(new Runnable() {
                     @Override
                     public void run() {
@@ -223,7 +223,7 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, OPFError> registrationErrors
+                    @NonNull final Map<String, UnrecoverablePushError> registrationErrors
             ) {
                 OPFLog.d("SendBroadcast onNoAvailableProvider()");
                 final Intent intent = new Intent(ACTION_NO_AVAILABLE_PROVIDER);

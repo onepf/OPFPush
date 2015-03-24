@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
-
-import android.support.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package org.onepf.opfpush.model;
 
 /**
- * @author Kirill Rozov
- * @since 24.09.14.
+ * This (empty) interface must be implemented by all classes that wish to be used as type of {@link org.onepf.opfpush.model.PushError}.
+ *
+ * @author Roman Savin
+ * @since 18.03.2015
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        GCMConstants.ERROR_AUTHENTICATION_FAILED,
-        GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
-})
-@interface GCMError {
+public interface ErrorType {
 }

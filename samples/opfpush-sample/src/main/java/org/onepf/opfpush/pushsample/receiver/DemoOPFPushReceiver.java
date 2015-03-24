@@ -21,9 +21,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPushReceiver;
-import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
@@ -102,7 +102,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
-                                      @NonNull final Map<String, OPFError> registrationErrors) {
+                                      @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
         OPFLog.methodD(context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }

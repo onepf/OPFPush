@@ -18,6 +18,10 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
@@ -36,6 +40,9 @@ public class SettingsTest extends Assert {
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
+    private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
+    private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
+
     private static final int NUM_TESTS = 100;
     private static final int NUM_PROVIDERS = 100;
     private static final int RANDOM_STRING_LENGTH = 16;
@@ -144,20 +151,6 @@ public class SettingsTest extends Assert {
         }
     }
 
-    private String[] getRandomStrings(int n, int len) {
-        char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-        String[] strings = new String[n];
-        for (int i = 0; i < n; ++i) {
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < len; j++) {
-                char c = chars[RND.nextInt(chars.length)];
-                sb.append(c);
-            }
-            strings[i] = sb.toString();
-        }
-        return strings;
-    }
-
     @Test
     public void saveLastAndroidId_commonSituation() {
         String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
@@ -191,5 +184,147 @@ public class SettingsTest extends Assert {
             settings.saveLastAndroidId(randomStrings[i]);
             assertEquals(randomStrings[i], settings.getLastAndroidId());
         }
+    }
+
+    @Test
+    public void isProviderUnregistrationPerforming_false() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertFalse(settings.isProviderUnregistrationPerforming(randomStrings[i]));
+        }
+    }
+
+    @Test
+    public void isProviderUnregistrationPerforming_true() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            sharedPreferences.edit().putBoolean(
+                    KEY_UNREGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US),
+                    true
+            ).apply();
+        }
+
+        final List<String> mixedRandomStrings = shuffleStringArray(randomStrings);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertTrue(settings.isProviderUnregistrationPerforming(mixedRandomStrings.get(i)));
+        }
+    }
+
+    @Test
+    public void saveUnregisteringProvider_commonCase() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.saveUnregisteringProvider(randomStrings[i]);
+        }
+
+        final List<String> mixedRandomStrings = shuffleStringArray(randomStrings);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertTrue(sharedPreferences.getBoolean(
+                    KEY_UNREGISTERING_PROVIDER_PREFIX + mixedRandomStrings.get(i).toLowerCase(Locale.US),
+                    false
+            ));
+        }
+    }
+
+    @Test
+    public void removeUnregisteringProvider_commonCase() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            sharedPreferences.edit().putBoolean(
+                    KEY_UNREGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US),
+                    true
+            ).apply();
+        }
+
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.removeUnregisteringProvider(randomStrings[i]);
+        }
+
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertFalse(sharedPreferences.contains(
+                    KEY_UNREGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US)
+            ));
+        }
+    }
+
+    @Test
+    public void isProviderRegistrationPerforming_false() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertFalse(settings.isProviderRegistrationPerforming(randomStrings[i]));
+        }
+    }
+
+    @Test
+    public void isProviderRegistrationPerforming_true() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            sharedPreferences.edit().putBoolean(
+                    KEY_REGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US),
+                    true
+            ).apply();
+        }
+
+        final List<String> mixedRandomStrings = shuffleStringArray(randomStrings);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertTrue(settings.isProviderRegistrationPerforming(mixedRandomStrings.get(i)));
+        }
+    }
+
+    @Test
+    public void saveRegisteringProvider_commonCase() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.saveRegisteringProvider(randomStrings[i]);
+        }
+
+        final List<String> mixedRandomStrings = shuffleStringArray(randomStrings);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertTrue(sharedPreferences.getBoolean(
+                    KEY_REGISTERING_PROVIDER_PREFIX + mixedRandomStrings.get(i).toLowerCase(Locale.US),
+                    false
+            ));
+        }
+    }
+
+    @Test
+    public void removeRegisteringProvider_commonCase() {
+        final String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            sharedPreferences.edit().putBoolean(
+                    KEY_REGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US),
+                    true
+            ).apply();
+        }
+
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.removeRegisteringProvider(randomStrings[i]);
+        }
+
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            assertFalse(sharedPreferences.contains(
+                    KEY_REGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US)
+            ));
+        }
+    }
+
+    private List<String> shuffleStringArray(final String[] array) {
+        final List<String> mixedArray = Arrays.asList(array);
+        Collections.shuffle(mixedArray);
+        return mixedArray;
+    }
+
+    private String[] getRandomStrings(int n, int len) {
+        char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+        String[] strings = new String[n];
+        for (int i = 0; i < n; ++i) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < len; j++) {
+                char c = chars[RND.nextInt(chars.length)];
+                sb.append(c);
+            }
+            strings[i] = sb.toString();
+        }
+        return strings;
     }
 }
