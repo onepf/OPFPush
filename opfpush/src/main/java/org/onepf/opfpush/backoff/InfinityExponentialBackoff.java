@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Roman Savin
  * @since 05.09.14.
  */
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class InfinityExponentialBackoff implements Backoff {
 
     public static final int MAX_TRY_COUNT = 16;
@@ -44,11 +45,12 @@ final class InfinityExponentialBackoff implements Backoff {
     }
 
     @Override
-    public long getTryDelay() {
-        if (tryNumber.getAndIncrement() >= MAX_TRY_COUNT) {
-            return getTryDelay(tryNumber.getAndSet(0));
+    public synchronized long getTryDelay() {
+        int currentTryNumber = 0;
+        if (!tryNumber.compareAndSet(MAX_TRY_COUNT, 0)) {
+            currentTryNumber = tryNumber.getAndIncrement();
         }
-        return getTryDelay(tryNumber.get());
+        return getTryDelay(currentTryNumber);
     }
 
     private long getTryDelay(int currentTryNumber) {
