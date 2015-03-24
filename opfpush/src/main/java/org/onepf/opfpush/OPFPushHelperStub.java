@@ -35,39 +35,39 @@ public class OPFPushHelperStub extends OPFPushHelper {
 
     @Override
     public void register() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     public void unregister() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Nullable
     @Override
     public String getRegistrationId() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return null;
     }
 
     @Nullable
     @Override
     public String getProviderName() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return null;
     }
 
     @Nullable
     @Override
     public PushProvider getCurrentProvider() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return null;
     }
 
     @NonNull
     @Override
     public ReceivedMessageHandler getReceivedMessageHandler() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return new ReceivedMessageHandlerStub();
     }
 
@@ -83,43 +83,43 @@ public class OPFPushHelperStub extends OPFPushHelper {
 
     @Override
     void init(@NonNull final Configuration initialConfiguration) {
-        OPFLog.methodD(initialConfiguration);
+        OPFLog.logMethod(initialConfiguration);
     }
 
     @Override
     boolean isInitDone() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return false;
     }
 
     @Override
     void restartRegisterOnBoot() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     void register(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
     }
 
     @Override
     void unregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
     }
 
     @Override
     void onNeedRetryRegister() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     void registerNextAvailableProvider(@Nullable final String prevProviderName) {
-        OPFLog.methodD(prevProviderName);
+        OPFLog.logMethod(prevProviderName);
     }
 
     @Override
     void registerPackageChangeReceiver() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @NonNull
@@ -133,43 +133,43 @@ public class OPFPushHelperStub extends OPFPushHelper {
         @Override
         public void onMessage(@NonNull final String providerName,
                               @Nullable final Bundle extras) {
-            OPFLog.methodD(providerName, extras);
+            OPFLog.logMethod(providerName, extras);
         }
 
         @Override
         public void onDeletedMessages(@NonNull final String providerName,
                                       final int messagesCount) {
-            OPFLog.methodD(providerName, messagesCount);
+            OPFLog.logMethod(providerName, messagesCount);
         }
 
         @Override
         public void onRegistered(@NonNull final String providerName,
                                  @NonNull final String registrationId) {
-            OPFLog.methodD(providerName, registrationId);
+            OPFLog.logMethod(providerName, registrationId);
         }
 
         @Override
         public void onUnregistered(@NonNull final String providerName,
                                    @Nullable final String oldRegistrationId) {
-            OPFLog.methodD(providerName, oldRegistrationId);
+            OPFLog.logMethod(providerName, oldRegistrationId);
         }
 
         @Override
         public void onRegistrationError(@NonNull final String providerName,
                                         @NonNull final PushError error) {
-            OPFLog.methodD(providerName, error);
+            OPFLog.logMethod(providerName, error);
         }
 
         @Override
         public void onUnregistrationError(@NonNull final String providerName,
                                           @NonNull final PushError error) {
-            OPFLog.methodD(providerName, error);
+            OPFLog.logMethod(providerName, error);
         }
 
         @Override
         public void onError(@NonNull final String providerName,
                             @NonNull final PushError error) {
-            OPFLog.methodD(providerName, error);
+            OPFLog.logMethod(providerName, error);
         }
     }
 }

@@ -28,7 +28,7 @@ public class SendMessageService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        OPFLog.methodD(OPFUtils.toString(intent));
+        OPFLog.logMethod(OPFUtils.toString(intent));
 
         if (ACTION_SEND_MESSAGE.equals(intent.getAction())) {
             final Message message = intent.getParcelableExtra(EXTRA_MESSAGE);

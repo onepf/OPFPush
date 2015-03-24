@@ -51,7 +51,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFLog.methodD(context, providerName, OPFUtils.toString(extras));
+        OPFLog.logMethod(context, providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -81,14 +81,14 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFLog.methodD(providerName, messagesCount);
+        OPFLog.logMethod(providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFLog.methodD(providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
@@ -96,14 +96,14 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
-        OPFLog.methodD(providerName, oldRegistrationId);
+        OPFLog.logMethod(providerName, oldRegistrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
-        OPFLog.methodD(context, registrationErrors);
+        OPFLog.logMethod(context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

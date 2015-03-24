@@ -34,59 +34,59 @@ class ADMProviderStub implements PushProvider {
 
     @Override
     public void register() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     public void unregister() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     public boolean isAvailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return false;
     }
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return false;
     }
 
     @Nullable
     @Override
     public String getRegistrationId() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return null;
     }
 
     @NonNull
     @Override
     public String getName() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return PROVIDER_NAME;
     }
 
     @Nullable
     @Override
     public String getHostAppPackage() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return null;
     }
 
     @Override
     public void checkManifest() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     public void onRegistrationInvalid() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 
     @Override
     public void onUnavailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
     }
 }

@@ -45,7 +45,7 @@ public final class NotificationUtils {
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final String notificationTitle,
                                         @NonNull final String notificationText) {
-        OPFLog.methodD(context, notificationTitle, notificationText);
+        OPFLog.logMethod(context, notificationTitle, notificationText);
 
 
         final PendingIntent pendingIntent = PendingIntent.getActivity(

@@ -43,7 +43,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         final String action = intent.getAction();

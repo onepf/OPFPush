@@ -34,7 +34,7 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         intent.setComponent(new ComponentName(context, GCMService.class));
         startWakefulService(context, intent);

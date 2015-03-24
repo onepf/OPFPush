@@ -46,7 +46,7 @@ final class RegisteringTimeoutController {
     }
 
     static void setTimeout(@NonNull final Context context, @NonNull final String providerName) {
-        OPFLog.methodD(context, providerName);
+        OPFLog.logMethod(context, providerName);
         final long when = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(TIMEOUT_MINUTES);
         OPFLog.d(
                 "Set registering timeout : %s",

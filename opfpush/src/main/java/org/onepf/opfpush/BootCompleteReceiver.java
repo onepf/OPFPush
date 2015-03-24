@@ -35,7 +35,7 @@ public final class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, intent);
+        OPFLog.logMethod(context, intent);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {

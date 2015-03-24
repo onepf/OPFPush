@@ -64,7 +64,7 @@ final class Settings {
 
     @NonNull
     public synchronized State getState() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
         State state = State.fromValue(stateValue);
@@ -78,12 +78,12 @@ final class Settings {
     }
 
     public synchronized void saveState(@NonNull final State state) {
-        OPFLog.methodD(state);
+        OPFLog.logMethod(state);
         preferences.put(KEY_STATE, state.getValue());
     }
 
     public synchronized void clear() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferences.clear();
     }
 
@@ -93,7 +93,7 @@ final class Settings {
     }
 
     public synchronized void saveLastProvider(@Nullable final PushProvider provider) {
-        OPFLog.methodD(provider);
+        OPFLog.logMethod(provider);
 
         if (provider == null) {
             preferences.remove(KEY_LAST_PROVIDER_NAME);
@@ -108,7 +108,7 @@ final class Settings {
     }
 
     public synchronized void saveLastAndroidId(@Nullable final String androidId) {
-        OPFLog.methodD(androidId);
+        OPFLog.logMethod(androidId);
 
         if (androidId == null) {
             preferences.remove(KEY_LAST_ANDROID_ID);
@@ -118,7 +118,7 @@ final class Settings {
     }
 
     public synchronized void saveUnregisteringProvider(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         preferences.put(
                 getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
                 true
@@ -126,12 +126,12 @@ final class Settings {
     }
 
     public synchronized void removeUnregisteringProvider(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         preferences.remove(getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName));
     }
 
     public synchronized boolean isProviderUnregistrationPerforming(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         return preferences.getBoolean(
                 getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
                 false
@@ -139,7 +139,7 @@ final class Settings {
     }
 
     public synchronized void saveRegisteringProvider(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         preferences.put(
                 getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
                 true
@@ -147,12 +147,12 @@ final class Settings {
     }
 
     public synchronized void removeRegisteringProvider(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         preferences.remove(getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName));
     }
 
     public synchronized boolean isProviderRegistrationPerforming(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         return preferences.getBoolean(
                 getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
                 false

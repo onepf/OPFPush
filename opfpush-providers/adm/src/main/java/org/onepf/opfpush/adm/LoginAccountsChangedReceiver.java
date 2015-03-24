@@ -43,7 +43,7 @@ public class LoginAccountsChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final PreferencesProvider preferencesProvider = PreferencesProvider.getInstance(context);
         final Account[] amazonAccounts = AccountManager.get(context).getAccountsByType(ACCOUNT_TYPE);

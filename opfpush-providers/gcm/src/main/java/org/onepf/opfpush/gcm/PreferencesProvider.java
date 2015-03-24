@@ -59,7 +59,7 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -69,7 +69,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -79,7 +79,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void reset() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferences.clear();
     }
 
@@ -88,7 +88,7 @@ final class PreferencesProvider {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFLog.methodD(appVersion);
+        OPFLog.logMethod(appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 }

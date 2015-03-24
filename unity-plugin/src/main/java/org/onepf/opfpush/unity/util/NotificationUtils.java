@@ -44,7 +44,7 @@ public final class NotificationUtils {
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final String notificationTitle,
                                         @NonNull final String notificationText) {
-        OPFLog.methodD(NotificationUtils.class, "showNotification",
+        OPFLog.logMethod(NotificationUtils.class, "showNotification",
                 context, notificationTitle, notificationText);
 
 

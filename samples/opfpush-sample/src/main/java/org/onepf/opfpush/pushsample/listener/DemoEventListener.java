@@ -58,7 +58,7 @@ public class DemoEventListener implements EventListener {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFLog.methodD(providerName, OPFUtils.toString(extras));
+        OPFLog.logMethod(providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -88,14 +88,14 @@ public class DemoEventListener implements EventListener {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFLog.methodD(providerName, messagesCount);
+        OPFLog.logMethod(providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFLog.methodD(providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
@@ -103,14 +103,14 @@ public class DemoEventListener implements EventListener {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
-        OPFLog.methodD(providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
-        OPFLog.methodD(context, registrationErrors);
+        OPFLog.logMethod(context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

@@ -59,7 +59,7 @@ public class UnityEventListener implements EventListener {
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
 
-        OPFLog.methodD(UnityEventListener.class, "onMessage", providerName, OPFUtils.toString(extras));
+        OPFLog.logMethod(UnityEventListener.class, "onMessage", providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -89,14 +89,14 @@ public class UnityEventListener implements EventListener {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFLog.methodD(UnityEventListener.class, "onDeletedMessages", providerName, messagesCount);
+        OPFLog.logMethod(UnityEventListener.class, "onDeletedMessages", providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFLog.methodD(UnityEventListener.class, "onRegistered", providerName, registrationId);
+        OPFLog.logMethod(UnityEventListener.class, "onRegistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
@@ -104,14 +104,14 @@ public class UnityEventListener implements EventListener {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
-        OPFLog.methodD(UnityEventListener.class, "onUnregistered", providerName, registrationId);
+        OPFLog.logMethod(UnityEventListener.class, "onUnregistered", providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, OPFError> registrationErrors) {
-        OPFLog.methodD(UnityEventListener.class, "onNoAvailableProvider", context, registrationErrors);
+        OPFLog.logMethod(UnityEventListener.class, "onNoAvailableProvider", context, registrationErrors);
         EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
     }
 }

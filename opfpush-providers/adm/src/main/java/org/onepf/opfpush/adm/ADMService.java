@@ -69,7 +69,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NonNull final Intent intent) {
-        OPFLog.methodD(OPFUtils.toString(intent));
+        OPFLog.logMethod(OPFUtils.toString(intent));
         //ADM can receive messages even if it's unregistered. So we have to check ADM state.
         final PushProvider currentProvider = OPFPush.getHelper().getCurrentProvider();
 
@@ -93,7 +93,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         preferencesProvider.saveRegistrationId(registrationId);
         preferencesProvider.removeAuthenticationFailedFlag();
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
@@ -113,7 +113,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
-        OPFLog.methodD(admRegistrationId);
+        OPFLog.logMethod(admRegistrationId);
         final String registrationId = admRegistrationId == null
                 ? preferencesProvider.getRegistrationId()
                 : admRegistrationId;
@@ -134,7 +134,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistrationError(@NonNull @ADMError final String errorId) {
-        OPFLog.methodD(errorId);
+        OPFLog.logMethod(errorId);
         final PushError error = convertError(errorId);
         OPFLog.d("Converted error : " + error);
 

@@ -53,19 +53,19 @@ public final class InfinityExponentialBackoffManager implements BackoffManager {
 
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         return getManagerByOperation(operation).hasTries(providerName, operation);
     }
 
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         return getManagerByOperation(operation).getTryDelay(providerName, operation);
     }
 
     public void reset(@NonNull final String providerName,
                       @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         getManagerByOperation(operation).reset(providerName, operation);
     }
 

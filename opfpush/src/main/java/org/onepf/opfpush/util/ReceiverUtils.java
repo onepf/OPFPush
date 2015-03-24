@@ -50,7 +50,7 @@ public final class ReceiverUtils {
             @NonNull final Context context,
             @NonNull final PushProvider provider
     ) {
-        OPFLog.methodD(context, provider);
+        OPFLog.logMethod(context, provider);
 
         final PackageChangeReceiver packageChangeReceiver = new PackageChangeReceiver(provider);
 
@@ -74,7 +74,7 @@ public final class ReceiverUtils {
 
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public static boolean isOPFReceiverRegistered(@NonNull final Context context) {
-        OPFLog.methodD(context);
+        OPFLog.logMethod(context);
         final Intent intentBroadcastReceive = new Intent(ACTION_RECEIVE);
         final Intent intentBroadcastRegistration = new Intent(ACTION_REGISTRATION);
         final Intent intentBroadcastUnregistration = new Intent(ACTION_UNREGISTRATION);

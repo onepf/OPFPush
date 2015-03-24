@@ -51,7 +51,7 @@ public final class OPFPush {
      */
     @NonNull
     public static OPFPushHelper getHelper() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (helper == null) {
             throw new InitException(false);
         }
@@ -68,7 +68,7 @@ public final class OPFPush {
      */
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        OPFLog.methodD(context, configuration);
+        OPFLog.logMethod(context, configuration);
         OPFChecks.checkThread(true);
 
         if (helper != null) {

@@ -87,7 +87,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
         super.register();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isUnregistrationPerforming()) {
             OPFLog.i("Start register GCMProvider.");
             executeTask(new RegisterTask());
@@ -98,7 +98,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
         super.unregister();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isRegistrationPerforming()) {
             OPFLog.i("Start unregister GCMProvider.");
             preferencesProvider.reset();
@@ -108,7 +108,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public void checkManifest() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         super.checkManifest();
         final Context context = getContext();
         if (needGoogleAccounts()) {
@@ -135,7 +135,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isAvailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isReceivePermissionDeclared()) {
             OPFLog.i("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
             return false;
@@ -170,25 +170,25 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return !TextUtils.isEmpty(preferencesProvider.getRegistrationId());
     }
 
     @Override
     public void onRegistrationInvalid() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferencesProvider.reset();
     }
 
     @Override
     public void onUnavailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         close();
     }
 
     @Override
     public void send(@NonNull final Message message) {
-        OPFLog.methodD(message);
+        OPFLog.logMethod(message);
 
         if (!isRegistered()) {
             OPFLog.e("Registration state isn't REGISTERED");
@@ -213,7 +213,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private boolean checkGoogleAccount() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (needGoogleAccounts()) {
             OPFLog.d("Need google account");
             // On device with version of Android less than "4.0.4"
@@ -228,7 +228,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private void close() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         if (registrationExecutor != null) {
             OPFLog.d("Registration executor is not null");
@@ -242,7 +242,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void executeTask(@NonNull final Runnable runnable) {
-        OPFLog.methodD(runnable);
+        OPFLog.logMethod(runnable);
 
         if (registrationExecutor == null || registrationExecutor.isShutdown()) {
             registrationExecutor = Executors.newSingleThreadExecutor();
@@ -261,7 +261,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         @Override
         @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             try {
                 final String registrationId =
@@ -291,7 +291,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -299,7 +299,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
-            OPFLog.methodD(registrationId);
+            OPFLog.logMethod(registrationId);
             preferencesProvider.saveRegistrationId(registrationId);
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
@@ -310,12 +310,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onAuthError() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
             onError(GCMConstants.ERROR_AUTHENTICATION_FAILED);
         }
 
         private void onError(@NonNull final String errorId) {
-            OPFLog.methodD(errorId);
+            OPFLog.logMethod(errorId);
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
             getContext().sendBroadcast(intent);
@@ -334,7 +334,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         @Override
         @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             try {
                 GoogleCloudMessaging.getInstance(getContext()).unregister();
@@ -359,7 +359,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -367,7 +367,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onUnregistrationSuccess() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);

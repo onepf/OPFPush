@@ -45,7 +45,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);
@@ -60,7 +60,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);
@@ -74,7 +74,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);

@@ -41,7 +41,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {
@@ -70,7 +70,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
     private void checkRegistering(@NonNull final Context context,
                                   @NonNull final OPFPushHelper helper,
                                   @NonNull final String providerName) {
-        OPFLog.methodD(context, helper, providerName);
+        OPFLog.logMethod(context, helper, providerName);
         if (helper.isRegistering()) {
             Settings.getInstance(context).saveState(State.UNREGISTERED);
             helper.registerNextAvailableProvider(providerName);

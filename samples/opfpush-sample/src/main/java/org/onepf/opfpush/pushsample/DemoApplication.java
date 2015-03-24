@@ -39,10 +39,8 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) {
-            OPFLog.setEnabled(true);
-        }
-        OPFLog.methodD();
+        OPFLog.setEnabled(BuildConfig.DEBUG, true);
+        OPFLog.logMethod();
 
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(

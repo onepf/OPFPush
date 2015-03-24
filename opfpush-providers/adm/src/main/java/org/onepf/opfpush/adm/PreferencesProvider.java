@@ -60,13 +60,13 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         updateAppVersion();
         return preferences.getString(KEY_REGISTRATION_ID);
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         updateAppVersion();
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -81,21 +81,21 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveAuthenticationFailedFlag() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         updateAppVersion();
         preferences.put(KEY_AUTHENTICATION_FAILED_FLAG, true);
     }
 
     public synchronized void removeAuthenticationFailedFlag() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         updateAppVersion();
         preferences.remove(KEY_AUTHENTICATION_FAILED_FLAG);
     }
 
     public synchronized void reset() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferences.clear();
     }
 
@@ -107,7 +107,7 @@ final class PreferencesProvider {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFLog.methodD(appVersion);
+        OPFLog.logMethod(appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 

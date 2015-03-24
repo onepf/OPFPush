@@ -92,12 +92,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void postRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void postRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -107,12 +107,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void cancelRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void cancelRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
