@@ -18,7 +18,10 @@ package org.onepf.opfpush;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -31,7 +34,8 @@ import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfpush.pushprovider.PushProvider;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.InitException;
@@ -48,6 +52,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
+import static org.onepf.opfpush.OPFConstants.ACTION_NO_AVAILABLE_PROVIDER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RECEIVE;
+import static org.onepf.opfpush.OPFConstants.ACTION_REGISTRATION;
+import static org.onepf.opfpush.OPFConstants.ACTION_UNREGISTRATION;
+import static org.onepf.opfpush.OPFConstants.PACKAGE_DATA_SCHEME;
 import static org.onepf.opfpush.model.Operation.REGISTER;
 import static org.onepf.opfpush.model.Operation.UNREGISTER;
 import static org.onepf.opfpush.model.State.REGISTERED;
@@ -60,7 +69,7 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
  * Use {@link #register()} to start a registration and {@link #unregister()} for start an unregistration.
  * The registration and unregistration operations are asynchronous. You can handle results of these operations
  * via the implementation of the {@link org.onepf.opfpush.listener.EventListener} interface or the extension of
- * the {@link org.onepf.opfpush.OPFPushReceiver} class.
+ * the {@link org.onepf.opfpush.receiver.OPFPushReceiver} class.
  * <p/>
  * You must initialize the {@link org.onepf.opfpush.OPFPush} class before start using the {@code OPFPushHelper}.
  *
@@ -118,7 +127,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
      * If the {@code OPFPushHelper} is unregistered, it chooses a push provider with
      * the highest priority and starts the registration. Does nothing in another case.
      * The registration result can be handled via the implementation of the {@link org.onepf.opfpush.listener.EventListener}
-     * interface or the extension of the {@link org.onepf.opfpush.OPFPushReceiver} class.
+     * interface or the extension of the {@link org.onepf.opfpush.receiver.OPFPushReceiver} class.
      * <p/>
      * The priority of providers corresponds to the order in which they was added to the
      * {@link org.onepf.opfpush.configuration.Configuration} before the initialization.
@@ -306,7 +315,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         }
 
         final EventListener eventListener = configuration.getEventListener();
-        final boolean isOPFReceiverRegistered = ReceiverUtils.isOPFReceiverRegistered(appContext);
+        final boolean isOPFReceiverRegistered = isOPFReceiverRegistered();
 
         OPFLog.d("isOPFReceiverRegistered == " + isOPFReceiverRegistered
                 + "; eventListenerWrapper == " + eventListener);
@@ -395,8 +404,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         OPFLog.logMethod();
         OPFLog.d("currentProvider == " + currentProvider);
         if (currentProvider != null && packageReceiver == null) {
-            packageReceiver = ReceiverUtils
-                    .registerPackageChangeReceiver(appContext, currentProvider);
+            packageReceiver = registerPackageChangeReceiver(currentProvider);
         }
     }
 
@@ -602,6 +610,48 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         registerProviderErrors.clear();
         unregisterPackageChangeReceiver();
         eventListenerWrapper.onUnregistered(appContext, providerName, registrationId);
+    }
+
+    private BroadcastReceiver registerPackageChangeReceiver(@NonNull final PushProvider provider) {
+        OPFLog.logMethod(provider);
+
+        final PackageChangeReceiver packageChangeReceiver = new PackageChangeReceiver(provider);
+
+        final IntentFilter appUpdateFilter = new IntentFilter(Intent.ACTION_PACKAGE_REPLACED);
+        appUpdateFilter.addDataScheme(PACKAGE_DATA_SCHEME);
+        appUpdateFilter.addDataPath(appContext.getPackageName(), PatternMatcher.PATTERN_LITERAL);
+        appContext.registerReceiver(packageChangeReceiver, appUpdateFilter);
+
+        final String hostAppPackage = provider.getHostAppPackage();
+        if (hostAppPackage != null) {
+            OPFLog.d("Host app package isn't null");
+
+            final IntentFilter hostAppRemovedFilter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+            hostAppRemovedFilter.addDataScheme(PACKAGE_DATA_SCHEME);
+            hostAppRemovedFilter.addDataPath(hostAppPackage, PatternMatcher.PATTERN_LITERAL);
+            appContext.registerReceiver(packageChangeReceiver, hostAppRemovedFilter);
+        }
+
+        return packageChangeReceiver;
+    }
+
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
+    private boolean isOPFReceiverRegistered() {
+        OPFLog.logMethod();
+        final Intent intentBroadcastReceive = new Intent(ACTION_RECEIVE);
+        final Intent intentBroadcastRegistration = new Intent(ACTION_REGISTRATION);
+        final Intent intentBroadcastUnregistration = new Intent(ACTION_UNREGISTRATION);
+        final Intent intentBroadcastNoAvailableProvider = new Intent(ACTION_NO_AVAILABLE_PROVIDER);
+
+        try {
+            OPFChecks.checkReceiver(appContext, intentBroadcastReceive);
+            OPFChecks.checkReceiver(appContext, intentBroadcastRegistration);
+            OPFChecks.checkReceiver(appContext, intentBroadcastUnregistration);
+            OPFChecks.checkReceiver(appContext, intentBroadcastNoAvailableProvider);
+        } catch (RuntimeException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

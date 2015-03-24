@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.model.RecoverablePushError;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -33,7 +34,7 @@ import static org.onepf.opfpush.model.RecoverablePushError.Type.REGISTERING_PERF
 import static org.onepf.opfpush.model.RecoverablePushError.Type.UNREGISTERING_PERFORMING;
 
 /**
- * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
+ * Implements the common functionality of the {@link org.onepf.opfpush.pushprovider.PushProvider} interface.
  * This class in intended to simplify the {@code PushProvider} implementation.
  *
  * @author Kirill Rozov

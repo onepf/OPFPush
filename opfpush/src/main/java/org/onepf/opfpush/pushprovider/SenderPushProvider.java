@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.pushprovider;
 
-import android.support.annotation.StringDef;
+import android.support.annotation.NonNull;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.onepf.opfpush.model.Message;
 
 /**
- * @author Roman Savin
- * @since 25.12.14
+ * PushProvider that can send messages to server.
+ *
+ * @author Kirill Rozov
+ * @since 10/13/14.
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        OPFConstants.ACTION_RECEIVE,
-        OPFConstants.ACTION_REGISTRATION,
-        OPFConstants.ACTION_UNREGISTRATION,
-        OPFConstants.ACTION_NO_AVAILABLE_PROVIDER
-})
-@interface OPFAction {
+public interface SenderPushProvider {
+
+    /**
+     * Send message to server. Method must be consumed async.
+     *
+     * @throws IllegalStateException If try send message when provider isn't registered.
+     */
+    void send(@NonNull Message msg);
 }

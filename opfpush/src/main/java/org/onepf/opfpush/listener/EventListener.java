@@ -81,7 +81,7 @@ public interface EventListener {
      * <p/>
      * A push provider can be unavailable in two common reasons:
      * <ol>
-     * <li>The {@link org.onepf.opfpush.PushProvider#isAvailable()} method has returned false value.</li>
+     * <li>The {@link org.onepf.opfpush.pushprovider.PushProvider#isAvailable()} method has returned false value.</li>
      * <li>An unrecoverable registration error has occurred.</li>
      * </ol>
      * <p/>

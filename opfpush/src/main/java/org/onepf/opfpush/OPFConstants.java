@@ -46,6 +46,8 @@ public final class OPFConstants {
 
     static final String ACTION_CHECK_REGISTERING_TIMEOUT = BuildConfig.APPLICATION_ID + "intent.CHECK_REGISTERING_TIMEOUT";
 
+    static final String PACKAGE_DATA_SCHEME = "package";
+
     private OPFConstants() {
         throw new UnsupportedOperationException();
     }

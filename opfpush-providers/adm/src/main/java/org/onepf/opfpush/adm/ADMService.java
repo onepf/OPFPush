@@ -25,7 +25,7 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.RecoverablePushError;
 import org.onepf.opfpush.model.UnrecoverablePushError;

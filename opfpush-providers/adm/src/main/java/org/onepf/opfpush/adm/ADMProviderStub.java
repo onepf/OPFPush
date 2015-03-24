@@ -19,7 +19,7 @@ package org.onepf.opfpush.adm;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;

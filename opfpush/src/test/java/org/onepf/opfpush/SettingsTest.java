@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.mock.MockNamePushProvider;
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;

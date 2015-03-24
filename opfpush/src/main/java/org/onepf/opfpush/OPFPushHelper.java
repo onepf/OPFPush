@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.pushprovider.PushProvider;
 
 /**
  * @author Roman Savin
@@ -34,7 +35,7 @@ public abstract class OPFPushHelper {
      * If the {@code OPFPushHelper} is unregistered, it chooses a push provider with
      * the highest priority and starts the registration. Does nothing in another case.
      * The registration result can be handled via the implementation of the {@link org.onepf.opfpush.listener.EventListener}
-     * interface or the extension of the {@link org.onepf.opfpush.OPFPushReceiver} class.
+     * interface or the extension of the {@link org.onepf.opfpush.receiver.OPFPushReceiver} class.
      * <p/>
      * The priority of providers corresponds to the order in which they was added to the
      * {@link org.onepf.opfpush.configuration.Configuration} before the initialization.

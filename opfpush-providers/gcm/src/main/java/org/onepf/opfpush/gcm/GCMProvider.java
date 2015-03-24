@@ -31,8 +31,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;

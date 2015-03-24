@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfpush.OPFPushReceiver;
+import org.onepf.opfpush.receiver.OPFPushReceiver;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;

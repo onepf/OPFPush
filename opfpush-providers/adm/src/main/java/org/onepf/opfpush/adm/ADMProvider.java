@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.amazon.device.messaging.ADM;
 
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 

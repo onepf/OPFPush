@@ -19,7 +19,7 @@ package org.onepf.opfpush.nokia;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 
 /**
  * @author Roman Savin

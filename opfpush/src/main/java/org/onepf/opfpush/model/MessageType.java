@@ -17,7 +17,7 @@
 package org.onepf.opfpush.model;
 
 /**
- * The type of messages that are received by {@link org.onepf.opfpush.OPFPushReceiver}.
+ * The type of messages that are received by {@link org.onepf.opfpush.receiver.OPFPushReceiver}.
  *
  * @author Roman Savin
  * @since 25.12.14

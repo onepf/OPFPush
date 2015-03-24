@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
 /**

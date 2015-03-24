@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -55,7 +55,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
     public final void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFLog.logMethod(context, OPFUtils.toString(intent));
 
-        @OPFAction final String action = intent.getAction();
+        final String action = intent.getAction();
         switch (action) {
             case ACTION_NO_AVAILABLE_PROVIDER:
                 handleNoAvailableProvider(context, intent);

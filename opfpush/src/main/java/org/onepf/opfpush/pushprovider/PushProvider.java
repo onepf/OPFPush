@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.pushprovider;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
  * <p/>
  * The {@link #register()} and {@link #unregister()} methods intended for the internal use,
  * should never be called directly.
- * Use {@link OPFPushHelper#register()} or {@link OPFPushHelper#unregister()} to start registration
+ * Use {@link org.onepf.opfpush.OPFPushHelper#register()} or {@link org.onepf.opfpush.OPFPushHelper#unregister()} to start registration
  * or unregistration.
  *
  * @author Anton Rutkevich, Alexey Vitenko, Kirill Rozov
@@ -36,7 +36,7 @@ public interface PushProvider {
      * Initiates the registration of the provider. Must be async.
      * <p/>
      * Intended for the internal use, should never be called directly.
-     * To start the registration call {@link OPFPushHelper#register()}.
+     * To start the registration call {@link org.onepf.opfpush.OPFPushHelper#register()}.
      */
     void register();
 
@@ -44,7 +44,7 @@ public interface PushProvider {
      * Initiates the unregistering of the provider. Must be async.
      * <p/>
      * Intended for internal use, should never be called directly.
-     * To start registration call {@link OPFPushHelper#unregister()}.
+     * To start registration call {@link org.onepf.opfpush.OPFPushHelper#unregister()}.
      */
     void unregister();
 
