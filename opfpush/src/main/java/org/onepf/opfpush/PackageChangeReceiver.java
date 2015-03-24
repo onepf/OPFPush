@@ -50,7 +50,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             final String hostAppPackage = provider.getHostAppPackage();
             if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
-                OPFLog.d("Host app '%s' of provider '%s' removed.",
+                OPFLog.i("Host app '%s' of provider '%s' has been removed.",
                         hostAppPackage, provider.getName());
                 helper.registerNextAvailableProvider(provider.getName());
             }

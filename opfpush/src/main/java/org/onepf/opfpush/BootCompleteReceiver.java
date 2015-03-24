@@ -39,17 +39,16 @@ public final class BootCompleteReceiver extends BroadcastReceiver {
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {
-            OPFLog.d("Helper is registered");
+            OPFLog.i("Helper is registered");
             if (isAndroidIDChanged(context)) {
-                OPFLog.d("Android ID changed.");
+                OPFLog.i("Android ID changed.");
                 helper.onNeedRetryRegister();
             } else {
-                OPFLog.d("Android ID hasn't been changed");
+                OPFLog.i("Android ID hasn't been changed");
                 helper.registerPackageChangeReceiver();
             }
         } else if (helper.isRegistering()) {
-            OPFLog.d("Registration in progress");
-            OPFLog.d("Retry register after reboot.");
+            OPFLog.i("Registration in progress. Retry register after reboot.");
             helper.restartRegisterOnBoot();
         }
     }

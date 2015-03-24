@@ -136,7 +136,7 @@ public class ADMService extends ADMMessageHandlerBase {
     protected void onRegistrationError(@NonNull @ADMError final String errorId) {
         OPFLog.logMethod(errorId);
         final PushError error = convertError(errorId);
-        OPFLog.d("Converted error : " + error);
+        OPFLog.d("ADM received error : " + error);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistering()) {
@@ -160,7 +160,6 @@ public class ADMService extends ADMMessageHandlerBase {
             case ADMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown ADM error : " + errorId);
                 return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
         }
     }

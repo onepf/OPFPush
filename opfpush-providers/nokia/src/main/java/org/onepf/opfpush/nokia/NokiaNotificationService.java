@@ -139,7 +139,6 @@ public class NokiaNotificationService extends PushBaseIntentService {
             case PushConstants.ERROR_INVALID_SENDER:
                 return new UnrecoverablePushError(INVALID_SENDER, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown Nokia Notification error : " + errorId);
                 return new UnrecoverablePushError(INVALID_SENDER, PROVIDER_NAME, errorId);
         }
     }

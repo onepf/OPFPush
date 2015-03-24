@@ -18,6 +18,8 @@ package org.onepf.opfpush.model;
 
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 /**
  * Registration or unregistering operation error.
  * Divided in two categories: <b>recoverable</b> and <b>unrecoverable</b>.
@@ -90,5 +92,16 @@ public abstract class PushError<T extends ErrorType> {
     @NonNull
     public String getErrorId() {
         return errorId;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                Locale.US,
+                "PushError : \n{ \"isRecoverable\" : %1$S,\n\"providerName\" : \"%2$s\",\n\"type\" : \"%3$s\",\n\"errorId\":\"%4$s\"}",
+                isRecoverable(),
+                providerName,
+                type,
+                errorId);
     }
 }

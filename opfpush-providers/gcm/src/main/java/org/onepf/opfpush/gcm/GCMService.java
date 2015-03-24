@@ -126,7 +126,6 @@ public class GCMService extends IntentService {
             case GCMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown GCM error : " + errorId);
                 return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
         }
     }

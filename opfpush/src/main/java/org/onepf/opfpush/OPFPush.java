@@ -76,10 +76,12 @@ public final class OPFPush {
         }
 
         if (OPFUtils.isMainProcess(context)) {
+            OPFLog.i("Init in main process");
             final OPFPushHelper newHelper = new OPFPushHelperImpl(context);
             newHelper.init(configuration);
             helper = newHelper;
         } else {
+            OPFLog.i("Init in not main process");
             helper = new OPFPushHelperStub();
         }
     }

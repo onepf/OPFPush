@@ -44,10 +44,10 @@ public class ADMProvider implements PushProvider {
     public ADMProvider(@NonNull final Context context) {
         if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)
                 && isAdmClassExists()) {
-            OPFLog.i("Kindle store app is installed");
+            OPFLog.d("Kindle store app is installed");
             provider = new ADMProviderImpl(context.getApplicationContext());
         } else {
-            OPFLog.i("Kindle store app isn't installed");
+            OPFLog.d("Kindle store app isn't installed");
             provider = new ADMProviderStub();
         }
     }

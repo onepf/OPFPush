@@ -63,7 +63,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
                     throw new IllegalStateException(String.format(Locale.US, "Unknown action '%s'.", action));
             }
         } else {
-            OPFLog.e("OPFPush must be initialized");
+            OPFLog.w("OPFPush must be initialized");
         }
     }
 
