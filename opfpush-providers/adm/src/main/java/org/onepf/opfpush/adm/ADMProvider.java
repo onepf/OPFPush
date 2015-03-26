@@ -17,16 +17,14 @@
 package org.onepf.opfpush.adm;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.amazon.device.messaging.ADM;
-
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 
-import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
+import static org.onepf.opfpush.adm.ADMConstants.AMAZON_MANUFACTURER;
 
 /**
  * Amazon Device Messaging push provider delegate.
@@ -42,8 +40,7 @@ public class ADMProvider implements PushProvider {
     private final PushProvider provider;
 
     public ADMProvider(@NonNull final Context context) {
-        if (OPFUtils.isInstalled(context, KINDLE_STORE_APP_PACKAGE)
-                && isAdmClassExists()) {
+        if (Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
             OPFLog.d("Kindle store app is installed");
             provider = new ADMProviderImpl(context.getApplicationContext());
         } else {
@@ -103,16 +100,5 @@ public class ADMProvider implements PushProvider {
     @Override
     public void onUnavailable() {
         provider.onUnavailable();
-    }
-
-    private boolean isAdmClassExists() {
-        try {
-            ADM.class.getCanonicalName();
-            return true;
-        } catch (NoClassDefFoundError e) {
-            OPFLog.w("ADM class not found");
-        }
-
-        return false;
     }
 }
