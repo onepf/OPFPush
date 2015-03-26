@@ -55,7 +55,7 @@ public class ADMService extends ADMMessageHandlerBase {
 
     public ADMService() {
         super("ADMService");
-        preferencesProvider = PreferencesProvider.getInstance(getApplicationContext());
+        preferencesProvider = PreferencesProvider.getInstance(getApplication());
     }
 
     /**
