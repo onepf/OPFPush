@@ -31,7 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class InfinityExponentialBackoff implements Backoff {
 
-    public static final int MAX_TRY_COUNT = 16;
+    /**
+     * Give max delay about an hour.
+     */
+    public static final int MAX_TRY_COUNT = 12;
 
     @NonNull
     private final AtomicInteger tryNumber = new AtomicInteger(0);
@@ -46,8 +49,8 @@ final class InfinityExponentialBackoff implements Backoff {
 
     @Override
     public synchronized long getTryDelay() {
-        int currentTryNumber = 0;
-        if (!tryNumber.compareAndSet(MAX_TRY_COUNT, 0)) {
+        int currentTryNumber = MAX_TRY_COUNT;
+        if (tryNumber.get() < MAX_TRY_COUNT) {
             currentTryNumber = tryNumber.getAndIncrement();
         }
         return getTryDelay(currentTryNumber);
