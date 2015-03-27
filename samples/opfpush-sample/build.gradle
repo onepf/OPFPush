@@ -60,6 +60,9 @@ android {
         versionName "2.0"
 
         applicationId 'org.onepf.opfpush.pushsample'
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
     signingConfigs {
@@ -87,6 +90,10 @@ android {
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
 }
 
 dependencies {
@@ -102,4 +109,12 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.18-SNAPSHOT'
     provided 'com.amazon:amazon-device-messaging:1.0.1'
+
+
+    // App's dependencies, including test
+    compile 'com.android.support:support-annotations:21.0.3'
+
+    // Testing-only dependencies
+    androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
 }
