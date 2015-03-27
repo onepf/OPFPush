@@ -26,7 +26,12 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 18.03.2015
  */
-public class RecoverablePushError extends PushError<RecoverablePushError.Type> {
+public final class RecoverablePushError extends PushError<RecoverablePushError.Type> {
+
+    public RecoverablePushError(@NonNull final Type type,
+                                @NonNull final String providerName) {
+        this(type, providerName, type.name());
+    }
 
     public RecoverablePushError(@NonNull final Type type,
                                 @NonNull final String providerName,

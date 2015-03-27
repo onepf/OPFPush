@@ -34,7 +34,7 @@ import org.onepf.opfutils.OPFUtils;
 import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AUTHENTICATION_FAILED;
-import static org.onepf.opfpush.model.UnrecoverablePushError.Type.UNKNOWN_ERROR;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.PROVIDER_SPECIFIC_ERROR;
 
 /**
  * This {@link IntentService} does the actual handling of the GCM message.
@@ -126,7 +126,7 @@ public class GCMService extends IntentService {
             case GCMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
+                return new UnrecoverablePushError(PROVIDER_SPECIFIC_ERROR, PROVIDER_NAME, errorId);
         }
     }
 }

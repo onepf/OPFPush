@@ -29,6 +29,7 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
@@ -122,11 +123,14 @@ class ADMProviderImpl extends BasePushProvider {
         return !TextUtils.isEmpty(getRegistrationId());
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return super.isAvailable()
-                && adm.isSupported()
-                && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
+    public AvailabilityResult getAvailabilityResult() {
+        return new AvailabilityResult(
+                super.getAvailabilityResult().isAvailable()
+                        && adm.isSupported()
+                        && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)
+        );
     }
 
     @Override

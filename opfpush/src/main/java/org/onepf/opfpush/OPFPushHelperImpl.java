@@ -30,6 +30,7 @@ import org.onepf.opfpush.backoff.InfinityExponentialBackoffManager;
 import org.onepf.opfpush.backoff.RetryManager;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.State;
@@ -62,6 +63,7 @@ import static org.onepf.opfpush.model.Operation.UNREGISTER;
 import static org.onepf.opfpush.model.State.REGISTERED;
 import static org.onepf.opfpush.model.State.REGISTERING;
 import static org.onepf.opfpush.model.State.UNREGISTERED;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_ERROR;
 
 /**
  * The helper class to manage push providers.
@@ -385,7 +387,22 @@ final class OPFPushHelperImpl extends OPFPushHelper {
                 final PushProvider provider = sortedProvidersList.get(i);
                 final String providerName = provider.getName();
                 OPFLog.d("Provider name : " + providerName);
-                if (provider.isAvailable() && !registerProviderErrors.containsKey(providerName)) {
+
+                final AvailabilityResult providerAvailability = provider.getAvailabilityResult();
+                if (!providerAvailability.isAvailable()) {
+                    final Integer availabilityErrorCode = providerAvailability.getErrorCode();
+                    OPFLog.d("Provider isn't available. Error code : " + availabilityErrorCode);
+                    if (availabilityErrorCode != null) {
+                        registerProviderErrors.put(
+                                providerName,
+                                new UnrecoverablePushError(
+                                        AVAILABILITY_ERROR,
+                                        providerName,
+                                        availabilityErrorCode
+                                )
+                        );
+                    }
+                } else if (!registerProviderErrors.containsKey(providerName)) {
                     OPFLog.d("Provider is available.");
                     retryManager.cancelRetryAllOperations(provider.getName());
                     register(provider);
@@ -447,7 +464,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
 
         OPFLog.d("Try restore last provider '%s'.", lastProvider);
 
-        if (lastProvider.isAvailable() && lastProvider.isRegistered()) {
+        if (lastProvider.getAvailabilityResult().isAvailable() && lastProvider.isRegistered()) {
             OPFLog.i("Last provider is available and registered");
             currentProvider = lastProvider;
             settings.saveState(REGISTERED);

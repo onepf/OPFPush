@@ -36,7 +36,7 @@ import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AUTHENTICATION_FAILED;
 import static org.onepf.opfpush.model.UnrecoverablePushError.Type.INVALID_SENDER;
-import static org.onepf.opfpush.model.UnrecoverablePushError.Type.UNKNOWN_ERROR;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.PROVIDER_SPECIFIC_ERROR;
 
 /**
  * This class allows your app to receive messages sent via ADM.
@@ -160,7 +160,7 @@ public class ADMService extends ADMMessageHandlerBase {
             case ADMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
+                return new UnrecoverablePushError(PROVIDER_SPECIFIC_ERROR, PROVIDER_NAME, errorId);
         }
     }
 }

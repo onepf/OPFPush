@@ -31,6 +31,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfutils.OPFChecks;
@@ -134,32 +135,34 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         OPFChecks.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent, PERMISSION_SEND);
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
+    public AvailabilityResult getAvailabilityResult() {
         OPFLog.logMethod();
         if (!isReceivePermissionDeclared()) {
             OPFLog.d("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
-            return false;
+            return new AvailabilityResult(false);
         }
 
         //Need verify that GCM classes present, because dependency provided.
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
-            return false;
+            return new AvailabilityResult(false);
         }
 
-        if (super.isAvailable()) {
+        if (super.getAvailabilityResult().isAvailable()) {
             final int conResult = GooglePlayServicesUtil
                     .isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
-                return !needGoogleAccounts() || checkGoogleAccount();
+                return new AvailabilityResult(!needGoogleAccounts() || checkGoogleAccount()); //todo remove or add error code with auth error.
             } else {
-                OPFLog.w("Google Play Services not available. Reason: '%s'.",
+                OPFLog.d("Google Play Services not available. Reason: '%s'.",
                         GooglePlayServicesUtil.getErrorString(conResult));
+                return new AvailabilityResult(conResult);
             }
         }
-        return false;
+        return new AvailabilityResult(false);
     }
 
     @Override

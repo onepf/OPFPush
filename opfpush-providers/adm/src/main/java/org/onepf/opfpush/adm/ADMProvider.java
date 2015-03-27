@@ -21,6 +21,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
@@ -59,9 +60,10 @@ public class ADMProvider implements PushProvider {
         provider.unregister();
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return provider.isAvailable();
+    public AvailabilityResult getAvailabilityResult() {
+        return provider.getAvailabilityResult();
     }
 
     @Override

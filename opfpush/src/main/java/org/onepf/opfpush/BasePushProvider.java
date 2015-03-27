@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.RecoverablePushError;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFChecks;
@@ -68,9 +69,10 @@ public abstract class BasePushProvider implements PushProvider {
         this.hostAppPackage = hostAppPackage;
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return OPFUtils.isInstalled(appContext, hostAppPackage);
+    public AvailabilityResult getAvailabilityResult() {
+        return new AvailabilityResult(OPFUtils.isInstalled(appContext, hostAppPackage));
     }
 
     @Override
@@ -162,14 +164,14 @@ public abstract class BasePushProvider implements PushProvider {
     private void sendRegistrationPerformingError() {
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistrationError(
                 name,
-                new RecoverablePushError(REGISTERING_PERFORMING, name, REGISTERING_PERFORMING.name())
+                new RecoverablePushError(REGISTERING_PERFORMING, name)
         );
     }
 
     private void sendUnregisteringPerformingError() {
         OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(
                 name,
-                new RecoverablePushError(UNREGISTERING_PERFORMING, name, UNREGISTERING_PERFORMING.name())
+                new RecoverablePushError(UNREGISTERING_PERFORMING, name)
         );
     }
 

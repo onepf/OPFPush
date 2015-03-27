@@ -19,6 +19,8 @@ package org.onepf.opfpush.pushprovider;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.AvailabilityResult;
+
 /**
  * The {@code PushProvider} interface represent the provider for push notification from the server to
  * the client app.
@@ -51,9 +53,11 @@ public interface PushProvider {
     /**
      * Checks whether the provider is available.
      *
-     * @return {@code true} if the provider is available, otherwise false.
+     * @return The instance of {@link org.onepf.opfpush.model.AvailabilityResult}
+     * that contains result of availability check.
      */
-    boolean isAvailable();
+    @NonNull
+    AvailabilityResult getAvailabilityResult();
 
     /**
      * Checks whether the application was successfully registered on the service.

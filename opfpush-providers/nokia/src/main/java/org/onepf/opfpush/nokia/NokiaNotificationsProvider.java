@@ -21,6 +21,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.AvailabilityResult;
+
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
 
 /**
@@ -55,9 +57,10 @@ public class NokiaNotificationsProvider implements NokiaPushProvider {
         provider.unregister();
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return provider.isAvailable();
+    public AvailabilityResult getAvailabilityResult() {
+        return provider.getAvailabilityResult();
     }
 
     @Override

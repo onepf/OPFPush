@@ -138,12 +138,12 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
+                    @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
                 post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onNoAvailableProvider()");
-                        eventListener.onNoAvailableProvider(context, registrationErrors);
+                        eventListener.onNoAvailableProvider(context, pushErrors);
                     }
                 });
             }
@@ -223,12 +223,12 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, UnrecoverablePushError> registrationErrors
+                    @NonNull final Map<String, UnrecoverablePushError> pushErrors
             ) {
                 OPFLog.d("SendBroadcast onNoAvailableProvider()");
                 final Intent intent = new Intent(ACTION_NO_AVAILABLE_PROVIDER);
                 final Bundle extras = new Bundle();
-                extras.putSerializable(EXTRA_REGISTRATION_ERRORS, (Serializable) registrationErrors);
+                extras.putSerializable(EXTRA_REGISTRATION_ERRORS, (Serializable) pushErrors);
                 intent.putExtras(extras);
                 context.sendBroadcast(intent);
             }

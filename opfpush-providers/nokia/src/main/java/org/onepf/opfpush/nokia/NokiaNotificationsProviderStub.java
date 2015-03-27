@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
@@ -64,10 +65,11 @@ class NokiaNotificationsProviderStub implements NokiaPushProvider {
         OPFLog.logMethod();
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
+    public AvailabilityResult getAvailabilityResult() {
         OPFLog.logMethod();
-        return false;
+        return new AvailabilityResult(false);
     }
 
     @Override

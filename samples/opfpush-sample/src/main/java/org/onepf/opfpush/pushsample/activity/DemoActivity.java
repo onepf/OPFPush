@@ -149,7 +149,7 @@ public class DemoActivity extends Activity {
         final Map<String, UnrecoverablePushError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
         if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
             final UnrecoverablePushError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
-            infoText.setText(getString(R.string.registration_error_fmt, error.getErrorId()));
+            infoText.setText(getString(R.string.registration_error_fmt, error.getOriginalError()));
         } else {
             infoText.setText(getString(R.string.no_available_provider));
         }

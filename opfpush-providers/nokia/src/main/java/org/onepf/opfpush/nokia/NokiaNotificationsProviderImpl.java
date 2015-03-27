@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
@@ -53,19 +54,20 @@ class NokiaNotificationsProviderImpl extends BasePushProvider implements NokiaPu
         this.sendersIds = sendersIds;
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
+    public AvailabilityResult getAvailabilityResult() {
         OPFLog.logMethod();
         if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
             try {
                 PushRegistrar.checkDevice(getContext());
-                return true;
+                return new AvailabilityResult(true);
             } catch (UnsupportedOperationException exception) {
                 OPFLog.d(exception.toString());
-                return false;
+                return new AvailabilityResult(false);
             }
         } else {
-            return false;
+            return new AvailabilityResult(false);
         }
     }
 
