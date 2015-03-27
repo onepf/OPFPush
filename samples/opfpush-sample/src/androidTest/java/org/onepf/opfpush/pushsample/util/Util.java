@@ -7,6 +7,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.OPFPush;
+
+import java.lang.reflect.Field;
 import java.util.Locale;
 
 /**
@@ -45,6 +48,14 @@ public final class Util {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public static void eraseHelperInstance() throws Exception {
+        synchronized (OPFPush.class) {
+            final Field instanceField = OPFPush.class.getDeclaredField("helper");
+            instanceField.setAccessible(true);
+            instanceField.set(null, null);
         }
     }
 

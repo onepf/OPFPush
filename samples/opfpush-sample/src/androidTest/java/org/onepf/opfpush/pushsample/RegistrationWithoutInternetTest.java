@@ -5,12 +5,18 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.adm.ADMConstants;
@@ -29,6 +35,7 @@ import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAI
 import static org.onepf.opfpush.pushsample.util.Util.KEY_UNREGISTERING_PROVIDER_PREFIX;
 import static org.onepf.opfpush.pushsample.util.Util.MAX_WAIT_TIME_ATTEMPT;
 import static org.onepf.opfpush.pushsample.util.Util.MAX_WAIT_TIME_LONG_ATTEMPT;
+import static org.onepf.opfpush.pushsample.util.Util.eraseHelperInstance;
 import static org.onepf.opfpush.pushsample.util.Util.getProviderPreferenceKey;
 import static org.onepf.opfpush.pushsample.util.Util.setWifiEnabled;
 
@@ -36,7 +43,7 @@ import static org.onepf.opfpush.pushsample.util.Util.setWifiEnabled;
  * @author antonpp
  * @since 24.03.15
  */
-@LargeTest
+@RunWith(AndroidJUnit4.class)
 public class RegistrationWithoutInternetTest extends ActivityInstrumentationTestCase2<DemoActivity> {
 
     private static final int ATTEMPTS = 4;
@@ -53,15 +60,21 @@ public class RegistrationWithoutInternetTest extends ActivityInstrumentationTest
     private OPFPushHelper helper;
     private int registrationAttempt = 0;
 
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
+//        eraseHelperInstance();
+
         activity = getActivity();
         helper = OPFPush.getHelper();
         MockReceivedMessageHandler.addListenerToHelper(helper, new MessageHandler());
     }
 
-
+    @Test
     public void testRegistrationWithoutWifi() {
         setWifiEnabled(activity, true);
 
@@ -109,14 +122,6 @@ public class RegistrationWithoutInternetTest extends ActivityInstrumentationTest
             }
         }
         return true;
-    }
-
-
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-//        setWifiEnabled(activity, true);
     }
 
     private final class MessageHandler extends MessageHandlerAdapter {

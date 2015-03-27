@@ -2,11 +2,16 @@ package org.onepf.opfpush.pushsample;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.model.PushError;
@@ -23,13 +28,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.pushsample.util.Util.MAX_WAIT_TIME_ATTEMPT;
 import static org.onepf.opfpush.pushsample.util.Util.MAX_WAIT_TIME_LONG_ATTEMPT;
+import static org.onepf.opfpush.pushsample.util.Util.eraseHelperInstance;
 import static org.onepf.opfpush.pushsample.util.Util.setWifiEnabled;
 
 /**
  * @author antonpp
  * @since 27.03.15
  */
-@LargeTest
+@RunWith(AndroidJUnit4.class)
 public class UnregisterProviderWithoutInternetTest  extends ActivityInstrumentationTestCase2<DemoActivity> {
     public UnregisterProviderWithoutInternetTest() {
         super(DemoActivity.class);
@@ -43,14 +49,21 @@ public class UnregisterProviderWithoutInternetTest  extends ActivityInstrumentat
     private final Monitor unregisterationMonitor = new Monitor();
     private final Monitor unregisterationErrorMonitor = new Monitor();
 
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
+//        eraseHelperInstance();
+
         activity = getActivity();
         helper = OPFPush.getHelper();
         MockReceivedMessageHandler.addListenerToHelper(helper, new MessageHandler());
     }
 
+    @Test
     public void testUnregistrationWithoutWifi() {
 
         setWifiEnabled(activity, true);

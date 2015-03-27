@@ -62,7 +62,6 @@ android {
         applicationId 'org.onepf.opfpush.pushsample'
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
     signingConfigs {
