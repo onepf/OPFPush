@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.SenderPushProvider;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -66,6 +66,7 @@ import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
  * @see <a href="https://developer.android.com/google/gcm/index.html">Google Cloud Messaging for Android</a>
  * @since 04.09.14
  */
+@SuppressWarnings("PMD.GodClass")
 public class GCMProvider extends BasePushProvider implements SenderPushProvider {
 
     private final String senderID;
@@ -87,7 +88,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
         super.register();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isUnregistrationPerforming()) {
             OPFLog.i("Start register GCMProvider.");
             executeTask(new RegisterTask());
@@ -98,7 +99,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
         super.unregister();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isRegistrationPerforming()) {
             OPFLog.i("Start unregister GCMProvider.");
             preferencesProvider.reset();
@@ -108,7 +109,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public void checkManifest() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         super.checkManifest();
         final Context context = getContext();
         if (needGoogleAccounts()) {
@@ -135,9 +136,9 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isAvailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (!isReceivePermissionDeclared()) {
-            OPFLog.i("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
+            OPFLog.d("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
             return false;
         }
 
@@ -145,7 +146,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
-            OPFLog.e("Can't find Google Cloud Messaging classes.");
             return false;
         }
 
@@ -170,25 +170,25 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @Override
     public boolean isRegistered() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return !TextUtils.isEmpty(preferencesProvider.getRegistrationId());
     }
 
     @Override
     public void onRegistrationInvalid() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferencesProvider.reset();
     }
 
     @Override
     public void onUnavailable() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         close();
     }
 
     @Override
     public void send(@NonNull final Message message) {
-        OPFLog.methodD(message);
+        OPFLog.logMethod(message);
 
         if (!isRegistered()) {
             OPFLog.e("Registration state isn't REGISTERED");
@@ -213,22 +213,22 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     private boolean checkGoogleAccount() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (needGoogleAccounts()) {
-            OPFLog.d("Need google account");
+            OPFLog.i("Need google account.");
             // On device with version of Android less than "4.0.4"
             // we need to ensure that the user has at least one google account.
             final Account[] googleAccounts
                     = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
             return googleAccounts.length != 0;
         } else {
-            OPFLog.d("Not need google account");
+            OPFLog.i("Not need google account");
             return true;
         }
     }
 
     private void close() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         if (registrationExecutor != null) {
             OPFLog.d("Registration executor is not null");
@@ -242,7 +242,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void executeTask(@NonNull final Runnable runnable) {
-        OPFLog.methodD(runnable);
+        OPFLog.logMethod(runnable);
 
         if (registrationExecutor == null || registrationExecutor.isShutdown()) {
             registrationExecutor = Executors.newSingleThreadExecutor();
@@ -261,20 +261,20 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         @Override
         @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             try {
                 final String registrationId =
                         GoogleCloudMessaging.getInstance(getContext()).register(senderID);
                 if (TextUtils.isEmpty(registrationId)) {
-                    OPFLog.d("Registration id is empty");
+                    OPFLog.w("Registration id is empty");
                     onAuthError();
                 } else {
                     OPFLog.d("Registration id isn't empty");
                     onRegistrationSuccess(registrationId);
                 }
             } catch (IOException e) {
-                OPFLog.e("Error while register GCM.", e);
+                OPFLog.i("Error while register GCM.", e);
 
                 final String error = e.getMessage();
                 switch (error) {
@@ -291,7 +291,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -299,7 +299,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
-            OPFLog.methodD(registrationId);
+            OPFLog.logMethod(registrationId);
             preferencesProvider.saveRegistrationId(registrationId);
 
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
@@ -310,12 +310,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onAuthError() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
             onError(GCMConstants.ERROR_AUTHENTICATION_FAILED);
         }
 
         private void onError(@NonNull final String errorId) {
-            OPFLog.methodD(errorId);
+            OPFLog.logMethod(errorId);
             final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
             getContext().sendBroadcast(intent);
@@ -334,7 +334,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         @Override
         @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             try {
                 GoogleCloudMessaging.getInstance(getContext()).unregister();
@@ -342,7 +342,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
                 onUnregistrationSuccess();
             } catch (IOException e) {
-                OPFLog.e("Error while unregister GCM.", e);
+                OPFLog.i("Error while unregister GCM.", e);
 
                 final String error = e.getMessage();
                 switch (error) {
@@ -352,14 +352,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                     case GoogleCloudMessaging.ERROR_MAIN_THREAD:
                         throw new WrongThreadException(false);
                     default:
-                        OPFLog.e("Error while unregister : " + e);
+                        onError(error);
                         break;
                 }
             }
         }
 
         private void onServicesNotAvailable() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
@@ -367,12 +367,19 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         }
 
         private void onUnregistrationSuccess() {
-            OPFLog.methodD();
+            OPFLog.logMethod();
 
             final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
             intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);
 
             OPFLog.d("Send broadcast intent : " + OPFUtils.toString(intent));
+            getContext().sendBroadcast(intent);
+        }
+
+        private void onError(@NonNull final String errorId) {
+            OPFLog.logMethod(errorId);
+            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
+            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
             getContext().sendBroadcast(intent);
         }
     }

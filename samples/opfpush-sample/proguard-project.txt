@@ -28,3 +28,7 @@
 -keepclassmembers class ** {
     public void onEvent*(**);
 }
+
+#appcompat
+-dontwarn android.view.accessibility.AccessibilityNodeInfo
+-dontwarn android.media.session.MediaSession

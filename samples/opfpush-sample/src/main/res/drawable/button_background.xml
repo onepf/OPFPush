@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <item android:drawable="@color/background_material_dark" android:state_pressed="true" />
 
-</resources>
+    <item android:drawable="@color/button_material_dark" />
+
+</selector>

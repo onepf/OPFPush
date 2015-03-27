@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushprovider;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfpush.model.Message;
+
 /**
- * @author Roman Savin
- * @since 10.12.14
+ * PushProvider that can send messages to server.
+ *
+ * @author Kirill Rozov
+ * @since 10/13/14.
  */
-public class RegisteredEvent {
+public interface SenderPushProvider {
 
-    @NonNull
-    private String registrationId;
-
-    public RegisteredEvent(@NonNull final String registrationId) {
-        this.registrationId = registrationId;
-    }
-
-    @NonNull
-    public String getRegistrationId() {
-        return registrationId;
-    }
+    /**
+     * Send message to server. Method must be consumed async.
+     *
+     * @throws IllegalStateException If try send message when provider isn't registered.
+     */
+    void send(@NonNull Message msg);
 }

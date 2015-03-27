@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,21 +35,20 @@ public final class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, intent);
+        OPFLog.logMethod(context, intent);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistered()) {
-            OPFLog.d("Helper is registered");
+            OPFLog.i("Helper is registered");
             if (isAndroidIDChanged(context)) {
-                OPFLog.d("Android ID changed.");
+                OPFLog.i("Android ID changed.");
                 helper.onNeedRetryRegister();
             } else {
-                OPFLog.d("Android ID hasn't been changed");
+                OPFLog.i("Android ID hasn't been changed");
                 helper.registerPackageChangeReceiver();
             }
         } else if (helper.isRegistering()) {
-            OPFLog.d("Registration in progress");
-            OPFLog.d("Retry register after reboot.");
+            OPFLog.i("Registration in progress. Retry register after reboot.");
             helper.restartRegisterOnBoot();
         }
     }

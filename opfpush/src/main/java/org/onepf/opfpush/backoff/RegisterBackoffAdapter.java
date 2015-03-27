@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,21 +38,21 @@ final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager 
 
     @Override
     public boolean hasTries(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         return registerBackoff.hasTries();
     }
 
     @Override
     public long getTryDelay(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         return registerBackoff.getTryDelay();
     }
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         registerBackoff.reset();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public final class OPFPush {
      */
     @NonNull
     public static OPFPushHelper getHelper() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (helper == null) {
             throw new InitException(false);
         }
@@ -68,7 +68,7 @@ public final class OPFPush {
      */
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        OPFLog.methodD(context, configuration);
+        OPFLog.logMethod(context, configuration);
         OPFChecks.checkThread(true);
 
         if (helper != null) {
@@ -76,10 +76,12 @@ public final class OPFPush {
         }
 
         if (OPFUtils.isMainProcess(context)) {
+            OPFLog.i("Init in main process");
             final OPFPushHelper newHelper = new OPFPushHelperImpl(context);
             newHelper.init(configuration);
             helper = newHelper;
         } else {
+            OPFLog.i("Init in not main process");
             helper = new OPFPushHelperStub();
         }
     }

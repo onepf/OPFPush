@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.onepf.opfpush.model;
 
 /**
- * The type of messages that are received by {@link org.onepf.opfpush.OPFPushReceiver}.
+ * The type of messages that are received by {@link org.onepf.opfpush.receiver.OPFPushReceiver}.
  *
  * @author Roman Savin
  * @since 25.12.14

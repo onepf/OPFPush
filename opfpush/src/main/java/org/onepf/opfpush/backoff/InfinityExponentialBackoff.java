@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Roman Savin
  * @since 05.09.14.
  */
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class InfinityExponentialBackoff implements Backoff {
 
-    public static final int MAX_TRY_COUNT = 16;
+    /**
+     * Give max delay about an hour.
+     */
+    public static final int MAX_TRY_COUNT = 12;
 
     @NonNull
     private final AtomicInteger tryNumber = new AtomicInteger(0);
@@ -44,16 +48,17 @@ final class InfinityExponentialBackoff implements Backoff {
     }
 
     @Override
-    public long getTryDelay() {
-        if (tryNumber.getAndIncrement() >= MAX_TRY_COUNT) {
-            return getTryDelay(tryNumber.getAndSet(0));
+    public synchronized long getTryDelay() {
+        int currentTryNumber = MAX_TRY_COUNT;
+        if (tryNumber.get() < MAX_TRY_COUNT) {
+            currentTryNumber = tryNumber.getAndIncrement();
         }
-        return getTryDelay(tryNumber.get());
+        return getTryDelay(currentTryNumber);
     }
 
     private long getTryDelay(int currentTryNumber) {
-        OPFLog.methodD(currentTryNumber);
-        return TimeUnit.SECONDS.toMillis((long) Math.pow(2, currentTryNumber));
+        OPFLog.logMethod(currentTryNumber);
+        return TimeUnit.SECONDS.toMillis(2 << currentTryNumber);
     }
 
     @Override

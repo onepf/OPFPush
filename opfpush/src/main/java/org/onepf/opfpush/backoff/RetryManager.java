@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ import org.onepf.opfpush.model.Operation;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Context.ALARM_SERVICE;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
@@ -90,12 +92,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void postRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void postRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -105,12 +107,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void cancelRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void cancelRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -118,8 +120,13 @@ public final class RetryManager implements BackoffManager {
                            @NonNull final Operation operation,
                            @NonNull final String action) {
         final long when = System.currentTimeMillis() + getTryDelay(providerName, operation);
-        OPFLog.d("Post retry %s provider '%s' at %s", operation, providerName,
-                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
+        OPFLog.d("Post retry %s provider '%s' at %s",
+                operation,
+                providerName,
+                SimpleDateFormat.getDateTimeInstance(
+                        DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US
+                ).format(new Date(when))
+        );
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
         intent.setAction(action);

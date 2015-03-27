@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class GCMService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        OPFLog.methodD(OPFUtils.toString(intent));
+        OPFLog.logMethod(OPFUtils.toString(intent));
 
         @GCMAction String action = intent.getAction();
         if (GCMConstants.ACTION_REGISTRATION_CALLBACK.equals(action)) {
@@ -82,28 +82,28 @@ public class GCMService extends IntentService {
     }
 
     private void onMessage(@NonNull final Intent intent) {
-        OPFLog.methodD(OPFUtils.toString(intent));
+        OPFLog.logMethod(OPFUtils.toString(intent));
         OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
     }
 
     private void onDeletedMessages() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         OPFPush.getHelper().getReceivedMessageHandler()
                 .onDeletedMessages(PROVIDER_NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
     }
 
     private void onRegistered(@NonNull final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
     private void onUnregistered(@Nullable final String oldRegistrationId) {
-        OPFLog.methodD(oldRegistrationId);
+        OPFLog.logMethod(oldRegistrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, oldRegistrationId);
     }
 
     private void onRegistrationError(@NonNull final String errorId) {
-        OPFLog.methodD(errorId);
+        OPFLog.logMethod(errorId);
         final PushError error = convertError(errorId);
         OPFLog.d("Converted error : " + error);
 
@@ -111,7 +111,7 @@ public class GCMService extends IntentService {
     }
 
     private void onUnregistrationError(@NonNull final String errorId) {
-        OPFLog.methodD(errorId);
+        OPFLog.logMethod(errorId);
         final PushError error = convertError(errorId);
         OPFLog.d("Converted error : " + error);
 
@@ -126,7 +126,6 @@ public class GCMService extends IntentService {
             case GCMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown GCM error : " + errorId);
                 return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
         }
     }

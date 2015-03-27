@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -43,14 +44,14 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
             final String hostAppPackage = provider.getHostAppPackage();
             if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
-                OPFLog.d("Host app '%s' of provider '%s' removed.",
+                OPFLog.i("Host app '%s' of provider '%s' has been removed.",
                         hostAppPackage, provider.getName());
                 helper.registerNextAvailableProvider(provider.getName());
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public interface EventListener {
      * <p/>
      * A push provider can be unavailable in two common reasons:
      * <ol>
-     * <li>The {@link org.onepf.opfpush.PushProvider#isAvailable()} method has returned false value.</li>
+     * <li>The {@link org.onepf.opfpush.pushprovider.PushProvider#isAvailable()} method has returned false value.</li>
      * <li>An unrecoverable registration error has occurred.</li>
      * </ol>
      * <p/>

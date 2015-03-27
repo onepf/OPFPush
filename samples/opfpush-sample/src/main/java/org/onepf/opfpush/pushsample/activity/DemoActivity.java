@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OPFLog.methodD();
+        OPFLog.logMethod();
         setContentView(R.layout.activity_demo);
 
         infoText = (TextView) findViewById(R.id.info_text);
@@ -91,32 +91,32 @@ public class DemoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         EventBus.getDefault().registerSticky(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        OPFLog.methodD();
+        OPFLog.logMethod();
         EventBus.getDefault().unregister(this);
     }
 
     public void onRegisterClick(@NonNull final View view) {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         initViewsRegisteringState();
         helper.register();
     }
 
     public void onUnregisterClick(@NonNull final View view) {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         initViewsUnregisteringState();
         helper.unregister();
     }
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final MessageEvent messageEvent) {
-        OPFLog.methodD(messageEvent);
+        OPFLog.logMethod(messageEvent);
         final String messageString = messageEvent.getMessage();
         if (!TextUtils.isEmpty(messageString)) {
             adapter.add(messageString);
@@ -126,7 +126,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final RegisteredEvent registeredEvent) {
-        OPFLog.methodD(registeredEvent);
+        OPFLog.logMethod(registeredEvent);
         final String registrationIdString = registeredEvent.getRegistrationId();
         if (!TextUtils.isEmpty(registrationIdString)) {
             initViewsRegisteredState(registrationIdString);
@@ -136,7 +136,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final UnregisteredEvent unregisteredEvent) {
-        OPFLog.methodD(unregisteredEvent);
+        OPFLog.logMethod(unregisteredEvent);
         final String registrationIdString = unregisteredEvent.getRegistrationId();
         initViewsUnregisteredState(registrationIdString);
         EventBus.getDefault().removeStickyEvent(unregisteredEvent);
@@ -144,7 +144,7 @@ public class DemoActivity extends Activity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
-        OPFLog.methodD(noAvailableProviderEvent);
+        OPFLog.logMethod(noAvailableProviderEvent);
         initViewsUnregisteredState("");
         final Map<String, UnrecoverablePushError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
         if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
@@ -157,7 +157,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsRegisteringState() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         infoText.setText(getString(R.string.registration));
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(false);
@@ -165,7 +165,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsRegisteredState(@NonNull final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         infoText.setText(getString(R.string.registered_state_fmt, registrationId));
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);
@@ -173,7 +173,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsUnregisteredState(@Nullable final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         infoText.setText(getString(R.string.unregistered_state_fmt, registrationId));
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(true);
@@ -181,7 +181,7 @@ public class DemoActivity extends Activity {
     }
 
     private void initViewsUnregisteringState() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         infoText.setText(getString(R.string.unregistration));
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);

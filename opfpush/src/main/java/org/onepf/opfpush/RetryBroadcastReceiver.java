@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isInitDone()) {
@@ -63,14 +63,14 @@ public final class RetryBroadcastReceiver extends BroadcastReceiver {
                     throw new IllegalStateException(String.format(Locale.US, "Unknown action '%s'.", action));
             }
         } else {
-            OPFLog.e("OPFPush must be initialized");
+            OPFLog.w("OPFPush must be initialized");
         }
     }
 
     private void checkRegistering(@NonNull final Context context,
                                   @NonNull final OPFPushHelper helper,
                                   @NonNull final String providerName) {
-        OPFLog.methodD(context, helper, providerName);
+        OPFLog.logMethod(context, helper, providerName);
         if (helper.isRegistering()) {
             Settings.getInstance(context).saveState(State.UNREGISTERED);
             helper.registerNextAvailableProvider(providerName);

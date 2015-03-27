@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.onepf.opfpush.model;
 
 import android.support.annotation.NonNull;
+
+import java.util.Locale;
 
 /**
  * Registration or unregistering operation error.
@@ -90,5 +92,16 @@ public abstract class PushError<T extends ErrorType> {
     @NonNull
     public String getErrorId() {
         return errorId;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                Locale.US,
+                "PushError : \n{ \"isRecoverable\" : %1$S,\n\"providerName\" : \"%2$s\",\n\"type\" : \"%3$s\",\n\"errorId\":\"%4$s\"}",
+                isRecoverable(),
+                providerName,
+                type,
+                errorId);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.RecoverablePushError;
 import org.onepf.opfpush.model.UnrecoverablePushError;
@@ -55,7 +55,7 @@ public class ADMService extends ADMMessageHandlerBase {
 
     public ADMService() {
         super("ADMService");
-        preferencesProvider = PreferencesProvider.getInstance(getApplicationContext());
+        preferencesProvider = PreferencesProvider.getInstance(getApplication());
     }
 
     /**
@@ -69,7 +69,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onMessage(@NonNull final Intent intent) {
-        OPFLog.methodD(OPFUtils.toString(intent));
+        OPFLog.logMethod(OPFUtils.toString(intent));
         //ADM can receive messages even if it's unregistered. So we have to check ADM state.
         final PushProvider currentProvider = OPFPush.getHelper().getCurrentProvider();
 
@@ -93,7 +93,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistered(@NonNull final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         preferencesProvider.saveRegistrationId(registrationId);
         preferencesProvider.removeAuthenticationFailedFlag();
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
@@ -113,7 +113,7 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onUnregistered(@Nullable final String admRegistrationId) {
-        OPFLog.methodD(admRegistrationId);
+        OPFLog.logMethod(admRegistrationId);
         final String registrationId = admRegistrationId == null
                 ? preferencesProvider.getRegistrationId()
                 : admRegistrationId;
@@ -134,9 +134,9 @@ public class ADMService extends ADMMessageHandlerBase {
      */
     @Override
     protected void onRegistrationError(@NonNull @ADMError final String errorId) {
-        OPFLog.methodD(errorId);
+        OPFLog.logMethod(errorId);
         final PushError error = convertError(errorId);
-        OPFLog.d("Converted error : " + error);
+        OPFLog.d("ADM received error : " + error);
 
         final OPFPushHelper helper = OPFPush.getHelper();
         if (helper.isRegistering()) {
@@ -160,7 +160,6 @@ public class ADMService extends ADMMessageHandlerBase {
             case ADMConstants.ERROR_AUTHENTICATION_FAILED:
                 return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown ADM error : " + errorId);
                 return new UnrecoverablePushError(UNKNOWN_ERROR, PROVIDER_NAME, errorId);
         }
     }

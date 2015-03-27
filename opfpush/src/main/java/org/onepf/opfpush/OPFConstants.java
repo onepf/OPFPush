@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public final class OPFConstants {
     public static final String ACTION_RETRY_UNREGISTER = BuildConfig.APPLICATION_ID + "intent.RETRY_UNREGISTER";
 
     static final String ACTION_CHECK_REGISTERING_TIMEOUT = BuildConfig.APPLICATION_ID + "intent.CHECK_REGISTERING_TIMEOUT";
+
+    static final String PACKAGE_DATA_SCHEME = "package";
 
     private OPFConstants() {
         throw new UnsupportedOperationException();

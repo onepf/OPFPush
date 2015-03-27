@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ final class EventListenerWrapperCreator {
     static EventListener getEventListenerWrapper(
             @Nullable final EventListener eventListener
     ) {
-        OPFLog.methodD(eventListener);
+        OPFLog.logMethod(eventListener);
 
         if (eventListener != null) {
             return createMainLooperWrapper(eventListener);
@@ -70,7 +70,7 @@ final class EventListenerWrapperCreator {
 
     @NonNull
     private static EventListener createMainLooperWrapper(@NonNull final EventListener eventListener) {
-        OPFLog.methodD(eventListener);
+        OPFLog.logMethod(eventListener);
         return new EventListener() {
 
             private final Handler handler = new Handler(Looper.getMainLooper());
@@ -160,7 +160,7 @@ final class EventListenerWrapperCreator {
 
     @NonNull
     private static EventListener createBroadcastSender() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return new EventListener() {
             @Override
             public void onMessage(
