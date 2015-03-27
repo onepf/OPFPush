@@ -29,14 +29,14 @@ import java.util.Map;
 public class NoAvailableProviderEvent {
 
     @NonNull
-    private Map<String, UnrecoverablePushError> registrationErrors;
+    private Map<String, UnrecoverablePushError> pushErrors;
 
-    public NoAvailableProviderEvent(@NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
-        this.registrationErrors = registrationErrors;
+    public NoAvailableProviderEvent(@NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+        this.pushErrors = pushErrors;
     }
 
     @NonNull
-    public Map<String, UnrecoverablePushError> getRegistrationErrors() {
-        return registrationErrors;
+    public Map<String, UnrecoverablePushError> getPushErrors() {
+        return pushErrors;
     }
 }
