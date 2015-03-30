@@ -16,12 +16,9 @@
 
 package org.onepf.opfpush.gcm;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -44,13 +41,10 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.C2DM_ACTION_RECEIVE;
-import static org.onepf.opfpush.gcm.GCMConstants.ANDROID_RELEASE_4_0_4;
-import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_ACCOUNT_TYPE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_SERVICES_FRAMEWORK_PACKAGE;
@@ -113,9 +107,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         OPFLog.logMethod();
         super.checkManifest();
         final Context context = getContext();
-        if (needGoogleAccounts()) {
-            OPFChecks.checkPermission(context, GET_ACCOUNTS);
-        }
         OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
@@ -155,7 +146,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             final int conResult = GooglePlayServicesUtil
                     .isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
-                return new AvailabilityResult(!needGoogleAccounts() || checkGoogleAccount()); //todo remove or add error code with auth error.
+                return new AvailabilityResult(true);
             } else {
                 OPFLog.d("Google Play Services not available. Reason: '%s'.",
                         GooglePlayServicesUtil.getErrorString(conResult));
@@ -208,26 +199,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public String toString() {
         return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderID);
-    }
-
-    private boolean needGoogleAccounts() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4);
-    }
-
-    private boolean checkGoogleAccount() {
-        OPFLog.logMethod();
-        if (needGoogleAccounts()) {
-            OPFLog.i("Need google account.");
-            // On device with version of Android less than "4.0.4"
-            // we need to ensure that the user has at least one google account.
-            final Account[] googleAccounts
-                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
-            return googleAccounts.length != 0;
-        } else {
-            OPFLog.i("Not need google account");
-            return true;
-        }
     }
 
     private void close() {
