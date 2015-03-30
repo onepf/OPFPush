@@ -88,7 +88,7 @@ public class UnregisterProviderWithoutInternetTest  extends ActivityInstrumentat
 
         setWifiEnabled(activity, true);
 
-        if (!registrationMonitor.doWait(MAX_WAIT_TIME_LONG_ATTEMPT)) {
+        if (!unregisterationMonitor.doWait(MAX_WAIT_TIME_LONG_ATTEMPT)) {
             Assert.fail("Application did not complete unregistration after wifi is turned on");
         }
 
