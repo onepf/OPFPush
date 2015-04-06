@@ -118,15 +118,22 @@ public class OPFPushHelperStub extends OPFPushHelper {
         OPFLog.logMethod(prevProviderName);
     }
 
-    @Override
-    void registerPackageChangeReceiver() {
-        OPFLog.logMethod();
-    }
-
     @NonNull
     @Override
     Settings getSettings() {
         throw new UnsupportedOperationException();
+    }
+
+    @Nullable
+    @Override
+    String getProviderNameByHostApp(@Nullable final String appPackage) {
+        OPFLog.logMethod(appPackage);
+        return null;
+    }
+
+    @Override
+    void cancelAllOperationsForProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
     }
 
     private final class ReceivedMessageHandlerStub implements ReceivedMessageHandler {
