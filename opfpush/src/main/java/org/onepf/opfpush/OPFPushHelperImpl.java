@@ -82,6 +82,7 @@ import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_E
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 final class OPFPushHelperImpl extends OPFPushHelper {
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private EventListener eventListenerWrapper;
 
@@ -94,6 +95,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
     @Nullable
     private PushProvider currentProvider;
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private List<PushProvider> sortedProvidersList;
 
@@ -371,6 +373,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         register();
     }
 
+    @SuppressWarnings("PMD.OneDeclarationPerLine")
     @Override
     void registerNextAvailableProvider(@Nullable final String prevProviderName) {
         synchronized (registrationLock) {
@@ -379,8 +382,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             final int providersCount = sortedProvidersList.size();
             final int prevProviderPosition = getProviderPosition(sortedProvidersList, prevProviderName);
 
-            for (int i = (prevProviderPosition + 1) % providersCount,
-                         j = 0;
+            for (int i = (prevProviderPosition + 1) % providersCount, j = 0;
                  j < providersCount;
                  i = (i + 1) % providersCount, j++) {
 
@@ -729,9 +731,15 @@ final class OPFPushHelperImpl extends OPFPushHelper {
                                  @NonNull final String registrationId) {
             synchronized (registrationLock) {
                 OPFLog.logMethod(providerName, registrationId);
-                OPFLog.i("Successfully register provider '%s'.", providerName);
                 retryManager.cancelRetryAllOperations(providerName);
+                settings.removeRegisteringProvider(providerName);
 
+                if (isRegistered()) {
+                    OPFLog.d("Registration state is REGISTERED");
+                    return;
+                }
+
+                OPFLog.i("Successfully register provider '%s'.", providerName);
                 settings.saveState(REGISTERED);
                 settings.saveLastAndroidId(
                         Secure.getString(appContext.getContentResolver(), ANDROID_ID)
@@ -741,7 +749,6 @@ final class OPFPushHelperImpl extends OPFPushHelper {
                 registerProviderErrors.clear();
                 registerPackageChangeReceiver();
 
-                settings.removeRegisteringProvider(providerName);
                 eventListenerWrapper.onRegistered(appContext, providerName, registrationId);
             }
         }
