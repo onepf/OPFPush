@@ -89,7 +89,7 @@ public final class UnrecoverablePushError extends PushError<UnrecoverablePushErr
                 availabilityErrorCode);
     }
 
-    public static enum Type implements ErrorType {
+    public enum Type implements ErrorType {
 
         /**
          * Invalid parameters have been sent to register provider.

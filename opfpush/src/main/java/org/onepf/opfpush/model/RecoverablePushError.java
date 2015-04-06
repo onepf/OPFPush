@@ -44,7 +44,7 @@ public final class RecoverablePushError extends PushError<RecoverablePushError.T
         return true;
     }
 
-    public static enum Type implements ErrorType {
+    public enum Type implements ErrorType {
 
         /**
          * A service is not available at the moment. Most popular reason of this error is the internet
