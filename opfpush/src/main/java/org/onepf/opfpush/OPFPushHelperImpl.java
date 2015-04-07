@@ -443,16 +443,12 @@ final class OPFPushHelperImpl extends OPFPushHelper {
 
     private void onProviderUnavailable(@NonNull final PushProvider provider) {
         OPFLog.logMethod(provider);
+        final String providerName = provider.getName();
 
+        cancelAllOperationsForProvider(providerName);
+        settings.removeRegisteringProvider(providerName);
+        settings.removeUnregisteringProvider(providerName);
         provider.onUnavailable();
-        if (provider.equals(currentProvider)) {
-            OPFLog.i("Current provider become unavailable");
-
-            currentProvider = null;
-            settings.clear();
-
-            register(); //Restart registration
-        }
     }
 
     private void restoreLastProvider() {
@@ -473,7 +469,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         } else {
             OPFLog.i("Last provider is unavailable or unregistered");
             settings.clear();
-
+            currentProvider = null;
             onProviderUnavailable(lastProvider);
         }
     }
@@ -511,22 +507,27 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         OPFLog.logMethod(provider);
 
         final String regId = provider.getRegistrationId();
-        if (!provider.isRegistered() || TextUtils.isEmpty(regId)) {
+        if (provider.isRegistered() && !TextUtils.isEmpty(regId)) {
+            receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());
+        } else if (provider.getAvailabilityResult().isAvailable()) {
             RegisteringTimeoutController.setTimeout(appContext, provider.getName());
             settings.saveState(REGISTERING);
             provider.register();
         } else {
-            receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());
+            onProviderUnavailable(provider);
+            register();
         }
     }
 
     private void unregister(@NonNull final PushProvider provider) {
         OPFLog.logMethod(provider);
 
-        if (provider.isRegistered()) {
+        if (!provider.isRegistered()) {
+            receivedMessageHandler.onUnregistered(provider.getName(), provider.getRegistrationId());
+        } else if (provider.getAvailabilityResult().isAvailable()) {
             provider.unregister();
         } else {
-            receivedMessageHandler.onUnregistered(provider.getName(), provider.getRegistrationId());
+            onProviderUnavailable(provider);
         }
     }
 

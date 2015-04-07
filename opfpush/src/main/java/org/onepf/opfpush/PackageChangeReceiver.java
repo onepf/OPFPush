@@ -45,8 +45,6 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
             if (providerName == null) {
                 return;
             }
-            clearSettingsForProvider(providerName);
-            helper.cancelAllOperationsForProvider(providerName);
             checkCurrentProvider(providerName);
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)
                 && context.getPackageName().equals(getAppPackage(intent))) {
@@ -65,6 +63,8 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         final String currentProviderName = currentProvider.getName();
         if (providerName.equals(currentProviderName)) {
             OPFLog.i("Host app of provider '%s' has been removed.", currentProviderName);
+            clearSettingsForProvider(currentProviderName);
+            helper.cancelAllOperationsForProvider(currentProviderName);
             helper.registerNextAvailableProvider(currentProviderName);
         }
     }
