@@ -26,6 +26,7 @@ import org.onepf.opfpush.RetryBroadcastReceiver;
 import org.onepf.opfpush.model.Operation;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.exception.InitException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,13 +66,25 @@ public final class RetryManager implements BackoffManager {
 
     @NonNull
     @SuppressWarnings("PMD.NonThreadSafeSingleton")
-    public static RetryManager getInstance(@NonNull final Context context,
-                                           @NonNull final BackoffManager backoffManager) {
+    public static RetryManager init(@NonNull final Context context,
+                            @NonNull final BackoffManager backoffManager) {
         OPFChecks.checkThread(true);
-        if (instance == null) {
-            instance = new RetryManager(context, backoffManager);
-        }
+        checkInit(false);
+        return instance = new RetryManager(context, backoffManager);
+    }
+
+    @NonNull
+    public static RetryManager getInstance() {
+        OPFChecks.checkThread(true);
+        checkInit(true);
         return instance;
+    }
+
+    private static void checkInit(final boolean initExpected) {
+        final boolean isInit = instance != null;
+        if (initExpected != isInit) {
+            throw new InitException(isInit);
+        }
     }
 
     @Override

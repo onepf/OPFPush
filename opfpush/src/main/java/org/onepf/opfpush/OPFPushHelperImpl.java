@@ -106,8 +106,9 @@ final class OPFPushHelperImpl extends OPFPushHelper {
     @NonNull
     private final Settings settings;
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
-    private final RetryManager retryManager;
+    private RetryManager retryManager;
 
     @NonNull
     private final Object registrationLock = new Object();
@@ -119,8 +120,6 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         super();
         appContext = context.getApplicationContext();
         settings = Settings.getInstance(context);
-        retryManager = RetryManager.getInstance(context,
-                InfinityExponentialBackoffManager.getInstance());
     }
 
     /**
@@ -313,6 +312,8 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             providersByHostApps.put(provider.getHostAppPackage(), provider.getName());
         }
 
+        retryManager = RetryManager.init(appContext, InfinityExponentialBackoffManager.getInstance());
+
         final EventListener eventListener = configuration.getEventListener();
         final boolean isOPFReceiverRegistered = isOPFReceiverRegistered();
 
@@ -428,8 +429,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         return providersByHostApps.get(appPackage);
     }
 
-    @Override
-    void cancelAllOperationsForProvider(@NonNull final String providerName) {
+    private void cancelAllOperationsForProvider(@NonNull final String providerName) {
         OPFLog.logMethod(providerName);
         retryManager.cancelRetryAllOperations(providerName);
     }

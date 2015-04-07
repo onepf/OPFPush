@@ -131,11 +131,6 @@ public class OPFPushHelperStub extends OPFPushHelper {
         return null;
     }
 
-    @Override
-    void cancelAllOperationsForProvider(@NonNull final String providerName) {
-        OPFLog.logMethod(providerName);
-    }
-
     private final class ReceivedMessageHandlerStub implements ReceivedMessageHandler {
 
         @Override

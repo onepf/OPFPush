@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.backoff.RetryManager;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -64,7 +65,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         if (providerName.equals(currentProviderName)) {
             OPFLog.i("Host app of provider '%s' has been removed.", currentProviderName);
             clearSettingsForProvider(currentProviderName);
-            helper.cancelAllOperationsForProvider(currentProviderName);
+            RetryManager.getInstance().cancelRetryAllOperations(providerName);
             helper.registerNextAvailableProvider(currentProviderName);
         }
     }

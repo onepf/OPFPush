@@ -137,8 +137,6 @@ public abstract class OPFPushHelper {
     @Nullable
     abstract String getProviderNameByHostApp(@Nullable final String appPackage);
 
-    abstract void cancelAllOperationsForProvider(@NonNull final String providerName);
-
     /**
      * Handles messages that were received by a push provider receiver.
      */
