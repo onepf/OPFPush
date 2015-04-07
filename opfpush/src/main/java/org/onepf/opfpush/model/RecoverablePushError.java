@@ -29,11 +29,6 @@ import android.support.annotation.NonNull;
 public final class RecoverablePushError extends PushError<RecoverablePushError.Type> {
 
     public RecoverablePushError(@NonNull final Type type,
-                                @NonNull final String providerName) {
-        this(type, providerName, type.name());
-    }
-
-    public RecoverablePushError(@NonNull final Type type,
                                 @NonNull final String providerName,
                                 @NonNull final String errorId) {
         super(type, providerName, errorId);
@@ -50,16 +45,6 @@ public final class RecoverablePushError extends PushError<RecoverablePushError.T
          * A service is not available at the moment. Most popular reason of this error is the internet
          * connection unavailability.
          */
-        SERVICE_NOT_AVAILABLE,
-
-        /**
-         * Occurs when try the registration while the unregistering is being performed.
-         */
-        UNREGISTERING_PERFORMING,
-
-        /**
-         * Occurs when try the unregistering while the registration is being performed.
-         */
-        REGISTERING_PERFORMING
+        SERVICE_NOT_AVAILABLE
     }
 }

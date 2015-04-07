@@ -147,24 +147,18 @@ class NokiaNotificationsProviderImpl extends BasePushProvider implements NokiaPu
 
     @Override
     public void register() {
-        super.register();
         OPFLog.logMethod();
-        if (!isUnregistrationPerforming()) {
-            OPFLog.i("Start register NokiaNotificationsProvider.");
-            PushRegistrar.register(getContext(), sendersIds);
-        }
+        OPFLog.i("Start register NokiaNotificationsProvider.");
+        PushRegistrar.register(getContext(), sendersIds);
     }
 
     @Override
     public void unregister() {
-        super.unregister();
         OPFLog.logMethod();
-        if (!isRegistrationPerforming()) {
-            OPFLog.i("Start unregister NokiaNotificationsProvider.");
-            final Context context = getContext();
-            PushRegistrar.unregister(context);
-            PushRegistrar.onDestroy(context);
-        }
+        OPFLog.i("Start unregister NokiaNotificationsProvider.");
+        final Context context = getContext();
+        PushRegistrar.unregister(context);
+        PushRegistrar.onDestroy(context);
     }
 
     @Override

@@ -46,7 +46,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
             if (providerName == null) {
                 return;
             }
-            checkCurrentProvider(providerName);
+            checkCurrentProvider(context, providerName);
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)
                 && context.getPackageName().equals(getAppPackage(intent))) {
             OPFLog.d("Application updated.");
@@ -54,7 +54,8 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         }
     }
 
-    private void checkCurrentProvider(@NonNull final String providerName) {
+    private void checkCurrentProvider(@NonNull final Context context,
+                                      @NonNull final String providerName) {
         final OPFPushHelper helper = OPFPush.getHelper();
         final PushProvider currentProvider = helper.getCurrentProvider();
         if (currentProvider == null) {
@@ -64,14 +65,15 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         final String currentProviderName = currentProvider.getName();
         if (providerName.equals(currentProviderName)) {
             OPFLog.i("Host app of provider '%s' has been removed.", currentProviderName);
-            clearSettingsForProvider(currentProviderName);
+            clearSettingsForProvider(context, currentProviderName);
             RetryManager.getInstance().cancelRetryAllOperations(providerName);
             helper.registerNextAvailableProvider(currentProviderName);
         }
     }
 
-    private void clearSettingsForProvider(@NonNull final String providerName) {
-        final Settings settings = OPFPush.getHelper().getSettings();
+    private void clearSettingsForProvider(@NonNull final Context context,
+                                          @NonNull final String providerName) {
+        final Settings settings = Settings.getInstance(context);
         settings.removeRegisteringProvider(providerName);
         settings.removeUnregisteringProvider(providerName);
     }

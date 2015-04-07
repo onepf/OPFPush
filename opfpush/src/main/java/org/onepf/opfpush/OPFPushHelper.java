@@ -131,9 +131,6 @@ public abstract class OPFPushHelper {
 
     abstract void registerNextAvailableProvider(@Nullable final String prevProviderName);
 
-    @NonNull
-    abstract Settings getSettings();
-
     @Nullable
     abstract String getProviderNameByHostApp(@Nullable final String appPackage);
 

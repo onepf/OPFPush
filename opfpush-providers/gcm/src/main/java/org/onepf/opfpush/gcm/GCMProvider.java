@@ -82,24 +82,17 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
-        super.register();
         OPFLog.logMethod();
-        if (!isUnregistrationPerforming()) {
-            OPFLog.i("Start register GCMProvider.");
-            executeTask(new RegisterTask());
-        }
+        OPFLog.i("Start register GCMProvider.");
+        executeTask(new RegisterTask());
     }
 
     @Override
     @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
-        super.unregister();
         OPFLog.logMethod();
-        if (!isRegistrationPerforming()) {
-            OPFLog.i("Start unregister GCMProvider.");
-            preferencesProvider.reset();
-            executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
-        }
+        OPFLog.i("Start unregister GCMProvider.");
+        executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
     }
 
     @Override
@@ -211,6 +204,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             registrationExecutor = null;
         }
 
+        preferencesProvider.reset();
         GoogleCloudMessaging.getInstance(getContext()).close();
     }
 

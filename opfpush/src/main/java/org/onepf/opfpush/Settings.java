@@ -43,6 +43,8 @@ final class Settings {
     private static final String KEY_LAST_ANDROID_ID = "android_id";
     private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
     private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
+    private static final String KEY_PENDING_REGISTRATION_PROVIDER = "pending_registration_provider";
+    private static final String KEY_PENDING_UNREGISTRATION_PROVIDER = "pending_unregistration_provider";
 
     private static volatile Settings instance;
 
@@ -158,6 +160,38 @@ final class Settings {
                 getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
                 false
         );
+    }
+
+    public synchronized void savePendingRegistrationProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(KEY_PENDING_REGISTRATION_PROVIDER, providerName);
+    }
+
+    public synchronized void removePendingRegistrationProvider() {
+        OPFLog.logMethod();
+        preferences.remove(KEY_PENDING_REGISTRATION_PROVIDER);
+    }
+
+    @Nullable
+    public synchronized String getPendingRegistrationProvider() {
+        OPFLog.logMethod();
+        return preferences.getString(KEY_PENDING_REGISTRATION_PROVIDER);
+    }
+
+    public synchronized void savePendingUnregistrationProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(KEY_PENDING_UNREGISTRATION_PROVIDER, providerName);
+    }
+
+    public synchronized void removePendingUnregistrationProvider() {
+        OPFLog.logMethod();
+        preferences.remove(KEY_PENDING_UNREGISTRATION_PROVIDER);
+    }
+
+    @Nullable
+    public synchronized String getPendingUnregistrationProvider() {
+        OPFLog.logMethod();
+        return preferences.getString(KEY_PENDING_UNREGISTRATION_PROVIDER);
     }
 
     private String getProviderPreferenceKey(@NonNull final String prefix,
