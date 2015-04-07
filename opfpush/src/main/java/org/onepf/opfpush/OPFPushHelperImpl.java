@@ -148,7 +148,6 @@ final class OPFPushHelperImpl extends OPFPushHelper {
                 case REGISTERING:
                     break;
                 case UNREGISTERED:
-                    settings.saveState(REGISTERING);
                     registerFirstAvailableProvider();
                     break;
             }
@@ -350,7 +349,9 @@ final class OPFPushHelperImpl extends OPFPushHelper {
 
     @Override
     void register(@NonNull final String providerName) {
-        register(getProviderWithException(providerName));
+        synchronized (registrationLock) {
+            register(getProviderWithException(providerName));
+        }
     }
 
     @Override
@@ -507,11 +508,11 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         OPFLog.logMethod(provider);
 
         final String regId = provider.getRegistrationId();
-        if (provider.isRegistered() && !TextUtils.isEmpty(regId)) {
+        if (provider.isRegistered() && !TextUtils.isEmpty(regId) && !isRegistering()) {
             receivedMessageHandler.onRegistered(provider.getName(), provider.getRegistrationId());
         } else if (provider.getAvailabilityResult().isAvailable()) {
-            RegisteringTimeoutController.setTimeout(appContext, provider.getName());
             settings.saveState(REGISTERING);
+            RegisteringTimeoutController.setTimeout(appContext, provider.getName());
             provider.register();
         } else {
             onProviderUnavailable(provider);
@@ -814,9 +815,10 @@ final class OPFPushHelperImpl extends OPFPushHelper {
                 OPFLog.logMethod(providerName, error);
 
                 final State state = settings.getState();
-                final boolean isRegistered = getProviderWithException(providerName).isRegistered();
-                OPFLog.i("Error occurred. Registration state : " + state + " Provider.isRegistered == " + isRegistered);
-                if (state == REGISTERING || !isRegistered) {
+                final boolean isProviderRegistered = getProviderWithException(providerName).isRegistered();
+                OPFLog.i("Error occurred. Registration state : "
+                        + state + " Provider.isRegistered == " + isProviderRegistered);
+                if (state == REGISTERING || !isProviderRegistered) {
                     onRegistrationError(providerName, error);
                 } else {
                     onUnregistrationError(providerName, error);
