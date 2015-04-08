@@ -558,8 +558,12 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         } else {
             OPFLog.i("Provider %s is no available", provider);
 
+            final String pendingRegistrationProvider = settings.getPendingRegistrationProvider();
             settings.removePendingUnregistrationProvider();
             onProviderUnavailable(provider);
+            if (providerName.equals(pendingRegistrationProvider)) {
+                registerNextAvailableProvider(providerName);
+            }
         }
     }
 
