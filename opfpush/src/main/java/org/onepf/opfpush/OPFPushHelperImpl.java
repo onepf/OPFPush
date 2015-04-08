@@ -507,6 +507,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         if (settings.isProviderUnregistrationPerforming(providerName)) {
             OPFLog.i("Unregistration is being performed for provider %s", provider);
 
+            //reset retrying backoff
             retryManager.cancelRetryUnregister(providerName);
             unregister(providerName);
 
@@ -540,6 +541,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         if (settings.isProviderRegistrationPerforming(providerName)) {
             OPFLog.i("Registration is being performed for provider %s", provider);
 
+            //reset retrying backoff
             retryManager.cancelRetryRegister(providerName);
             register(providerName);
 
