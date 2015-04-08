@@ -58,6 +58,8 @@ public class SettingsTest extends Assert {
     private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
     private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
 
+    private static final String OPF_CORE_POSTFIX = "opfpush";
+
     private static final int NUM_TESTS = 100;
     private static final int NUM_PROVIDERS = 100;
     private static final int RANDOM_STRING_LENGTH = 16;
@@ -71,7 +73,8 @@ public class SettingsTest extends Assert {
     @Before
     public void setup() {
         Context ctx = Robolectric.application.getApplicationContext();
-        sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_MULTI_PROCESS);
+        sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName() + "." + OPF_CORE_POSTFIX,
+                Context.MODE_MULTI_PROCESS);
         settings = Settings.getInstance(ctx);
         pushProviders = new MockNamePushProvider[NUM_PROVIDERS];
         for (int i = 0; i < NUM_PROVIDERS; ++i) {

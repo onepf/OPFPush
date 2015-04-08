@@ -46,7 +46,7 @@ public class PreferencesProviderTest extends Assert {
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
     private static final String KEY_AUTHENTICATION_FAILED_FLAG = "authentication_failed_flag";
-    private static final String ADM_POSTFIX = "adm";
+    private static final String ADM_POSTFIX = "opfpush_adm";
 
     private static final Random RND = new Random();
 

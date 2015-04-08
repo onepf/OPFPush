@@ -53,6 +53,7 @@ class ADMProviderImpl extends BasePushProvider {
     @NonNull
     private final ADM adm;
 
+    @NonNull
     private final PreferencesProvider preferencesProvider;
 
     public ADMProviderImpl(@NonNull final Context context) {

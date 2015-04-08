@@ -43,7 +43,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 @RunWith(RobolectricTestRunner.class)
 public class PreferencesProviderTest extends Assert {
 
-    private static final String GCM_POSTFIX = "gcm";
+    private static final String GCM_POSTFIX = "opfpush_gcm";
     private static final String KEY_APP_VERSION = "app_version";
     private static final String KEY_REGISTRATION_ID = "registration_id";
 
