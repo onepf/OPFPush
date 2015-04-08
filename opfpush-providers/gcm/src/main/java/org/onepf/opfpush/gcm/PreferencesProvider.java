@@ -36,7 +36,7 @@ final class PreferencesProvider {
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
 
-    private static final String GCM_POSTFIX = "gcm";
+    private static final String GCM_POSTFIX = "opfpush_gcm";
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
@@ -48,6 +48,7 @@ final class PreferencesProvider {
         preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
+    @NonNull
     public static PreferencesProvider getInstance(@NonNull final Context context) {
         OPFChecks.checkThread(true);
         if (instance == null) {

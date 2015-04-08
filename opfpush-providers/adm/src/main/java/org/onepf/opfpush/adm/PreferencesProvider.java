@@ -38,7 +38,7 @@ final class PreferencesProvider {
     private static final String KEY_APP_VERSION = "app_version";
     private static final String KEY_AUTHENTICATION_FAILED_FLAG = "authentication_failed_flag";
 
-    private static final String ADM_POSTFIX = "adm";
+    private static final String ADM_POSTFIX = "opfpush_adm";
 
     private static volatile PreferencesProvider instance;
 
@@ -49,6 +49,7 @@ final class PreferencesProvider {
     }
 
     @SuppressWarnings("PMD.NonThreadSafeSingleton")
+    @NonNull
     public static PreferencesProvider getInstance(@NonNull final Context context) {
         OPFChecks.checkThread(true);
         if (instance == null) {

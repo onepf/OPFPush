@@ -46,13 +46,15 @@ final class Settings {
     private static final String KEY_PENDING_REGISTRATION_PROVIDER = "pending_registration_provider";
     private static final String KEY_PENDING_UNREGISTRATION_PROVIDER = "pending_unregistration_provider";
 
+    private static final String OPF_CORE_POSTFIX = "opfpush";
+
     private static volatile Settings instance;
 
     @NonNull
     private final OPFPreferences preferences;
 
     private Settings(@NonNull final Context context) {
-        preferences = new OPFPreferences(context);
+        preferences = new OPFPreferences(context, OPF_CORE_POSTFIX);
     }
 
     @SuppressWarnings("PMD.NonThreadSafeSingleton")
