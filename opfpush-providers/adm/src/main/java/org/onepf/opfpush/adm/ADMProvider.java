@@ -42,10 +42,10 @@ public class ADMProvider implements PushProvider {
 
     public ADMProvider(@NonNull final Context context) {
         if (Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
-            OPFLog.d("Kindle store app is installed");
+            OPFLog.d("It's an Amazon device.");
             provider = new ADMProviderImpl(context.getApplicationContext());
         } else {
-            OPFLog.d("Kindle store app isn't installed");
+            OPFLog.d("It's no an Amazon device.");
             provider = new ADMProviderStub();
         }
     }
