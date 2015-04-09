@@ -20,7 +20,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
@@ -50,9 +49,12 @@ final class PreferencesProvider {
 
     @NonNull
     public static PreferencesProvider getInstance(@NonNull final Context context) {
-        OPFChecks.checkThread(true);
         if (instance == null) {
-            instance = new PreferencesProvider(context);
+            synchronized (PreferencesProvider.class) {
+                if (instance == null) {
+                    instance = new PreferencesProvider(context);
+                }
+            }
         }
 
         return instance;
