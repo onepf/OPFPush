@@ -18,7 +18,7 @@ package org.onepf.opfpush.unity.model;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 
 import java.util.Map;
 
@@ -29,14 +29,14 @@ import java.util.Map;
 public class NoAvailableProviderEvent {
 
     @NonNull
-    private Map<String, OPFError> registrationErrors;
+    private Map<String, UnrecoverablePushError> pushErrors;
 
-    public NoAvailableProviderEvent(@NonNull final Map<String, OPFError> registrationErrors) {
-        this.registrationErrors = registrationErrors;
+    public NoAvailableProviderEvent(@NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+        this.pushErrors = pushErrors;
     }
 
     @NonNull
-    public Map<String, OPFError> getRegistrationErrors() {
-        return registrationErrors;
+    public Map<String, UnrecoverablePushError> getPushErrors() {
+        return pushErrors;
     }
 }

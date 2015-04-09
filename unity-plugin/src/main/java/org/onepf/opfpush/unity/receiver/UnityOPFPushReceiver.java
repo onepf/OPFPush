@@ -23,8 +23,8 @@ import android.support.annotation.Nullable;
 
 import com.unity3d.player.UnityPlayer;
 
-import org.onepf.opfpush.OPFPushReceiver;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.receiver.OPFPushReceiver;
 import org.onepf.opfpush.unity.model.MessageEvent;
 import org.onepf.opfpush.unity.model.NoAvailableProviderEvent;
 import org.onepf.opfpush.unity.model.RegisteredEvent;
@@ -56,8 +56,7 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFLog.logMethod(UnityOPFPushReceiver.class, "onMessage",
-                context, providerName, OPFUtils.toString(extras));
+        OPFLog.logMethod(context, providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -87,14 +86,14 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFLog.logMethod(UnityOPFPushReceiver.class, "onDeletedMessages", providerName, messagesCount);
+        OPFLog.logMethod(providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFLog.logMethod(UnityOPFPushReceiver.class, "onRegistered", providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
 
         UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, registrationId);
@@ -104,14 +103,14 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
-        OPFLog.logMethod(UnityOPFPushReceiver.class, "onUnregistered", providerName, oldRegistrationId);
+        OPFLog.logMethod(providerName, oldRegistrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
-                                      @NonNull final Map<String, OPFError> registrationErrors) {
-        OPFLog.logMethod(UnityOPFPushReceiver.class, "onNoAvailableProvider", context, registrationErrors);
-        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
+                                      @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+        OPFLog.logMethod(context, pushErrors);
+        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));
     }
 }
