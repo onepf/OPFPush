@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'com.noveogroup.android.check'
+apply plugin: 'jacoco'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -25,8 +26,8 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 21
-        versionName "0.1.5"
+        targetSdkVersion 22
+        versionName "0.2.0"
     }
 
     lintOptions {
@@ -40,10 +41,14 @@ android {
         androidTest.java.srcDirs += 'src/test/java'
 
     }
+
+    jacoco {
+        version "0.7.1.201405082137"
+    }
 }
 
 check {
-    abortOnError false
+    abortOnError true
 
     checkstyle {
         config rootProject.file('config/checkstyle.xml')
@@ -54,6 +59,51 @@ check {
     }
 }
 
+build {
+    doLast {
+        jacocoTestReport.execute()
+    }
+}
+
+jacoco {
+    toolVersion "0.7.1.201405082137"
+}
+
+def coverageSourceDirs = [
+        'src/main/java',
+]
+
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories = fileTree(
+            dir: './build/intermediates/classes/debug',
+            excludes: ['**/R*.class',
+                       '**/*$InjectAdapter.class',
+                       '**/*$ModuleAdapter.class',
+                       '**/*$ViewInjector*.class'
+            ])
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files("$buildDir/jacoco/testDebug.exec")
+    // Bit hacky but fixes https://code.google.com/p/android/issues/detail?id=69174.
+    // We iterate through the compiled .class tree and rename $$ to $.
+    doFirst {
+        new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
+    }
+
+    doLast {
+        println 'Wrote HTML jacoco report to file:' + projectDir + "/build/reports/jacoco/jacocoTestReport/html/index.html"
+    }
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'
@@ -61,11 +111,11 @@ dependencies {
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
     //noinspection NewerVersionAvailable
-    compile 'org.onepf:opfpush:0.1.5@aar'
-    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'org.onepf:opfpush:0.2.0@aar'
+    compile 'com.google.android.gms:play-services-gcm:7.0.0'
 
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
     //noinspection NewerVersionAvailable
-    provided 'org.onepf:opfutils:0.1.15'
+    provided 'org.onepf:opfutils:0.1.20'
 }

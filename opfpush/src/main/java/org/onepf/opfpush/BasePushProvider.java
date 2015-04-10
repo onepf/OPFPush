@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.util.ManifestUtils;
-import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.pushprovider.PushProvider;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFUtils;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
@@ -30,7 +31,7 @@ import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static android.Manifest.permission.WAKE_LOCK;
 
 /**
- * Implements the common functionality of the {@link org.onepf.opfpush.PushProvider} interface.
+ * Implements the common functionality of the {@link org.onepf.opfpush.pushprovider.PushProvider} interface.
  * This class in intended to simplify the {@code PushProvider} implementation.
  *
  * @author Kirill Rozov
@@ -64,9 +65,10 @@ public abstract class BasePushProvider implements PushProvider {
         this.hostAppPackage = hostAppPackage;
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return OPFUtils.isInstalled(appContext, hostAppPackage);
+    public AvailabilityResult getAvailabilityResult() {
+        return new AvailabilityResult(OPFUtils.isInstalled(appContext, hostAppPackage));
     }
 
     @Override
@@ -84,17 +86,15 @@ public abstract class BasePushProvider implements PushProvider {
 
     @Override
     public void checkManifest() {
-        appContext.enforceCallingOrSelfPermission(INTERNET, ManifestUtils.getSecurityExceptionMessage(INTERNET));
-        appContext.enforceCallingOrSelfPermission(RECEIVE_BOOT_COMPLETED,
-                ManifestUtils.getSecurityExceptionMessage(RECEIVE_BOOT_COMPLETED));
-        appContext.enforceCallingOrSelfPermission(WAKE_LOCK, ManifestUtils.getSecurityExceptionMessage(WAKE_LOCK));
-        appContext.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE,
-                ManifestUtils.getSecurityExceptionMessage(ACCESS_NETWORK_STATE));
+        OPFChecks.checkPermission(appContext, INTERNET);
+        OPFChecks.checkPermission(appContext, RECEIVE_BOOT_COMPLETED);
+        OPFChecks.checkPermission(appContext, WAKE_LOCK);
+        OPFChecks.checkPermission(appContext, ACCESS_NETWORK_STATE);
 
-        ReceiverUtils.checkReceiver(appContext, new Intent(Intent.ACTION_BOOT_COMPLETED),
-                BootCompleteReceiver.class.getName(), null);
-        ReceiverUtils.checkReceiver(appContext, new Intent(appContext, RetryBroadcastReceiver.class),
-                RetryBroadcastReceiver.class.getName(), null);
+        OPFChecks.checkReceiver(appContext, BootCompleteReceiver.class.getName(),
+                new Intent(Intent.ACTION_BOOT_COMPLETED));
+        OPFChecks.checkReceiver(appContext, RetryBroadcastReceiver.class.getName(),
+                new Intent(appContext, RetryBroadcastReceiver.class));
     }
 
     @Override

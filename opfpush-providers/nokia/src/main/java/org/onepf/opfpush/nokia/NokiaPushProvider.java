@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.nokia;
 
-import android.support.annotation.StringDef;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.onepf.opfpush.pushprovider.PushProvider;
 
 /**
  * @author Roman Savin
- * @since 25.12.14
+ * @since 23.03.2015
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        OPFConstants.ACTION_RECEIVE,
-        OPFConstants.ACTION_REGISTRATION,
-        OPFConstants.ACTION_UNREGISTRATION,
-        OPFConstants.ACTION_NO_AVAILABLE_PROVIDER
-})
-@interface OPFAction {
+public interface NokiaPushProvider extends PushProvider {
+
+    long getRegisterOnServerLifespan();
+
+    void setRegisteredOnServer(@NonNull final Context context, final boolean flag);
+
+    void setRegisterOnServerLifespan(@NonNull final Context context, final long lifespan);
+
+    boolean isRegisterOnServer();
 }

@@ -1,8 +1,42 @@
 Implementation of [Amazon Device Messaging][1] for OPFPush.
 
+## Download
+
+Download [the latest AAR][adm-latest-aar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-adm:0.2.0@aar'
+```
+    
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-adm</artifactId>
+    <version>0.2.0</version>
+    <type>aar</type>
+</dependency>
+```
+
+You can also use JAR dependency.
+Download [the latest JAR][adm-latest-jar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-adm:0.2.0'
+```
+
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-adm</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## How To Use
 
-Add following permissions to your AndroidManifest.xml file:
+**AndroidManifest**
+
+Add the following permissions to your AndroidManifest.xml file:
 
 ```xml
 <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" />
@@ -11,7 +45,7 @@ Add following permissions to your AndroidManifest.xml file:
     android:protectionLevel="signature" />
 ```
 
-also add following receiver:
+also add the following receiver:
 
 ```xml
 <receiver
@@ -43,10 +77,10 @@ If you use JAR dependency, you also must add to your application AndroidManifest
             android:required="false" />
 
         <service
-            android:name=".ADMService"
+            android:name="org.onepf.opfpush.adm.ADMService"
             android:exported="false" />
 
-        <receiver android:name=".LoginAccountsChangedReceiver">
+        <receiver android:name="org.onepf.opfpush.adm.LoginAccountsChangedReceiver">
 
             <intent-filter>
                 <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED" />
@@ -58,11 +92,25 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 </manifest>
 ```
 
+**Proguard**
+
+Add the following lines to your `proguard-project.txt` file:
+```java
+-dontwarn com.amazon.device.messaging.**
+-keep class com.amazon.device.messaging.** {*;}
+-keep public class * extends com.amazon.device.messaging.ADMMessageReceiver
+-keep public class * extends com.amazon.device.messaging.ADMMessageHandlerBase
+```
+
+**Usage**
+
 To use `ADMProvider` just add it to `Configuration` when building new instance, like this:
 
 ```java
 Configuration.Builder builder = new Configuration.Builder();
-builder.addProviders(new ADMProvider(this));
+builder.addProviders(new ADMProvider(context));
 ```
 
 [1]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
+[adm-latest-aar]: https://todo
+[adm-latest-jar]: https://todo

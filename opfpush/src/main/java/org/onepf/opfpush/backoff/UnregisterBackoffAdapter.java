@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import static org.onepf.opfpush.model.Operation.UNREGISTER;
 final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManager {
 
     @NonNull
-    private Class<T> backoffClass;
+    private final Class<T> backoffClass;
 
     @NonNull
     private final Map<String, Backoff> backoffMap = new HashMap<>();
@@ -45,7 +45,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);
@@ -60,7 +60,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     @Override
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);
@@ -74,7 +74,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         if (backoffMap.containsKey(providerName)) {
             OPFLog.d("Backoff map contains key for provider " + providerName);
@@ -83,6 +83,7 @@ final class UnregisterBackoffAdapter<T extends Backoff> implements BackoffManage
     }
 
     @NonNull
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private Backoff createBackoff() {
         try {
             return backoffClass.newInstance();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,23 +29,25 @@ import org.onepf.opfutils.OPFUtils;
  * @author Roman Savin
  * @since 01.10.14.
  */
+@SuppressWarnings({"PMD.NonThreadSafeSingleton", "PMD.AvoidSynchronizedAtMethodLevel"})
 final class PreferencesProvider {
 
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
 
-    private static final String GCM_POSTFIX = "gcm";
+    private static final String GCM_POSTFIX = "opfpush_gcm";
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
     private static volatile PreferencesProvider instance;
 
-    private OPFPreferences preferences;
+    private final OPFPreferences preferences;
 
     private PreferencesProvider(@NonNull final Context context) {
         preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
+    @NonNull
     public static PreferencesProvider getInstance(@NonNull final Context context) {
         if (instance == null) {
             synchronized (PreferencesProvider.class) {
@@ -60,7 +62,7 @@ final class PreferencesProvider {
 
     @Nullable
     public synchronized String getRegistrationId() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         if (getAppVersion() == OPFUtils.getAppVersion(preferences.getContext())) {
             return preferences.getString(KEY_REGISTRATION_ID);
         } else {
@@ -70,7 +72,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void saveRegistrationId(@Nullable final String registrationId) {
-        OPFLog.methodD(registrationId);
+        OPFLog.logMethod(registrationId);
         saveAppVersion(OPFUtils.getAppVersion(preferences.getContext()));
         if (registrationId == null) {
             preferences.remove(KEY_REGISTRATION_ID);
@@ -80,7 +82,7 @@ final class PreferencesProvider {
     }
 
     public synchronized void reset() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferences.clear();
     }
 
@@ -89,7 +91,7 @@ final class PreferencesProvider {
     }
 
     private void saveAppVersion(final int appVersion) {
-        OPFLog.methodD(appVersion);
+        OPFLog.logMethod(appVersion);
         preferences.put(KEY_APP_VERSION, appVersion);
     }
 }

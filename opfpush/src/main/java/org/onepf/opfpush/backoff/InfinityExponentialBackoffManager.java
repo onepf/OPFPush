@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.onepf.opfpush.backoff;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.model.Operation;
 
@@ -27,7 +28,7 @@ import org.onepf.opfpush.model.Operation;
  */
 public final class InfinityExponentialBackoffManager implements BackoffManager {
 
-    private static InfinityExponentialBackoffManager instance = null;
+    private static volatile InfinityExponentialBackoffManager instance;
 
     @NonNull
     private final BackoffManager registerBackoffAdapter;
@@ -40,7 +41,9 @@ public final class InfinityExponentialBackoffManager implements BackoffManager {
         unregisterBackoffAdapter = new UnregisterBackoffAdapter<>(InfinityExponentialBackoff.class);
     }
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static InfinityExponentialBackoffManager getInstance() {
+        OPFChecks.checkThread(true);
         if (instance == null) {
             instance = new InfinityExponentialBackoffManager();
         }
@@ -50,19 +53,19 @@ public final class InfinityExponentialBackoffManager implements BackoffManager {
 
     public boolean hasTries(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         return getManagerByOperation(operation).hasTries(providerName, operation);
     }
 
     public long getTryDelay(@NonNull final String providerName,
                             @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         return getManagerByOperation(operation).getTryDelay(providerName, operation);
     }
 
     public void reset(@NonNull final String providerName,
                       @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         getManagerByOperation(operation).reset(providerName, operation);
     }
 

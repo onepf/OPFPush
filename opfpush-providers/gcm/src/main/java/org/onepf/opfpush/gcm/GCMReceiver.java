@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public class GCMReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         intent.setComponent(new ComponentName(context, GCMService.class));
         startWakefulService(context, intent);

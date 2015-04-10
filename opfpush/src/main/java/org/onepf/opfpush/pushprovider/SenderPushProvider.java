@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
+package org.onepf.opfpush.pushprovider;
 
-import android.support.annotation.StringDef;
+import android.support.annotation.NonNull;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.onepf.opfpush.model.Message;
 
 /**
+ * PushProvider that can send messages to server.
+ *
  * @author Kirill Rozov
- * @since 24.09.14.
+ * @since 10/13/14.
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        GCMConstants.ERROR_AUTHENTICATION_FAILED,
-        GCMConstants.ERROR_SERVICE_NOT_AVAILABLE
-})
-@interface GCMError {
+public interface SenderPushProvider {
+
+    /**
+     * Send message to server. Method must be consumed async.
+     *
+     * @throws IllegalStateException If try send message when provider isn't registered.
+     */
+    void send(@NonNull Message msg);
 }

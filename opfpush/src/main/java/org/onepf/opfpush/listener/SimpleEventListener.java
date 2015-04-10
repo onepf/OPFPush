@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 
 import java.util.Map;
 
@@ -37,33 +37,33 @@ public class SimpleEventListener implements EventListener {
     public void onMessage(@NonNull Context context,
                           @NonNull String providerName,
                           @Nullable Bundle extras) {
-
+        //nothing
     }
 
     @Override
     public void onDeletedMessages(@NonNull Context context,
                                   @NonNull String providerName,
                                   int messagesCount) {
-
+        //nothing
     }
 
     @Override
     public void onRegistered(@NonNull Context context,
                              @NonNull String providerName,
                              @NonNull String registrationId) {
-
+        //nothing
     }
 
     @Override
     public void onUnregistered(@NonNull Context context,
                                @NonNull String providerName,
                                @Nullable String registrationId) {
-
+        //nothing
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull Context context,
-                                      @NonNull Map<String, OPFError> registrationErrors) {
-
+                                      @NonNull Map<String, UnrecoverablePushError> pushErrors) {
+        //nothing
     }
 }

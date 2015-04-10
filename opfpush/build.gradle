@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'com.noveogroup.android.check'
+apply plugin: 'jacoco'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -26,8 +27,8 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 21
-        versionName "0.1.5"
+        targetSdkVersion 22
+        versionName "0.2.0"
     }
 
     lintOptions {
@@ -40,10 +41,14 @@ android {
     sourceSets {
         androidTest.java.srcDirs += 'src/test/java'
     }
+
+    jacoco {
+        version "0.7.1.201405082137"
+    }
 }
 
 check {
-    abortOnError false
+    abortOnError true
 
     checkstyle {
         config rootProject.file('config/checkstyle.xml')
@@ -63,5 +68,5 @@ dependencies {
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
     //noinspection NewerVersionAvailable
-    provided 'org.onepf:opfutils:0.1.15'
+    provided 'org.onepf:opfutils:0.1.20'
 }

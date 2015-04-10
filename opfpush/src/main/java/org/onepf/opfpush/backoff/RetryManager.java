@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,27 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Pair;
 
+import org.onepf.opfpush.ConnectivityChangeReceiver;
 import org.onepf.opfpush.RetryBroadcastReceiver;
 import org.onepf.opfpush.model.Operation;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.exception.InitException;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 import static android.content.Context.ALARM_SERVICE;
+import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
@@ -42,31 +53,51 @@ import static org.onepf.opfpush.model.Operation.UNREGISTER;
  */
 public final class RetryManager implements BackoffManager {
 
-    private static RetryManager instance = null;
+    private static volatile RetryManager instance;
 
     @NonNull
-    private Context appContext;
+    private final Context appContext;
 
     @NonNull
-    private BackoffManager backoffManager;
+    private final BackoffManager backoffManager;
 
     @NonNull
-    private AlarmManager alarmManager;
+    private final AlarmManager alarmManager;
+
+    private final Set<Pair<String, String>> retryProvidersActions;
+
+    @Nullable
+    private ConnectivityChangeReceiver connectivityChangeReceiver;
 
     private RetryManager(@NonNull final Context context,
                          @NonNull final BackoffManager backoffManager) {
         this.appContext = context.getApplicationContext();
         this.backoffManager = backoffManager;
         this.alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        this.retryProvidersActions = new HashSet<>();
     }
 
     @NonNull
-    public static RetryManager getInstance(@NonNull final Context context,
-                                           @NonNull final BackoffManager backoffManager) {
-        if (instance == null) {
-            instance = new RetryManager(context, backoffManager);
-        }
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
+    public static RetryManager init(@NonNull final Context context,
+                            @NonNull final BackoffManager backoffManager) {
+        OPFChecks.checkThread(true);
+        checkInit(false);
+        return instance = new RetryManager(context, backoffManager);
+    }
+
+    @NonNull
+    public static RetryManager getInstance() {
+        OPFChecks.checkThread(true);
+        checkInit(true);
         return instance;
+    }
+
+    private static void checkInit(final boolean initExpected) {
+        final boolean isInit = instance != null;
+        if (initExpected != isInit) {
+            throw new InitException(isInit);
+        }
     }
 
     @Override
@@ -87,12 +118,12 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void postRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void postRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         postRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
     }
 
@@ -102,21 +133,35 @@ public final class RetryManager implements BackoffManager {
     }
 
     public void cancelRetryRegister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, REGISTER, ACTION_RETRY_REGISTER);
     }
 
     public void cancelRetryUnregister(@NonNull final String providerName) {
-        OPFLog.methodD(providerName);
+        OPFLog.logMethod(providerName);
         cancelRetry(providerName, UNREGISTER, ACTION_RETRY_UNREGISTER);
+    }
+
+    @NonNull
+    public Set<Pair<String, String>> getRetryProvidersActions() {
+        OPFLog.logMethod();
+        return retryProvidersActions;
     }
 
     private void postRetry(@NonNull final String providerName,
                            @NonNull final Operation operation,
                            @NonNull final String action) {
         final long when = System.currentTimeMillis() + getTryDelay(providerName, operation);
-        OPFLog.d("Post retry %s provider '%s' at %s", operation, providerName,
-                SimpleDateFormat.getDateTimeInstance().format(new Date(when)));
+        OPFLog.d("Post retry %s provider '%s' at %s",
+                operation,
+                providerName,
+                SimpleDateFormat.getDateTimeInstance(
+                        DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US
+                ).format(new Date(when))
+        );
+
+        retryProvidersActions.add(new Pair<>(providerName, action));
+        registerConnectivityChangeReceiver();
 
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
         intent.setAction(action);
@@ -134,6 +179,11 @@ public final class RetryManager implements BackoffManager {
                              @NonNull final String action) {
         reset(providerName, operation);
 
+        retryProvidersActions.remove(new Pair<>(providerName, action));
+        if (retryProvidersActions.isEmpty()) {
+            unregisterConnectivityChangeReceiver();
+        }
+
         final Intent intent = new Intent(appContext, RetryBroadcastReceiver.class);
         intent.setAction(action);
 
@@ -141,5 +191,21 @@ public final class RetryManager implements BackoffManager {
                 .getBroadcast(appContext, providerName.hashCode(), intent, 0);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
+    }
+
+    private void registerConnectivityChangeReceiver() {
+        OPFLog.logMethod();
+        if (connectivityChangeReceiver == null) {
+            connectivityChangeReceiver = new ConnectivityChangeReceiver();
+            appContext.registerReceiver(connectivityChangeReceiver, new IntentFilter(CONNECTIVITY_ACTION));
+        }
+    }
+
+    private void unregisterConnectivityChangeReceiver() {
+        OPFLog.logMethod();
+        if (connectivityChangeReceiver != null) {
+            appContext.unregisterReceiver(connectivityChangeReceiver);
+            connectivityChangeReceiver = null;
+        }
     }
 }

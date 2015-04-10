@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 
 import java.util.Map;
 
@@ -81,18 +81,28 @@ public interface EventListener {
      * <p/>
      * A push provider can be unavailable in two common reasons:
      * <ol>
-     * <li>The {@link org.onepf.opfpush.PushProvider#isAvailable()} method has returned false value.</li>
+     * <li>The {@link org.onepf.opfpush.pushprovider.PushProvider#getAvailabilityResult()} method has returned false value.</li>
      * <li>An unrecoverable registration error has occurred.</li>
      * </ol>
      * <p/>
-     * In the second case you can get the {@link org.onepf.opfpush.model.OPFError} object from the {@code registrationErrors}
-     * map. You can notify the user about the occurred error if the error can be resolved by user.
-     * For example if you get the {@link org.onepf.opfpush.model.OPFError#AUTHENTICATION_FAILED} for the GCM push provider,
-     * you can ask the user whether he wants to add the google account.
+     * In the first case an {@link org.onepf.opfpush.model.UnrecoverablePushError} object will be put
+     * to the {@code Map} if {@link org.onepf.opfpush.model.AvailabilityResult#getErrorCode()} is not null.
+     * In other words if a provider returned specific error code while an availability check,
+     * you will get the {@link org.onepf.opfpush.model.UnrecoverablePushError.Type#AVAILABILITY_ERROR}
+     * and the {@link org.onepf.opfpush.model.UnrecoverablePushError#getAvailabilityErrorCode()} will return
+     * not null value.
+     * If a provider is no available because the host app (store) of the provider isn't installed,
+     * you will not get an error for the provider in the {@code Map}.
+     * <p/>
+     * In the second case you can get the {@link org.onepf.opfpush.model.UnrecoverablePushError} object
+     * from the {@code pushErrors} map.
+     * You can notify the user about the occurred error if the error can be resolved by user.
+     * For example if you get the {@link org.onepf.opfpush.model.UnrecoverablePushError.Type#AUTHENTICATION_FAILED}
+     * for the GCM push provider, you can ask the user whether he wants to add the google account.
      *
      * @param context            The application context.
-     * @param registrationErrors The map in which registration errors are stored with a push providers' name as a key
+     * @param pushErrors The map in which registration errors are stored with a push providers' name as a key
      *                           If there is no registration errors, the map is empty.
      */
-    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, OPFError> registrationErrors);
+    void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, UnrecoverablePushError> pushErrors);
 }

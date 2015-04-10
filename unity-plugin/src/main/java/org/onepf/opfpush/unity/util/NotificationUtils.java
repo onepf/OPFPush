@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public final class NotificationUtils {
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final String notificationTitle,
                                         @NonNull final String notificationText) {
-        OPFLog.methodD(NotificationUtils.class, "showNotification",
+        OPFLog.logMethod(NotificationUtils.class, "showNotification",
                 context, notificationTitle, notificationText);
 
 

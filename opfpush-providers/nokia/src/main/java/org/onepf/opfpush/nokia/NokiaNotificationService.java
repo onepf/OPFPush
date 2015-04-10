@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,15 @@ import android.support.annotation.NonNull;
 import com.nokia.push.PushBaseIntentService;
 import com.nokia.push.PushConstants;
 
+import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.model.RecoverablePushError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.model.OPFError;
 
+import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.INVALID_PARAMETERS;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.INVALID_SENDER;
 import static org.onepf.opfpush.nokia.NokiaPushConstants.PROVIDER_NAME;
 
 /**
@@ -51,7 +56,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onRegistered(@NonNull final Context appContext,
                                 @NonNull final String registrationId) {
-        OPFLog.methodD(appContext, registrationId);
+        OPFLog.logMethod(appContext, registrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
     }
 
@@ -64,7 +69,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onUnregistered(@NonNull final Context appContext,
                                   @NonNull final String oldRegistrationId) {
-        OPFLog.methodD(appContext, oldRegistrationId);
+        OPFLog.logMethod(appContext, oldRegistrationId);
         OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, oldRegistrationId);
     }
 
@@ -76,7 +81,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onMessage(@NonNull final Context appContext, @NonNull final Intent intent) {
-        OPFLog.methodD(appContext, intent);
+        OPFLog.logMethod(appContext, intent);
         OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
     }
 
@@ -89,7 +94,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
      */
     @Override
     protected void onDeletedMessages(@NonNull final Context appContext, final int total) {
-        OPFLog.methodD(appContext, total);
+        OPFLog.logMethod(appContext, total);
         OPFPush.getHelper().getReceivedMessageHandler().onDeletedMessages(PROVIDER_NAME, total);
     }
 
@@ -102,7 +107,7 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected void onError(@NonNull final Context appContext,
                            @NonNull @NokiaNotificationsError final String errorId) {
-        OPFLog.methodD(appContext, errorId);
+        OPFLog.logMethod(appContext, errorId);
         OPFPush.getHelper().getReceivedMessageHandler().onError(PROVIDER_NAME, convertError(errorId));
     }
 
@@ -118,24 +123,23 @@ public class NokiaNotificationService extends PushBaseIntentService {
     @Override
     protected boolean onRecoverableError(@NonNull final Context appContext,
                                          @NonNull @NokiaNotificationsError final String errorId) {
-        OPFLog.methodD(appContext, errorId);
+        OPFLog.logMethod(appContext, errorId);
         OPFPush.getHelper().getReceivedMessageHandler()
                 .onRegistrationError(PROVIDER_NAME, convertError(errorId));
         return false;
     }
 
     @NonNull
-    private static OPFError convertError(@NonNull @NokiaNotificationsError String errorId) {
+    private static PushError convertError(@NonNull @NokiaNotificationsError String errorId) {
         switch (errorId) {
-            case PushConstants.ERROR_INVALID_PARAMETERS:
-                return OPFError.INVALID_PARAMETERS;
             case PushConstants.ERROR_SERVICE_NOT_AVAILABLE:
-                return OPFError.SERVICE_NOT_AVAILABLE;
+                return new RecoverablePushError(SERVICE_NOT_AVAILABLE, PROVIDER_NAME, errorId);
+            case PushConstants.ERROR_INVALID_PARAMETERS:
+                return new UnrecoverablePushError(INVALID_PARAMETERS, PROVIDER_NAME, errorId);
             case PushConstants.ERROR_INVALID_SENDER:
-                return OPFError.INVALID_SENDER;
+                return new UnrecoverablePushError(INVALID_SENDER, PROVIDER_NAME, errorId);
             default:
-                OPFLog.e("Unknown Nokia Notification error : " + errorId);
-                return OPFError.UNKNOWN_ERROR;
+                return new UnrecoverablePushError(INVALID_SENDER, PROVIDER_NAME, errorId);
         }
     }
 }

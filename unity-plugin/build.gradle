@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-//apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 21
+        minSdkVersion 15
+        targetSdkVersion 22
         versionCode 2
         versionName "2.0"
     }
@@ -38,11 +37,16 @@ android {
 
 dependencies {
     provided files('libs/unity-engine.jar')
-    compile project(':opfpush-providers:adm')
-    compile project(':opfpush-providers:gcm')
-    compile project(':opfpush-providers:nokia')
+    compile project(':adm')
+    compile(project(':gcm')) {
+        transitive = false
+    }
+    compile project(':nokia')
 
-    compile 'com.google.android.gms:play-services:6.5.87'
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services:7.0.0'
+    compile 'com.nokia:push:1.0'
+    compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'org.onepf:opfutils:0.1.20'
+    provided 'com.amazon:amazon-device-messaging:1.0.1'
 }

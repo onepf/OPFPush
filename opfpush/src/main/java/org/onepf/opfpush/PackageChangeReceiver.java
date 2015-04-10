@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.backoff.RetryManager;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -33,32 +35,47 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
 
     private static final String PACKAGE_URI_PREFIX = "package:";
 
-    @NonNull
-    private PushProvider provider;
-
-    public PackageChangeReceiver(@NonNull final PushProvider provider) {
-        this.provider = provider;
-    }
-
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final OPFPushHelper helper = OPFPush.getHelper();
         final String action = intent.getAction();
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-            final String hostAppPackage = provider.getHostAppPackage();
-            if (hostAppPackage != null && hostAppPackage.equals(getAppPackage(intent))) {
-                OPFLog.d("Host app '%s' of provider '%s' removed.",
-                        hostAppPackage, provider.getName());
-                helper.registerNextAvailableProvider(provider.getName());
+            final String providerName = helper.getProviderNameByHostApp(getAppPackage(intent));
+            if (providerName == null) {
+                return;
             }
-        } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
-            if (context.getPackageName().equals(getAppPackage(intent))) {
-                OPFLog.d("Application updated.");
-                helper.onNeedRetryRegister();
-            }
+            checkCurrentProvider(context, providerName);
+        } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)
+                && context.getPackageName().equals(getAppPackage(intent))) {
+            OPFLog.d("Application updated.");
+            helper.onNeedRetryRegister();
         }
+    }
+
+    private void checkCurrentProvider(@NonNull final Context context,
+                                      @NonNull final String providerName) {
+        final OPFPushHelper helper = OPFPush.getHelper();
+        final PushProvider currentProvider = helper.getCurrentProvider();
+        if (currentProvider == null) {
+            return;
+        }
+
+        final String currentProviderName = currentProvider.getName();
+        if (providerName.equals(currentProviderName)) {
+            OPFLog.i("Host app of provider '%s' has been removed.", currentProviderName);
+            clearSettingsForProvider(context, currentProviderName);
+            RetryManager.getInstance().cancelRetryAllOperations(providerName);
+            helper.registerNextAvailableProvider(currentProviderName);
+        }
+    }
+
+    private void clearSettingsForProvider(@NonNull final Context context,
+                                          @NonNull final String providerName) {
+        final Settings settings = Settings.getInstance(context);
+        settings.removeRegisteringProvider(providerName);
+        settings.removeUnregisteringProvider(providerName);
     }
 
     @Nullable

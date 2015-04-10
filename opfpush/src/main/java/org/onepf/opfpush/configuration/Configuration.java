@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package org.onepf.opfpush.configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.PushProvider;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.listener.EventListener;
 
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ import java.util.Map;
  * @author Roman Savin
  * @since 04.09.2014
  */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
     @NonNull
@@ -105,7 +106,7 @@ public final class Configuration {
         @Nullable
         private EventListener eventListener;
 
-        private boolean isSelectSystemPreferred = false;
+        private boolean isSelectSystemPreferred;
 
         /**
          * See {@link #addProviders(java.util.List)}
@@ -133,12 +134,6 @@ public final class Configuration {
         public Builder addProviders(@NonNull final List<? extends PushProvider> providers) {
             if (providers.isEmpty()) {
                 return this;
-            }
-
-            for (PushProvider provider : providers) {
-                if (provider.isAvailable()) {
-                    provider.checkManifest();
-                }
             }
 
             if (this.providersMap == null) {
@@ -184,6 +179,7 @@ public final class Configuration {
          * @throws java.lang.IllegalArgumentException If there are no any added providers.
          */
         @NonNull
+        @SuppressWarnings("PMD.AccessorClassGeneration")
         public Configuration build() {
             if (providersMap == null) {
                 throw new IllegalArgumentException("Need to add at least one push provider.");

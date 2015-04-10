@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.listener.EventListener;
-import org.onepf.opfpush.model.OPFError;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
@@ -58,7 +58,7 @@ public class DemoEventListener implements EventListener {
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFLog.methodD(providerName, OPFUtils.toString(extras));
+        OPFLog.logMethod(providerName, OPFUtils.toString(extras));
         if (extras == null) {
             return;
         }
@@ -88,14 +88,14 @@ public class DemoEventListener implements EventListener {
     public void onDeletedMessages(@NonNull final Context context,
                                   @NonNull final String providerName,
                                   final int messagesCount) {
-        OPFLog.methodD(providerName, messagesCount);
+        OPFLog.logMethod(providerName, messagesCount);
     }
 
     @Override
     public void onRegistered(@NonNull final Context context,
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
-        OPFLog.methodD(providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
     }
 
@@ -103,14 +103,14 @@ public class DemoEventListener implements EventListener {
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
-        OPFLog.methodD(providerName, registrationId);
+        OPFLog.logMethod(providerName, registrationId);
         EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
-                                      @NonNull final Map<String, OPFError> registrationErrors) {
-        OPFLog.methodD(context, registrationErrors);
-        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
+                                      @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+        OPFLog.logMethod(context, pushErrors);
+        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.State;
+import org.onepf.opfpush.pushprovider.PushProvider;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
+
+import java.util.Locale;
 
 import static org.onepf.opfpush.model.State.UNREGISTERED;
 
@@ -31,11 +35,18 @@ import static org.onepf.opfpush.model.State.UNREGISTERED;
  * @author Roman Savin
  * @since 01.10.14.
  */
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 final class Settings {
 
     private static final String KEY_LAST_PROVIDER_NAME = "last_provider_name";
     private static final String KEY_STATE = "state";
     private static final String KEY_LAST_ANDROID_ID = "android_id";
+    private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
+    private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
+    private static final String KEY_PENDING_REGISTRATION_PROVIDER = "pending_registration_provider";
+    private static final String KEY_PENDING_UNREGISTRATION_PROVIDER = "pending_unregistration_provider";
+
+    private static final String OPF_CORE_POSTFIX = "opfpush";
 
     private static volatile Settings instance;
 
@@ -43,16 +54,14 @@ final class Settings {
     private final OPFPreferences preferences;
 
     private Settings(@NonNull final Context context) {
-        preferences = new OPFPreferences(context);
+        preferences = new OPFPreferences(context, OPF_CORE_POSTFIX);
     }
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static Settings getInstance(@NonNull final Context context) {
+        OPFChecks.checkThread(true);
         if (instance == null) {
-            synchronized (Settings.class) {
-                if (instance == null) {
-                    instance = new Settings(context);
-                }
-            }
+            instance = new Settings(context);
         }
 
         return instance;
@@ -60,7 +69,7 @@ final class Settings {
 
     @NonNull
     public synchronized State getState() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
 
         final int stateValue = preferences.getInt(KEY_STATE, UNREGISTERED.getValue());
         State state = State.fromValue(stateValue);
@@ -74,12 +83,12 @@ final class Settings {
     }
 
     public synchronized void saveState(@NonNull final State state) {
-        OPFLog.methodD(state);
+        OPFLog.logMethod(state);
         preferences.put(KEY_STATE, state.getValue());
     }
 
     public synchronized void clear() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         preferences.clear();
     }
 
@@ -89,7 +98,7 @@ final class Settings {
     }
 
     public synchronized void saveLastProvider(@Nullable final PushProvider provider) {
-        OPFLog.methodD(provider);
+        OPFLog.logMethod(provider);
 
         if (provider == null) {
             preferences.remove(KEY_LAST_PROVIDER_NAME);
@@ -104,12 +113,91 @@ final class Settings {
     }
 
     public synchronized void saveLastAndroidId(@Nullable final String androidId) {
-        OPFLog.methodD(androidId);
+        OPFLog.logMethod(androidId);
 
         if (androidId == null) {
             preferences.remove(KEY_LAST_ANDROID_ID);
         } else {
             preferences.put(KEY_LAST_ANDROID_ID, androidId);
         }
+    }
+
+    public synchronized void saveUnregisteringProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(
+                getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
+                true
+        );
+    }
+
+    public synchronized void removeUnregisteringProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.remove(getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName));
+    }
+
+    public synchronized boolean isProviderUnregistrationPerforming(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        return preferences.getBoolean(
+                getProviderPreferenceKey(KEY_UNREGISTERING_PROVIDER_PREFIX, providerName),
+                false
+        );
+    }
+
+    public synchronized void saveRegisteringProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(
+                getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
+                true
+        );
+    }
+
+    public synchronized void removeRegisteringProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.remove(getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName));
+    }
+
+    public synchronized boolean isProviderRegistrationPerforming(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        return preferences.getBoolean(
+                getProviderPreferenceKey(KEY_REGISTERING_PROVIDER_PREFIX, providerName),
+                false
+        );
+    }
+
+    public synchronized void savePendingRegistrationProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(KEY_PENDING_REGISTRATION_PROVIDER, providerName);
+    }
+
+    public synchronized void removePendingRegistrationProvider() {
+        OPFLog.logMethod();
+        preferences.remove(KEY_PENDING_REGISTRATION_PROVIDER);
+    }
+
+    @Nullable
+    public synchronized String getPendingRegistrationProvider() {
+        OPFLog.logMethod();
+        return preferences.getString(KEY_PENDING_REGISTRATION_PROVIDER);
+    }
+
+    public synchronized void savePendingUnregistrationProvider(@NonNull final String providerName) {
+        OPFLog.logMethod(providerName);
+        preferences.put(KEY_PENDING_UNREGISTRATION_PROVIDER, providerName);
+    }
+
+    public synchronized void removePendingUnregistrationProvider() {
+        OPFLog.logMethod();
+        preferences.remove(KEY_PENDING_UNREGISTRATION_PROVIDER);
+    }
+
+    @Nullable
+    public synchronized String getPendingUnregistrationProvider() {
+        OPFLog.logMethod();
+        return preferences.getString(KEY_PENDING_UNREGISTRATION_PROVIDER);
+    }
+
+    private String getProviderPreferenceKey(@NonNull final String prefix,
+                                            @NonNull final String providerName) {
+        return prefix + providerName.toLowerCase(Locale.US);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import static org.onepf.opfpush.model.Operation.REGISTER;
 final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager {
 
     @NonNull
-    private Backoff registerBackoff;
+    private final Backoff registerBackoff;
 
     public RegisterBackoffAdapter(@NonNull final Class<T> backoffClass) {
         this.registerBackoff = createBackoff(backoffClass);
@@ -38,26 +38,27 @@ final class RegisterBackoffAdapter<T extends Backoff> implements BackoffManager 
 
     @Override
     public boolean hasTries(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         return registerBackoff.hasTries();
     }
 
     @Override
     public long getTryDelay(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         return registerBackoff.getTryDelay();
     }
 
     @Override
     public void reset(@NonNull final String providerName, @NonNull final Operation operation) {
-        OPFLog.methodD(providerName, operation);
+        OPFLog.logMethod(providerName, operation);
         checkOperation(operation);
         registerBackoff.reset();
     }
 
     @NonNull
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     private Backoff createBackoff(@NonNull final Class<T> backoffClass) {
         try {
             return backoffClass.newInstance();

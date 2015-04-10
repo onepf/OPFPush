@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 import org.robolectric.Robolectric;
@@ -45,7 +46,7 @@ public class PreferencesProviderTest extends Assert {
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
     private static final String KEY_AUTHENTICATION_FAILED_FLAG = "authentication_failed_flag";
-    private static final String ADM_POSTFIX = "adm";
+    private static final String ADM_POSTFIX = "opfpush_adm";
 
     private static final Random RND = new Random();
 
@@ -72,7 +73,7 @@ public class PreferencesProviderTest extends Assert {
                 instanceField.setAccessible(true);
                 instanceField.set(null, null);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
+                OPFLog.e(e.getMessage());
             }
         }
     }

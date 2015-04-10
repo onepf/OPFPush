@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush;
+package org.onepf.opfpush.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.MessageType;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -53,9 +53,9 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     @Override
     public final void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
-        @OPFAction final String action = intent.getAction();
+        final String action = intent.getAction();
         switch (action) {
             case ACTION_NO_AVAILABLE_PROVIDER:
                 handleNoAvailableProvider(context, intent);
@@ -74,18 +74,18 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleNoAvailableProvider(@NonNull final Context context,
                                            @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final Bundle extras = intent.getExtras();
         @SuppressWarnings("unchecked")
-        final Map<String, OPFError> registrationErrors =
-                (Map<String, OPFError>) extras.getSerializable(EXTRA_REGISTRATION_ERRORS);
+        final Map<String, UnrecoverablePushError> registrationErrors =
+                (Map<String, UnrecoverablePushError>) extras.getSerializable(EXTRA_REGISTRATION_ERRORS);
         onNoAvailableProvider(context, registrationErrors);
     }
 
     private void handleRegistrationAction(@NonNull final Context context,
                                           @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         onRegistered(
@@ -97,7 +97,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleUnregistrationAction(@NonNull final Context context,
                                             @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         onUnregistered(
@@ -109,7 +109,7 @@ public abstract class OPFPushReceiver extends BroadcastReceiver implements Event
 
     private void handleReceiveAction(@NonNull final Context context,
                                      @NonNull final Intent intent) {
-        OPFLog.methodD(context, OPFUtils.toString(intent));
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
 
         final String providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME);
         final MessageType messageType = (MessageType) intent.getSerializableExtra(EXTRA_MESSAGE_TYPE);

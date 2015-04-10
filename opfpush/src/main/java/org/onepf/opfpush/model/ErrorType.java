@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm.util;
+package org.onepf.opfpush.model;
 
 /**
- * @author Kirill Rozov
+ * This (empty) interface must be implemented by all classes that wish to be used as type of {@link org.onepf.opfpush.model.PushError}.
+ *
  * @author Roman Savin
- * @since 10/9/14.
+ * @since 18.03.2015
  */
-public final class TestConstants {
-
-    private TestConstants() {
-        throw new UnsupportedOperationException();
-    }
-
-    public static final String GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms";
-
-    public static final String SENDER_ID = "12191132";
-
-    public static final String REGISTRATION_ID = "123abc";
-
-    public static final String MESSAGE_EXTRA_KEY = "message";
+public interface ErrorType {
 }

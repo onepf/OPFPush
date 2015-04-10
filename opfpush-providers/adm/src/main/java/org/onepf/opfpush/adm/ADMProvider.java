@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,131 +16,91 @@
 
 package org.onepf.opfpush.adm;
 
-import android.accounts.AccountManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import com.amazon.device.messaging.development.ADMManifest;
-
-import org.onepf.opfpush.BasePushProvider;
-import org.onepf.opfpush.util.ManifestUtils;
-import org.onepf.opfpush.util.ReceiverUtils;
+import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
-import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_APP_REGISTRATION_EVENT;
-import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_RECEIVE_ADM_MESSAGE;
-import static com.amazon.device.messaging.development.ADMManifest.PERMISSION_RECEIVE_MESSAGES;
 import static org.onepf.opfpush.adm.ADMConstants.AMAZON_MANUFACTURER;
-import static org.onepf.opfpush.adm.ADMConstants.KINDLE_STORE_APP_PACKAGE;
-import static org.onepf.opfpush.adm.ADMConstants.PROVIDER_NAME;
-import static org.onepf.opfpush.adm.ADMConstants.RECEIVE_MESSAGE_PERMISSION_SUFFIX;
 
 /**
- * Amazon Device Messaging push provider implementation.
+ * Amazon Device Messaging push provider delegate.
  *
  * @author Kirill Rozov
  * @author Roman Savin
  * @see <a href="https://developer.amazon.com/appsandservices/apis/engage/device-messaging">Amazon Device Messaging</a>
  * @since 06.09.14
  */
-public class ADMProvider extends BasePushProvider {
+public class ADMProvider implements PushProvider {
 
     @NonNull
-    private ADMDelegate adm;
-
-    private PreferencesProvider preferencesProvider;
+    private final PushProvider provider;
 
     public ADMProvider(@NonNull final Context context) {
-        super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE);
-        adm = new ADMDelegate(context);
-        preferencesProvider = PreferencesProvider.getInstance(getContext());
+        if (Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
+            OPFLog.d("It's an Amazon device.");
+            provider = new ADMProviderImpl(context.getApplicationContext());
+        } else {
+            OPFLog.d("It's no an Amazon device.");
+            provider = new ADMProviderStub();
+        }
     }
 
     @Override
     public void register() {
-        OPFLog.methodD();
-        OPFLog.d("Start register ADMProvider.");
-        adm.startRegister();
-    }
-
-    @Override
-    public void checkManifest() {
-        OPFLog.methodD();
-        super.checkManifest();
-        final Context context = getContext();
-        ADMManifest.checkManifestAuthoredProperly(context);
-        context.enforceCallingOrSelfPermission(PERMISSION_RECEIVE_MESSAGES,
-                ManifestUtils.getSecurityExceptionMessage(PERMISSION_RECEIVE_MESSAGES));
-        context.enforceCallingOrSelfPermission(GET_ACCOUNTS,
-                ManifestUtils.getSecurityExceptionMessage(GET_ACCOUNTS));
-        final String admMessagePermission = context.getPackageName() + RECEIVE_MESSAGE_PERMISSION_SUFFIX;
-        context.enforceCallingOrSelfPermission(admMessagePermission,
-                ManifestUtils.getSecurityExceptionMessage(admMessagePermission));
-
-        ManifestUtils.checkService(context, new ComponentName(context, ADMService.class));
-        
-        final Intent registrationBroadcastIntent = new Intent(ACTION_APP_REGISTRATION_EVENT);
-        final Intent receiveBroadcastIntent = new Intent(ACTION_RECEIVE_ADM_MESSAGE);
-        final Intent loginChangedBroadcastIntent = new Intent(AccountManager.LOGIN_ACCOUNTS_CHANGED_ACTION);
-        ReceiverUtils.checkReceiver(context, registrationBroadcastIntent,
-                ADMReceiver.class.getName(), ADMManifest.PERMISSION_SEND_MESSAGES);
-        ReceiverUtils.checkReceiver(context, receiveBroadcastIntent,
-                ADMReceiver.class.getName(), ADMManifest.PERMISSION_SEND_MESSAGES);
-        ReceiverUtils.checkReceiver(context, loginChangedBroadcastIntent,
-                LoginAccountsChangedReceiver.class.getName(), null);
-    }
-
-    @Override
-    public void onRegistrationInvalid() {
-        //nothing
-    }
-
-    @Override
-    public void onUnavailable() {
-        //nothing
-    }
-
-    @Override
-    public boolean isRegistered() {
-        OPFLog.methodD();
-        return !TextUtils.isEmpty(getRegistrationId());
+        provider.register();
     }
 
     @Override
     public void unregister() {
-        OPFLog.methodD();
-        OPFLog.i("Start unregister ADMProvider.");
-        adm.startUnregister();
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return super.isAvailable()
-                && adm.isSupported()
-                && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
-    }
-
-    @Override
-    @Nullable
-    public String getRegistrationId() {
-        OPFLog.methodD();
-        if (!TextUtils.isEmpty(adm.getRegistrationId())) {
-            OPFLog.d("ADM registration id is not empty");
-            return adm.getRegistrationId();
-        }
-
-        return preferencesProvider.getRegistrationId();
+        provider.unregister();
     }
 
     @NonNull
     @Override
-    public String toString() {
-        return PROVIDER_NAME;
+    public AvailabilityResult getAvailabilityResult() {
+        return provider.getAvailabilityResult();
+    }
+
+    @Override
+    public boolean isRegistered() {
+        return provider.isRegistered();
+    }
+
+    @Nullable
+    @Override
+    public String getRegistrationId() {
+        return provider.getRegistrationId();
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return provider.getName();
+    }
+
+    @Nullable
+    @Override
+    public String getHostAppPackage() {
+        return provider.getHostAppPackage();
+    }
+
+    @Override
+    public void checkManifest() {
+        provider.checkManifest();
+    }
+
+    @Override
+    public void onRegistrationInvalid() {
+        provider.onRegistrationInvalid();
+    }
+
+    @Override
+    public void onUnavailable() {
+        provider.onUnavailable();
     }
 }

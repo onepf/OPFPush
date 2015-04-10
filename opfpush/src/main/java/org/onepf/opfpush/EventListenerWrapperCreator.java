@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.EventListener;
-import org.onepf.opfpush.model.OPFError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -58,7 +59,7 @@ final class EventListenerWrapperCreator {
     static EventListener getEventListenerWrapper(
             @Nullable final EventListener eventListener
     ) {
-        OPFLog.methodD(eventListener);
+        OPFLog.logMethod(eventListener);
 
         if (eventListener != null) {
             return createMainLooperWrapper(eventListener);
@@ -69,18 +70,18 @@ final class EventListenerWrapperCreator {
 
     @NonNull
     private static EventListener createMainLooperWrapper(@NonNull final EventListener eventListener) {
-        OPFLog.methodD(eventListener);
+        OPFLog.logMethod(eventListener);
         return new EventListener() {
 
             private final Handler handler = new Handler(Looper.getMainLooper());
-            
+
             @Override
             public void onMessage(
                     @NonNull final Context context,
                     @NonNull final String providerName,
                     @Nullable final Bundle extras
             ) {
-                handler.post(new Runnable() {
+                post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onMessage(%1$s, %2$s)", providerName, extras);
@@ -95,7 +96,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     final int messagesCount
             ) {
-                handler.post(new Runnable() {
+                post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onDeletedMessages(%1$s, %2$s)", providerName, messagesCount);
@@ -110,7 +111,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     @NonNull final String registrationId
             ) {
-                handler.post(new Runnable() {
+                post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onRegistered(%1$s, %2$s)", providerName, registrationId);
@@ -125,7 +126,7 @@ final class EventListenerWrapperCreator {
                     @NonNull final String providerName,
                     @Nullable final String registrationId
             ) {
-                handler.post(new Runnable() {
+                post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onUnregistered(%1$s, %2$s)", providerName, registrationId);
@@ -137,21 +138,29 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, OPFError> registrationErrors) {
-                handler.post(new Runnable() {
+                    @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+                post(new Runnable() {
                     @Override
                     public void run() {
                         OPFLog.d("Post onNoAvailableProvider()");
-                        eventListener.onNoAvailableProvider(context, registrationErrors);
+                        eventListener.onNoAvailableProvider(context, pushErrors);
                     }
                 });
+            }
+
+            private void post(@NonNull final Runnable runnable) {
+                if (OPFUtils.isMainThread()) {
+                    runnable.run();
+                } else {
+                    handler.post(runnable);
+                }
             }
         };
     }
 
     @NonNull
     private static EventListener createBroadcastSender() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         return new EventListener() {
             @Override
             public void onMessage(
@@ -214,12 +223,12 @@ final class EventListenerWrapperCreator {
             @Override
             public void onNoAvailableProvider(
                     @NonNull final Context context,
-                    @NonNull final Map<String, OPFError> registrationErrors
+                    @NonNull final Map<String, UnrecoverablePushError> pushErrors
             ) {
                 OPFLog.d("SendBroadcast onNoAvailableProvider()");
                 final Intent intent = new Intent(ACTION_NO_AVAILABLE_PROVIDER);
                 final Bundle extras = new Bundle();
-                extras.putSerializable(EXTRA_REGISTRATION_ERRORS, (Serializable) registrationErrors);
+                extras.putSerializable(EXTRA_REGISTRATION_ERRORS, (Serializable) pushErrors);
                 intent.putExtras(extras);
                 context.sendBroadcast(intent);
             }

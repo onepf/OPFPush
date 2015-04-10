@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        OPFLog.setEnabled(true);
-        OPFLog.methodD();
+        OPFLog.setEnabled(BuildConfig.DEBUG, true);
+        OPFLog.logMethod();
 
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
