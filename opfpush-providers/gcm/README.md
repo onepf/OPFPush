@@ -1,10 +1,42 @@
 [Google Cloud Messaging][1] implementation for OPFPush.
 
+## Download
+
+Download [the latest AAR][gcm-latest-aar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-gcm:0.2.0@aar'
+```
+    
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-gcm</artifactId>
+    <version>0.2.0</version>
+    <type>aar</type>
+</dependency>
+```
+
+You can also use JAR dependency.
+Download [the latest JAR][gcm-latest-jar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-gcm:0.2.0'
+```
+
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-gcm</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## How To Use
 
 **AndroidManifest**
 
-Add following permissions to your AndroidManifest.xml file:
+Add the following permissions to your AndroidManifest.xml file:
 
 ```xml
 <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
@@ -13,7 +45,7 @@ Add following permissions to your AndroidManifest.xml file:
     android:protectionLevel="signature" />
 ```
 
-also add following receiver:
+also add the following receiver:
 
 ```xml
 <receiver
@@ -39,11 +71,11 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 
 <application>
     <service
-        android:name=".GCMService"
+        android:name="org.onepf.opfpush.gcm.GCMService"
         android:exported="false" />
 
     <service
-        android:name=".SendMessageService"
+        android:name="org.onepf.opfpush.gcm.SendMessageService"
         android:exported="false" />
 
 </application>
@@ -55,7 +87,9 @@ To use `GCMProvider` just add it to `Configuration` when building new instance, 
 
 ```java
 Configuration.Builder builder = new Configuration.Builder();
-builder.addProviders(new GCMProvider(this, GCM_SENDER_ID));
+builder.addProviders(new GCMProvider(context, GCM_SENDER_ID));
 ```
 
 [1]: https://developer.android.com/google/gcm/index.html
+[gcm-latest-aar]: http://todo
+[gcm-latest-jar]: http://todo

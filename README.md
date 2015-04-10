@@ -1,13 +1,14 @@
-# OPFPush (alpha)
+# OPFPush
 
-The project is under development.
+OPFPush is an open source library which provides an easy way for developers to integrate android 
+push notifications into their apps.
 
-Currently OPFPush is a library that wraps Google Cloud Messaging, Nokia Notification Push,
-Amazon Device Messaging and has possibility to integrate new push service.
+Currently OPFPush supports the following push providers: [Google Cloud Messaging][google-cloud-messaging],
+[Nokia Notification Push][nokia-notifications], [Amazon Device Messaging][amazon-device-messaging] and
+provides possibility to use the system push provider for a specific device.
 
 
 ## Table Of Contents
-
 - [Download](#user-content-download)
 - [How To Use](#user-content-how-to-use)
 - [Using of OPFPushReceiver](#user-content-using-of-opfpushreceiver)
@@ -20,201 +21,155 @@ Amazon Device Messaging and has possibility to integrate new push service.
 
 ## Download
 
-Download [the latest AAR][opfpush-latest-aar] or [the latest JAR][opfpush-latest-jar]. Also you can grab it via Gradle.
-For AAR dependency (you also must add OPFUtils dependency):
-```groovy
-compile 'org.onepf:opfpush:0.1.5@aar'
-compile 'org.onepf:opfutils:0.1.15@aar'
-```
-for JAR dependency:
-```groovy
-compile 'org.onepf:opfpush:0.1.5'
-```
+1. To use OPFPush you must add to your dependencies [OPFUtils library][opfutils].
+   Download [the latest AAR][opfpush-latest-aar] of OPFPush and [the latest JAR][opfutils-latest-jar]
+   or grab it via Gradle:
+   ```groovy
+   compile 'org.onepf:opfpush:0.2.0@aar'
+   compile 'org.onepf:opfutils:0.1.20'
+   ```
 
-or Maven:
-```xml
-<dependency>
-    <groupId>org.onepf</groupId>
-    <artifactId>opfpush</artifactId>
-    <version>0.1.5</version>
-    <type>aar</type>
-</dependency>
-```
-for JAR dependency:
-```xml
-<dependency>
-    <groupId>org.onepf</groupId>
-    <artifactId>opfpush</artifactId>
-    <version>0.1.5</version>
-</dependency>
-```
+   or Maven:
+   ```xml
+   <dependency>
+      <groupId>org.onepf</groupId>
+      <artifactId>opfpush</artifactId>
+      <version>0.2.0</version>
+      <type>aar</type>
+   </dependency>
+   <dependency>
+       <groupId>org.onepf</groupId>
+       <artifactId>opfutils</artifactId>
+       <version>0.1.20</version>
+   </dependency>
+   ```
 
+   You also can use JAR dependency. See [the following section][jar-dependency-using].
+
+2. Add specific dependencies for each used push provider that you can find in the 
+   section [Implemented Push Services](#user-content-implemented-push-services).
 
 ## How To Use
 
 **Project files setup**
 
-Before setup `OPFPush` you must setup your project files.
+1. Add specific permissions and receivers to the AndroidManifest.xml file for each used push provider. 
+   You can find more information in README.md files of implemented providers. 
+   See the section [Implemented Push Services](#user-content-implemented-push-services).
 
-1. If you use JAR dependencies add to your AndroidManifest.xml file the following permissions:
-    ```xml   
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    ```
-    
-   and the following receivers:
-    ```xml
-    <receiver android:name="org.onepf.opfpush.BootCompleteReceiver">
-        <intent-filter>
-            <action android:name="android.intent.action.BOOT_COMPLETED"/>
-        </intent-filter>
-    </receiver>
-
-    <receiver android:name="org.onepf.opfpush.PackageChangeReceiver">
-        <intent-filter>
-            <action android:name="android.intent.action.PACKAGE_REPLACED" />
-            <action android:name="android.intent.action.PACKAGE_REMOVED" />
-
-            <data android:scheme="package" />
-        </intent-filter>
-    </receiver>
-
-    <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
-    ```
-
-2. Add for each used providers specific changes that you can find in provider README.md file. See section [Implemented Push Services](#user-content-implemented-push-services).
-
-3. Add the following line to your `proguard-project.txt` file:
+2. Add the following line to your `proguard-project.txt` file:
     ```
     -dontwarn edu.umd.cs.findbugs.annotations.*
     ```
-   Also add the proguard rules specific for the each used provider that you can find in provider README.md file.
-   See section [Implemented Push Services](#user-content-implemented-push-services).
+3. Add the proguard rules specific for the each used push provider that you can find in provider README.md file.
+   See the section [Implemented Push Services](#user-content-implemented-push-services).
    
 **OPFPush setup**
 
-You can setup `OPFPush` following steps:
+To setup `OPFPush` add the following peace of code to your `Application.onCreate()` method:
+```java
+//Enable OPFLogs:
+OPFLog.setEnabled(BuildConfig.DEBUG, true); //debug logs will be enabled only in debug build.
+//Create Configuration object:
+Configuration.Builder builder = new Configuration.Builder();
+//Add push providers that you want to use.
+builder.addProviders( 
+   new GCMProvider(this, GCM_SENDER_ID),
+   new ADMProvider(this),
+   new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
+)
+.setSelectSystemPreferred(true) //Select the system push provider for a specific device. (false by default).
+.setEventListener(new PushEventListener(this)); //An implementation of EventListener interface.
+Configuration configuration = builder.build();
+//Init OPFPush using the created Configuration object:
+OPFPush.init(this, configuration);
+//Start registration.
+OPFPush.getHelper().register();
+```
 
-1. Create `Configuration` object:
+You'll get the registration id into `EventListener.onRegistered()` callback.
+After registration you'll start receiving push messages into `EventListener.onMessage()` callback.
 
-    ```java
-    Configuration.Builder builder = new Configuration.Builder();
-    builder.addProviders(new GCMProvider(this, GCM_SENDER_ID))
-           .addProviders(
-               new GCMProvider(this, GCM_SENDER_ID),
-               new ADMProvider(this),
-               new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
-           )
-           .setSelectSystemPreferred(true)
-           .setEventListener(new PushEventListener(this));
-    Configuration configuration = builder.build();
-    ```
-
-2. Init `OPFPush` using created `Configuration` object:
-
-    ```java
-    //Init OPFPush.
-    OPFPush.init(this, configuration);
-    ```
-
-    Preferred place to init `OPFPush` is the `Application` class of your app.
-
-3. Register `OPFPushHelper`:
-
-    ```java
-    //Start registration.
-    OPFPush.getHelper().register();
-    ```
-
-4. You can enable logging by call (by default it off):
-    ```java
-    OPFLog.setEnabled(true);
-    ```
+If you want to start using GCM in your application but don't know how. See [the easiest way][easiest-gcm]
+to implement GCM using OPFPush library.
 
 ##Using of OPFPushReceiver
 
 You can use `BroadcastReceiver` instead of `EventListener` for receiving push events. 
-Just extend `OPFPushReceiver` and add your receiver to AndroidManifest.xml with the following intent filter:
-
-```xml
-<receiver
-    android:name="[YOUR_RECEIVER_NAME]"
-    android:exported="false">
-    
-        <intent-filter>
-            <action android:name="org.onepf.opfpush.intent.NO_AVAILABLE_PROVIDER" />
-            <action android:name="org.onepf.opfpush.intent.RECEIVE" />
-            <action android:name="org.onepf.opfpush.intent.REGISTRATION" />
-            <action android:name="org.onepf.opfpush.intent.UNREGISTRATION" />
-        </intent-filter>
-
-</receiver>
-```
-
-**IMPORTANT** You can't use `EventListener` and `OPFPushReceiver` in the same project.
-
+See [the following section][opfpush-receiver-section]
 
 ## Implemented Push Services
 
-1. [Google Cloud Messaging][google-cloud-messaging]. See [GCM provider][opfpush-gcm].
-2. [Amazon Device Messaging][amazon-device-messaging]. See [ADM provider][opfpush-adm].
-3. [Nokia Notifications][nokia-notifications]. See [Nokia Notifications provider][opfpush-nokia].
+1. [Google Cloud Messaging][google-cloud-messaging].
+    Download [the latest AAR][gcm-latest-aar] or grab via Gradle:
+    ```groovy
+    compile 'org.onepf:opfpush-gcm:0.2.0@aar'
+    ```
+    
+    or Maven:
+    ```xml
+    <dependency>
+        <groupId>org.onepf</groupId>
+        <artifactId>opfpush-gcm</artifactId>
+        <version>0.2.0</version>
+        <type>aar</type>
+    </dependency>
+    ```
+    
+    See [GCM provider][opfpush-gcm] for more information .
+    
+2. [Amazon Device Messaging][amazon-device-messaging].
+    Download [the latest AAR][adm-latest-aar] or grab via Gradle:
+    ```groovy
+    compile 'org.onepf:opfpush-adm:0.2.0@aar'
+    ```
+    
+    or Maven:
+    ```xml
+    <dependency>
+        <groupId>org.onepf</groupId>
+        <artifactId>opfpush-adm</artifactId>
+        <version>0.2.0</version>
+        <type>aar</type>
+    </dependency>
+    ```
+    
+    See [ADM provider][opfpush-adm] for more information.
+    
+3. [Nokia Notifications][nokia-notifications].
+    Download [the latest AAR][nokia-latest-aar] or grab via Gradle:
+    ```groovy
+    compile 'org.onepf:opfpush-nokia:0.2.0@aar'
+    ```
+        
+    or Maven:
+    ```xml
+    <dependency>
+        <groupId>org.onepf</groupId>
+        <artifactId>opfpush-nokia</artifactId>
+        <version>0.2.0</version>
+        <type>aar</type>
+    </dependency>
+    ```
 
+    See [Nokia Notifications provider][opfpush-nokia] for more information.
 
 ## Create Custom Push Provider
 
-For create custom Push Provider you must create class that implement `PushProvider` interface.
-Common functionality contains in `BasePushProvider` class, and we recommend subclass this class.
-
-All provider has <i>Host Application</i>. Host application this is application that provider
-push service work, such contains services, describe permission ant etc.
-Usually this is store application, like Google Play Store for Google Cloud Messaging.
-
-Requirements for custom Push Provider:
-
-1. `register()` and `unregister()` method must execute asynchronously.
-2. `isAvailable()` method must check device state for that provider has possibility to register,
-    but this no mean that it registration can finish successfully.
-3. `isRegistered()` method must return true if provider is registered and false otherwise.
-4. `getRegistrationId()` method must return not null string only when it registered.
-    In all other cases this method must return `null`.
-5. `getName()` method must always return unique not null string for all using providers.
-6. `getHostAppPackage()` method must return not null string with package of host application
-    of push service.
-7. `checkManifest()` method must check that all needed permissions, data and
-   components described in manifests.
-8. When `onRegistrationInvalid()` or `onUnavailable` method called
-   you must reset all data about registration.
-
-Provider notify `OPFPushHelper` about registration, or unregistration, or other events by
-call methods in `ReceivedMessageHandler` class, such `onRegistered()` or `onMessage()`.
-You can get `ReceivedMessageHandler` object with call `OPFPush.getHelper().getReceivedMessageHandler()`.
-
-For notify about successful registration or unregistration result you must call `ReceivedMessageHandler.onRegistered()` or `ReceivedMessageHandler.onUnregistered()`.
-
-For notify about error of registration or unregistration you must call `ReceivedMessageHandler.onRegistrationError()` or `ReceivedMessageHandler.onUnregistrationError()`.
-If you don't know what operation caused an error you must call `ReceivedMessageHandler.onError()`. `OPFPushHelper` chooses right callback method relying on current state in this case.
-
-For notify about receive new message call `ReceivedMessageHandler.onMessage()`.
-
-Some provider can notify about deleted messages with call `ReceivedMessageHandler.onDeletedMessages()`.
-Not all providers that can notify about this event can provide delete messages count.
-For unknown count pass value `OPFConstants.MESSAGES_COUNT_UNKNOWN` as argument `messagesCount`.
-
+To create a custom push provider see [the following section][custom-push-provider].
 
 ## Comparison of most popular push services
 
 | Criteria                            | GCM   | ADM   | Nokia Notifications | OPFPush     |
 | :---------------------------------- | :---: | :---: | :-----------------: | :---------: |
 | Receive messages                    |   +   |   +   |          +          |      +      |
+| Asynchronous registration and unregistration |   -   |   +   |          +          |      +      |
 | Retry register on fail              |   -   |   +   |          +          |      +      |
 | Retry register on fail after reboot |   -   |   -   |          -          |      +      |
 | Retry unregister on fail            |   -   |   -   |          -          |      +      |
 | Check is registration valid on boot |   -   |   -   |          -          |      +      |
 | Retry register after updating app version |   -   |   -   |          -          |      +      |
-| Retry register after updating android os |   -   |   -   |          -          |      +      |
+| Retry register after changing [ANDROID_ID][android-id] |   -   |   -   |          -          |      +      |
 
 
 
@@ -238,12 +193,17 @@ For unknown count pass value `OPFConstants.MESSAGES_COUNT_UNKNOWN` as argument `
 [google-cloud-messaging]: https://developer.android.com/google/gcm
 [amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
+[opfutils]: https://github.com/onepf/OPFUtils
+[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.20/opfutils-0.1.20.jar
+[jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies
+[opfpush-receiver-section]: https://github.com/onepf/OPFPush/wiki/Using-of-OPFPushReceiver
+[custom-push-provider]: https://github.com/onepf/OPFPush/wiki/Create-custom-push-provider
+[android-id]: http://developer.android.com/reference/android/provider/Settings.Secure.html#ANDROID_ID
 [opfpush-gcm]: ./opfpush-providers/gcm
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
-[new-build-system]: http://tools.android.com/tech-docs/new-build-system
-[opfpush-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.jar
-[openpush-site]: http://www.onepf.org/openpush/
-[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.1.5/opfpush-0.1.5.aar
-[aar-format-docs]: http://tools.android.com/tech-docs/new-build-system/aar-format
-[BroadcastMessageListener.java]: ./samples/gcm_migrate_sample/src/main/java/org/onepf/opfpush/gcm_migrate_sample/BroadcastMessageListener.java
+[opfpush-latest-aar]: http://todo
+[gcm-latest-aar]: http://todo
+[adm-latest-aar]: http://todo
+[nokia-latest-aar]: http://todo
+[easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM
