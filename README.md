@@ -202,8 +202,8 @@ To create a custom push provider see [the following section][custom-push-provide
 [opfpush-gcm]: ./opfpush-providers/gcm
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
-[opfpush-latest-aar]: http://todo
-[gcm-latest-aar]: http://todo
-[adm-latest-aar]: http://todo
-[nokia-latest-aar]: http://todo
+[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-0.2.0.aar
+[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-gcm-0.2.0.aar
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.aar
+[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-nokia-0.2.0.aar
 [easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM

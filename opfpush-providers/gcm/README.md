@@ -91,5 +91,5 @@ builder.addProviders(new GCMProvider(context, GCM_SENDER_ID));
 ```
 
 [1]: https://developer.android.com/google/gcm/index.html
-[gcm-latest-aar]: http://todo
-[gcm-latest-jar]: http://todo
+[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-gcm-0.2.0.aar
+[gcm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-gcm-0.2.0.jar

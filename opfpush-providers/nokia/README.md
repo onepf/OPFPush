@@ -84,5 +84,5 @@ builder.addProviders(new NokiaNotificationsProvider(context, NOKIA_NOTIFICATION_
 ```
 
 [Nokia Notifications Page]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
-[nokia-latest-aar]: http://todo
-[nokia-latest-jar]: http://todo
+[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-nokia-0.2.0.aar
+[nokia-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-nokia-0.2.0.jar
