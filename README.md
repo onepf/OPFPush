@@ -1,9 +1,9 @@
 # OPFPush
 
 OPFPush is an open source library which provides an easy way for developers to integrate android 
-push notifications to their apps.
+push notifications into their apps.
 
-Currently OPFPush wraps the following push providers: [Google Cloud Messaging][google-cloud-messaging],
+Currently OPFPush supports the following push providers: [Google Cloud Messaging][google-cloud-messaging],
 [Nokia Notification Push][nokia-notifications], [Amazon Device Messaging][amazon-device-messaging] and
 provides possibility to use the system push provider for a specific device.
 
