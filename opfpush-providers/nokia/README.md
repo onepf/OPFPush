@@ -1,10 +1,42 @@
 [Nokia Notifications][Nokia Notifications Page] implementation for OPFPush.
 
+## Download
+
+Download [the latest AAR][nokia-latest-aar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-nokia:0.2.0@aar'
+```
+        
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-nokia</artifactId>
+    <version>0.2.0</version>
+    <type>aar</type>
+</dependency>
+```
+
+You can also use JAR dependency.
+Download [the latest JAR][nokia-latest-jar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-nokia:0.2.0'
+```
+
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-nokia</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## How To Use
 
 **AndroidManifest**
 
-Add following permissions to your AndroidManifest.xml file:
+Add the following permissions to your AndroidManifest.xml file:
 
 ```xml
 <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
@@ -13,7 +45,7 @@ Add following permissions to your AndroidManifest.xml file:
     android:protectionLevel="signature" />
 ```
 
-also add following receiver:
+also add the following receiver:
 
 ```xml
 <receiver
@@ -37,7 +69,7 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 
 <application>
     <service
-        android:name=".NokiaNotificationService"
+        android:name="org.onepf.opfpush.nokia.NokiaNotificationService"
         android:exported="false"/>
 </application>
 ```
@@ -48,7 +80,9 @@ To use `NokiaNotificationsProvider` just add it to `Configuration` when building
 
 ```java
 Configuration.Builder builder = new Configuration.Builder();
-builder.addProviders(new NokiaNotificationsProvider(this, NOKIA_NOTIFICATION_SENDER_ID));
+builder.addProviders(new NokiaNotificationsProvider(context, NOKIA_NOTIFICATION_SENDER_ID));
 ```
 
 [Nokia Notifications Page]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
+[nokia-latest-aar]: http://todo
+[nokia-latest-jar]: http://todo
