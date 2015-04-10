@@ -5,7 +5,7 @@ push notifications to their apps.
 
 Currently OPFPush wraps the following push providers: [Google Cloud Messaging][google-cloud-messaging],
 [Nokia Notification Push][nokia-notifications], [Amazon Device Messaging][amazon-device-messaging] and
-provides possibility to use a system system push provider for a specific device.
+provides possibility to use the system push provider for a specific device.
 
 
 ## Table Of Contents
@@ -44,7 +44,7 @@ provides possibility to use a system system push provider for a specific device.
    </dependency>
    ```
 
-   You also can use JAR dependency. Read about it the following [section][jar-dependency-using].
+   You also can use JAR dependency. See [the following section][jar-dependency-using].
 
 2. Add specific dependencies for each used push provider that you can find in the 
    section [Implemented Push Services](#user-content-implemented-push-services).
@@ -62,46 +62,41 @@ provides possibility to use a system system push provider for a specific device.
     -dontwarn edu.umd.cs.findbugs.annotations.*
     ```
 3. Add the proguard rules specific for the each used push provider that you can find in provider README.md file.
-   See section [Implemented Push Services](#user-content-implemented-push-services).
+   See the section [Implemented Push Services](#user-content-implemented-push-services).
    
 **OPFPush setup**
 
 To setup `OPFPush` add the following peace of code to your `Application.onCreate()` method:
-
-    ```java
-    //Enable OPFLogs:
-    OPFLog.setEnabled(BuildConfig.DEBUG, true); //debug logs will be enabled only in debug build.
-    
-    //Create Configuration object:
-    Configuration.Builder builder = new Configuration.Builder();
-    
-    //Add push providers that you want to use.
-    builder.addProviders( 
-               new GCMProvider(this, GCM_SENDER_ID),
-               new ADMProvider(this),
-               new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
-           )
-           .setSelectSystemPreferred(true) //Select the system push provider for a specific device. (false by default).
-           .setEventListener(new PushEventListener(this)); //An implementation of EventListener interface.
-    Configuration configuration = builder.build();
-    
-    //Init OPFPush using the created Configuration object:
-    OPFPush.init(this, configuration);
-    
-    //Start registration.
-    OPFPush.getHelper().register();
-    ```
+```java
+//Enable OPFLogs:
+OPFLog.setEnabled(BuildConfig.DEBUG, true); //debug logs will be enabled only in debug build.
+//Create Configuration object:
+Configuration.Builder builder = new Configuration.Builder();
+//Add push providers that you want to use.
+builder.addProviders( 
+   new GCMProvider(this, GCM_SENDER_ID),
+   new ADMProvider(this),
+   new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
+)
+.setSelectSystemPreferred(true) //Select the system push provider for a specific device. (false by default).
+.setEventListener(new PushEventListener(this)); //An implementation of EventListener interface.
+Configuration configuration = builder.build();
+//Init OPFPush using the created Configuration object:
+OPFPush.init(this, configuration);
+//Start registration.
+OPFPush.getHelper().register();
+```
 
 You'll get the registration id into `EventListener.onRegistered()` callback.
 After registration you'll start receiving push messages into `EventListener.onMessage()` callback.
 
-If you want to start using GCM in your application but don't know how. See [the easiest way]
+If you want to start using GCM in your application but don't know how. See [the easiest way][easiest-gcm]
 to implement GCM using OPFPush library.
 
 ##Using of OPFPushReceiver
 
 You can use `BroadcastReceiver` instead of `EventListener` for receiving push events. 
-See the following [section][opfpush-receiver-section]
+See [the following section][opfpush-receiver-section]
 
 ## Implemented Push Services
 
@@ -161,7 +156,7 @@ See the following [section][opfpush-receiver-section]
 
 ## Create Custom Push Provider
 
-To create a custom push provider see the following [section][custom-push-provider].
+To create a custom push provider see [the following section][custom-push-provider].
 
 ## Comparison of most popular push services
 
@@ -200,7 +195,7 @@ To create a custom push provider see the following [section][custom-push-provide
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
 [opfutils]: https://github.com/onepf/OPFUtils
 [opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.20/opfutils-0.1.20.jar
-[jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies.
+[jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies
 [opfpush-receiver-section]: https://github.com/onepf/OPFPush/wiki/Using-of-OPFPushReceiver
 [custom-push-provider]: https://github.com/onepf/OPFPush/wiki/Create-custom-push-provider
 [android-id]: http://developer.android.com/reference/android/provider/Settings.Secure.html#ANDROID_ID
@@ -211,3 +206,4 @@ To create a custom push provider see the following [section][custom-push-provide
 [gcm-latest-aar]: http://todo
 [adm-latest-aar]: http://todo
 [nokia-latest-aar]: http://todo
+[easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM
