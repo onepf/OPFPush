@@ -28,7 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfpush.mock.MockNamePushProvider;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.robolectric.RobolectricTestRunner;
@@ -36,13 +35,17 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
+import static org.onepf.opfpush.testutil.Util.NUM_PROVIDERS;
+import static org.onepf.opfpush.testutil.Util.NUM_TESTS;
+import static org.onepf.opfpush.testutil.Util.RANDOM_STRING_LENGTH;
+import static org.onepf.opfpush.testutil.Util.getRandomPushProviders;
+import static org.onepf.opfpush.testutil.Util.getRandomStrings;
+import static org.onepf.opfpush.testutil.Util.shuffleStringArray;
 
 /**
  * @author antonpp
@@ -50,7 +53,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
  */
 @Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
-@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions"})
+@SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions", "PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsTest extends Assert {
 
     private static final String LOG_TAG = SettingsTest.class.getSimpleName();
@@ -65,13 +68,9 @@ public class SettingsTest extends Assert {
 
     private static final String OPF_CORE_POSTFIX = "opfpush";
 
-    private static final int NUM_TESTS = 100;
-    private static final int NUM_PROVIDERS = 100;
-    private static final int RANDOM_STRING_LENGTH = 16;
-
     private static final Random RND = new Random();
 
-    private MockNamePushProvider[] pushProviders;
+    private PushProvider[] pushProviders;
     private SharedPreferences sharedPreferences;
     private Settings settings;
 
@@ -81,10 +80,7 @@ public class SettingsTest extends Assert {
         sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName() + "." + OPF_CORE_POSTFIX,
                 Context.MODE_MULTI_PROCESS);
         settings = Settings.getInstance(ctx);
-        pushProviders = new MockNamePushProvider[NUM_PROVIDERS];
-        for (int i = 0; i < NUM_PROVIDERS; ++i) {
-            pushProviders[i] = new MockNamePushProvider(String.format("provider%d", i + 1));
-        }
+        pushProviders = getRandomPushProviders();
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -420,23 +416,5 @@ public class SettingsTest extends Assert {
         assertEquals(settings, Settings.getInstance(RuntimeEnvironment.application.getApplicationContext()));
     }
 
-    private List<String> shuffleStringArray(final String[] array) {
-        final List<String> mixedArray = Arrays.asList(array);
-        Collections.shuffle(mixedArray);
-        return mixedArray;
-    }
 
-    private String[] getRandomStrings(int n, int len) {
-        char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-        String[] strings = new String[n];
-        for (int i = 0; i < n; ++i) {
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < len; j++) {
-                char c = chars[RND.nextInt(chars.length)];
-                sb.append(c);
-            }
-            strings[i] = sb.toString();
-        }
-        return strings;
-    }
 }

@@ -47,7 +47,7 @@ public class RegisteringTimeoutControllerTest {
 
     private static final String TEST_PROVIDER = "TEST_PROVIDER";
     private static final long TIMEOUT_MINUTES = 5;
-    private static final long TIME_DELTA_MILLISECONDS = 25;
+    private static final long TIME_DELTA_MILLISECONDS = 100;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Test
