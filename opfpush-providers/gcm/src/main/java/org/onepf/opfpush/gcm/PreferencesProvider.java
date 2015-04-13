@@ -20,7 +20,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
@@ -36,7 +35,7 @@ final class PreferencesProvider {
     private static final String KEY_REGISTRATION_ID = "registration_id";
     private static final String KEY_APP_VERSION = "app_version";
 
-    private static final String GCM_POSTFIX = "gcm";
+    private static final String GCM_POSTFIX = "opfpush_gcm";
 
     public static final int NO_SAVED_APP_VERSION = -1;
 
@@ -48,10 +47,14 @@ final class PreferencesProvider {
         preferences = new OPFPreferences(context, GCM_POSTFIX);
     }
 
+    @NonNull
     public static PreferencesProvider getInstance(@NonNull final Context context) {
-        OPFChecks.checkThread(true);
         if (instance == null) {
-            instance = new PreferencesProvider(context);
+            synchronized (PreferencesProvider.class) {
+                if (instance == null) {
+                    instance = new PreferencesProvider(context);
+                }
+            }
         }
 
         return instance;

@@ -109,8 +109,8 @@ public class DemoEventListener implements EventListener {
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
-                                      @NonNull final Map<String, UnrecoverablePushError> registrationErrors) {
-        OPFLog.logMethod(context, registrationErrors);
-        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(registrationErrors));
+                                      @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
+        OPFLog.logMethod(context, pushErrors);
+        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));
     }
 }

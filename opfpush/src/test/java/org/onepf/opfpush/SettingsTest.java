@@ -16,8 +16,10 @@
 
 package org.onepf.opfpush;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -45,7 +47,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 
 /**
  * @author antonpp
- * @since 24.02.2015
+ * @since 24.02.15
  */
 @Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -59,6 +61,10 @@ public class SettingsTest extends Assert {
     private static final String KEY_LAST_ANDROID_ID = "android_id";
     private static final String KEY_UNREGISTERING_PROVIDER_PREFIX = "unregistering_provider_";
     private static final String KEY_REGISTERING_PROVIDER_PREFIX = "registering_provider_";
+    private static final String KEY_PENDING_REGISTRATION_PROVIDER = "pending_registration_provider";
+    private static final String KEY_PENDING_UNREGISTRATION_PROVIDER = "pending_unregistration_provider";
+
+    private static final String OPF_CORE_POSTFIX = "opfpush";
 
     private static final int NUM_TESTS = 100;
     private static final int NUM_PROVIDERS = 100;
@@ -72,8 +78,9 @@ public class SettingsTest extends Assert {
 
     @Before
     public void setup() {
-        Context ctx = RuntimeEnvironment.application.getApplicationContext();
-        sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName(), Context.MODE_MULTI_PROCESS);
+        final Context ctx = RuntimeEnvironment.application.getApplicationContext();
+        sharedPreferences = ctx.getSharedPreferences(ctx.getPackageName() + "." + OPF_CORE_POSTFIX,
+                Context.MODE_MULTI_PROCESS);
         settings = Settings.getInstance(ctx);
         pushProviders = new MockNamePushProvider[NUM_PROVIDERS];
         for (int i = 0; i < NUM_PROVIDERS; ++i) {
@@ -81,6 +88,7 @@ public class SettingsTest extends Assert {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @After
     public void eraseSettingsInstance() {
         Field instanceField;
@@ -89,8 +97,7 @@ public class SettingsTest extends Assert {
                 instanceField = Settings.class.getDeclaredField("instance");
                 instanceField.setAccessible(true);
                 instanceField.set(null, null);
-
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (IllegalAccessException | NoSuchFieldException e) {
                 Log.e(LOG_TAG, e.getMessage());
             }
         }
@@ -146,6 +153,13 @@ public class SettingsTest extends Assert {
             settings.saveLastProvider(expected);
             assertEquals(expected.getName(), sharedPreferences.getString(KEY_LAST_PROVIDER_NAME, null));
         }
+    }
+
+    @Test
+    public void saveLastProviderNameNullCase() {
+        settings.saveLastProvider(pushProviders[RND.nextInt(NUM_PROVIDERS)]);
+        settings.saveLastProvider(null);
+        assertFalse(sharedPreferences.contains(KEY_LAST_PROVIDER_NAME));
     }
 
     @Test
@@ -323,6 +337,88 @@ public class SettingsTest extends Assert {
                     KEY_REGISTERING_PROVIDER_PREFIX + randomStrings[i].toLowerCase(Locale.US)
             ));
         }
+    }
+
+    @Test
+    public void testClear() {
+        sharedPreferences.edit()
+                .putString(KEY_LAST_PROVIDER_NAME, "not empty")
+                .putInt(KEY_STATE, RND.nextInt())
+                .putString(KEY_LAST_ANDROID_ID, "string")
+                .apply();
+        settings.clear();
+        assertFalse(sharedPreferences.contains(KEY_LAST_PROVIDER_NAME));
+        assertFalse(sharedPreferences.contains(KEY_STATE));
+        assertFalse(sharedPreferences.contains(KEY_LAST_ANDROID_ID));
+    }
+
+    @Test
+    public void testSavePendingRegistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingRegistrationProvider(randomStrings[i]);
+            assertEquals(randomStrings[i], sharedPreferences.getString(KEY_PENDING_REGISTRATION_PROVIDER, ""));
+        }
+    }
+
+    @Test
+    public void testRemovePendingRegistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingRegistrationProvider(randomStrings[i]);
+            assertTrue(sharedPreferences.contains(KEY_PENDING_REGISTRATION_PROVIDER));
+            settings.removePendingRegistrationProvider();
+            assertFalse(sharedPreferences.contains(KEY_PENDING_REGISTRATION_PROVIDER));
+        }
+    }
+
+    @Test
+    public void testGetPendingRegistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingRegistrationProvider(randomStrings[i]);
+            assertTrue(sharedPreferences.contains(KEY_PENDING_REGISTRATION_PROVIDER));
+            assertEquals(randomStrings[i], settings.getPendingRegistrationProvider());
+
+        }
+    }
+
+    @Test
+    public void testSavePendingUnregistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingUnregistrationProvider(randomStrings[i]);
+            assertEquals(randomStrings[i], sharedPreferences.getString(KEY_PENDING_UNREGISTRATION_PROVIDER, ""));
+        }
+    }
+
+    @Test
+    public void testRemovePendingUnregistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingUnregistrationProvider(randomStrings[i]);
+            assertTrue(sharedPreferences.contains(KEY_PENDING_UNREGISTRATION_PROVIDER));
+            settings.removePendingUnregistrationProvider();
+            assertFalse(sharedPreferences.contains(KEY_PENDING_UNREGISTRATION_PROVIDER));
+        }
+    }
+
+    @Test
+    public void testGetPendingUnregistrationProvider() {
+        String[] randomStrings = getRandomStrings(NUM_TESTS, RANDOM_STRING_LENGTH);
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            settings.savePendingUnregistrationProvider(randomStrings[i]);
+            assertTrue(sharedPreferences.contains(KEY_PENDING_UNREGISTRATION_PROVIDER));
+            assertEquals(randomStrings[i], settings.getPendingUnregistrationProvider());
+
+        }
+    }
+
+    @Test
+    public void testGetInstance() {
+        eraseSettingsInstance();
+        settings = Settings.getInstance(RuntimeEnvironment.application.getApplicationContext());
+        assertEquals(settings, Settings.getInstance(RuntimeEnvironment.application.getApplicationContext()));
     }
 
     private List<String> shuffleStringArray(final String[] array) {

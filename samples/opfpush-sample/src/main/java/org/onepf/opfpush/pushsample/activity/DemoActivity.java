@@ -27,11 +27,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import org.onepf.opfpush.gcm.GCMConstants;
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
-import org.onepf.opfpush.adm.ADMConstants;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.MessageEvent;
 import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
@@ -41,6 +43,8 @@ import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_ERROR;
 
 /**
  * @author Roman Savin
@@ -146,13 +150,29 @@ public class DemoActivity extends Activity {
     public void onEventMainThread(@NonNull final NoAvailableProviderEvent noAvailableProviderEvent) {
         OPFLog.logMethod(noAvailableProviderEvent);
         initViewsUnregisteredState("");
-        final Map<String, UnrecoverablePushError> registrationErrors = noAvailableProviderEvent.getRegistrationErrors();
-        if (registrationErrors.containsKey(ADMConstants.PROVIDER_NAME)) {
-            final UnrecoverablePushError error = registrationErrors.get(ADMConstants.PROVIDER_NAME);
-            infoText.setText(getString(R.string.registration_error_fmt, error.getErrorId()));
-        } else {
-            infoText.setText(getString(R.string.no_available_provider));
+        final Map<String, UnrecoverablePushError> pushErrors = noAvailableProviderEvent.getPushErrors();
+
+        infoText.setText(getString(R.string.no_available_provider));
+
+        //Log errors.
+        if (!pushErrors.isEmpty()) {
+            for (Map.Entry<String, UnrecoverablePushError> pushErrorEntry : pushErrors.entrySet()) {
+                OPFLog.d("Push provider %1$ss is unavailable. Error : %2$s",
+                        pushErrorEntry.getKey(), pushErrorEntry.getValue());
+            }
         }
+
+        if (pushErrors.containsKey(GCMConstants.PROVIDER_NAME)) {
+            final UnrecoverablePushError gcmError = pushErrors.get(GCMConstants.PROVIDER_NAME);
+            if (gcmError.getType() == AVAILABILITY_ERROR
+                    && gcmError.getAvailabilityErrorCode() != null) {
+                final int errorCode = gcmError.getAvailabilityErrorCode();
+                if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+                    GooglePlayServicesUtil.showErrorDialogFragment(errorCode, this, 0);
+                }
+            }
+        }
+
         EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
     }
 

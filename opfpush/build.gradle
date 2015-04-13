@@ -18,6 +18,7 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'com.noveogroup.android.check'
+apply plugin: 'jacoco'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
@@ -27,7 +28,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionName "0.1.6-SNAPSHOT"
+        versionName "0.2.0"
     }
 
     lintOptions {
@@ -39,6 +40,10 @@ android {
 
     sourceSets {
         androidTest.java.srcDirs += 'src/test/java'
+    }
+
+    jacoco {
+        version "0.7.1.201405082137"
     }
 }
 
@@ -54,6 +59,51 @@ check {
     }
 }
 
+build {
+    doLast {
+        jacocoTestReport.execute()
+    }
+}
+
+jacoco {
+    toolVersion "0.7.1.201405082137"
+}
+
+def coverageSourceDirs = [
+        'src/main/java',
+]
+
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories = fileTree(
+            dir: './build/intermediates/classes/debug',
+            excludes: ['**/R*.class',
+                       '**/*$InjectAdapter.class',
+                       '**/*$ModuleAdapter.class',
+                       '**/*$ViewInjector*.class'
+            ])
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files("$buildDir/jacoco/testDebug.exec")
+    // Bit hacky but fixes https://code.google.com/p/android/issues/detail?id=69174.
+    // We iterate through the compiled .class tree and rename $$ to $.
+    doFirst {
+        new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
+    }
+
+    doLast {
+        println 'Wrote HTML jacoco report to file:' + projectDir + "/build/reports/jacoco/jacocoTestReport/html/index.html"
+    }
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
@@ -63,5 +113,5 @@ dependencies {
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
     //noinspection NewerVersionAvailable
-    provided 'org.onepf:opfutils:0.1.18-SNAPSHOT'
+    provided 'org.onepf:opfutils:0.1.20'
 }

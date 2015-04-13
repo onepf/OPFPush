@@ -39,20 +39,20 @@ import java.util.Locale;
 public abstract class PushError<T extends ErrorType> {
 
     @NonNull
-    private final T type;
+    protected final T type;
 
     @NonNull
-    private final String providerName;
+    protected final String providerName;
 
     @NonNull
-    private final String errorId;
+    protected final String originalError;
 
     protected PushError(@NonNull final T type,
                         @NonNull final String providerName,
-                        @NonNull final String errorId) {
+                        @NonNull final String originalError) {
         this.type = type;
         this.providerName = providerName;
-        this.errorId = errorId;
+        this.originalError = originalError;
     }
 
     /**
@@ -83,25 +83,24 @@ public abstract class PushError<T extends ErrorType> {
     }
 
     /**
-     * Returns the error id.
+     * Returns the original error id.
      * Error id is a {@code String} that is returned by a specific push provider.
      * This {@code String} usually is described in the documentation of a push provider.
      *
      * @return The error id.
      */
     @NonNull
-    public String getErrorId() {
-        return errorId;
+    public String getOriginalError() {
+        return originalError;
     }
 
     @Override
     public String toString() {
         return String.format(
                 Locale.US,
-                "PushError : \n{ \"isRecoverable\" : %1$S,\n\"providerName\" : \"%2$s\",\n\"type\" : \"%3$s\",\n\"errorId\":\"%4$s\"}",
-                isRecoverable(),
+                "PushError : \n{\"providerName\" : \"%1$s\",\n\"type\" : \"%2$s\",\n\"originalError\":\"%3$s\"}",
                 providerName,
                 type,
-                errorId);
+                originalError);
     }
 }

@@ -63,7 +63,7 @@ public class SimpleEventListener implements EventListener {
 
     @Override
     public void onNoAvailableProvider(@NonNull Context context,
-                                      @NonNull Map<String, UnrecoverablePushError> registrationErrors) {
+                                      @NonNull Map<String, UnrecoverablePushError> pushErrors) {
         //nothing
     }
 }

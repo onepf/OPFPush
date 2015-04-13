@@ -20,40 +20,42 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
+import org.onepf.opfpush.backoff.RetryManager;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
-import static android.provider.Settings.Secure;
-import static android.provider.Settings.Secure.ANDROID_ID;
+import java.util.Set;
+
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_REGISTER;
+import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
 
 /**
- * @author Kirill Rozov
  * @author Roman Savin
- * @since 09.09.14.
+ * @since 07.04.2015
  */
-public final class BootCompleteReceiver extends BroadcastReceiver {
+public final class ConnectivityChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.logMethod(context, intent);
+        OPFLog.logMethod(context, OPFUtils.toString(intent));
+
+        final Set<Pair<String, String>> retryProvidersActions = RetryManager.getInstance()
+                .getRetryProvidersActions();
 
         final OPFPushHelper helper = OPFPush.getHelper();
-        if (helper.isRegistered()) {
-            OPFLog.i("Helper is registered");
-            if (isAndroidIDChanged(context)) {
-                OPFLog.i("Android ID changed.");
-                helper.onNeedRetryRegister();
-            } else {
-                OPFLog.i("Android ID hasn't been changed");
+        for (Pair<String, String> retryProviderAction : retryProvidersActions) {
+            final String providerName = retryProviderAction.first;
+            final String action = retryProviderAction.second;
+            switch (action) {
+                case ACTION_RETRY_REGISTER:
+                    helper.register(providerName);
+                    break;
+                case ACTION_RETRY_UNREGISTER:
+                    helper.unregister(providerName);
+                    break;
             }
-        } else if (helper.isRegistering()) {
-            OPFLog.i("Registration in progress. Retry register after reboot.");
-            helper.restartRegisterOnBoot();
         }
-    }
-
-    private boolean isAndroidIDChanged(@NonNull final Context context) {
-        return !Secure.getString(context.getContentResolver(), ANDROID_ID)
-                .equals(Settings.getInstance(context).getLastAndroidId());
     }
 }

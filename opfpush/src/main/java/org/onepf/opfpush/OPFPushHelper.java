@@ -131,10 +131,8 @@ public abstract class OPFPushHelper {
 
     abstract void registerNextAvailableProvider(@Nullable final String prevProviderName);
 
-    abstract void registerPackageChangeReceiver();
-
-    @NonNull
-    abstract Settings getSettings();
+    @Nullable
+    abstract String getProviderNameByHostApp(@Nullable final String appPackage);
 
     /**
      * Handles messages that were received by a push provider receiver.

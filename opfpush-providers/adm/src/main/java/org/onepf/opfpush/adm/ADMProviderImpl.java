@@ -29,6 +29,7 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
@@ -52,6 +53,7 @@ class ADMProviderImpl extends BasePushProvider {
     @NonNull
     private final ADM adm;
 
+    @NonNull
     private final PreferencesProvider preferencesProvider;
 
     public ADMProviderImpl(@NonNull final Context context) {
@@ -62,22 +64,16 @@ class ADMProviderImpl extends BasePushProvider {
 
     @Override
     public void register() {
-        super.register();
         OPFLog.logMethod();
-        if (!isUnregistrationPerforming()) {
-            OPFLog.i("Start register ADMProvider.");
-            adm.startRegister();
-        }
+        OPFLog.i("Start register ADMProvider.");
+        adm.startRegister();
     }
 
     @Override
     public void unregister() {
-        super.unregister();
         OPFLog.logMethod();
-        if (!isRegistrationPerforming()) {
-            OPFLog.i("Start unregister ADMProvider.");
-            adm.startUnregister();
-        }
+        OPFLog.i("Start unregister ADMProvider.");
+        adm.startUnregister();
     }
 
     @Override
@@ -122,11 +118,14 @@ class ADMProviderImpl extends BasePushProvider {
         return !TextUtils.isEmpty(getRegistrationId());
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
-        return super.isAvailable()
-                && adm.isSupported()
-                && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER);
+    public AvailabilityResult getAvailabilityResult() {
+        return new AvailabilityResult(
+                super.getAvailabilityResult().isAvailable()
+                        && adm.isSupported()
+                        && Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)
+        );
     }
 
     @Override

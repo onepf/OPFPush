@@ -71,6 +71,16 @@ Before setup `OPFPush` you must setup your project files.
             <action android:name="android.intent.action.BOOT_COMPLETED"/>
         </intent-filter>
     </receiver>
+
+    <receiver android:name="org.onepf.opfpush.PackageChangeReceiver">
+        <intent-filter>
+            <action android:name="android.intent.action.PACKAGE_REPLACED" />
+            <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+            <data android:scheme="package" />
+        </intent-filter>
+    </receiver>
+
     <receiver android:name="org.onepf.opfpush.RetryBroadcastReceiver"/>
     ```
 

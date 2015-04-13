@@ -16,12 +16,9 @@
 
 package org.onepf.opfpush.gcm;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -31,6 +28,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfutils.OPFChecks;
@@ -43,13 +41,10 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.C2DM_ACTION_RECEIVE;
-import static org.onepf.opfpush.gcm.GCMConstants.ANDROID_RELEASE_4_0_4;
-import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_ACCOUNT_TYPE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_SERVICES_FRAMEWORK_PACKAGE;
@@ -87,24 +82,17 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void register() {
-        super.register();
         OPFLog.logMethod();
-        if (!isUnregistrationPerforming()) {
-            OPFLog.i("Start register GCMProvider.");
-            executeTask(new RegisterTask());
-        }
+        OPFLog.i("Start register GCMProvider.");
+        executeTask(new RegisterTask());
     }
 
     @Override
     @SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel", "PMD.AccessorClassGeneration"})
     public synchronized void unregister() {
-        super.unregister();
         OPFLog.logMethod();
-        if (!isRegistrationPerforming()) {
-            OPFLog.i("Start unregister GCMProvider.");
-            preferencesProvider.reset();
-            executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
-        }
+        OPFLog.i("Start unregister GCMProvider.");
+        executeTask(new UnregisterTask(preferencesProvider.getRegistrationId()));
     }
 
     @Override
@@ -112,9 +100,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         OPFLog.logMethod();
         super.checkManifest();
         final Context context = getContext();
-        if (needGoogleAccounts()) {
-            OPFChecks.checkPermission(context, GET_ACCOUNTS);
-        }
         OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
@@ -134,32 +119,34 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         OPFChecks.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent, PERMISSION_SEND);
     }
 
+    @NonNull
     @Override
-    public boolean isAvailable() {
+    public AvailabilityResult getAvailabilityResult() {
         OPFLog.logMethod();
         if (!isReceivePermissionDeclared()) {
             OPFLog.d("com.google.android.c2dm.permission.RECEIVE permission isn't declared");
-            return false;
+            return new AvailabilityResult(false);
         }
 
         //Need verify that GCM classes present, because dependency provided.
         try {
             Class.forName(GOOGLE_CLOUD_MESSAGING_CLASS_NAME);
         } catch (ClassNotFoundException e) {
-            return false;
+            return new AvailabilityResult(false);
         }
 
-        if (super.isAvailable()) {
+        if (super.getAvailabilityResult().isAvailable()) {
             final int conResult = GooglePlayServicesUtil
                     .isGooglePlayServicesAvailable(getContext());
             if (conResult == ConnectionResult.SUCCESS) {
-                return !needGoogleAccounts() || checkGoogleAccount();
+                return new AvailabilityResult(true);
             } else {
-                OPFLog.w("Google Play Services not available. Reason: '%s'.",
+                OPFLog.d("Google Play Services not available. Reason: '%s'.",
                         GooglePlayServicesUtil.getErrorString(conResult));
+                return new AvailabilityResult(conResult);
             }
         }
-        return false;
+        return new AvailabilityResult(false);
     }
 
     @Override
@@ -207,26 +194,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderID);
     }
 
-    private boolean needGoogleAccounts() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
-                && !Build.VERSION.RELEASE.equals(ANDROID_RELEASE_4_0_4);
-    }
-
-    private boolean checkGoogleAccount() {
-        OPFLog.logMethod();
-        if (needGoogleAccounts()) {
-            OPFLog.i("Need google account.");
-            // On device with version of Android less than "4.0.4"
-            // we need to ensure that the user has at least one google account.
-            final Account[] googleAccounts
-                    = AccountManager.get(getContext()).getAccountsByType(GOOGLE_ACCOUNT_TYPE);
-            return googleAccounts.length != 0;
-        } else {
-            OPFLog.i("Not need google account");
-            return true;
-        }
-    }
-
     private void close() {
         OPFLog.logMethod();
 
@@ -237,6 +204,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             registrationExecutor = null;
         }
 
+        preferencesProvider.reset();
         GoogleCloudMessaging.getInstance(getContext()).close();
     }
 
