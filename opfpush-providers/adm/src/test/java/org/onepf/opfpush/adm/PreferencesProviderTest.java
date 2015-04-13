@@ -16,9 +16,7 @@
 
 package org.onepf.opfpush.adm;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 
 import junit.framework.Assert;
 
