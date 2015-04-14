@@ -95,7 +95,7 @@ public interface PushProvider {
      * Verify that application manifest contains all needed permissions.
      *
      * @throws java.lang.IllegalStateException If not all required permissions and components have been
-     *                                         described in the AndroidManifest.xml file.
+     *                                         described in the AndroidManifest.xml.xml file.
      */
     void checkManifest();
 

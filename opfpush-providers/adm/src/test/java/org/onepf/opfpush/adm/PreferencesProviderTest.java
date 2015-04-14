@@ -16,7 +16,9 @@
 
 package org.onepf.opfpush.adm;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 
 import junit.framework.Assert;
 
@@ -65,6 +67,7 @@ public class PreferencesProviderTest extends Assert {
         preferences.put(KEY_APP_VERSION, OPFUtils.getAppVersion(ctx));
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @After
     public void erasePreferencesProviderInstance() {
         Field instanceField;

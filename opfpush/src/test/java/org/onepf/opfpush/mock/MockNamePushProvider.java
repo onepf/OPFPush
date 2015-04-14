@@ -35,8 +35,8 @@ public class MockNamePushProvider extends BasePushProvider {
     }
 
     public MockNamePushProvider(@NonNull String name,
-                                @NonNull String hotAppPackage) {
-        super(RuntimeEnvironment.application, name, hotAppPackage);
+                                @NonNull String hostAppPackage) {
+        super(RuntimeEnvironment.application, name, hostAppPackage);
     }
 
     @Override
