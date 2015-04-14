@@ -1,18 +1,13 @@
 package org.onepf.opfpush.configuration;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.listener.SimpleEventListener;
 import org.onepf.opfpush.mock.MockNamePushProvider;
-import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.testutil.Util;
 import org.robolectric.RobolectricTestRunner;
@@ -22,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
@@ -90,7 +84,7 @@ public class ConfigurationBuilderTest extends Assert {
     public void testSetEventListener() {
         final PushProvider[] providers = Util.getRandomPushProviders();
         final Set<PushProvider> uniqueProviders = new HashSet<>(Arrays.asList(providers));
-        final EventListener eventListener = new MockEventListener();
+        final EventListener eventListener = new SimpleEventListener();
         builder.addProviders(uniqueProviders.toArray(new PushProvider[uniqueProviders.size()])).setEventListener(eventListener);
         final Configuration configuration = builder.build();
         assertEquals(configuration.getEventListener(), eventListener);
@@ -107,33 +101,5 @@ public class ConfigurationBuilderTest extends Assert {
         builder.addProviders(uniqueProviders.toArray(new PushProvider[uniqueProviders.size()])).setSelectSystemPreferred(false);
         configuration = builder.build();
         assertFalse(configuration.isSelectSystemPreferred());
-    }
-
-    private final class MockEventListener implements EventListener {
-
-        @Override
-        public void onMessage(@NonNull Context context, @NonNull String providerName, @Nullable Bundle extras) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void onDeletedMessages(@NonNull Context context, @NonNull String providerName, int messagesCount) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void onRegistered(@NonNull Context context, @NonNull String providerName, @NonNull String registrationId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void onUnregistered(@NonNull Context context, @NonNull String providerName, @Nullable String registrationId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void onNoAvailableProvider(@NonNull Context context, @NonNull Map<String, UnrecoverablePushError> pushErrors) {
-            throw new UnsupportedOperationException();
-        }
     }
 }
