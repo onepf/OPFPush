@@ -1,5 +1,37 @@
 Implementation of [Amazon Device Messaging][1] for OPFPush.
 
+## Download
+
+Download [the latest AAR][adm-latest-aar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-adm:0.2.0@aar'
+```
+    
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-adm</artifactId>
+    <version>0.2.0</version>
+    <type>aar</type>
+</dependency>
+```
+
+You can also use JAR dependency.
+Download [the latest JAR][adm-latest-jar] or grab via Gradle:
+```groovy
+compile 'org.onepf:opfpush-adm:0.2.0'
+```
+
+or Maven:
+```xml
+<dependency>
+    <groupId>org.onepf</groupId>
+    <artifactId>opfpush-adm</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
 ## How To Use
 
 **AndroidManifest**
@@ -45,10 +77,10 @@ If you use JAR dependency, you also must add to your application AndroidManifest
             android:required="false" />
 
         <service
-            android:name=".ADMService"
+            android:name="org.onepf.opfpush.adm.ADMService"
             android:exported="false" />
 
-        <receiver android:name=".LoginAccountsChangedReceiver">
+        <receiver android:name="org.onepf.opfpush.adm.LoginAccountsChangedReceiver">
 
             <intent-filter>
                 <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED" />
@@ -76,7 +108,9 @@ To use `ADMProvider` just add it to `Configuration` when building new instance, 
 
 ```java
 Configuration.Builder builder = new Configuration.Builder();
-builder.addProviders(new ADMProvider(this));
+builder.addProviders(new ADMProvider(context));
 ```
 
 [1]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.aar
+[adm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.jar
