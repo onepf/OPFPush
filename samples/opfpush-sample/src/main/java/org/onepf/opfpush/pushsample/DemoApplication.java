@@ -32,7 +32,7 @@ import org.onepf.opfpush.pushsample.listener.DemoEventListener;
  */
 public class DemoApplication extends Application {
 
-    private static final String GCM_SENDER_ID = "539088697591";
+    private static final String GCM_SENDER_ID = "707033278505";
 
     private static final String NOKIA_SENDER_ID = "pushsample";
 
