@@ -18,6 +18,7 @@
     package="org.onepf.opfpush.pushsample">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!--adm-->
     <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" />
