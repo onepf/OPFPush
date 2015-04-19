@@ -31,14 +31,15 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import org.onepf.opfpush.gcm.GCMConstants;
 import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.pushsample.R;
-import org.onepf.opfpush.pushsample.model.MessageEvent;
-import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.MessageEvent;
+import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
+import org.onepf.opfpush.pushsample.model.event.RegisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.UnregisteredEvent;
 
 import java.util.Map;
 
@@ -52,15 +53,13 @@ import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_E
  */
 public class DemoActivity extends Activity {
 
-    @NonNull
     private TextView infoText;
 
-    @NonNull
     private Button registerButton;
 
-    @NonNull
     private Button unregisterButton;
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private ArrayAdapter<String> adapter;
 
@@ -174,6 +173,13 @@ public class DemoActivity extends Activity {
         }
 
         EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(@NonNull final FailedRequestEvent failedRequestEvent) {
+        OPFLog.logMethod(failedRequestEvent);
+        OPFLog.d("Request failed : " + failedRequestEvent.getErrorMessage());
+        //todo show message error
     }
 
     private void initViewsRegisteringState() {

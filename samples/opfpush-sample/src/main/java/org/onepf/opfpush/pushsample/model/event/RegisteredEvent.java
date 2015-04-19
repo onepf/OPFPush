@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.event;
 
 import android.support.annotation.NonNull;
 
@@ -22,17 +22,17 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 10.12.14
  */
-public class MessageEvent {
+public final class RegisteredEvent {
 
     @NonNull
-    private String message;
+    private final String registrationId;
 
-    public MessageEvent(@NonNull final String message) {
-        this.message = message;
+    public RegisteredEvent(@NonNull final String registrationId) {
+        this.registrationId = registrationId;
     }
 
     @NonNull
-    public String getMessage() {
-        return message;
+    public String getRegistrationId() {
+        return registrationId;
     }
 }

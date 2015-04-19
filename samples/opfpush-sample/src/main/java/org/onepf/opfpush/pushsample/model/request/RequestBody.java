@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.request;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Roman Savin
- * @since 10.12.14
+ * @since 19.04.2015
  */
-public class UnregisteredEvent {
+public abstract class RequestBody {
 
-    @Nullable
-    private String registrationId;
+    @SerializedName("uuid")
+    @NonNull
+    public final String uuid;
 
-    public UnregisteredEvent(@Nullable final String registrationId) {
-        this.registrationId = registrationId;
-    }
-
-    @Nullable
-    public String getRegistrationId() {
-        return registrationId;
+    public RequestBody(@NonNull final String uuid) {
+        this.uuid = uuid;
     }
 }

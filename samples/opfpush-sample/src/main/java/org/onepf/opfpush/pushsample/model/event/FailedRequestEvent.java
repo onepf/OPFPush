@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.event;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.model.UnrecoverablePushError;
-
-import java.util.Map;
-
 /**
  * @author Roman Savin
- * @since 02.02.2015
+ * @since 19.04.2015
  */
-public class NoAvailableProviderEvent {
+public final class FailedRequestEvent {
 
     @NonNull
-    private Map<String, UnrecoverablePushError> pushErrors;
+    private final String errorMessage;
 
-    public NoAvailableProviderEvent(@NonNull final Map<String, UnrecoverablePushError> pushErrors) {
-        this.pushErrors = pushErrors;
+    public FailedRequestEvent(@NonNull final String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     @NonNull
-    public Map<String, UnrecoverablePushError> getPushErrors() {
-        return pushErrors;
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

@@ -17,6 +17,8 @@
 package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
+import android.content.Context;
+import android.telephony.TelephonyManager;
 
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
@@ -49,9 +51,16 @@ public class DemoApplication extends Application {
                         new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
                 )
                 .setSelectSystemPreferred(true)
-                .setEventListener(new DemoEventListener(this));
+                .setEventListener(new DemoEventListener());
 
         OPFPush.init(this, configBuilder.build());
         OPFPush.getHelper().register();
+    }
+
+    public String getUUID() {
+        final TelephonyManager telephonyManager;
+        telephonyManager  = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        return telephonyManager.getDeviceId();
     }
 }
