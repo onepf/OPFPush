@@ -16,8 +16,10 @@
 
 package org.onepf.opfpush.pushsample.retrofit;
 
+import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.request.RegistrationRequestBody;
 import org.onepf.opfpush.pushsample.model.request.UnregistrationRequestBody;
+import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
 import org.onepf.opfpush.pushsample.model.response.RegistrationResponse;
 import org.onepf.opfpush.pushsample.model.response.UnregistrationResponse;
 
@@ -38,4 +40,8 @@ public interface PushService {
     @POST("/unregister")
     void unregister(@Body final UnregistrationRequestBody body,
                     final Callback<UnregistrationResponse> callback);
+
+    @POST("/push")
+    void push(@Body final PushMessageRequestBody body,
+              final Callback<PushMessageResponse> callback);
 }

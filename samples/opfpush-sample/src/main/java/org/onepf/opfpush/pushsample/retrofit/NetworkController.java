@@ -26,10 +26,13 @@ import org.onepf.opfpush.pushsample.DemoApplication;
 import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
 import org.onepf.opfpush.pushsample.model.event.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.event.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.request.RegistrationRequestBody;
 import org.onepf.opfpush.pushsample.model.request.UnregistrationRequestBody;
+import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
 import org.onepf.opfpush.pushsample.model.response.RegistrationResponse;
 import org.onepf.opfpush.pushsample.model.response.UnregistrationResponse;
+import org.onepf.opfutils.OPFLog;
 
 import de.greenrobot.event.EventBus;
 import retrofit.Callback;
@@ -78,6 +81,12 @@ public final class NetworkController {
         pushService.unregister(body, unregistrationCallback(oldRegistrationId));
     }
 
+    public void pushMessage(@NonNull final Context context,
+                            @NonNull final String message) {
+        final PushMessageRequestBody body = new PushMessageRequestBody(getUuid(context), message);
+        pushService.push(body, pushMessageCallback());
+    }
+
     private String getUuid(@NonNull final Context context) {
         final DemoApplication application = (DemoApplication) context.getApplicationContext();
         return application.getUUID();
@@ -105,13 +114,29 @@ public final class NetworkController {
     ) {
         return new Callback<UnregistrationResponse>() {
             @Override
-            public void success(UnregistrationResponse unregistrationResponse, Response response) {
+            public void success(@NonNull final UnregistrationResponse unregistrationResponse,
+                                @NonNull final Response response) {
                 EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void failure(@NonNull final RetrofitError error) {
                 EventBus.getDefault().postSticky(new FailedRequestEvent(error.getMessage()));
+            }
+        };
+    }
+
+    private Callback<PushMessageResponse> pushMessageCallback() {
+        return new Callback<PushMessageResponse>() {
+            @Override
+            public void success(@NonNull final PushMessageResponse pushMessageResponse,
+                                @NonNull final Response response) {
+                OPFLog.logMethod(pushMessageResponse, response);
+            }
+
+            @Override
+            public void failure(@NonNull final RetrofitError error) {
+                OPFLog.logMethod(error);
             }
         };
     }
