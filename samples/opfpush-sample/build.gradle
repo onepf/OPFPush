@@ -100,11 +100,9 @@ dependencies {
     compile 'com.nokia:push:1.0'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.20'
+    compile 'org.onepf:opfutils:0.1.21-SNAPSHOT'
     provided 'com.amazon:amazon-device-messaging:1.0.1'
 
     compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.google.code.gson:gson:2.3.1'
 }

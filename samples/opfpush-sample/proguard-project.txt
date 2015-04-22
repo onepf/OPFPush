@@ -32,3 +32,22 @@
 #appcompat
 -dontwarn android.view.accessibility.AccessibilityNodeInfo
 -dontwarn android.media.session.MediaSession
+
+#retrofit
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+
+-dontwarn rx.**
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepclasseswithmembers class * {
+    @retrofit.http.* <methods>;
+}
+
+-keep class sun.misc.Unsafe { *; }
+#your package path where your gson models are stored
+-keep class org.onepf.opfpush.pushsample.request.** { *; }
+-keep class org.onepf.opfpush.pushsample.response.** { *; }
