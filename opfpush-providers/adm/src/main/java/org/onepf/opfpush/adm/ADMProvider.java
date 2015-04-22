@@ -21,6 +21,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
@@ -90,8 +91,8 @@ public class ADMProvider implements PushProvider {
     }
 
     @Override
-    public void checkManifest() {
-        provider.checkManifest();
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
+        provider.checkManifest(checkManifestHandler);
     }
 
     @Override
