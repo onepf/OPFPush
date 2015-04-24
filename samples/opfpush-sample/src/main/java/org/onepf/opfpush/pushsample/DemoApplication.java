@@ -45,7 +45,7 @@ public class DemoApplication extends Application {
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
                         new GCMProvider(this, GCM_SENDER_ID),
-                        /*new ADMProvider(this),*/
+                        new ADMProvider(this),
                         new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
                 )
                 .setSelectSystemPreferred(true)
