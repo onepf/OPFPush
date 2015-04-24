@@ -16,7 +16,9 @@
 
 package org.onepf.opfpush.adm;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 
 import junit.framework.Assert;
 
@@ -37,7 +39,8 @@ import java.util.Random;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 
 /**
- * Created by antonpp on 02.03.15.
+ * @author antonpp
+ * @since 02.03.2015
  */
 @Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -64,6 +67,7 @@ public class PreferencesProviderTest extends Assert {
         preferences.put(KEY_APP_VERSION, OPFUtils.getAppVersion(ctx));
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @After
     public void erasePreferencesProviderInstance() {
         Field instanceField;

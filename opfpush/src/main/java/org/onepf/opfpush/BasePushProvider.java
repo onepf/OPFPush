@@ -32,7 +32,7 @@ import static android.Manifest.permission.WAKE_LOCK;
 
 /**
  * Implements the common functionality of the {@link org.onepf.opfpush.pushprovider.PushProvider} interface.
- * This class in intended to simplify the {@code PushProvider} implementation.
+ * This class is intended to simplify the {@code PushProvider} implementation.
  *
  * @author Kirill Rozov
  * @author Roman Savin
