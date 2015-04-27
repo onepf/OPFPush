@@ -19,7 +19,7 @@ allprojects {
 
 Download [the latest AAR][adm-latest-aar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-adm:0.2.0@aar'
+compile 'org.onepf:opfpush-adm:0.2.1@aar'
 ```
     
 or Maven:
@@ -27,7 +27,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-adm</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <type>aar</type>
 </dependency>
 ```
@@ -35,7 +35,7 @@ or Maven:
 You can also use JAR dependency.
 Download [the latest JAR][adm-latest-jar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-adm:0.2.0'
+compile 'org.onepf:opfpush-adm:0.2.1'
 ```
 
 or Maven:
@@ -43,7 +43,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-adm</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 </dependency>
 ```
 
