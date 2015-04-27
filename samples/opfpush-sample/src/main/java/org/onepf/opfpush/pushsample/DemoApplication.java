@@ -52,6 +52,7 @@ public class DemoApplication extends Application {
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         OPFLog.logMethod();
 
+        OPFLog.i("Generated uuid : %s", uuid);
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
                         new GCMProvider(this, GCM_SENDER_ID),
