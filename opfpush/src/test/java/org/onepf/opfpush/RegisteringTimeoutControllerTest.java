@@ -41,7 +41,7 @@ import static org.robolectric.Shadows.shadowOf;
  * @author antonpp
  * @since 16.03.2015
  */
-@Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
+@Config(sdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class RegisteringTimeoutControllerTest {
 

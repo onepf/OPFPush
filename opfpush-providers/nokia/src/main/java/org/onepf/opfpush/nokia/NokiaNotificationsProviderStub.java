@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfutils.OPFLog;
 
@@ -100,7 +101,7 @@ class NokiaNotificationsProviderStub implements NokiaPushProvider {
     }
 
     @Override
-    public void checkManifest() {
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
         OPFLog.logMethod();
     }
 

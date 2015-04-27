@@ -25,8 +25,9 @@ import android.support.annotation.Nullable;
 import com.nokia.push.PushRegistrar;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
-import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Locale;
@@ -72,18 +73,22 @@ class NokiaNotificationsProviderImpl extends BasePushProvider implements NokiaPu
     }
 
     @Override
-    public void checkManifest() {
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
         OPFLog.logMethod();
-        super.checkManifest();
+        super.checkManifest(checkManifestHandler);
         final Context context = getContext();
         PushRegistrar.checkManifest(context);
 
-        OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
+        CheckUtils.checkPermission(context, PERMISSION_RECEIVE, checkManifestHandler);
 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
-        OPFChecks.checkPermission(context, c2dmPermission);
+        CheckUtils.checkPermission(context, c2dmPermission, checkManifestHandler);
 
-        OPFChecks.checkService(context, new ComponentName(context, NokiaNotificationService.class));
+        CheckUtils.checkService(
+                context,
+                new ComponentName(context, NokiaNotificationService.class),
+                checkManifestHandler
+        );
     }
 
     @Override

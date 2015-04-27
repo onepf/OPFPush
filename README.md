@@ -25,8 +25,8 @@ provides possibility to use the system push provider for a specific device.
    Download [the latest AAR][opfpush-latest-aar] of OPFPush and [the latest JAR][opfutils-latest-jar]
    or grab it via Gradle:
    ```groovy
-   compile 'org.onepf:opfpush:0.2.0@aar'
-   compile 'org.onepf:opfutils:0.1.20'
+   compile 'org.onepf:opfpush:0.2.1@aar'
+   compile 'org.onepf:opfutils:0.1.21'
    ```
 
    or Maven:
@@ -34,13 +34,13 @@ provides possibility to use the system push provider for a specific device.
    <dependency>
       <groupId>org.onepf</groupId>
       <artifactId>opfpush</artifactId>
-      <version>0.2.0</version>
+      <version>0.2.1</version>
       <type>aar</type>
    </dependency>
    <dependency>
        <groupId>org.onepf</groupId>
        <artifactId>opfutils</artifactId>
-       <version>0.1.20</version>
+       <version>0.1.21</version>
    </dependency>
    ```
 
@@ -103,7 +103,7 @@ See [the following section][opfpush-receiver-section]
 1. [Google Cloud Messaging][google-cloud-messaging].
     Download [the latest AAR][gcm-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-gcm:0.2.0@aar'
+    compile 'org.onepf:opfpush-gcm:0.2.1@aar'
     ```
     
     or Maven:
@@ -111,7 +111,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-gcm</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
         <type>aar</type>
     </dependency>
     ```
@@ -121,7 +121,7 @@ See [the following section][opfpush-receiver-section]
 2. [Amazon Device Messaging][amazon-device-messaging].
     Download [the latest AAR][adm-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-adm:0.2.0@aar'
+    compile 'org.onepf:opfpush-adm:0.2.1@aar'
     ```
     
     or Maven:
@@ -129,7 +129,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-adm</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
         <type>aar</type>
     </dependency>
     ```
@@ -139,7 +139,7 @@ See [the following section][opfpush-receiver-section]
 3. [Nokia Notifications][nokia-notifications].
     Download [the latest AAR][nokia-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-nokia:0.2.0@aar'
+    compile 'org.onepf:opfpush-nokia:0.2.1@aar'
     ```
         
     or Maven:
@@ -147,7 +147,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-nokia</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1</version>
         <type>aar</type>
     </dependency>
     ```

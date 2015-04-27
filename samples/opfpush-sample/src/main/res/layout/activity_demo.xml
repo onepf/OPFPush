@@ -25,6 +25,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
+    <EditText
+        android:id="@+id/message_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:inputType="text"
+        android:imeOptions="actionSend"
+        android:enabled="false" />
+
     <TextView
         android:id="@+id/info_text"
         android:layout_width="match_parent"

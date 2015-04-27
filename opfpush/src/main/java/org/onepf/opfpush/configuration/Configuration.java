@@ -20,8 +20,9 @@ package org.onepf.opfpush.configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.pushprovider.PushProvider;
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.pushprovider.PushProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,14 +49,19 @@ public final class Configuration {
     @Nullable
     private final EventListener eventListener;
 
+    @Nullable
+    private final CheckManifestHandler checkManifestHandler;
+
     private final boolean isSelectSystemPreferred;
 
     private Configuration(@NonNull final Collection<? extends PushProvider> providers,
                           @Nullable final EventListener eventListener,
-                          final boolean selectSystemPreferred) {
+                          final boolean selectSystemPreferred,
+                          @Nullable CheckManifestHandler checkManifestHandler) {
         this.providers = Collections.unmodifiableList(new ArrayList<>(providers));
         this.eventListener = eventListener;
         this.isSelectSystemPreferred = selectSystemPreferred;
+        this.checkManifestHandler = checkManifestHandler;
     }
 
     /**
@@ -87,6 +93,16 @@ public final class Configuration {
         return isSelectSystemPreferred;
     }
 
+    /**
+     * Returns the instance of the {@link CheckManifestHandler}.
+     *
+     * @return The instance of the {@link CheckManifestHandler}.
+     */
+    @Nullable
+    public CheckManifestHandler getCheckManifestHandler() {
+        return checkManifestHandler;
+    }
+
     @Override
     public String toString() {
         return "Configuration {"
@@ -107,6 +123,9 @@ public final class Configuration {
         private EventListener eventListener;
 
         private boolean isSelectSystemPreferred;
+
+        @Nullable
+        private CheckManifestHandler checkManifestHandler;
 
         /**
          * See {@link #addProviders(java.util.List)}
@@ -172,6 +191,12 @@ public final class Configuration {
             return this;
         }
 
+        @NonNull
+        public Builder setCheckManifestHandler(@NonNull final CheckManifestHandler checkManifestHandler) {
+            this.checkManifestHandler = checkManifestHandler;
+            return this;
+        }
+
         /**
          * Create the instance of the {@link Configuration} class.
          *
@@ -188,7 +213,8 @@ public final class Configuration {
             return new Configuration(
                     providersMap.values(),
                     eventListener,
-                    isSelectSystemPreferred
+                    isSelectSystemPreferred,
+                    checkManifestHandler
             );
         }
 

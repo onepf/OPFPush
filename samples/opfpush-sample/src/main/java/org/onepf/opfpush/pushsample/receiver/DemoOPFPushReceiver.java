@@ -22,14 +22,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfutils.OPFLog;
-import org.onepf.opfpush.receiver.OPFPushReceiver;
 import org.onepf.opfpush.pushsample.R;
-import org.onepf.opfpush.pushsample.model.MessageEvent;
-import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.MessageEvent;
+import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
+import org.onepf.opfpush.pushsample.retrofit.NetworkController;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
+import org.onepf.opfpush.receiver.OPFPushReceiver;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -89,7 +88,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
+        NetworkController.getInstance().register(context, providerName, registrationId);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
         OPFLog.logMethod(providerName, oldRegistrationId);
-        EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
+        NetworkController.getInstance().unregister(context, oldRegistrationId);
     }
 
     @Override
