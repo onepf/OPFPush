@@ -1,5 +1,20 @@
 Implementation of [Amazon Device Messaging][1] for OPFPush.
 
+## Dependency
+
+Amazon push provider depends on proprietary `amazon-device-messaging.jar` which can be found within Amazon Mobile App SDK.
+
+You can download it yourself and manually add it to your project, or user our GitHub hosted repo instead:
+```groovy
+allprojects {
+  repositories {
+    ...
+    // third-party dependencies
+    maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
+  }
+}
+```
+
 ## Download
 
 Download [the latest AAR][adm-latest-aar] or grab via Gradle:
