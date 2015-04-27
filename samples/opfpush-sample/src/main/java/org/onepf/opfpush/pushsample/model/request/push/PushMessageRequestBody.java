@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.request.push;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfpush.model.UnrecoverablePushError;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Roman Savin
- * @since 02.02.2015
+ * @since 19.04.2015
  */
-public class NoAvailableProviderEvent {
+public final class PushMessageRequestBody {
 
+    @SerializedName("uuids")
+    public final List<String> uuids;
+
+    @SerializedName("message")
     @NonNull
-    private Map<String, UnrecoverablePushError> pushErrors;
+    public final String message;
 
-    public NoAvailableProviderEvent(@NonNull final Map<String, UnrecoverablePushError> pushErrors) {
-        this.pushErrors = pushErrors;
-    }
-
-    @NonNull
-    public Map<String, UnrecoverablePushError> getPushErrors() {
-        return pushErrors;
+    public PushMessageRequestBody(@NonNull final String uuid,
+                                  @NonNull final String message) {
+        this.uuids = new ArrayList<String>() {{
+            add(uuid);
+        }};
+        this.message = message;
     }
 }

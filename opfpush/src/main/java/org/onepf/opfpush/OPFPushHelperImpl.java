@@ -307,7 +307,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
 
         final List<PushProvider> providers = configuration.getProviders();
         for (PushProvider provider : providers) {
-            provider.checkManifest();
+            provider.checkManifest(configuration.getCheckManifestHandler());
             providersByHostApps.put(provider.getHostAppPackage(), provider.getName());
         }
 

@@ -28,10 +28,11 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.pushprovider.SenderPushProvider;
-import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.WrongThreadException;
@@ -96,17 +97,17 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     }
 
     @Override
-    public void checkManifest() {
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
         OPFLog.logMethod();
-        super.checkManifest();
+        super.checkManifest(checkManifestHandler);
         final Context context = getContext();
-        OPFChecks.checkPermission(context, PERMISSION_RECEIVE);
+        CheckUtils.checkPermission(context, PERMISSION_RECEIVE, checkManifestHandler);
 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
-        OPFChecks.checkPermission(context, c2dmPermission);
+        CheckUtils.checkPermission(context, c2dmPermission, checkManifestHandler);
 
-        OPFChecks.checkService(context, new ComponentName(context, GCMService.class));
-        OPFChecks.checkService(context, new ComponentName(context, SendMessageService.class));
+        CheckUtils.checkService(context, new ComponentName(context, GCMService.class), checkManifestHandler);
+        CheckUtils.checkService(context, new ComponentName(context, SendMessageService.class), checkManifestHandler);
 
         final Intent c2dmReceiveBroadcastIntent = new Intent(C2DM_ACTION_RECEIVE);
         final Intent registrationBroadcastIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
@@ -114,9 +115,12 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         final String gcmReceiverName = GCMReceiver.class.getName();
 
-        OPFChecks.checkReceiver(context, gcmReceiverName, c2dmReceiveBroadcastIntent, PERMISSION_SEND);
-        OPFChecks.checkReceiver(context, gcmReceiverName, registrationBroadcastIntent, PERMISSION_SEND);
-        OPFChecks.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent, PERMISSION_SEND);
+        CheckUtils.checkReceiver(context, gcmReceiverName, c2dmReceiveBroadcastIntent,
+                PERMISSION_SEND, checkManifestHandler);
+        CheckUtils.checkReceiver(context, gcmReceiverName, registrationBroadcastIntent,
+                PERMISSION_SEND, checkManifestHandler);
+        CheckUtils.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent,
+                PERMISSION_SEND, checkManifestHandler);
     }
 
     @NonNull

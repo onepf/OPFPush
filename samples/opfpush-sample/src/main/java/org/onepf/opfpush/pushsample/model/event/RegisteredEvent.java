@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.event;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
 /**
  * @author Roman Savin
  * @since 10.12.14
  */
-public class UnregisteredEvent {
+public final class RegisteredEvent {
 
-    @Nullable
-    private String registrationId;
+    @NonNull
+    private final String registrationId;
 
-    public UnregisteredEvent(@Nullable final String registrationId) {
+    public RegisteredEvent(@NonNull final String registrationId) {
         this.registrationId = registrationId;
     }
 
-    @Nullable
+    @NonNull
     public String getRegistrationId() {
         return registrationId;
     }

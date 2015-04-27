@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.pushsample.model;
+package org.onepf.opfpush.pushsample.model.response.push;
 
 import android.support.annotation.NonNull;
 
 /**
  * @author Roman Savin
- * @since 10.12.14
+ * @since 19.04.2015
  */
-public class RegisteredEvent {
+public final class PushMessageResponse {
 
     @NonNull
-    private String registrationId;
-
-    public RegisteredEvent(@NonNull final String registrationId) {
-        this.registrationId = registrationId;
-    }
+    public final PushResult[] successed;
 
     @NonNull
-    public String getRegistrationId() {
-        return registrationId;
+    public final FailedPushResult[] failed;
+
+    @NonNull
+    public final String message;
+
+    public PushMessageResponse(@NonNull final PushResult[] successed,
+                                @NonNull final FailedPushResult[] failed,
+                                @NonNull final String message) {
+        this.successed = successed;
+        this.failed = failed;
+        this.message = message;
     }
 }

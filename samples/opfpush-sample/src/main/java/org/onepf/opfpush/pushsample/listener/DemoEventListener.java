@@ -21,15 +21,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.pushsample.R;
-import org.onepf.opfpush.pushsample.model.MessageEvent;
-import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.MessageEvent;
+import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
+import org.onepf.opfpush.pushsample.retrofit.NetworkController;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -46,13 +45,6 @@ import static org.onepf.opfpush.pushsample.util.Constants.PAYLOAD_EXTRA_KEY;
  * @since 09.12.14
  */
 public class DemoEventListener implements EventListener {
-
-    @NonNull
-    private Context appContext;
-
-    public DemoEventListener(@NonNull final Context context) {
-        this.appContext = context.getApplicationContext();
-    }
 
     @Override
     public void onMessage(@NonNull final Context context,
@@ -73,8 +65,8 @@ public class DemoEventListener implements EventListener {
         if (message != null) {
             try {
                 NotificationUtils.showNotification(
-                        appContext,
-                        appContext.getString(R.string.message_notification_title),
+                        context,
+                        context.getString(R.string.message_notification_title),
                         message
                 );
                 EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
@@ -96,7 +88,7 @@ public class DemoEventListener implements EventListener {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
+        NetworkController.getInstance().register(context, providerName, registrationId);
     }
 
     @Override
@@ -104,7 +96,7 @@ public class DemoEventListener implements EventListener {
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
+        NetworkController.getInstance().unregister(context, registrationId);
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.onepf.opfpush.pushprovider;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 
 /**
@@ -96,8 +97,9 @@ public interface PushProvider {
      *
      * @throws java.lang.IllegalStateException If not all required permissions and components have been
      *                                         described in the AndroidManifest.xml file.
+     * @param checkManifestHandler If not null an exception isn't thrown.
      */
-    void checkManifest();
+    void checkManifest(@Nullable CheckManifestHandler checkManifestHandler);
 
     /**
      * Callback method, that called when the application state change, like update to new version,

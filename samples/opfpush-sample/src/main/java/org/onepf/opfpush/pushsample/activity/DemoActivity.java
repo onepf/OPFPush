@@ -21,9 +21,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,14 +33,16 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import org.onepf.opfpush.gcm.GCMConstants;
 import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
+import org.onepf.opfpush.pushsample.retrofit.NetworkController;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.opfpush.pushsample.R;
-import org.onepf.opfpush.pushsample.model.MessageEvent;
-import org.onepf.opfpush.pushsample.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.pushsample.model.RegisteredEvent;
-import org.onepf.opfpush.pushsample.model.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.MessageEvent;
+import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
+import org.onepf.opfpush.pushsample.model.event.RegisteredEvent;
+import org.onepf.opfpush.pushsample.model.event.UnregisteredEvent;
 
 import java.util.Map;
 
@@ -52,15 +56,15 @@ import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_E
  */
 public class DemoActivity extends Activity {
 
-    @NonNull
+    private EditText messageField;
+
     private TextView infoText;
 
-    @NonNull
     private Button registerButton;
 
-    @NonNull
     private Button unregisterButton;
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private ArrayAdapter<String> adapter;
 
@@ -73,6 +77,7 @@ public class DemoActivity extends Activity {
         OPFLog.logMethod();
         setContentView(R.layout.activity_demo);
 
+        messageField = (EditText) findViewById(R.id.message_field);
         infoText = (TextView) findViewById(R.id.info_text);
 
         registerButton = (Button) findViewById(R.id.register_button);
@@ -176,6 +181,13 @@ public class DemoActivity extends Activity {
         EventBus.getDefault().removeStickyEvent(noAvailableProviderEvent);
     }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(@NonNull final FailedRequestEvent failedRequestEvent) {
+        OPFLog.logMethod(failedRequestEvent);
+        OPFLog.d("Request failed : " + failedRequestEvent.getErrorMessage());
+        //todo show message error
+    }
+
     private void initViewsRegisteringState() {
         OPFLog.logMethod();
         infoText.setText(getString(R.string.registration));
@@ -190,6 +202,17 @@ public class DemoActivity extends Activity {
         registerButton.setVisibility(View.GONE);
         unregisterButton.setVisibility(View.VISIBLE);
         unregisterButton.setEnabled(true);
+
+        messageField.setEnabled(true);
+        messageField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                NetworkController.getInstance()
+                        .pushMessage(DemoActivity.this, textView.getText().toString());
+                textView.setText("");
+                return true;
+            }
+        });
     }
 
     private void initViewsUnregisteredState(@Nullable final String registrationId) {
@@ -198,6 +221,8 @@ public class DemoActivity extends Activity {
         registerButton.setVisibility(View.VISIBLE);
         registerButton.setEnabled(true);
         unregisterButton.setVisibility(View.GONE);
+
+        messageField.setEnabled(false);
     }
 
     private void initViewsUnregisteringState() {
