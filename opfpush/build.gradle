@@ -106,9 +106,9 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:2.4'
+    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
 
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
