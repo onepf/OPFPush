@@ -22,7 +22,7 @@ provides possibility to use the system push provider for a specific device.
 ## Download
 
 1. To use OPFPush you must add to your dependencies [OPFUtils library][opfutils].
-   Download [the latest AAR][opfpush-latest-aar] of OPFPush and [the latest JAR][opfutils-latest-jar]
+   Download [the latest AAR][opfpush-latest-aar] of OPFPush and [the latest JAR][opfutils-latest-jar] of OPFUtils
    or grab it via Gradle:
    ```groovy
    compile 'org.onepf:opfpush:0.2.1@aar'
@@ -194,7 +194,7 @@ To create a custom push provider see [the following section][custom-push-provide
 [amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
 [opfutils]: https://github.com/onepf/OPFUtils
-[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.20/opfutils-0.1.20.jar
+[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.21/opfutils-0.1.21.jar
 [jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies
 [opfpush-receiver-section]: https://github.com/onepf/OPFPush/wiki/Using-of-OPFPushReceiver
 [custom-push-provider]: https://github.com/onepf/OPFPush/wiki/Create-custom-push-provider
@@ -202,8 +202,8 @@ To create a custom push provider see [the following section][custom-push-provide
 [opfpush-gcm]: ./opfpush-providers/gcm
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
-[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-0.2.0.aar
-[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-gcm-0.2.0.aar
-[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.aar
-[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-nokia-0.2.0.aar
+[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-0.2.1.aar
+[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-gcm-0.2.1.aar
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.aar
+[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-nokia-0.2.1.aar
 [easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM

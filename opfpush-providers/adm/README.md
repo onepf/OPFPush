@@ -127,5 +127,5 @@ builder.addProviders(new ADMProvider(context));
 ```
 
 [1]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
-[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.aar
-[adm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.0/opfpush-adm-0.2.0.jar
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.aar
+[adm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.jar
