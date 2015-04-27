@@ -110,7 +110,7 @@ dependencies {
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
     //noinspection NewerVersionAvailable
-    compile 'org.onepf:opfpush:0.2.0@aar'
+    compile 'org.onepf:opfpush:0.2.1@aar'
     
     provided 'com.amazon:amazon-device-messaging:1.0.1'
     provided 'com.android.support:support-annotations:19.1.0'
