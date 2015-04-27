@@ -29,8 +29,9 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
-import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static android.Manifest.permission.GET_ACCOUNTS;
@@ -77,29 +78,29 @@ class ADMProviderImpl extends BasePushProvider {
     }
 
     @Override
-    public void checkManifest() {
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
         OPFLog.logMethod();
-        super.checkManifest();
+        super.checkManifest(checkManifestHandler);
         final Context context = getContext();
         ADMManifest.checkManifestAuthoredProperly(context);
-        OPFChecks.checkPermission(context, PERMISSION_RECEIVE_MESSAGES);
-        OPFChecks.checkPermission(context, GET_ACCOUNTS);
+        CheckUtils.checkPermission(context, PERMISSION_RECEIVE_MESSAGES, checkManifestHandler);
+        CheckUtils.checkPermission(context, GET_ACCOUNTS, checkManifestHandler);
 
         final String admMessagePermission = context.getPackageName() + RECEIVE_MESSAGE_PERMISSION_SUFFIX;
-        OPFChecks.checkPermission(context, admMessagePermission);
+        CheckUtils.checkPermission(context, admMessagePermission, checkManifestHandler);
 
-        OPFChecks.checkService(context, new ComponentName(context, ADMService.class));
+        CheckUtils.checkService(context, new ComponentName(context, ADMService.class), checkManifestHandler);
 
         final Intent registrationBroadcastIntent = new Intent(ACTION_APP_REGISTRATION_EVENT);
         final Intent receiveBroadcastIntent = new Intent(ACTION_RECEIVE_ADM_MESSAGE);
         final Intent loginChangedBroadcastIntent = new Intent(AccountManager.LOGIN_ACCOUNTS_CHANGED_ACTION);
         final String admReceiverName = ADMReceiver.class.getName();
-        OPFChecks.checkReceiver(context, admReceiverName, registrationBroadcastIntent,
-                ADMManifest.PERMISSION_SEND_MESSAGES);
-        OPFChecks.checkReceiver(context, admReceiverName, receiveBroadcastIntent,
-                ADMManifest.PERMISSION_SEND_MESSAGES);
-        OPFChecks.checkReceiver(context, LoginAccountsChangedReceiver.class.getName(),
-                loginChangedBroadcastIntent);
+        CheckUtils.checkReceiver(context, admReceiverName, registrationBroadcastIntent,
+                ADMManifest.PERMISSION_SEND_MESSAGES, checkManifestHandler);
+        CheckUtils.checkReceiver(context, admReceiverName, receiveBroadcastIntent,
+                ADMManifest.PERMISSION_SEND_MESSAGES, checkManifestHandler);
+        CheckUtils.checkReceiver(context, LoginAccountsChangedReceiver.class.getName(),
+                loginChangedBroadcastIntent, checkManifestHandler);
     }
 
     @Override

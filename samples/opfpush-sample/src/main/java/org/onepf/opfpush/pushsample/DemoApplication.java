@@ -17,6 +17,11 @@
 package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
@@ -32,16 +37,22 @@ import org.onepf.opfpush.pushsample.listener.DemoEventListener;
  */
 public class DemoApplication extends Application {
 
-    private static final String GCM_SENDER_ID = "539088697591";
+    private static final String GCM_SENDER_ID = "707033278505";
 
     private static final String NOKIA_SENDER_ID = "pushsample";
+
+    private String uuid;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        uuid = generateUuid();
+
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         OPFLog.logMethod();
 
+        OPFLog.i("Generated uuid : %s", uuid);
         final Configuration.Builder configBuilder = new Configuration.Builder()
                 .addProviders(
                         new GCMProvider(this, GCM_SENDER_ID),
@@ -49,9 +60,37 @@ public class DemoApplication extends Application {
                         new NokiaNotificationsProvider(this, NOKIA_SENDER_ID)
                 )
                 .setSelectSystemPreferred(true)
-                .setEventListener(new DemoEventListener(this));
+                .setEventListener(new DemoEventListener());
 
         OPFPush.init(this, configBuilder.build());
         OPFPush.getHelper().register();
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    private String generateUuid() {
+        final TelephonyManager telephonyManager;
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        final String IMEI = telephonyManager.getDeviceId();
+        final String IMSI = telephonyManager.getSubscriberId();
+
+        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        final WifiInfo wInfo = wifiManager.getConnectionInfo();
+        final String macAddress = wInfo.getMacAddress();
+
+        final String androidId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        //noinspection StringBufferReplaceableByString
+        final StringBuilder uuidBuilder = new StringBuilder()
+                .append(IMEI == null ? "" : IMEI)
+                .append(IMSI == null ? "" : IMSI)
+                .append(macAddress == null ? "" : macAddress)
+                .append(androidId);
+
+        return uuidBuilder.toString();
     }
 }

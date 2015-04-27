@@ -19,10 +19,12 @@ package org.onepf.opfpush;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.pushprovider.PushProvider;
-import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFUtils;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
@@ -85,16 +87,16 @@ public abstract class BasePushProvider implements PushProvider {
     }
 
     @Override
-    public void checkManifest() {
-        OPFChecks.checkPermission(appContext, INTERNET);
-        OPFChecks.checkPermission(appContext, RECEIVE_BOOT_COMPLETED);
-        OPFChecks.checkPermission(appContext, WAKE_LOCK);
-        OPFChecks.checkPermission(appContext, ACCESS_NETWORK_STATE);
+    public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
+        CheckUtils.checkPermission(appContext, INTERNET, checkManifestHandler);
+        CheckUtils.checkPermission(appContext, RECEIVE_BOOT_COMPLETED, checkManifestHandler);
+        CheckUtils.checkPermission(appContext, WAKE_LOCK, checkManifestHandler);
+        CheckUtils.checkPermission(appContext, ACCESS_NETWORK_STATE, checkManifestHandler);
 
-        OPFChecks.checkReceiver(appContext, BootCompleteReceiver.class.getName(),
-                new Intent(Intent.ACTION_BOOT_COMPLETED));
-        OPFChecks.checkReceiver(appContext, RetryBroadcastReceiver.class.getName(),
-                new Intent(appContext, RetryBroadcastReceiver.class));
+        CheckUtils.checkReceiver(appContext, BootCompleteReceiver.class.getName(),
+                new Intent(Intent.ACTION_BOOT_COMPLETED), checkManifestHandler);
+        CheckUtils.checkReceiver(appContext, RetryBroadcastReceiver.class.getName(),
+                new Intent(appContext, RetryBroadcastReceiver.class), checkManifestHandler);
     }
 
     @Override
