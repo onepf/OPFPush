@@ -126,10 +126,7 @@ public class DemoActivity extends Activity {
     @SuppressWarnings("UnusedDeclaration")
     public void onEventMainThread(@NonNull final MessageEvent messageEvent) {
         OPFLog.logMethod(messageEvent);
-        final String messageString = messageEvent.getMessage();
-        if (!TextUtils.isEmpty(messageString)) {
-            adapter.add(messageString);
-        }
+        adapter.add(getString(R.string.message_fmt, messageEvent.getSenderUuid(), messageEvent.getMessage()));
         EventBus.getDefault().removeStickyEvent(messageEvent);
     }
 

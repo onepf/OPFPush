@@ -37,4 +37,6 @@
 
     <string name="message_notification_title">Message</string>
 
+    <string name="message_fmt">Sender uuid : %1$s; Message : %2$s</string>
+
 </resources>

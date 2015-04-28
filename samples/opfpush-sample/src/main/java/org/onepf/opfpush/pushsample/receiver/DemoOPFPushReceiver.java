@@ -38,7 +38,7 @@ import java.util.Map;
 import de.greenrobot.event.EventBus;
 
 import static org.onepf.opfpush.pushsample.util.Constants.MESSAGE_EXTRA_KEY;
-import static org.onepf.opfpush.pushsample.util.Constants.PAYLOAD_EXTRA_KEY;
+import static org.onepf.opfpush.pushsample.util.Constants.SENDER_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -55,21 +55,19 @@ public class DemoOPFPushReceiver extends OPFPushReceiver {
             return;
         }
 
-        String message = null;
-        if (extras.containsKey(MESSAGE_EXTRA_KEY)) {
-            message = extras.getString(MESSAGE_EXTRA_KEY);
-        } else if (extras.containsKey(PAYLOAD_EXTRA_KEY)) {
-            message = extras.getString(PAYLOAD_EXTRA_KEY);
-        }
+        final String message = extras.getString(MESSAGE_EXTRA_KEY);
+        final String senderUuid = extras.getString(SENDER_EXTRA_KEY);
 
-        if (message != null) {
+        if (message != null && senderUuid != null) {
             try {
                 NotificationUtils.showNotification(
                         context,
                         context.getString(R.string.message_notification_title),
                         message
                 );
-                EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
+                EventBus.getDefault().postSticky(
+                        new MessageEvent(senderUuid, URLDecoder.decode(message, "UTF-8"))
+                );
             } catch (UnsupportedEncodingException e) {
                 OPFLog.e(e.getCause().toString());
             }

@@ -24,11 +24,19 @@ import android.support.annotation.NonNull;
  */
 public final class MessageEvent {
 
+    @NonNull final String senderUuid;
+
     @NonNull
     private final String message;
 
-    public MessageEvent(@NonNull final String message) {
+    public MessageEvent(@NonNull final String senderUuid, @NonNull final String message) {
+        this.senderUuid = senderUuid;
         this.message = message;
+    }
+
+    @NonNull
+    public String getSenderUuid() {
+        return senderUuid;
     }
 
     @NonNull
