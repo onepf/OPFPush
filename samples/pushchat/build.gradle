@@ -1,4 +1,37 @@
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+
+ext {
+    projectLocalPropertiesFile = project.rootProject.file('local.properties')
+    projectLocalProperties = loadLocalProperties(projectLocalPropertiesFile)
+
+    storeFile = getFile(getLocalProperty('opfpush-sample.signing'))
+    storePassword = getLocalProperty('StorePassword')
+    keyAlias = getLocalProperty('KeyAlias')
+    keyPassword = getLocalProperty('KeyPassword')
+}
+
+def loadLocalProperties(propertiesFile) {
+    def localProperties = new Properties()
+    if (propertiesFile.exists()) {
+        localProperties.load(propertiesFile.newDataInputStream())
+    }
+    return localProperties
+}
+
+def getLocalProperty(propertyName) {
+    return project.projectLocalProperties.getProperty(propertyName)
+}
+
+def getFile(path) {
+    if (path != null) {
+        return file(path)
+    }
+}
+
+def isSigningKeySpecified() {
+    return project.storeFile != null && project.storePassword != null && project.keyAlias != null && project.keyPassword != null
+}
 
 android {
     compileSdkVersion 22
@@ -11,15 +44,54 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile project.storeFile
+            storePassword project.storePassword
+            keyAlias project.keyAlias
+            keyPassword project.keyPassword
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles 'proguard-project.txt'
+            if (isSigningKeySpecified()) {
+                signingConfig signingConfigs.release
+            }
         }
+    }
+
+    lintOptions {
+        abortOnError false
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText'
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'
+
+    //opfpush
+    compile 'org.onepf:opfutils:0.1.21'
+    compile 'org.onepf:opfpush:0.2.1@aar'
+    compile 'org.onepf:opfpush-adm:0.2.1@aar'
+    compile 'org.onepf:opfpush-gcm:0.2.1@aar'
+    compile 'org.onepf:opfpush-nokia:0.2.1@aar'
+
+    //push providers dependencies
+    provided 'com.amazon:amazon-device-messaging:1.0.1'
+    compile 'com.google.android.gms:play-services:7.0.0'
+    compile 'com.nokia:push:1.0'
+
+    //network
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.google.code.gson:gson:2.3.1'
 }
