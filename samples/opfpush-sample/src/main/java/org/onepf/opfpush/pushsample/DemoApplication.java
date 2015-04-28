@@ -17,11 +17,6 @@
 package org.onepf.opfpush.pushsample;
 
 import android.app.Application;
-import android.content.Context;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
@@ -29,6 +24,7 @@ import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.nokia.NokiaNotificationsProvider;
 import org.onepf.opfpush.pushsample.listener.DemoEventListener;
+import org.onepf.opfpush.pushsample.util.UuidGenerator;
 import org.onepf.opfutils.OPFLog;
 
 /**
@@ -47,10 +43,10 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        uuid = generateUuid();
-
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         OPFLog.logMethod();
+
+        uuid = UuidGenerator.generateUuid(this);
 
         OPFLog.i("Generated uuid : %s", uuid);
         final Configuration.Builder configBuilder = new Configuration.Builder()
@@ -68,29 +64,5 @@ public class DemoApplication extends Application {
 
     public String getUUID() {
         return uuid;
-    }
-
-    private String generateUuid() {
-        final TelephonyManager telephonyManager;
-        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-        final String IMEI = telephonyManager.getDeviceId();
-        final String IMSI = telephonyManager.getSubscriberId();
-
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        final WifiInfo wInfo = wifiManager.getConnectionInfo();
-        final String macAddress = wInfo.getMacAddress();
-
-        final String androidId = Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-
-        //noinspection StringBufferReplaceableByString
-        final StringBuilder uuidBuilder = new StringBuilder()
-                .append(IMEI == null ? "" : IMEI)
-                .append(IMSI == null ? "" : IMSI)
-                .append(macAddress == null ? "" : macAddress)
-                .append(androidId);
-
-        return uuidBuilder.toString();
     }
 }
