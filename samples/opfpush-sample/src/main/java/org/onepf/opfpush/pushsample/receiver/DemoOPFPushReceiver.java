@@ -22,13 +22,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfpush.pushsample.retrofit.NetworkController;
-import org.onepf.opfutils.OPFLog;
-import org.onepf.opfpush.receiver.OPFPushReceiver;
 import org.onepf.opfpush.pushsample.R;
 import org.onepf.opfpush.pushsample.model.event.MessageEvent;
 import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
+import org.onepf.opfpush.pushsample.retrofit.NetworkController;
 import org.onepf.opfpush.pushsample.util.NotificationUtils;
+import org.onepf.opfpush.receiver.OPFPushReceiver;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.io.UnsupportedEncodingException;

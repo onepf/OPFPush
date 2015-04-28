@@ -26,12 +26,12 @@ import org.onepf.opfpush.pushsample.DemoApplication;
 import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
 import org.onepf.opfpush.pushsample.model.event.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.event.UnregisteredEvent;
-import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.request.RegistrationRequestBody;
 import org.onepf.opfpush.pushsample.model.request.UnregistrationRequestBody;
-import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
+import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.response.RegistrationResponse;
 import org.onepf.opfpush.pushsample.model.response.UnregistrationResponse;
+import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
 import org.onepf.opfutils.OPFLog;
 
 import de.greenrobot.event.EventBus;

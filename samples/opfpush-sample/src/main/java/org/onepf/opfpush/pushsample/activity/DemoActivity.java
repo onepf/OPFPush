@@ -31,18 +31,18 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.onepf.opfpush.gcm.GCMConstants;
-import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
-import org.onepf.opfpush.pushsample.retrofit.NetworkController;
-import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
+import org.onepf.opfpush.gcm.GCMConstants;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.pushsample.R;
+import org.onepf.opfpush.pushsample.model.event.FailedRequestEvent;
 import org.onepf.opfpush.pushsample.model.event.MessageEvent;
 import org.onepf.opfpush.pushsample.model.event.NoAvailableProviderEvent;
 import org.onepf.opfpush.pushsample.model.event.RegisteredEvent;
 import org.onepf.opfpush.pushsample.model.event.UnregisteredEvent;
+import org.onepf.opfpush.pushsample.retrofit.NetworkController;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Map;
 

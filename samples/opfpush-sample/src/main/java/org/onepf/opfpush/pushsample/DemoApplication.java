@@ -23,13 +23,13 @@ import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
-import org.onepf.opfutils.OPFLog;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.nokia.NokiaNotificationsProvider;
 import org.onepf.opfpush.pushsample.listener.DemoEventListener;
+import org.onepf.opfutils.OPFLog;
 
 /**
  * @author Roman Savin

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.OPFPush;
+import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.pushprovider.PushProvider;
@@ -101,7 +102,7 @@ public final class MockPushProvider implements PushProvider {
     }
 
     @Override
-    public void checkManifest() {
+    public void checkManifest(@Nullable CheckManifestHandler checkManifestHandler) {
         // nothing
     }
 

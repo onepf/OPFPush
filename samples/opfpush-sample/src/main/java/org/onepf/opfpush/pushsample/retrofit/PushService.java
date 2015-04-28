@@ -16,12 +16,12 @@
 
 package org.onepf.opfpush.pushsample.retrofit;
 
-import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.request.RegistrationRequestBody;
 import org.onepf.opfpush.pushsample.model.request.UnregistrationRequestBody;
-import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
+import org.onepf.opfpush.pushsample.model.request.push.PushMessageRequestBody;
 import org.onepf.opfpush.pushsample.model.response.RegistrationResponse;
 import org.onepf.opfpush.pushsample.model.response.UnregistrationResponse;
+import org.onepf.opfpush.pushsample.model.response.push.PushMessageResponse;
 
 import retrofit.Callback;
 import retrofit.http.Body;

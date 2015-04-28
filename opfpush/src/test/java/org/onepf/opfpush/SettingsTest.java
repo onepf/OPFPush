@@ -51,7 +51,7 @@ import static org.onepf.opfpush.testutil.Util.shuffleStringArray;
  * @author antonpp
  * @since 24.02.15
  */
-@Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
+@Config(sdk = JELLY_BEAN_MR2)
 @RunWith(RobolectricTestRunner.class)
 @SuppressWarnings({"checkstyle:methodname", "PMD.MethodNamingConventions", "PMD.GodClass", "PMD.TooManyMethods"})
 public class SettingsTest extends Assert {

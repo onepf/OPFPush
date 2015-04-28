@@ -25,7 +25,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
  * @author antonpp
  * @since 13.04.15
  */
-@Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
+@Config(sdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class ConfigurationBuilderTest extends Assert {
 
