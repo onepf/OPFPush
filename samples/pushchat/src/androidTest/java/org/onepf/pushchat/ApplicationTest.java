@@ -1,4 +1,4 @@
-package org.onepf.opfpush.pushchat;
+package org.onepf.pushchat;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
