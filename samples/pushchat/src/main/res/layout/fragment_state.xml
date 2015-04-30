@@ -5,9 +5,43 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/uuid_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/horizontal_separator_height"
+        android:layout_marginBottom="@dimen/separator_margin"
+        android:layout_marginTop="@dimen/separator_margin"
+        android:background="@color/separator" />
+
+    <TextView
+        android:id="@+id/state_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    
+    <TextView
+        android:id="@+id/provider_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/registration_id_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/horizontal_separator_height"
+        android:layout_marginBottom="@dimen/separator_margin"
+        android:layout_marginTop="@dimen/separator_margin"
+        android:background="@color/separator" />
+
+    <Button
+        android:id="@+id/register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="State" />
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

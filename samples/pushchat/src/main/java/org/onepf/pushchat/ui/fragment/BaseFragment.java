@@ -19,6 +19,7 @@ package org.onepf.pushchat.ui.fragment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
+import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.ui.activity.MainActivity;
 
 /**
@@ -38,5 +39,9 @@ public class BaseFragment extends Fragment {
 
     public void setToolbarTitle(@NonNull final String title) {
         getMainActivity().setToolbarTitle(title);
+    }
+
+    public PushChatApplication getPushChatApplication() {
+        return (PushChatApplication) getActivity().getApplication();
     }
 }

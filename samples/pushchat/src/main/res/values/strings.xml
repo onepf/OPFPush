@@ -6,4 +6,15 @@
     <string name="title_messages_fragment">Messages</string>
     <string name="title_contacts_fragment">Contacts</string>
     <string name="title_about_fragment">About</string>
+
+    <!--State strings-->
+    <string name="uuid_fmt">UUID : %s</string>
+    <string name="state_fmt">State : %s</string>
+    <string name="registering">Registering</string>
+    <string name="registered">Registered</string>
+    <string name="unregistered">Unregistered</string>
+    <string name="register_button_text">Register</string>
+    <string name="unregister_button_text">Unregister</string>
+    <string name="provider_name_fmt">Provider name : %s</string>
+    <string name="registration_id_fmt">Registration id : %s</string>
 </resources>

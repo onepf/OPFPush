@@ -16,13 +16,21 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import org.onepf.opfpush.OPFPush;
+import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.pushchat.R;
 
 /**
@@ -30,6 +38,16 @@ import org.onepf.pushchat.R;
  * @since 29.04.2015
  */
 public class StateFragment extends BaseContentFragment {
+
+    private TextView stateTextView;
+
+    private TextView providerNameTextView;
+
+    private TextView registrationIdTextView;
+
+    private Button registerButton;
+
+    private BroadcastReceiver updateStateReceiver;
 
     @NonNull
     public static StateFragment newInstance() {
@@ -42,6 +60,124 @@ public class StateFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_state, container, false);
 
+        final TextView uuidTextView = (TextView) view.findViewById(R.id.uuid_text);
+        uuidTextView.setText(getString(R.string.uuid_fmt, getPushChatApplication().getUUID()));
+
+        stateTextView = (TextView) view.findViewById(R.id.state_text);
+        providerNameTextView = (TextView) view.findViewById(R.id.provider_name_text);
+        registrationIdTextView = (TextView) view.findViewById(R.id.registration_id_text);
+        registerButton = (Button) view.findViewById(R.id.register_button);
+
+        registerButton.setOnClickListener(onClickListener());
+
+        registerReceiver();
+        initState();
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unregisterReceiver();
+    }
+
+    private void initState() {
+        final OPFPushHelper helper = OPFPush.getHelper();
+        if (helper.isRegistering()) {
+            initRegisteringState();
+        } else if (helper.isRegistered()) {
+            //noinspection ConstantConditions
+            initRegisteredState(helper.getProviderName(), helper.getRegistrationId());
+        } else {
+            initUnregisteredState();
+        }
+    }
+
+    private void initRegisteringState() {
+        stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registering)));
+        providerNameTextView.setVisibility(View.GONE);
+        registrationIdTextView.setVisibility(View.GONE);
+        registerButton.setText(getString(R.string.register_button_text));
+        registerButton.setEnabled(false);
+    }
+
+    private void initRegisteredState(@NonNull final String providerName,
+                                     @NonNull final String registrationId) {
+        stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registered)));
+        providerNameTextView.setText(getString(R.string.provider_name_fmt, providerName));
+        registrationIdTextView.setText(getString(R.string.registration_id_fmt, registrationId));
+        providerNameTextView.setVisibility(View.VISIBLE);
+        registrationIdTextView.setVisibility(View.VISIBLE);
+        registerButton.setText(getString(R.string.unregister_button_text));
+        registerButton.setEnabled(true);
+    }
+
+    private void initUnregisteredState() {
+        stateTextView.setText(getString(R.string.state_fmt, getString(R.string.unregistered)));
+        providerNameTextView.setVisibility(View.GONE);
+        registrationIdTextView.setVisibility(View.GONE);
+        registerButton.setText(getString(R.string.register_button_text));
+        registerButton.setEnabled(true);
+    }
+
+    private void registerReceiver() {
+        if (updateStateReceiver == null) {
+            updateStateReceiver = new UpdateStateReceiver();
+            final IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(UpdateStateReceiver.REGISTERED_ACTION);
+            intentFilter.addAction(UpdateStateReceiver.UNREGISTERED_ACTION);
+            getActivity().registerReceiver(updateStateReceiver, intentFilter);
+        }
+    }
+
+    private void unregisterReceiver() {
+        if (updateStateReceiver != null) {
+            getActivity().unregisterReceiver(updateStateReceiver);
+            updateStateReceiver = null;
+        }
+    }
+
+    public class UpdateStateReceiver extends BroadcastReceiver {
+
+        public static final String REGISTERED_ACTION = "org.onepf.pushchat.REGISTERED_ACTION";
+        public static final String UNREGISTERED_ACTION = "org.onepf.pushchat.UNREGISTERED_ACTION";
+
+        public static final String PROVIDER_NAME_EXTRA_KEY = "PROVIDER_NAME_EXTRA_KEY";
+        public static final String REGISTRATION_ID_EXTRA_KEY = "REGISTRATION_ID_EXTRA_KEY";
+
+        @Override
+        public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
+            final String action = intent.getAction();
+            switch (action) {
+                case REGISTERED_ACTION:
+                    initRegisteredState(
+                            intent.getStringExtra(PROVIDER_NAME_EXTRA_KEY),
+                            intent.getStringExtra(REGISTRATION_ID_EXTRA_KEY)
+                    );
+                    break;
+                case UNREGISTERED_ACTION:
+                    initUnregisteredState();
+                    break;
+            }
+        }
+    }
+
+    private View.OnClickListener onClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final OPFPushHelper helper = OPFPush.getHelper();
+                if (helper.isRegistered()) {
+                    //state registered. need to unregister.
+                    helper.unregister();
+                } else if (!helper.isRegistering()) {
+                    //state unregistered. need to register.
+                    helper.register();
+                    initRegisteringState();
+                }
+                //state registering. button must be disabled.
+            }
+        };
     }
 }

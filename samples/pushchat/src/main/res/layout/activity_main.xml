@@ -21,7 +21,11 @@
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/activity_vertical_offset"
+            android:paddingLeft="@dimen/activity_horizontal_offset"
+            android:paddingRight="@dimen/activity_horizontal_offset"
+            android:paddingTop="@dimen/activity_vertical_offset" />
 
         <fragment
             android:id="@+id/navigation_drawer"
