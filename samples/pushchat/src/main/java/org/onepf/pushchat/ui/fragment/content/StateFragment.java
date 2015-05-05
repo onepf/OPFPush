@@ -84,6 +84,10 @@ public class StateFragment extends BaseContentFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unregisterReceiver();
+        stateTextView = null;
+        providerNameTextView = null;
+        registrationIdTextView = null;
+        registerButton = null;
     }
 
     private void initState() {

@@ -19,4 +19,12 @@
     <string name="unregister_button_text">Unregister</string>
     <string name="provider_name_fmt">Provider name : %s</string>
     <string name="registration_id_fmt">Registration id : %s</string>
+
+    <!--Contacts strings-->
+    <string name="add_contact_title">Add contact</string>
+    <string name="uuid_hint">Type uuid…</string>
+    <string name="uuid_not_exist">This uuid doesn\'t exist.</string>
+    <string name="own_uuid_error">Can\'t add own uuid.</string>
+    <string name="uuid_already_added">This uuid already added.</string>
+    <string name="remove_contact_question">Do you want remove this contact?</string>
 </resources>

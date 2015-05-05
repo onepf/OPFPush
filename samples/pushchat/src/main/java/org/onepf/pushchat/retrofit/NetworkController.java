@@ -27,6 +27,7 @@ import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
+import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
@@ -87,6 +88,11 @@ public final class NetworkController {
                             @NonNull final String message) {
         final PushMessageRequestBody body = new PushMessageRequestBody(getUuid(context), message);
         pushService.push(body, pushMessageCallback());
+    }
+
+    public void exist(@NonNull final String uuid,
+                      @NonNull final Callback<ExistResponse> callback) {
+        pushService.exist(uuid, callback);
     }
 
     private String getUuid(@NonNull final Context context) {

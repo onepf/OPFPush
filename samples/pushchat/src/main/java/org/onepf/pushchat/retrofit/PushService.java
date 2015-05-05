@@ -16,16 +16,21 @@
 
 package org.onepf.pushchat.retrofit;
 
+import android.support.annotation.NonNull;
+
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
+import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 
 import retrofit.Callback;
 import retrofit.http.Body;
+import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Query;
 
 /**
  * @author Roman Savin
@@ -34,14 +39,18 @@ import retrofit.http.POST;
 public interface PushService {
 
     @POST("/register")
-    void register(@Body final RegistrationRequestBody body,
-                  final Callback<RegistrationResponse> callback);
+    void register(@Body @NonNull final RegistrationRequestBody body,
+                  @NonNull final Callback<RegistrationResponse> callback);
 
     @POST("/unregister")
-    void unregister(@Body final UnregistrationRequestBody body,
-                    final Callback<UnregistrationResponse> callback);
+    void unregister(@Body @NonNull final UnregistrationRequestBody body,
+                    @NonNull final Callback<UnregistrationResponse> callback);
 
     @POST("/push")
-    void push(@Body final PushMessageRequestBody body,
-              final Callback<PushMessageResponse> callback);
+    void push(@Body @NonNull final PushMessageRequestBody body,
+              @NonNull final Callback<PushMessageResponse> callback);
+
+    @GET("/exist")
+    void exist(@Query("uuid") @NonNull final String uuid,
+               final Callback<ExistResponse> callback);
 }

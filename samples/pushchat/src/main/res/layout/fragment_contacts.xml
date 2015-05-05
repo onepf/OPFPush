@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/contacts_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/add_contact_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Contacts" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/activity_offset"
+        android:src="@drawable/ic_add_white_24dp"
+        fab:fab_colorNormal="@color/fab"
+        fab:fab_colorPressed="@color/fab_pressed"
+        fab:fab_colorRipple="@color/fab_ripple" />
 
-</LinearLayout>
+</FrameLayout>

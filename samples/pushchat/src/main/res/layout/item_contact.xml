@@ -14,12 +14,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <color name="separator">#000</color>
-
-    <color name="fab_ripple">#F06292</color>
-    <color name="fab">#E91E63</color>
-    <color name="fab_pressed">#C2185B</color>
-
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/uuid_text"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/uuid_item_height"
+    android:gravity="center_vertical" />

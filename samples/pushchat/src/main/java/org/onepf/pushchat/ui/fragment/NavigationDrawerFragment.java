@@ -61,8 +61,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         } else {
             currentSelectedPosition =
                     StateController.getState(getActivity()) == REGISTERED ?
-                    MESSAGES_POSITION :
-                    STATE_POSITION;
+                            MESSAGES_POSITION :
+                            STATE_POSITION;
         }
 
         selectItem(currentSelectedPosition);
@@ -86,6 +86,12 @@ public class NavigationDrawerFragment extends BaseFragment {
                 titles));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         return drawerListView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        drawerListView = null;
     }
 
     private void selectItem(int position) {

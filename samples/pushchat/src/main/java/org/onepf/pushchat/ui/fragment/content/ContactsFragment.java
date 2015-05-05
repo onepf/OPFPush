@@ -19,17 +19,26 @@ package org.onepf.pushchat.ui.fragment.content;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.ui.adapter.ContactsAdapter;
+import org.onepf.pushchat.ui.dialog.AddContactDialogFragment;
+import org.onepf.pushchat.utils.ContactsProvider;
 
 /**
  * @author Roman Savin
  * @since 29.04.2015
  */
 public class ContactsFragment extends BaseContentFragment {
+
+    private ContactsAdapter adapter;
 
     @NonNull
     public static ContactsFragment newInstance() {
@@ -42,6 +51,37 @@ public class ContactsFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_contacts, container, false);
 
+        adapter = new ContactsAdapter(this, ContactsProvider.getUuids(getActivity()));
+
+        final RecyclerView contactsView = (RecyclerView) view.findViewById(R.id.contacts_view);
+        contactsView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        contactsView.setAdapter(adapter);
+
+        final FloatingActionButton addContactFab =
+                (FloatingActionButton) view.findViewById(R.id.add_contact_fab);
+        addContactFab.attachToRecyclerView(contactsView);
+
+        addContactFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AddContactDialogFragment dialogFragment = AddContactDialogFragment.newInstance();
+                dialogFragment.show(getChildFragmentManager(), AddContactDialogFragment.TAG);
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        adapter = null;
+    }
+
+    public void addUuid(@NonNull final String uuid) {
+        ContactsProvider.addUuid(getActivity(), uuid);
+        if (adapter != null) {
+            adapter.addUuid(uuid);
+        }
     }
 }

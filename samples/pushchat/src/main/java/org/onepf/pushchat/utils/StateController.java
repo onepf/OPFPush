@@ -32,7 +32,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public final class StateController {
 
-    private static final String STATE_CONTROLLER = "org.onepf.pushchat.STATE_CONTROLLER";
+    private static final String STATE_PREFS_NAME = "org.onepf.pushchat.STATE_PREFS_NAME";
 
     private static final String IS_REGID_SAVED_KEY = "IS_REGID_SAVED_KEY";
 
@@ -70,7 +70,7 @@ public final class StateController {
 
     public static void putRegIdSavedOnServerValue(@NonNull final Context context,
                                                   final boolean isSaved) {
-        context.getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE)
+        context.getSharedPreferences(STATE_PREFS_NAME, MODE_PRIVATE)
                 .edit()
                 .putBoolean(IS_REGID_SAVED_KEY, isSaved)
                 .apply();
@@ -78,7 +78,7 @@ public final class StateController {
 
     public static void putNoAvailableProviderValue(@NonNull final Context context,
                                                    final boolean isNoAvailableProvider) {
-        context.getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE)
+        context.getSharedPreferences(STATE_PREFS_NAME, MODE_PRIVATE)
                 .edit()
                 .putBoolean(IS_NO_AVAILABLE_PROVIDER_KEY, isNoAvailableProvider)
                 .apply();
@@ -86,13 +86,13 @@ public final class StateController {
 
     private static boolean isRegIdSavedOnServer(@NonNull final Context context) {
         final SharedPreferences sharedPreferences = context
-                .getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE);
+                .getSharedPreferences(STATE_PREFS_NAME, MODE_PRIVATE);
         return sharedPreferences.getBoolean(IS_REGID_SAVED_KEY, false);
     }
 
     private static boolean isNoAvailableProvider(@NonNull final Context context) {
         final SharedPreferences sharedPreferences = context
-                .getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE);
+                .getSharedPreferences(STATE_PREFS_NAME, MODE_PRIVATE);
         return sharedPreferences.getBoolean(IS_NO_AVAILABLE_PROVIDER_KEY, false);
     }
 }

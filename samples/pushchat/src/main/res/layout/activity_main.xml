@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_margin="@dimen/activity_vertical_offset"
+            android:layout_margin="@dimen/activity_offset"
             android:visibility="gone" />
 
     </android.support.v7.widget.Toolbar>
@@ -32,10 +32,8 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="@dimen/activity_vertical_offset"
-            android:paddingLeft="@dimen/activity_horizontal_offset"
-            android:paddingRight="@dimen/activity_horizontal_offset"
-            android:paddingTop="@dimen/activity_vertical_offset" />
+            android:paddingLeft="@dimen/activity_offset"
+            android:paddingRight="@dimen/activity_offset" />
 
         <fragment
             android:id="@+id/navigation_drawer"
