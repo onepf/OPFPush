@@ -32,6 +32,8 @@ import android.widget.TextView;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.model.PushState;
+import org.onepf.pushchat.utils.StateController;
 
 /**
  * @author Roman Savin
@@ -84,17 +86,26 @@ public class StateFragment extends BaseContentFragment {
 
     private void initState() {
         final OPFPushHelper helper = OPFPush.getHelper();
-        if (helper.isRegistering()) {
-            initRegisteringState();
-        } else if (helper.isRegistered()) {
-            //noinspection ConstantConditions
-            initRegisteredState(helper.getProviderName(), helper.getRegistrationId());
-        } else {
-            initUnregisteredState();
+        final PushState state = StateController.getState(getActivity());
+        switch (state) {
+            case REGISTERED:
+                //noinspection ConstantConditions
+                initRegisteredState(helper.getProviderName(), helper.getRegistrationId());
+                break;
+            case REGISTERING:
+                initRegisteringState();
+                break;
+            case UNREGISTERED:
+                initUnregisteredState();
+                break;
+            case UNREGISTERING:
+                initUnregisteringState();
+                break;
         }
     }
 
     private void initRegisteringState() {
+        getMainActivity().showProgressbar();
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registering)));
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);
@@ -104,6 +115,7 @@ public class StateFragment extends BaseContentFragment {
 
     private void initRegisteredState(@NonNull final String providerName,
                                      @NonNull final String registrationId) {
+        getMainActivity().hideProgressBar();
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registered)));
         providerNameTextView.setText(getString(R.string.provider_name_fmt, providerName));
         registrationIdTextView.setText(getString(R.string.registration_id_fmt, registrationId));
@@ -114,11 +126,21 @@ public class StateFragment extends BaseContentFragment {
     }
 
     private void initUnregisteredState() {
+        getMainActivity().hideProgressBar();
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.unregistered)));
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);
         registerButton.setText(getString(R.string.register_button_text));
         registerButton.setEnabled(true);
+    }
+
+    private void initUnregisteringState() {
+        getMainActivity().showProgressbar();
+        stateTextView.setText(getString(R.string.state_fmt, getString(R.string.unregistering)));
+        providerNameTextView.setVisibility(View.GONE);
+        registrationIdTextView.setVisibility(View.GONE);
+        registerButton.setText(getString(R.string.unregister_button_text));
+        registerButton.setEnabled(false);
     }
 
     private void registerReceiver() {
@@ -167,16 +189,18 @@ public class StateFragment extends BaseContentFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final OPFPushHelper helper = OPFPush.getHelper();
-                if (helper.isRegistered()) {
-                    //state registered. need to unregister.
-                    helper.unregister();
-                } else if (!helper.isRegistering()) {
-                    //state unregistered. need to register.
-                    helper.register();
-                    initRegisteringState();
+                final PushState state = StateController.getState(getActivity());
+
+                switch (state) {
+                    case REGISTERED:
+                        initUnregisteringState();
+                        OPFPush.getHelper().unregister();
+                        break;
+                    case UNREGISTERED:
+                        initRegisteringState();
+                        OPFPush.getHelper().register();
+                        break;
                 }
-                //state registering. button must be disabled.
             }
         };
     }

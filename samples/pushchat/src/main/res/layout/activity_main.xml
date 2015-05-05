@@ -10,7 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/abc_action_bar_default_height_material"
-        app:theme="@style/ToolbarTheme" />
+        app:theme="@style/ToolbarTheme">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/activity_vertical_offset"
+            android:visibility="gone" />
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"

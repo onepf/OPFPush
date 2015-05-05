@@ -28,8 +28,14 @@ import org.onepf.pushchat.R;
 import org.onepf.pushchat.ui.ContentFragmentFactory;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
+import org.onepf.pushchat.utils.StateController;
+
+import static org.onepf.pushchat.model.PushState.REGISTERED;
 
 public class NavigationDrawerFragment extends BaseFragment {
+
+    private static final int STATE_POSITION = 0;
+    private static final int MESSAGES_POSITION = 1;
 
     private static final String STATE_SELECTED_POSITION_KEY = "STATE_SELECTED_POSITION_KEY";
 
@@ -52,6 +58,11 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         if (savedInstanceState != null) {
             currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION_KEY);
+        } else {
+            currentSelectedPosition =
+                    StateController.getState(getActivity()) == REGISTERED ?
+                    MESSAGES_POSITION :
+                    STATE_POSITION;
         }
 
         selectItem(currentSelectedPosition);

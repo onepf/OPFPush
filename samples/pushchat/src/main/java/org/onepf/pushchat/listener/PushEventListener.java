@@ -17,7 +17,6 @@
 package org.onepf.pushchat.listener;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,13 +25,9 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
+import org.onepf.pushchat.retrofit.NetworkController;
 
 import java.util.Map;
-
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.PROVIDER_NAME_EXTRA_KEY;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTERED_ACTION;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTRATION_ID_EXTRA_KEY;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin
@@ -80,12 +75,7 @@ public class PushEventListener implements EventListener {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-
-        final Intent registeredIntent = new Intent(REGISTERED_ACTION);
-        registeredIntent.putExtra(PROVIDER_NAME_EXTRA_KEY, providerName);
-        registeredIntent.putExtra(REGISTRATION_ID_EXTRA_KEY, registrationId);
-        context.sendBroadcast(registeredIntent);
-        /*NetworkController.getInstance().register(context, providerName, registrationId);*/
+        NetworkController.getInstance().register(context, providerName, registrationId);
     }
 
     @Override
@@ -93,14 +83,13 @@ public class PushEventListener implements EventListener {
                                @NonNull final String providerName,
                                @Nullable final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        context.sendBroadcast(new Intent(UNREGISTERED_ACTION));
-        /*NetworkController.getInstance().unregister(context, registrationId);*/
+        NetworkController.getInstance().unregister(context);
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
-        /*EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));*/
+        //todo show dialog, show message in state fragment
     }
 }
