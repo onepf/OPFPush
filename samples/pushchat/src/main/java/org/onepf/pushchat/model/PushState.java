@@ -28,5 +28,7 @@ public enum PushState {
 
     UNREGISTERED,
 
-    UNREGISTERING
+    UNREGISTERING,
+
+    NO_AVAILABLE_PROVIDER
 }

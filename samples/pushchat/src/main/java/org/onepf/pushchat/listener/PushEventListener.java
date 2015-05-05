@@ -30,6 +30,7 @@ import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.pushchat.retrofit.NetworkController;
+import org.onepf.pushchat.utils.StateController;
 
 import java.util.Map;
 
@@ -83,6 +84,8 @@ public class PushEventListener implements EventListener {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
+
+        StateController.putNoAvailableProviderValue(context, false);
         NetworkController.getInstance().register(context, providerName, registrationId);
     }
 
@@ -99,6 +102,7 @@ public class PushEventListener implements EventListener {
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
 
+        StateController.putNoAvailableProviderValue(context, true);
         NetworkController.getInstance().unregister(context);
 
         //Log errors.

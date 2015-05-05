@@ -32,14 +32,22 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public final class StateController {
 
-    private static final String SERVER_STATE_PREFS_NAME = "SERVER_STATE_PREFS_NAME";
+    private static final String STATE_CONTROLLER = "org.onepf.pushchat.STATE_CONTROLLER";
 
     private static final String IS_REGID_SAVED_KEY = "IS_REGID_SAVED_KEY";
+
+    private static final String IS_NO_AVAILABLE_PROVIDER_KEY = "IS_NO_AVAILABLE_PROVIDER_KEY";
+
+    private StateController() {
+        throw new UnsupportedOperationException();
+    }
 
     @NonNull
     public static PushState getState(@NonNull final Context context) {
         final OPFPushHelper helper = OPFPush.getHelper();
-        if (helper.isRegistered()) {
+        if (isNoAvailableProvider(context)) {
+            return PushState.NO_AVAILABLE_PROVIDER;
+        } else if (helper.isRegistered()) {
             if (isRegIdSavedOnServer(context)) {
                 //helper is registered and reg id is saved on server;
                 return PushState.REGISTERED;
@@ -62,15 +70,29 @@ public final class StateController {
 
     public static void putRegIdSavedOnServerValue(@NonNull final Context context,
                                                   final boolean isSaved) {
-        context.getSharedPreferences(SERVER_STATE_PREFS_NAME, MODE_PRIVATE)
+        context.getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE)
                 .edit()
                 .putBoolean(IS_REGID_SAVED_KEY, isSaved)
                 .apply();
     }
 
+    public static void putNoAvailableProviderValue(@NonNull final Context context,
+                                                   final boolean isNoAvailableProvider) {
+        context.getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE)
+                .edit()
+                .putBoolean(IS_NO_AVAILABLE_PROVIDER_KEY, isNoAvailableProvider)
+                .apply();
+    }
+
     private static boolean isRegIdSavedOnServer(@NonNull final Context context) {
         final SharedPreferences sharedPreferences = context
-                .getSharedPreferences(SERVER_STATE_PREFS_NAME, MODE_PRIVATE);
+                .getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE);
         return sharedPreferences.getBoolean(IS_REGID_SAVED_KEY, false);
+    }
+
+    private static boolean isNoAvailableProvider(@NonNull final Context context) {
+        final SharedPreferences sharedPreferences = context
+                .getSharedPreferences(STATE_CONTROLLER, MODE_PRIVATE);
+        return sharedPreferences.getBoolean(IS_NO_AVAILABLE_PROVIDER_KEY, false);
     }
 }

@@ -14,6 +14,7 @@
     <string name="registered">Registered</string>
     <string name="unregistered">Unregistered</string>
     <string name="unregistering">Unregistering</string>
+    <string name="no_available_provider">No available provider</string>
     <string name="register_button_text">Register</string>
     <string name="unregister_button_text">Unregister</string>
     <string name="provider_name_fmt">Provider name : %s</string>

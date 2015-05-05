@@ -35,6 +35,8 @@ import org.onepf.pushchat.R;
 import org.onepf.pushchat.model.PushState;
 import org.onepf.pushchat.utils.StateController;
 
+import static org.onepf.pushchat.model.PushState.NO_AVAILABLE_PROVIDER;
+
 /**
  * @author Roman Savin
  * @since 29.04.2015
@@ -96,10 +98,13 @@ public class StateFragment extends BaseContentFragment {
                 initRegisteringState();
                 break;
             case UNREGISTERED:
-                initUnregisteredState();
+                initUnregisteredState(false);
                 break;
             case UNREGISTERING:
                 initUnregisteringState();
+                break;
+            case NO_AVAILABLE_PROVIDER:
+                initUnregisteredState(true);
                 break;
         }
     }
@@ -125,9 +130,12 @@ public class StateFragment extends BaseContentFragment {
         registerButton.setEnabled(true);
     }
 
-    private void initUnregisteredState() {
+    private void initUnregisteredState(final boolean isNoAvailableProvider) {
         getMainActivity().hideProgressBar();
-        stateTextView.setText(getString(R.string.state_fmt, getString(R.string.unregistered)));
+        stateTextView.setText(getString(R.string.state_fmt, isNoAvailableProvider ?
+                        getString(R.string.no_available_provider) :
+                        getString(R.string.unregistered))
+        );
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);
         registerButton.setText(getString(R.string.register_button_text));
@@ -179,7 +187,7 @@ public class StateFragment extends BaseContentFragment {
                     );
                     break;
                 case UNREGISTERED_ACTION:
-                    initUnregisteredState();
+                    initUnregisteredState(StateController.getState(context) == NO_AVAILABLE_PROVIDER);
                     break;
             }
         }
@@ -196,6 +204,7 @@ public class StateFragment extends BaseContentFragment {
                         initUnregisteringState();
                         OPFPush.getHelper().unregister();
                         break;
+                    case NO_AVAILABLE_PROVIDER:
                     case UNREGISTERED:
                         initRegisteringState();
                         OPFPush.getHelper().register();
