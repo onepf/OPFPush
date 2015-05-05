@@ -17,10 +17,14 @@
 package org.onepf.pushchat.listener;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import org.onepf.opfpush.gcm.GCMConstants;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
@@ -28,6 +32,10 @@ import org.onepf.opfutils.OPFUtils;
 import org.onepf.pushchat.retrofit.NetworkController;
 
 import java.util.Map;
+
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_ERROR;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.GCM_ERROR_CODE_EXTRA_KEY;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
 
 /**
  * @author Roman Savin
@@ -90,6 +98,28 @@ public class PushEventListener implements EventListener {
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
-        //todo show dialog, show message in state fragment
+
+        NetworkController.getInstance().unregister(context);
+
+        //Log errors.
+        if (!pushErrors.isEmpty()) {
+            for (Map.Entry<String, UnrecoverablePushError> pushErrorEntry : pushErrors.entrySet()) {
+                OPFLog.d("Push provider %1$ss is unavailable. Error : %2$s",
+                        pushErrorEntry.getKey(), pushErrorEntry.getValue());
+            }
+        }
+
+        if (pushErrors.containsKey(GCMConstants.PROVIDER_NAME)) {
+            final UnrecoverablePushError gcmError = pushErrors.get(GCMConstants.PROVIDER_NAME);
+            if (gcmError.getType() == AVAILABILITY_ERROR
+                    && gcmError.getAvailabilityErrorCode() != null) {
+                final int errorCode = gcmError.getAvailabilityErrorCode();
+                if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+                    final Intent intent = new Intent(SHOW_GCM_ERROR_DIALOG_ACTION);
+                    intent.putExtra(GCM_ERROR_CODE_EXTRA_KEY, errorCode);
+                    context.sendBroadcast(intent);
+                }
+            }
+        }
     }
 }

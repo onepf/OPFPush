@@ -38,7 +38,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 
-import static org.onepf.pushchat.ui.activity.MainActivity.UpdateProgressBarReceiver.HIDE_PROGRESS_BAR_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.PROVIDER_NAME_EXTRA_KEY;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTERED_ACTION;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTRATION_ID_EXTRA_KEY;

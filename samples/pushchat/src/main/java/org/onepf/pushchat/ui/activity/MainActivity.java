@@ -33,6 +33,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
@@ -41,8 +43,9 @@ import org.onepf.pushchat.utils.FragmentUtils;
 import org.onepf.pushchat.utils.StateController;
 
 import static org.onepf.pushchat.model.PushState.REGISTERED;
-import static org.onepf.pushchat.ui.activity.MainActivity.UpdateProgressBarReceiver.HIDE_PROGRESS_BAR_ACTION;
-import static org.onepf.pushchat.ui.activity.MainActivity.UpdateProgressBarReceiver.SHOW_PROGRESS_BAR_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_PROGRESS_BAR_ACTION;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -59,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
 
     private String title;
 
-    private UpdateProgressBarReceiver receiver;
+    private MainActivityReceiver receiver;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -158,10 +161,11 @@ public class MainActivity extends ActionBarActivity {
 
     private void registerReceiver() {
         if (receiver == null) {
-            receiver = new UpdateProgressBarReceiver();
+            receiver = new MainActivityReceiver();
             final IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(SHOW_PROGRESS_BAR_ACTION);
             intentFilter.addAction(HIDE_PROGRESS_BAR_ACTION);
+            intentFilter.addAction(SHOW_GCM_ERROR_DIALOG_ACTION);
             registerReceiver(receiver, intentFilter);
         }
     }
@@ -184,10 +188,19 @@ public class MainActivity extends ActionBarActivity {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    public class UpdateProgressBarReceiver extends BroadcastReceiver {
+    private void showGcmErrorDialog(final int errorCode) {
+        if (errorCode != -1) {
+            GooglePlayServicesUtil.showErrorDialogFragment(errorCode, this, 0);
+        }
+    }
+
+    public class MainActivityReceiver extends BroadcastReceiver {
 
         public static final String SHOW_PROGRESS_BAR_ACTION = "SHOW_PROGRESS_BAR_ACTION";
         public static final String HIDE_PROGRESS_BAR_ACTION = "HIDE_PROGRESS_BAR_ACTION";
+        public static final String SHOW_GCM_ERROR_DIALOG_ACTION = "SHOW_GCM_ERROR_DIALOG_ACTION";
+
+        public static final String GCM_ERROR_CODE_EXTRA_KEY = "GCM_ERROR_CODE_EXTRA_KEY";
 
         @Override
         public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
@@ -198,6 +211,9 @@ public class MainActivity extends ActionBarActivity {
                     break;
                 case HIDE_PROGRESS_BAR_ACTION:
                     hideProgressBar();
+                    break;
+                case SHOW_GCM_ERROR_DIALOG_ACTION:
+                    showGcmErrorDialog(intent.getIntExtra(GCM_ERROR_CODE_EXTRA_KEY, -1));
                     break;
             }
         }
