@@ -33,7 +33,7 @@
     <string name="remove_contact_question">Do you want remove this contact?</string>
 
     <!--Messages string-->
-    <string name="date_fmt">Date : %s</string>
+    <string name="time_fmt">Time : %s</string>
     <string name="sender_fmt">Sender : %s</string>
     <string name="message_notification_title">Message</string>
     <string name="remove_messages">Remove messages</string>

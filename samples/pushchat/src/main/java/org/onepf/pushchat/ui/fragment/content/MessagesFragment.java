@@ -26,13 +26,12 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
+import org.onepf.pushchat.ui.adapter.MessagesCursorAdapter;
 
-import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.*;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
 
 /**
  * @author Roman Savin
@@ -40,7 +39,7 @@ import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEn
  */
 public class MessagesFragment extends BaseContentFragment {
 
-    private SimpleCursorAdapter adapter;
+    private MessagesCursorAdapter adapter;
 
     @NonNull
     public static MessagesFragment newInstance() {
@@ -69,29 +68,7 @@ public class MessagesFragment extends BaseContentFragment {
     private void initMessagesList(@NonNull final View view) {
         final ListView messagesListView = (ListView) view.findViewById(R.id.messages_list);
 
-        // The desired columns to be bound
-        final String[] columns = new String[]{
-                SENDER_UUID,
-                MESSAGE,
-                RECEIVED_TIME
-        };
-
-        // the XML defined views which the data will be bound to
-        final int[] to = new int[]{
-                R.id.sender,
-                R.id.message_text,
-                R.id.date
-        };
-
-        adapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.item_message,
-                null,
-                columns,
-                to,
-                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
-        );
-
+        adapter = new MessagesCursorAdapter(getActivity());
         messagesListView.setAdapter(adapter);
     }
 
