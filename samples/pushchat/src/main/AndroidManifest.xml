@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.onepf.pushchat">
+          package="org.onepf.pushchat">
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <!--adm permissions-->
-    <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" />
+    <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"/>
     <uses-permission
         android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
     <!--gcm permissions-->
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
     <!--nokia-->
     <!--Same as gcm-->
@@ -30,12 +30,13 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
         </activity>
@@ -46,10 +47,10 @@
             android:permission="com.amazon.device.messaging.permission.SEND">
 
             <intent-filter>
-                <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
-                <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
+                <action android:name="com.amazon.device.messaging.intent.REGISTRATION"/>
+                <action android:name="com.amazon.device.messaging.intent.RECEIVE"/>
 
-                <category android:name="${applicationId}" />
+                <category android:name="${applicationId}"/>
             </intent-filter>
         </receiver>
 
@@ -59,12 +60,12 @@
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="${applicationId}" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="${applicationId}"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION" />
-                <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION" />
+                <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION"/>
+                <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION"/>
             </intent-filter>
         </receiver>
 
@@ -74,13 +75,19 @@
             android:permission="com.nokia.pushnotifications.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->
-                <action android:name="com.nokia.pushnotifications.intent.RECEIVE" />
+                <action android:name="com.nokia.pushnotifications.intent.RECEIVE"/>
                 <!-- Receives the registration id. -->
-                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION" />
+                <action android:name="com.nokia.pushnotifications.intent.REGISTRATION"/>
 
-                <category android:name="${applicationId}" />
+                <category android:name="${applicationId}"/>
             </intent-filter>
         </receiver>
+
+        <provider
+            android:authorities="org.onepf.pushchat.db.databaseContentProvider"
+            android:name=".db.DatabaseContentProvider"
+            android:exported="false">
+        </provider>
 
     </application>
 

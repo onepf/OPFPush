@@ -34,8 +34,8 @@ import static org.onepf.pushchat.model.PushState.REGISTERED;
 
 public class NavigationDrawerFragment extends BaseFragment {
 
-    private static final int STATE_POSITION = 0;
-    private static final int MESSAGES_POSITION = 1;
+    public static final int STATE_POSITION = 0;
+    public static final int MESSAGES_POSITION = 1;
 
     private static final String STATE_SELECTED_POSITION_KEY = "STATE_SELECTED_POSITION_KEY";
 
@@ -94,7 +94,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView = null;
     }
 
-    private void selectItem(int position) {
+    public void selectItem(int position) {
         currentSelectedPosition = position;
         if (drawerListView != null) {
             drawerListView.setItemChecked(position, true);

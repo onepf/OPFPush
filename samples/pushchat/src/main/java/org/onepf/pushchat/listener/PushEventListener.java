@@ -29,14 +29,22 @@ import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
+import org.onepf.pushchat.R;
+import org.onepf.pushchat.db.DatabaseHelper;
+import org.onepf.pushchat.model.Message;
 import org.onepf.pushchat.retrofit.NetworkController;
+import org.onepf.pushchat.utils.NotificationUtils;
 import org.onepf.pushchat.utils.StateController;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AVAILABILITY_ERROR;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.GCM_ERROR_CODE_EXTRA_KEY;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
+import static org.onepf.pushchat.utils.Constants.MESSAGE_EXTRA_KEY;
+import static org.onepf.pushchat.utils.Constants.SENDER_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -49,7 +57,7 @@ public class PushEventListener implements EventListener {
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
         OPFLog.logMethod(providerName, OPFUtils.toString(extras));
-        /*if (extras == null) {
+        if (extras == null) {
             return;
         }
 
@@ -57,19 +65,26 @@ public class PushEventListener implements EventListener {
         final String senderUuid = extras.getString(SENDER_EXTRA_KEY);
 
         if (message != null && senderUuid != null) {
+            String decodedMessage;
             try {
-                NotificationUtils.showNotification(
-                        context,
-                        context.getString(R.string.message_notification_title),
-                        message
-                );
-                EventBus.getDefault().postSticky(
-                        new MessageEvent(senderUuid, URLDecoder.decode(message, "UTF-8"))
-                );
+                decodedMessage = URLDecoder.decode(message, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                OPFLog.e(e.getCause().toString());
+                OPFLog.e(e.getMessage());
+                decodedMessage = message;
             }
-        }*/
+
+            NotificationUtils.showNotification(
+                    context,
+                    context.getString(R.string.message_notification_title),
+                    decodedMessage
+            );
+
+            DatabaseHelper.getInstance(context).addMessage(new Message(
+                            senderUuid,
+                            decodedMessage,
+                            System.currentTimeMillis())
+            );
+        }
     }
 
     @Override

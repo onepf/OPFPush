@@ -31,4 +31,10 @@
     <string name="own_uuid_error">Can\'t add own uuid.</string>
     <string name="uuid_already_added">This uuid already added.</string>
     <string name="remove_contact_question">Do you want remove this contact?</string>
+
+    <!--Messages string-->
+    <string name="date_fmt">Date : %s</string>
+    <string name="sender_fmt">Sender : %s</string>
+    <string name="message_notification_title">Message</string>
+
 </resources>

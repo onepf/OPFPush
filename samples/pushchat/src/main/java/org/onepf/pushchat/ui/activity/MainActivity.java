@@ -32,11 +32,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
-
 import com.google.android.gms.common.GooglePlayServicesUtil;
-
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.ui.fragment.NavigationDrawerFragment;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
 import org.onepf.pushchat.ui.fragment.content.StateFragment;
@@ -47,12 +46,13 @@ import static android.content.Intent.ACTION_SEND;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static org.onepf.pushchat.model.PushState.REGISTERED;
-import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
-import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
-import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_PROGRESS_BAR_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.*;
+import static org.onepf.pushchat.ui.fragment.NavigationDrawerFragment.MESSAGES_POSITION;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    public static final String OPEN_MESSAGES_FRAGMENT_ACTION = "OPEN_MESSAGES_FRAGMENT_ACTION";
 
     private static final String TOOLBAR_TITLE_KEY = "TOOLBAR_TITLE_KEY";
 
@@ -120,6 +120,15 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (OPEN_MESSAGES_FRAGMENT_ACTION.equals(intent.getAction())) {
+            ((NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer))
+                    .selectItem(MESSAGES_POSITION);
+        }
     }
 
     @Override
