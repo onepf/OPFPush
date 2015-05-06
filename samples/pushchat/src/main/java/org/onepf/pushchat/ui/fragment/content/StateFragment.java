@@ -33,7 +33,7 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.model.PushState;
-import org.onepf.pushchat.utils.StateController;
+import org.onepf.pushchat.controller.StateController;
 
 import static org.onepf.pushchat.model.PushState.NO_AVAILABLE_PROVIDER;
 

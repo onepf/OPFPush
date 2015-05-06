@@ -31,7 +31,7 @@ import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
-import org.onepf.pushchat.utils.StateController;
+import org.onepf.pushchat.controller.StateController;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;

@@ -28,7 +28,7 @@ import org.onepf.pushchat.R;
 import org.onepf.pushchat.ui.ContentFragmentFactory;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
-import org.onepf.pushchat.utils.StateController;
+import org.onepf.pushchat.controller.StateController;
 
 import static org.onepf.pushchat.model.PushState.REGISTERED;
 

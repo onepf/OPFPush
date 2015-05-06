@@ -41,7 +41,7 @@ import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
 import org.onepf.pushchat.ui.fragment.content.StateFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
-import org.onepf.pushchat.utils.StateController;
+import org.onepf.pushchat.controller.StateController;
 
 import static android.content.Intent.ACTION_SEND;
 import static android.view.View.GONE;

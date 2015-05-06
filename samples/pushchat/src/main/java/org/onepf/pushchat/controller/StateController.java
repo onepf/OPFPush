@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.pushchat.utils;
+package org.onepf.pushchat.controller;
 
 import android.content.Context;
 import android.content.SharedPreferences;

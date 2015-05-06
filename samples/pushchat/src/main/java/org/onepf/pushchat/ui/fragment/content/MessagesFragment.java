@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
 import org.onepf.pushchat.ui.adapter.MessagesCursorAdapter;
 
@@ -57,6 +58,18 @@ public class MessagesFragment extends BaseContentFragment {
         initLoaderManager();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NotificationController.getInstance().setNeedShowNotification(false);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        NotificationController.getInstance().setNeedShowNotification(true);
     }
 
     @Override

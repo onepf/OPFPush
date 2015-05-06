@@ -33,8 +33,8 @@ import org.onepf.pushchat.R;
 import org.onepf.pushchat.db.DatabaseHelper;
 import org.onepf.pushchat.model.Message;
 import org.onepf.pushchat.retrofit.NetworkController;
-import org.onepf.pushchat.utils.NotificationUtils;
-import org.onepf.pushchat.utils.StateController;
+import org.onepf.pushchat.controller.NotificationController;
+import org.onepf.pushchat.controller.StateController;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -73,7 +73,7 @@ public class PushEventListener implements EventListener {
                 decodedMessage = message;
             }
 
-            NotificationUtils.showNotification(
+            NotificationController.getInstance().showNotification(
                     context,
                     context.getString(R.string.message_notification_title),
                     decodedMessage
