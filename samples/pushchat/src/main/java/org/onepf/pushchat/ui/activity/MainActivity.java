@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.db.DatabaseHelper;
 import org.onepf.pushchat.ui.fragment.NavigationDrawerFragment;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
@@ -58,6 +59,8 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String IS_SHARE_MENU_ITEM_VISIBLE_KEY = "IS_SHARE_MENU_ITEM_VISIBLE_KEY";
 
+    private static final String IS_CLEAR_MENU_ITEM_VISIBLE_KEY = "IS_CLEAR_MENU_ITEM_VISIBLE_KEY";
+
     private Toolbar toolbar;
 
     private DrawerLayout drawerLayout;
@@ -66,7 +69,12 @@ public class MainActivity extends ActionBarActivity {
 
     private ProgressBar progressBar;
 
+    private MenuItem shareMenuItem;
+    private MenuItem clearMenuItem;
+
     private boolean isShareMenuItemVisible;
+
+    private boolean isClearMenuItemVisible;
 
     private String title;
 
@@ -99,6 +107,7 @@ public class MainActivity extends ActionBarActivity {
         } else {
             title = savedInstanceState.getString(TOOLBAR_TITLE_KEY);
             isShareMenuItemVisible = savedInstanceState.getBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, false);
+            isClearMenuItemVisible = savedInstanceState.getBoolean(IS_CLEAR_MENU_ITEM_VISIBLE_KEY, false);
         }
         setUpNavigationDrawer();
     }
@@ -138,24 +147,37 @@ public class MainActivity extends ActionBarActivity {
             outState.putString(TOOLBAR_TITLE_KEY, title);
         }
         outState.putBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, isShareMenuItemVisible);
+        outState.putBoolean(IS_CLEAR_MENU_ITEM_VISIBLE_KEY, isClearMenuItemVisible);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        final int itemId = item.getItemId();
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
-        } else if (item.getItemId() == R.id.action_share) {
-            onShareClickListener();
+        } else if (itemId == R.id.action_share) {
+            onShareClick();
+            return true;
+        } else if (itemId == R.id.action_clear) {
+            onClearClick();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(@NonNull final Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        final MenuItem shareMenuItem = menu.findItem(R.id.action_share);
+        shareMenuItem = menu.findItem(R.id.action_share);
+        clearMenuItem = menu.findItem(R.id.action_clear);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(@NonNull final Menu menu) {
         shareMenuItem.setVisible(isShareMenuItemVisible);
+        clearMenuItem.setVisible(isClearMenuItemVisible);
+
         return true;
     }
 
@@ -200,6 +222,16 @@ public class MainActivity extends ActionBarActivity {
         invalidateOptionsMenu();
     }
 
+    public void showClearButton() {
+        isClearMenuItemVisible = true;
+        invalidateOptionsMenu();
+    }
+
+    public void hideClearButton() {
+        isClearMenuItemVisible = false;
+        invalidateOptionsMenu();
+    }
+
     public PushChatApplication getPushChatApplication() {
         return (PushChatApplication) getApplication();
     }
@@ -239,12 +271,16 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void onShareClickListener() {
+    private void onShareClick() {
         final Intent intent = new Intent(ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT,
                 getString(R.string.uuid_fmt, getPushChatApplication().getUUID()));
         intent.setType("text/plain");
         startActivity(Intent.createChooser(intent, getString(R.string.share_intent_chooser_title)));
+    }
+
+    private void onClearClick() {
+        DatabaseHelper.getInstance(this).deleteMessages();
     }
 
     public class MainActivityReceiver extends BroadcastReceiver {

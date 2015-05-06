@@ -94,7 +94,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(MESSAGE, message.getMessage());
         contentValues.put(RECEIVED_TIME, message.getReceivedTime());
 
-        asyncQueryHandler.startInsert(1, null, ContentDescriptor.MessagesContract.TABLE_URI, contentValues);
+        asyncQueryHandler.startInsert(1, null, MessagesContract.TABLE_URI, contentValues);
+    }
+
+    public void deleteMessages() {
+        asyncQueryHandler.startDelete(1, null, MessagesContract.TABLE_URI, null, null);
     }
 
     private static class MyAsyncQueryHandler extends AsyncQueryHandler {

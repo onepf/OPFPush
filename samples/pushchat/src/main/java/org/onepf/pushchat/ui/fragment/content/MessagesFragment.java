@@ -53,10 +53,17 @@ public class MessagesFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_messages, container, false);
 
+        showClearButton();
         initMessagesList(view);
         initLoaderManager();
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        hideClearButton();
     }
 
     private void initMessagesList(@NonNull final View view) {

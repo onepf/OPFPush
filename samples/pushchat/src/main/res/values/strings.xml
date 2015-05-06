@@ -36,5 +36,6 @@
     <string name="date_fmt">Date : %s</string>
     <string name="sender_fmt">Sender : %s</string>
     <string name="message_notification_title">Message</string>
+    <string name="remove_messages">Remove messages</string>
 
 </resources>

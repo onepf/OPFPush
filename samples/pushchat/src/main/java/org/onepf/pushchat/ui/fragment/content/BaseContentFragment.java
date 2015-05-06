@@ -39,4 +39,12 @@ public class BaseContentFragment extends BaseFragment {
     protected void hideShareButton() {
         getMainActivity().hideShareButton();
     }
+
+    protected void showClearButton() {
+        getMainActivity().showClearButton();
+    }
+
+    protected void hideClearButton() {
+        getMainActivity().hideClearButton();
+    }
 }
