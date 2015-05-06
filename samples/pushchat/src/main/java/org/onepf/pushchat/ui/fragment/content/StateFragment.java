@@ -28,14 +28,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.pushchat.R;
-import org.onepf.pushchat.model.PushState;
 import org.onepf.pushchat.controller.StateController;
+import org.onepf.pushchat.model.PushState;
 
 import static org.onepf.pushchat.model.PushState.NO_AVAILABLE_PROVIDER;
+import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin
@@ -168,8 +169,8 @@ public class StateFragment extends BaseContentFragment {
         if (updateStateReceiver == null) {
             updateStateReceiver = new UpdateStateReceiver();
             final IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(UpdateStateReceiver.REGISTERED_ACTION);
-            intentFilter.addAction(UpdateStateReceiver.UNREGISTERED_ACTION);
+            intentFilter.addAction(REGISTERED_ACTION);
+            intentFilter.addAction(UNREGISTERED_ACTION);
             getActivity().registerReceiver(updateStateReceiver, intentFilter);
         }
     }
@@ -182,10 +183,6 @@ public class StateFragment extends BaseContentFragment {
     }
 
     public class UpdateStateReceiver extends BroadcastReceiver {
-
-        public static final String REGISTERED_ACTION = "org.onepf.pushchat.REGISTERED_ACTION";
-        public static final String UNREGISTERED_ACTION = "org.onepf.pushchat.UNREGISTERED_ACTION";
-
         public static final String PROVIDER_NAME_EXTRA_KEY = "PROVIDER_NAME_EXTRA_KEY";
         public static final String REGISTRATION_ID_EXTRA_KEY = "REGISTRATION_ID_EXTRA_KEY";
 

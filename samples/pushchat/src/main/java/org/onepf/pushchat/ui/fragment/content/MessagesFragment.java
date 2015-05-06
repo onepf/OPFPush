@@ -16,7 +16,10 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +27,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,15 +37,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.NotificationController;
+import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
 import org.onepf.pushchat.db.DatabaseHelper;
 import org.onepf.pushchat.model.Message;
+import org.onepf.pushchat.model.PushState;
+import org.onepf.pushchat.model.response.push.FailedPushResult;
+import org.onepf.pushchat.model.response.push.PushMessageResponse;
 import org.onepf.pushchat.retrofit.NetworkController;
 import org.onepf.pushchat.ui.adapter.MessagesCursorAdapter;
 import org.onepf.pushchat.ui.dialog.AlertDialogFragment;
 import org.onepf.pushchat.utils.ContactsProvider;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
+import static org.onepf.pushchat.utils.Constants.*;
 
 /**
  * @author Roman Savin
@@ -50,6 +62,10 @@ import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEn
 public class MessagesFragment extends BaseContentFragment {
 
     private MessagesCursorAdapter adapter;
+
+    private EditText messageEditText;
+
+    private UpdateStateReceiver receiver;
 
     @NonNull
     public static MessagesFragment newInstance() {
@@ -62,12 +78,16 @@ public class MessagesFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_messages, container, false);
 
-        final EditText messageEditText = (EditText) view.findViewById(R.id.message_input);
+        messageEditText = (EditText) view.findViewById(R.id.message_input);
         messageEditText.setOnEditorActionListener(onEditorActionListener());
+
+        messageEditText.setEnabled(StateController.getState(getActivity()) == PushState.REGISTERED);
 
         showClearButton();
         initMessagesList(view);
         initLoaderManager();
+
+        registerReceiver();
 
         return view;
     }
@@ -88,32 +108,67 @@ public class MessagesFragment extends BaseContentFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        unregisterReceiver();
         hideClearButton();
+        messageEditText = null;
     }
 
     private TextView.OnEditorActionListener onEditorActionListener() {
         return new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                final String messageText = textView.getText().toString();
+                if (TextUtils.isEmpty(messageText)) {
+                    return false;
+                }
+
                 final Context context = getActivity();
                 if (ContactsProvider.getUuids(context).isEmpty()) {
                     final AlertDialogFragment dialogFragment = AlertDialogFragment
                             .newInstance(getString(R.string.empty_contact_list));
                     dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                 } else {
-                    final String messageText = textView.getText().toString();
+                    showProgressBar();
 
-                    DatabaseHelper.getInstance(context).addMessage(new Message(
-                            getString(R.string.sender_you),
+                    NetworkController.getInstance().pushMessage(
+                            context,
                             messageText,
-                            System.currentTimeMillis()
-                    ));
-                    NetworkController.getInstance().pushMessage(getActivity(), messageText);
+                            pushMessageCallback(messageText)
+                    );
                     textView.setText("");
                 }
                 return true;
             }
         };
+    }
+
+    private void registerReceiver() {
+        if (receiver == null) {
+            receiver = new UpdateStateReceiver();
+            final IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(REGISTERED_ACTION);
+            intentFilter.addAction(UNREGISTERED_ACTION);
+            getActivity().registerReceiver(receiver, intentFilter);
+        }
+    }
+
+    private void unregisterReceiver() {
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+            receiver = null;
+        }
+    }
+
+    private void enableMessageEditText() {
+        if (messageEditText != null) {
+            messageEditText.setEnabled(true);
+        }
+    }
+
+    private void disableMessageEditText() {
+        if (messageEditText != null) {
+            messageEditText.setEnabled(false);
+        }
     }
 
     private void initMessagesList(@NonNull final View view) {
@@ -145,5 +200,62 @@ public class MessagesFragment extends BaseContentFragment {
                 }
             }
         });
+    }
+
+    private Callback<PushMessageResponse> pushMessageCallback(@NonNull final String messageText) {
+        return new Callback<PushMessageResponse>() {
+
+            @Override
+            public void success(@NonNull final PushMessageResponse pushMessageResponse,
+                                @NonNull final Response response) {
+                hideProgressBar();
+                DatabaseHelper.getInstance(getActivity()).addMessage(new Message(
+                        getString(R.string.sender_you),
+                        messageText,
+                        System.currentTimeMillis()
+                ));
+
+                final FailedPushResult[] failedPushResults = pushMessageResponse.failed;
+                if (failedPushResults != null && failedPushResults.length > 0) {
+                    final StringBuilder errorBuilder = new StringBuilder("Can't send message to the following uuids:")
+                            .append(LINE_SEPARATOR);
+                    for (FailedPushResult failedPushResult : failedPushResults) {
+                        errorBuilder.append(LINE_SEPARATOR)
+                                .append("UUID : \"")
+                                .append(failedPushResult.pushReceiver.uuid)
+                                .append("\" Reason : ")
+                                .append(failedPushResult.errorMessage)
+                                .append(LINE_SEPARATOR);
+                    }
+
+                    final AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(errorBuilder.toString());
+                    dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
+                }
+            }
+
+            @Override
+            public void failure(@NonNull final RetrofitError error) {
+                hideProgressBar();
+                final AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(error.getMessage());
+                dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
+            }
+        };
+    }
+
+    public class UpdateStateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            switch (action) {
+                case REGISTERED_ACTION:
+                    enableMessageEditText();
+                    break;
+                case UNREGISTERED_ACTION:
+                    disableMessageEditText();
+                    break;
+            }
+        }
     }
 }

@@ -25,6 +25,11 @@ public final class Constants {
     public static final String MESSAGE_EXTRA_KEY = "message";
     public static final String SENDER_EXTRA_KEY = "sender";
 
+    public static final String REGISTERED_ACTION = "org.onepf.pushchat.REGISTERED_ACTION";
+    public static final String UNREGISTERED_ACTION = "org.onepf.pushchat.UNREGISTERED_ACTION";
+
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     private Constants() {
         throw new UnsupportedOperationException();
     }

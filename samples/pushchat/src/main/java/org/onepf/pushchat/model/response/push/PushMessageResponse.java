@@ -17,6 +17,7 @@
 package org.onepf.pushchat.model.response.push;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * @author Roman Savin
@@ -24,18 +25,18 @@ import android.support.annotation.NonNull;
  */
 public final class PushMessageResponse {
 
-    @NonNull
+    @Nullable
     public final PushResult[] successed;
 
-    @NonNull
+    @Nullable
     public final FailedPushResult[] failed;
 
     @NonNull
     public final String message;
 
-    public PushMessageResponse(@NonNull final PushResult[] successed,
-                                @NonNull final FailedPushResult[] failed,
-                                @NonNull final String message) {
+    public PushMessageResponse(@Nullable final PushResult[] successed,
+                               @Nullable final FailedPushResult[] failed,
+                               @NonNull final String message) {
         this.successed = successed;
         this.failed = failed;
         this.message = message;

@@ -19,11 +19,10 @@ package org.onepf.pushchat.retrofit;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-
 import com.google.gson.GsonBuilder;
-
 import org.onepf.opfutils.OPFLog;
 import org.onepf.pushchat.PushChatApplication;
+import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
@@ -31,8 +30,6 @@ import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
-import org.onepf.pushchat.controller.StateController;
-
 import org.onepf.pushchat.utils.ContactsProvider;
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -42,9 +39,9 @@ import retrofit.converter.GsonConverter;
 
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.PROVIDER_NAME_EXTRA_KEY;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTERED_ACTION;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTRATION_ID_EXTRA_KEY;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.UNREGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin
@@ -86,13 +83,14 @@ public final class NetworkController {
     }
 
     public void pushMessage(@NonNull final Context context,
-                            @NonNull final String message) {
+                            @NonNull final String message,
+                            @NonNull final Callback<PushMessageResponse> pushMessageCallback) {
         final PushMessageRequestBody body = new PushMessageRequestBody(
                 ContactsProvider.getUuids(context),
                 getUuid(context),
                 message
         );
-        pushService.push(body, pushMessageCallback());
+        pushService.push(body, pushMessageCallback);
     }
 
     public void exist(@NonNull final String uuid,
@@ -154,21 +152,6 @@ public final class NetworkController {
                 OPFLog.logMethod(error);
                 OPFLog.e(error.getMessage());
                 unregister(context);
-            }
-        };
-    }
-
-    private Callback<PushMessageResponse> pushMessageCallback() {
-        return new Callback<PushMessageResponse>() {
-            @Override
-            public void success(@NonNull final PushMessageResponse pushMessageResponse,
-                                @NonNull final Response response) {
-                OPFLog.logMethod(pushMessageResponse, response);
-            }
-
-            @Override
-            public void failure(@NonNull final RetrofitError error) {
-                OPFLog.logMethod(error);
             }
         };
     }
