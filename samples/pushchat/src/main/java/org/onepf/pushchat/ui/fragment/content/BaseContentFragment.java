@@ -16,6 +16,10 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
+import android.content.Context;
+import android.support.annotation.Nullable;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import org.onepf.pushchat.ui.fragment.BaseFragment;
 
 /**
@@ -46,5 +50,13 @@ public class BaseContentFragment extends BaseFragment {
 
     protected void hideClearButton() {
         getMainActivity().hideClearButton();
+    }
+
+    protected void hideKeyboard(@Nullable final View view) {
+        if (view != null) {
+            final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

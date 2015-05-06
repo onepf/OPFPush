@@ -17,11 +17,9 @@
 package org.onepf.pushchat.model.request.push;
 
 import android.support.annotation.NonNull;
-
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Roman Savin
@@ -30,17 +28,20 @@ import java.util.List;
 public final class PushMessageRequestBody {
 
     @SerializedName("uuids")
-    public final List<String> uuids;
+    public final Set<String> uuids;
+
+    @SerializedName("sender")
+    public final String sender;
 
     @SerializedName("message")
     @NonNull
     public final String message;
 
-    public PushMessageRequestBody(@NonNull final String uuid,
+    public PushMessageRequestBody(@NonNull final Set<String> uuids,
+                                  @NonNull final String sender,
                                   @NonNull final String message) {
-        this.uuids = new ArrayList<String>() {{
-            add(uuid);
-        }};
+        this.uuids = uuids;
+        this.sender = sender;
         this.message = message;
     }
 }

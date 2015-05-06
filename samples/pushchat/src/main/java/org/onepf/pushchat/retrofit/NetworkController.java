@@ -33,6 +33,7 @@ import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 import org.onepf.pushchat.controller.StateController;
 
+import org.onepf.pushchat.utils.ContactsProvider;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -86,7 +87,11 @@ public final class NetworkController {
 
     public void pushMessage(@NonNull final Context context,
                             @NonNull final String message) {
-        final PushMessageRequestBody body = new PushMessageRequestBody(getUuid(context), message);
+        final PushMessageRequestBody body = new PushMessageRequestBody(
+                ContactsProvider.getUuids(context),
+                getUuid(context),
+                message
+        );
         pushService.push(body, pushMessageCallback());
     }
 

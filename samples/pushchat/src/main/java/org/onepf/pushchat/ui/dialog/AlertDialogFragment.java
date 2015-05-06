@@ -18,6 +18,7 @@ package org.onepf.pushchat.ui.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -50,9 +51,16 @@ public class AlertDialogFragment extends DialogFragment {
 
         dialogBuilder.setMessage(getArguments().getString(MESSAGE_BUNDLE_KEY));
 
-        if (onClickListener != null) {
-            dialogBuilder.setPositiveButton(android.R.string.ok, onClickListener);
+        if (onClickListener == null) {
+            onClickListener = new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dismiss();
+                }
+            };
         }
+
+        dialogBuilder.setPositiveButton(android.R.string.ok, onClickListener);
 
         return dialogBuilder.create();
     }

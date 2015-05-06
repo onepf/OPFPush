@@ -16,6 +16,7 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,14 +24,22 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
+import org.onepf.pushchat.db.DatabaseHelper;
+import org.onepf.pushchat.model.Message;
+import org.onepf.pushchat.retrofit.NetworkController;
 import org.onepf.pushchat.ui.adapter.MessagesCursorAdapter;
+import org.onepf.pushchat.ui.dialog.AlertDialogFragment;
+import org.onepf.pushchat.utils.ContactsProvider;
 
 import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
 
@@ -53,6 +62,9 @@ public class MessagesFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_messages, container, false);
 
+        final EditText messageEditText = (EditText) view.findViewById(R.id.message_input);
+        messageEditText.setOnEditorActionListener(onEditorActionListener());
+
         showClearButton();
         initMessagesList(view);
         initLoaderManager();
@@ -70,12 +82,38 @@ public class MessagesFragment extends BaseContentFragment {
     public void onPause() {
         super.onPause();
         NotificationController.getInstance().setNeedShowNotification(true);
+        hideKeyboard(getView());
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         hideClearButton();
+    }
+
+    private TextView.OnEditorActionListener onEditorActionListener() {
+        return new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                final Context context = getActivity();
+                if (ContactsProvider.getUuids(context).isEmpty()) {
+                    final AlertDialogFragment dialogFragment = AlertDialogFragment
+                            .newInstance(getString(R.string.empty_contact_list));
+                    dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
+                } else {
+                    final String messageText = textView.getText().toString();
+
+                    DatabaseHelper.getInstance(context).addMessage(new Message(
+                            getString(R.string.sender_you),
+                            messageText,
+                            System.currentTimeMillis()
+                    ));
+                    NetworkController.getInstance().pushMessage(getActivity(), messageText);
+                    textView.setText("");
+                }
+                return true;
+            }
+        };
     }
 
     private void initMessagesList(@NonNull final View view) {
