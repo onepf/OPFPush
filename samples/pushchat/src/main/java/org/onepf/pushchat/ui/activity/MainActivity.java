@@ -29,12 +29,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
@@ -42,6 +43,9 @@ import org.onepf.pushchat.ui.fragment.content.StateFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
 import org.onepf.pushchat.utils.StateController;
 
+import static android.content.Intent.ACTION_SEND;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static org.onepf.pushchat.model.PushState.REGISTERED;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
@@ -50,7 +54,9 @@ import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.S
 
 public class MainActivity extends ActionBarActivity {
 
-    public static final String TOOLBAR_TITLE_KEY = "TOOLBAR_TITLE_KEY";
+    private static final String TOOLBAR_TITLE_KEY = "TOOLBAR_TITLE_KEY";
+
+    private static final String IS_SHARE_MENU_ITEM_VISIBLE_KEY = "IS_SHARE_MENU_ITEM_VISIBLE_KEY";
 
     private Toolbar toolbar;
 
@@ -59,6 +65,8 @@ public class MainActivity extends ActionBarActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     private ProgressBar progressBar;
+
+    private boolean isShareMenuItemVisible;
 
     private String title;
 
@@ -72,6 +80,8 @@ public class MainActivity extends ActionBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         if (savedInstanceState == null) {
+            isShareMenuItemVisible = false;
+
             final BaseContentFragment fragment;
             if (StateController.getState(this) == REGISTERED) {
                 title = getString(R.string.title_messages_fragment);
@@ -88,6 +98,7 @@ public class MainActivity extends ActionBarActivity {
             );
         } else {
             title = savedInstanceState.getString(TOOLBAR_TITLE_KEY);
+            isShareMenuItemVisible = savedInstanceState.getBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, false);
         }
         setUpNavigationDrawer();
     }
@@ -117,15 +128,26 @@ public class MainActivity extends ActionBarActivity {
         if (toolbar != null) {
             outState.putString(TOOLBAR_TITLE_KEY, title);
         }
+        outState.putBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, isShareMenuItemVisible);
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        //noinspection SimplifiableIfStatement
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        } else if (item.getItemId() == R.id.action_share) {
+            onShareClickListener();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(@NonNull final Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        final MenuItem shareMenuItem = menu.findItem(R.id.action_share);
+        shareMenuItem.setVisible(isShareMenuItemVisible);
+        return true;
     }
 
     @Override
@@ -149,14 +171,28 @@ public class MainActivity extends ActionBarActivity {
 
     public void showProgressbar() {
         if (progressBar != null) {
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(VISIBLE);
         }
     }
 
     public void hideProgressBar() {
         if (progressBar != null) {
-            progressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(GONE);
         }
+    }
+
+    public void showShareButton() {
+        isShareMenuItemVisible = true;
+        invalidateOptionsMenu();
+    }
+
+    public void hideShareButton() {
+        isShareMenuItemVisible = false;
+        invalidateOptionsMenu();
+    }
+
+    public PushChatApplication getPushChatApplication() {
+        return (PushChatApplication) getApplication();
     }
 
     private void registerReceiver() {
@@ -192,6 +228,14 @@ public class MainActivity extends ActionBarActivity {
         if (errorCode != -1) {
             GooglePlayServicesUtil.showErrorDialogFragment(errorCode, this, 0);
         }
+    }
+
+    private void onShareClickListener() {
+        final Intent intent = new Intent(ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT,
+                getString(R.string.uuid_fmt, getPushChatApplication().getUUID()));
+        intent.setType("text/plain");
+        startActivity(Intent.createChooser(intent, getString(R.string.share_intent_chooser_title)));
     }
 
     public class MainActivityReceiver extends BroadcastReceiver {

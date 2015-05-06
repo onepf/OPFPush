@@ -23,4 +23,20 @@ import org.onepf.pushchat.ui.fragment.BaseFragment;
  * @since 29.04.2015
  */
 public class BaseContentFragment extends BaseFragment {
+
+    protected void showProgressBar() {
+        getMainActivity().showProgressbar();
+    }
+
+    protected void hideProgressBar() {
+        getMainActivity().hideProgressBar();
+    }
+
+    protected void showShareButton() {
+        getMainActivity().showShareButton();
+    }
+
+    protected void hideShareButton() {
+        getMainActivity().hideShareButton();
+    }
 }

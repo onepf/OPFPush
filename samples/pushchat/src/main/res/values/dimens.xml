@@ -8,4 +8,6 @@
     <dimen name="navigation_drawer_width">240dp</dimen>
 
     <dimen name="uuid_item_height">48dp</dimen>
+
+    <dimen name="toolbar_item_size">24dp</dimen>
 </resources>

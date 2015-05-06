@@ -29,19 +29,19 @@ import org.onepf.pushchat.ui.activity.MainActivity;
 public class BaseFragment extends Fragment {
 
     @NonNull
-    public MainActivity getMainActivity() {
+    protected MainActivity getMainActivity() {
         return (MainActivity) getActivity();
     }
 
-    public void closeDrawer() {
+    protected void closeDrawer() {
         getMainActivity().closeDrawer();
     }
 
-    public void setToolbarTitle(@NonNull final String title) {
+    protected void setToolbarTitle(@NonNull final String title) {
         getMainActivity().setToolbarTitle(title);
     }
 
-    public PushChatApplication getPushChatApplication() {
-        return (PushChatApplication) getActivity().getApplication();
+    protected PushChatApplication getPushChatApplication() {
+        return getMainActivity().getPushChatApplication();
     }
 }

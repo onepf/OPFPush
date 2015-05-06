@@ -84,6 +84,7 @@ public class StateFragment extends BaseContentFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unregisterReceiver();
+        hideShareButton();
         stateTextView = null;
         providerNameTextView = null;
         registrationIdTextView = null;
@@ -114,7 +115,9 @@ public class StateFragment extends BaseContentFragment {
     }
 
     private void initRegisteringState() {
-        getMainActivity().showProgressbar();
+        hideShareButton();
+        showProgressBar();
+
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registering)));
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);
@@ -124,7 +127,9 @@ public class StateFragment extends BaseContentFragment {
 
     private void initRegisteredState(@NonNull final String providerName,
                                      @NonNull final String registrationId) {
-        getMainActivity().hideProgressBar();
+        hideProgressBar();
+        showShareButton();
+
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.registered)));
         providerNameTextView.setText(getString(R.string.provider_name_fmt, providerName));
         registrationIdTextView.setText(getString(R.string.registration_id_fmt, registrationId));
@@ -135,7 +140,9 @@ public class StateFragment extends BaseContentFragment {
     }
 
     private void initUnregisteredState(final boolean isNoAvailableProvider) {
-        getMainActivity().hideProgressBar();
+        hideProgressBar();
+        hideShareButton();
+
         stateTextView.setText(getString(R.string.state_fmt, isNoAvailableProvider ?
                         getString(R.string.no_available_provider) :
                         getString(R.string.unregistered))
@@ -147,7 +154,9 @@ public class StateFragment extends BaseContentFragment {
     }
 
     private void initUnregisteringState() {
-        getMainActivity().showProgressbar();
+        hideShareButton();
+        showProgressBar();
+
         stateTextView.setText(getString(R.string.state_fmt, getString(R.string.unregistering)));
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);

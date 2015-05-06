@@ -7,6 +7,9 @@
     <string name="title_contacts_fragment">Contacts</string>
     <string name="title_about_fragment">About</string>
 
+    <!--Menu strings-->
+    <string name="action_share">Share uuid</string>
+
     <!--State strings-->
     <string name="uuid_fmt">UUID : %s</string>
     <string name="state_fmt">State : %s</string>
@@ -19,6 +22,7 @@
     <string name="unregister_button_text">Unregister</string>
     <string name="provider_name_fmt">Provider name : %s</string>
     <string name="registration_id_fmt">Registration id : %s</string>
+    <string name="share_intent_chooser_title">Send uuid to…</string>
 
     <!--Contacts strings-->
     <string name="add_contact_title">Add contact</string>
