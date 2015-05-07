@@ -79,7 +79,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     @NonNull
     private final AsyncQueryHandler asyncQueryHandler;
 
-    private volatile static DatabaseHelper instance = null;
+    private volatile static DatabaseHelper instance;
 
     private DatabaseHelper(@NonNull final Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -117,20 +117,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void addMessage(@NonNull final Message message) {
-        new QueryContactNameQueryHandler(
-                appContext.getContentResolver(),
-                new QueryContactNameQueryHandler.QueryContactNameCallback() {
-                    @Override
-                    public void onComplete(@NonNull final String name) {
-                        final ContentValues contentValues = new ContentValues();
-                        contentValues.put(MessageEntry.SENDER_UUID, message.getSenderUuid());
-                        contentValues.put(MessageEntry.SENDER_NAME, name);
-                        contentValues.put(MessageEntry.MESSAGE, message.getMessage());
-                        contentValues.put(MessageEntry.RECEIVED_TIME, message.getReceivedTime());
-
-                        asyncQueryHandler.startInsert(MESSAGE_OPERATION_TOKEN, null, MessagesContract.TABLE_URI, contentValues);
-                    }
-                })
+        new QueryContactNameQueryHandler(appContext.getContentResolver(), queryContactNameCallback(message))
                 .startQuery(
                         QUERY_CONTACT_NAME_TOKEN,
                         null,
@@ -142,26 +129,46 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 );
     }
 
+    private QueryContactNameQueryHandler.QueryContactNameCallback queryContactNameCallback(
+            @NonNull final Message message
+    ) {
+        return new QueryContactNameQueryHandler.QueryContactNameCallback() {
+            @Override
+            public void onComplete(@NonNull final String name) {
+                final ContentValues contentValues = new ContentValues();
+                contentValues.put(MessageEntry.SENDER_UUID, message.getSenderUuid());
+                contentValues.put(MessageEntry.SENDER_NAME, name);
+                contentValues.put(MessageEntry.MESSAGE, message.getMessage());
+                contentValues.put(MessageEntry.RECEIVED_TIME, message.getReceivedTime());
+
+                asyncQueryHandler.startInsert(MESSAGE_OPERATION_TOKEN, null, MessagesContract.TABLE_URI, contentValues);
+            }
+        };
+    }
+
     public void deleteMessages() {
         asyncQueryHandler.startDelete(MESSAGE_OPERATION_TOKEN, null, MessagesContract.TABLE_URI, null, null);
     }
 
     public void addContact(@NonNull final Contact contact) {
+        final String contactName = contact.getName();
+        final String contactUuid = contact.getUuid();
+
         final ContentValues contactContentValues = new ContentValues();
-        contactContentValues.put(ContactEntry.NAME, contact.getName());
-        contactContentValues.put(ContactEntry.UUID, contact.getUuid());
+        contactContentValues.put(ContactEntry.NAME, contactName);
+        contactContentValues.put(ContactEntry.UUID, contactUuid);
 
         asyncQueryHandler.startInsert(CONTACT_OPERATION_TOKEN, null, ContactsContract.TABLE_URI, contactContentValues);
 
         final ContentValues messageContentValues = new ContentValues();
-        messageContentValues.put(MessageEntry.SENDER_NAME, contact.getName());
+        messageContentValues.put(MessageEntry.SENDER_NAME, contactName);
         asyncQueryHandler.startUpdate(
                 MESSAGE_OPERATION_TOKEN,
                 null,
                 MessagesContract.TABLE_URI,
                 messageContentValues,
                 MessageEntry.SENDER_UUID + "=?",
-                new String[]{contact.getUuid()}
+                new String[]{contactUuid}
         );
     }
 
@@ -217,6 +224,27 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         final boolean isEmpty = cursor.getCount() == 0;
         cursor.close();
         return isEmpty;
+    }
+
+    @NonNull
+    public String querySenderUuidById(final long id) {
+        final Cursor cursor = getReadableDatabase().query(
+                MessagesContract.TABLE_NAME,
+                new String[]{MessageEntry.SENDER_UUID},
+                MessageEntry.ID + "=?",
+                new String[]{String.valueOf(id)},
+                null,
+                null,
+                null
+        );
+
+        String senderUuid = "";
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            senderUuid = cursor.getString(cursor.getColumnIndexOrThrow(MessageEntry.SENDER_UUID));
+        }
+        cursor.close();
+        return senderUuid;
     }
 
     public static class ContactsUuidsAsyncQueryHandler extends AsyncQueryHandler {

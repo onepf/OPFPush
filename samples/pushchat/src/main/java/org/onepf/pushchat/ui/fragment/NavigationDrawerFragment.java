@@ -17,6 +17,8 @@
 package org.onepf.pushchat.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,11 +33,10 @@ import org.onepf.pushchat.utils.FragmentUtils;
 import org.onepf.pushchat.controller.StateController;
 
 import static org.onepf.pushchat.model.PushState.REGISTERED;
+import static org.onepf.pushchat.ui.ContentFragmentFactory.MESSAGES_FRAGMENT_POSITION;
+import static org.onepf.pushchat.ui.ContentFragmentFactory.STATE_FRAGMENT_POSITION;
 
 public class NavigationDrawerFragment extends BaseFragment {
-
-    public static final int STATE_POSITION = 0;
-    public static final int MESSAGES_POSITION = 1;
 
     private static final String STATE_SELECTED_POSITION_KEY = "STATE_SELECTED_POSITION_KEY";
 
@@ -46,7 +47,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private String[] titles;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         titles = new String[]{
@@ -56,34 +57,30 @@ public class NavigationDrawerFragment extends BaseFragment {
                 getString(R.string.title_about_fragment)
         };
 
-        if (savedInstanceState != null) {
-            currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION_KEY);
-        } else {
+        if (savedInstanceState == null) {
             currentSelectedPosition =
                     StateController.getState(getActivity()) == REGISTERED ?
-                            MESSAGES_POSITION :
-                            STATE_POSITION;
+                            MESSAGES_FRAGMENT_POSITION :
+                            STATE_FRAGMENT_POSITION;
+        } else {
+            currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION_KEY);
         }
 
         selectItem(currentSelectedPosition);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        drawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
-        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
+        drawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         drawerListView.setAdapter(new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                titles));
+                titles
+        ));
+        drawerListView.setOnItemClickListener(onItemClickListener());
         drawerListView.setItemChecked(currentSelectedPosition, true);
         return drawerListView;
     }
@@ -94,21 +91,31 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView = null;
     }
 
-    public void selectItem(int position) {
+    public void selectItem(final int position) {
         currentSelectedPosition = position;
         if (drawerListView != null) {
             drawerListView.setItemChecked(position, true);
         }
-        setToolbarTitle(titles[position]);
-        closeDrawer();
 
         final BaseContentFragment contentFragment = ContentFragmentFactory.getFragmentByPosition(position);
+        setToolbarTitle(getString(contentFragment.getTitleResId()));
         FragmentUtils.replace(getFragmentManager(), contentFragment, contentFragment.getClass().getName());
+
+        closeDrawer();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_SELECTED_POSITION_KEY, currentSelectedPosition);
+    }
+
+    private AdapterView.OnItemClickListener onItemClickListener() {
+        return new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                selectItem(position);
+            }
+        };
     }
 }

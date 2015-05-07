@@ -17,12 +17,7 @@
 package org.onepf.pushchat.ui;
 
 import android.support.annotation.NonNull;
-
-import org.onepf.pushchat.ui.fragment.content.AboutFragment;
-import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
-import org.onepf.pushchat.ui.fragment.content.ContactsFragment;
-import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
-import org.onepf.pushchat.ui.fragment.content.StateFragment;
+import org.onepf.pushchat.ui.fragment.content.*;
 
 /**
  * @author Roman Savin
@@ -30,10 +25,10 @@ import org.onepf.pushchat.ui.fragment.content.StateFragment;
  */
 public final class ContentFragmentFactory {
 
-    private static final int STATE_FRAGMENT_POSITION = 0;
-    private static final int MESSAGES_FRAGMENT_POSITION = 1;
-    private static final int CONTACTS_FRAGMENT_POSITION = 2;
-    private static final int ABOUT_FRAGMENT_POSITION = 3;
+    public static final int STATE_FRAGMENT_POSITION = 0;
+    public static final int MESSAGES_FRAGMENT_POSITION = 1;
+    public static final int CONTACTS_FRAGMENT_POSITION = 2;
+    public static final int ABOUT_FRAGMENT_POSITION = 3;
 
     private ContentFragmentFactory() {
         throw new UnsupportedOperationException();

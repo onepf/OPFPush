@@ -35,20 +35,20 @@ import android.widget.ProgressBar;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.DatabaseHelper;
 import org.onepf.pushchat.ui.fragment.NavigationDrawerFragment;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
 import org.onepf.pushchat.ui.fragment.content.StateFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
-import org.onepf.pushchat.controller.StateController;
 
 import static android.content.Intent.ACTION_SEND;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static org.onepf.pushchat.model.PushState.REGISTERED;
+import static org.onepf.pushchat.ui.ContentFragmentFactory.MESSAGES_FRAGMENT_POSITION;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.*;
-import static org.onepf.pushchat.ui.fragment.NavigationDrawerFragment.MESSAGES_POSITION;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -92,12 +92,12 @@ public class MainActivity extends ActionBarActivity {
 
             final BaseContentFragment fragment;
             if (StateController.getState(this) == REGISTERED) {
-                title = getString(R.string.title_messages_fragment);
                 fragment = MessagesFragment.newInstance();
             } else {
-                title = getString(R.string.title_state_fragment);
                 fragment = StateFragment.newInstance();
             }
+
+            title = getString(fragment.getTitleResId());
 
             FragmentUtils.add(
                     getSupportFragmentManager(),
@@ -109,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
             isShareMenuItemVisible = savedInstanceState.getBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, false);
             isClearMenuItemVisible = savedInstanceState.getBoolean(IS_CLEAR_MENU_ITEM_VISIBLE_KEY, false);
         }
-        setUpNavigationDrawer();
+        setupNavigationDrawer();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity {
         super.onNewIntent(intent);
         if (OPEN_MESSAGES_FRAGMENT_ACTION.equals(intent.getAction())) {
             ((NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer))
-                    .selectItem(MESSAGES_POSITION);
+                    .selectItem(MESSAGES_FRAGMENT_POSITION);
         }
     }
 
@@ -254,7 +254,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void setUpNavigationDrawer() {
+    private void setupNavigationDrawer() {
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 

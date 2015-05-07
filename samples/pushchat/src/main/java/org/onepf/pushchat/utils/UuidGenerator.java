@@ -35,7 +35,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public final class UuidGenerator {
 
-    private final static MessageDigest digester;
+    private static final MessageDigest DIGESTER;
 
     static {
         MessageDigest tmpDigester = null;
@@ -44,7 +44,7 @@ public final class UuidGenerator {
         } catch (NoSuchAlgorithmException e) {
             OPFLog.e(e.getMessage());
         }
-        digester = tmpDigester;
+        DIGESTER = tmpDigester;
     }
 
     private UuidGenerator() {
@@ -78,13 +78,13 @@ public final class UuidGenerator {
 
     @NonNull
     private static String crypt(@NonNull final String string) {
-        if (digester == null || TextUtils.isEmpty(string)) {
+        if (DIGESTER == null || TextUtils.isEmpty(string)) {
             return string;
         }
 
-        digester.update(string.getBytes());
+        DIGESTER.update(string.getBytes());
 
-        final byte[] hashBytes = digester.digest();
+        final byte[] hashBytes = DIGESTER.digest();
         final StringBuilder hexString = new StringBuilder();
 
         for (byte hashByte : hashBytes) {

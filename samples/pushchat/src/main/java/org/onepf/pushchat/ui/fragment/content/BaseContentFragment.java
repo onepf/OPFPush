@@ -26,7 +26,9 @@ import org.onepf.pushchat.ui.fragment.BaseFragment;
  * @author Roman Savin
  * @since 29.04.2015
  */
-public class BaseContentFragment extends BaseFragment {
+public abstract class BaseContentFragment extends BaseFragment {
+
+    public abstract int getTitleResId();
 
     protected void showProgressBar() {
         getMainActivity().showProgressbar();

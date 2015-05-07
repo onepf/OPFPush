@@ -32,6 +32,7 @@ import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
+import org.onepf.pushchat.utils.Constants;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -41,10 +42,7 @@ import retrofit.converter.GsonConverter;
 import java.util.Set;
 
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.PROVIDER_NAME_EXTRA_KEY;
-import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.REGISTRATION_ID_EXTRA_KEY;
-import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
-import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.*;
 
 /**
  * @author Roman Savin
@@ -91,7 +89,7 @@ public final class NetworkController {
         DatabaseHelper.getInstance(context).queryAllContactsUuids(
                 new QueryContactsUuidsCallback() {
                     @Override
-                    public void onComplete(@NonNull Set<String> uuids) {
+                    public void onComplete(@NonNull final Set<String> uuids) {
                         final PushMessageRequestBody body = new PushMessageRequestBody(
                                 uuids,
                                 getUuid(context),
@@ -127,7 +125,7 @@ public final class NetworkController {
 
                 final Intent registeredIntent = new Intent(REGISTERED_ACTION);
                 registeredIntent.putExtra(PROVIDER_NAME_EXTRA_KEY, providerName);
-                registeredIntent.putExtra(REGISTRATION_ID_EXTRA_KEY, registrationId);
+                registeredIntent.putExtra(Constants.REGISTRATION_ID_EXTRA_KEY, registrationId);
                 context.sendBroadcast(registeredIntent);
                 context.sendBroadcast(new Intent(HIDE_PROGRESS_BAR_ACTION));
             }

@@ -44,4 +44,9 @@ public class AboutFragment extends BaseContentFragment {
 
         return view;
     }
+
+    @Override
+    public int getTitleResId() {
+        return R.string.title_about_fragment;
+    }
 }

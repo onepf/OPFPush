@@ -35,8 +35,7 @@ import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.model.PushState;
 
 import static org.onepf.pushchat.model.PushState.NO_AVAILABLE_PROVIDER;
-import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
-import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.*;
 
 /**
  * @author Roman Savin
@@ -90,6 +89,11 @@ public class StateFragment extends BaseContentFragment {
         providerNameTextView = null;
         registrationIdTextView = null;
         registerButton = null;
+    }
+
+    @Override
+    public int getTitleResId() {
+        return R.string.title_state_fragment;
     }
 
     private void initState() {
@@ -182,9 +186,7 @@ public class StateFragment extends BaseContentFragment {
         }
     }
 
-    public class UpdateStateReceiver extends BroadcastReceiver {
-        public static final String PROVIDER_NAME_EXTRA_KEY = "PROVIDER_NAME_EXTRA_KEY";
-        public static final String REGISTRATION_ID_EXTRA_KEY = "REGISTRATION_ID_EXTRA_KEY";
+    private class UpdateStateReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {

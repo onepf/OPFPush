@@ -62,6 +62,8 @@ public class MessagesFragment extends BaseContentFragment {
 
     private UpdateStateReceiver receiver;
 
+    private MessagesLoaderCallbacks loaderCallbacks;
+
     @NonNull
     public static MessagesFragment newInstance() {
         return new MessagesFragment();
@@ -73,12 +75,8 @@ public class MessagesFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_messages, container, false);
 
-        messageEditText = (EditText) view.findViewById(R.id.message_input);
-        messageEditText.setOnEditorActionListener(onEditorActionListener());
-
-        messageEditText.setEnabled(StateController.getState(getActivity()) == PushState.REGISTERED);
-
         showClearButton();
+        initMessagesEditText(view);
         initMessagesList(view);
         initLoaderManager();
 
@@ -105,13 +103,42 @@ public class MessagesFragment extends BaseContentFragment {
         super.onDestroyView();
         unregisterReceiver();
         hideClearButton();
+        loaderCallbacks = null;
         messageEditText = null;
+        adapter = null;
+    }
+
+    @Override
+    public int getTitleResId() {
+        return R.string.title_messages_fragment;
+    }
+
+    private void initMessagesEditText(@NonNull final View view) {
+        messageEditText = (EditText) view.findViewById(R.id.message_input);
+        messageEditText.setOnEditorActionListener(onEditorActionListener());
+        messageEditText.setEnabled(StateController.getState(getActivity()) == PushState.REGISTERED);
+    }
+
+    private void initMessagesList(@NonNull final View view) {
+        final ListView messagesListView = (ListView) view.findViewById(R.id.messages_list);
+
+        adapter = new MessagesCursorAdapter(getActivity());
+        messagesListView.setAdapter(adapter);
+
+        messagesListView.setOnItemLongClickListener(onItemLongClickListener());
+    }
+
+    private void initLoaderManager() {
+        final LoaderManager loaderManager = getLoaderManager();
+        loaderCallbacks = new MessagesLoaderCallbacks();
+        loaderManager.initLoader(0, null, loaderCallbacks);
     }
 
     private TextView.OnEditorActionListener onEditorActionListener() {
         return new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                //Action send. Perform checks and push message.
                 final String messageText = textView.getText().toString();
                 if (TextUtils.isEmpty(messageText)) {
                     return false;
@@ -119,10 +146,12 @@ public class MessagesFragment extends BaseContentFragment {
 
                 final Context context = getActivity();
                 if (DatabaseHelper.getInstance(context).isContactsTableEmpty()) {
+                    //There aren't any contacts. Show dialog.
                     final AlertDialogFragment dialogFragment = AlertDialogFragment
                             .newInstance(getString(R.string.empty_contact_list));
                     dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
                 } else {
+                    //Send message
                     showProgressBar();
 
                     NetworkController.getInstance().pushMessage(
@@ -132,6 +161,24 @@ public class MessagesFragment extends BaseContentFragment {
                     );
                     textView.setText("");
                 }
+                return true;
+            }
+        };
+    }
+
+    private AdapterView.OnItemLongClickListener onItemLongClickListener() {
+        return new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                //copy sender uuid.
+                final ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
+                clipboard.setPrimaryClip(ClipData.newPlainText(
+                        getString(R.string.sender_uuid_clipdata_label),
+                        DatabaseHelper.getInstance(getActivity()).querySenderUuidById(id)
+                ));
+
+                Toast.makeText(getActivity(), R.string.sender_uuid_copy_toast, Toast.LENGTH_SHORT).show();
+
                 return true;
             }
         };
@@ -166,60 +213,13 @@ public class MessagesFragment extends BaseContentFragment {
         }
     }
 
-    private void initMessagesList(@NonNull final View view) {
-        final ListView messagesListView = (ListView) view.findViewById(R.id.messages_list);
-
-        adapter = new MessagesCursorAdapter(getActivity());
-        messagesListView.setAdapter(adapter);
-
-        messagesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //copy sender uuid.
-                final TextView senderTextView = (TextView) view.findViewById(R.id.sender);
-                final ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setPrimaryClip(ClipData.newPlainText(
-                        getString(R.string.sender_uuid_clipdata_label),
-                        senderTextView.getText()
-                ));
-
-                Toast.makeText(getActivity(), R.string.sender_uuid_copy_toast, Toast.LENGTH_SHORT).show();
-
-                return true;
-            }
-        });
-    }
-
-    private void initLoaderManager() {
-        final LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
-            @Override
-            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(getActivity(), MessagesContract.TABLE_URI, null, null, null, RECEIVED_TIME + " DESC");
-            }
-
-            @Override
-            public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-                if (adapter != null && cursor != null) {
-                    adapter.changeCursor(cursor);
-                }
-            }
-
-            @Override
-            public void onLoaderReset(Loader<Cursor> loader) {
-                if (adapter != null) {
-                    adapter.changeCursor(null);
-                }
-            }
-        });
-    }
-
     private Callback<PushMessageResponse> pushMessageCallback(@NonNull final String messageText) {
         return new Callback<PushMessageResponse>() {
 
             @Override
             public void success(@NonNull final PushMessageResponse pushMessageResponse,
                                 @NonNull final Response response) {
+                //Add message to DB.
                 hideProgressBar();
                 DatabaseHelper.getInstance(getActivity()).addMessage(new Message(
                         getString(R.string.sender_you),
@@ -227,6 +227,7 @@ public class MessagesFragment extends BaseContentFragment {
                         System.currentTimeMillis()
                 ));
 
+                //Show dialog about failed uuids.
                 final FailedPushResult[] failedPushResults = pushMessageResponse.failed;
                 if (failedPushResults != null && failedPushResults.length > 0) {
                     final StringBuilder errorBuilder = new StringBuilder("Can't send message to the following uuids:")
@@ -247,6 +248,7 @@ public class MessagesFragment extends BaseContentFragment {
 
             @Override
             public void failure(@NonNull final RetrofitError error) {
+                //Show error dialog
                 hideProgressBar();
                 final AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(error.getMessage());
                 dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);
@@ -254,7 +256,7 @@ public class MessagesFragment extends BaseContentFragment {
         };
     }
 
-    public class UpdateStateReceiver extends BroadcastReceiver {
+    private class UpdateStateReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -267,6 +269,28 @@ public class MessagesFragment extends BaseContentFragment {
                 case UNREGISTERED_ACTION:
                     disableMessageEditText();
                     break;
+            }
+        }
+    }
+
+    private class MessagesLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), MessagesContract.TABLE_URI, null, null, null, RECEIVED_TIME + " DESC");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (adapter != null && cursor != null) {
+                adapter.changeCursor(cursor);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            if (adapter != null) {
+                adapter.changeCursor(null);
             }
         }
     }

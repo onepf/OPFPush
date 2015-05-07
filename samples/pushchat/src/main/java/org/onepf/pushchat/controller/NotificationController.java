@@ -33,6 +33,10 @@ import org.onepf.pushchat.ui.activity.MainActivity;
  */
 public final class NotificationController {
 
+    private static class NotificationControllerHolder {
+        private static final NotificationController INSTANCE = new NotificationController();
+    }
+
     private boolean needShowNotification = true;
 
     public static NotificationController getInstance() {
@@ -66,16 +70,9 @@ public final class NotificationController {
                     .setContentText(notificationText)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
-
-            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
-                    .notify(0, notificationBuilder.build());
         }
 
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(0, notificationBuilder.build());
-    }
-
-    private static class NotificationControllerHolder {
-        private static final NotificationController INSTANCE = new NotificationController();
     }
 }

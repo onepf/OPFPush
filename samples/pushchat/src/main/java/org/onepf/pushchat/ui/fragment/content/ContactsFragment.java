@@ -45,6 +45,7 @@ public class ContactsFragment extends BaseContentFragment {
 
     private ContactsCursorAdapter adapter;
     private ListView contactsListView;
+    private LoaderManager.LoaderCallbacks loaderCallbacks;
 
     @NonNull
     public static ContactsFragment newInstance() {
@@ -67,8 +68,14 @@ public class ContactsFragment extends BaseContentFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        loaderCallbacks = null;
         adapter = null;
         contactsListView = null;
+    }
+
+    @Override
+    public int getTitleResId() {
+        return R.string.title_contacts_fragment;
     }
 
     private void initContactsList(@NonNull final View view) {
@@ -84,44 +91,20 @@ public class ContactsFragment extends BaseContentFragment {
         final FloatingActionButton addContactFab =
                 (FloatingActionButton) view.findViewById(R.id.add_contact_fab);
         addContactFab.attachToListView(contactsListView);
-
-        addContactFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AddContactDialogFragment dialogFragment = AddContactDialogFragment.newInstance();
-                dialogFragment.show(getFragmentManager(), AddContactDialogFragment.TAG);
-            }
-        });
+        addContactFab.setOnClickListener(onFabClickListener());
     }
 
     private void initLoaderManager() {
         final LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
-            @Override
-            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-                return new CursorLoader(getActivity(), ContentDescriptor.ContactsContract.TABLE_URI, null, null, null, null);
-            }
-
-            @Override
-            public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-                if (adapter != null && cursor != null) {
-                    adapter.changeCursor(cursor);
-                }
-            }
-
-            @Override
-            public void onLoaderReset(Loader<Cursor> loader) {
-                if (adapter != null) {
-                    adapter.changeCursor(null);
-                }
-            }
-        });
+        loaderCallbacks = new ContactsLoaderCallbacks();
+        loaderManager.initLoader(0, null, loaderCallbacks);
     }
 
     private AdapterView.OnItemLongClickListener onItemLongClick() {
         return new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+                //Show dialog which suggests to remove contact
                 final AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(
                         getActivity().getString(R.string.remove_contact_question)
                 );
@@ -135,9 +118,43 @@ public class ContactsFragment extends BaseContentFragment {
     private DialogInterface.OnClickListener onDialogClickListener(final long removingContactId) {
         return new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(final DialogInterface dialog, final int which) {
+                //delete contact from DB.
                 DatabaseHelper.getInstance(getActivity()).deleteContact(removingContactId);
             }
         };
+    }
+
+    private View.OnClickListener onFabClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                //Show dialog which suggests to add new contact.
+                final AddContactDialogFragment dialogFragment = AddContactDialogFragment.newInstance();
+                dialogFragment.show(getFragmentManager(), AddContactDialogFragment.TAG);
+            }
+        };
+    }
+
+    private class ContactsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getActivity(), ContentDescriptor.ContactsContract.TABLE_URI, null, null, null, null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (adapter != null && cursor != null) {
+                adapter.changeCursor(cursor);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            if (adapter != null) {
+                adapter.changeCursor(null);
+            }
+        }
     }
 }

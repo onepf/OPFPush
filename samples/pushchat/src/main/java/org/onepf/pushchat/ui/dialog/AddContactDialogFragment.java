@@ -92,6 +92,7 @@ public class AddContactDialogFragment extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Perform checks before adding contact to DB
                 final String name = nameEditText.getText().toString();
                 final String uuid = uuidEditText.getText().toString();
 
@@ -105,6 +106,7 @@ public class AddContactDialogFragment extends DialogFragment {
                     errorTextView.setText(R.string.uuid_already_added);
                     errorTextView.setVisibility(View.VISIBLE);
                 } else {
+                    //check existing and add to DB
                     errorTextView.setVisibility(View.GONE);
                     NetworkController.getInstance().exist(uuid, existCallback(name, uuid, errorTextView));
                 }
@@ -119,6 +121,7 @@ public class AddContactDialogFragment extends DialogFragment {
             @Override
             public void success(@NonNull final ExistResponse existResponse,
                                 @NonNull final Response response) {
+                //Add to DB if exists
                 if (existResponse.exist) {
                     DatabaseHelper.getInstance(getActivity()).addContact(new Contact(name, uuid));
                     dismiss();

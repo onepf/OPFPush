@@ -28,6 +28,9 @@ public final class Constants {
     public static final String REGISTERED_ACTION = "org.onepf.pushchat.REGISTERED_ACTION";
     public static final String UNREGISTERED_ACTION = "org.onepf.pushchat.UNREGISTERED_ACTION";
 
+    public static final String PROVIDER_NAME_EXTRA_KEY = "PROVIDER_NAME_EXTRA_KEY";
+    public static final String REGISTRATION_ID_EXTRA_KEY = "REGISTRATION_ID_EXTRA_KEY";
+
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private Constants() {
