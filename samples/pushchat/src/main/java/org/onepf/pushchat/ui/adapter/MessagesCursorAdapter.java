@@ -37,13 +37,33 @@ import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEn
  */
 public class MessagesCursorAdapter extends CursorAdapter {
 
+    private static final int TYPE_COUNT = 2;
+
+    private static final int ODD_ITEM = 1;
+
     public MessagesCursorAdapter(@NonNull final Context context) {
         super(context, null, true);
     }
 
     @Override
+    public int getItemViewType(final int position) {
+        return position % 2;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return TYPE_COUNT;
+    }
+
+    @Override
     public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.item_message, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.item_message, parent, false);
+
+        if (getItemViewType(cursor.getPosition()) == ODD_ITEM) {
+            view.setBackgroundResource(R.color.message_odd_item_background);
+        }
+
+        return view;
     }
 
     @Override

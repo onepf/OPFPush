@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ListView
         android:id="@+id/messages_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/message_input_layout"
+        android:dividerHeight="0dp" />
 
-    <EditText
-        android:id="@+id/message_input"
+    <LinearLayout
+        android:id="@+id/message_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
-        android:imeOptions="actionSend"
-        android:layout_gravity="bottom"
-        android:hint="@string/message_input_hint"/>
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:background="@android:color/white">
 
-</FrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/message_divider_color" />
+
+        <EditText
+            android:id="@+id/message_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_offset"
+            android:paddingRight="@dimen/activity_offset"
+            android:inputType="text"
+            android:imeOptions="actionSend"
+            android:hint="@string/message_input_hint" />
+
+    </LinearLayout>
+
+</RelativeLayout>

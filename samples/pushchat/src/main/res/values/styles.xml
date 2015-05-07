@@ -1,7 +1,18 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar" />
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar" />
+        <item name="colorPrimary">@color/toolbar</item>
+        <item name="colorPrimaryDark">@color/toolbar</item>
+
+        <item name="actionOverflowMenuStyle">@android:style/Widget.Holo.Light.ListPopupWindow</item>
+
+        <item name="android:textColor">@color/text</item>
+
+        <!--<item name="colorPressedHighlight">@color/toolbar</item>
+        <item name="colorLongPressedHighlight">@color/toolbar</item>-->
+    </style>
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
 </resources>

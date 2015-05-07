@@ -69,7 +69,7 @@ android {
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'IconExpectedSize',
-                'IconDensities', 'AlwaysShowAction', 'RtlEnabled'
+                'IconDensities', 'AlwaysShowAction', 'RtlEnabled', 'Overdraw', 'UnusedIds'
     }
 
     packagingOptions {
