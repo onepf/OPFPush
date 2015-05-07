@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.pushchat.model;
+package org.onepf.pushchat.model.db;
 
 import android.support.annotation.NonNull;
 
@@ -25,12 +25,12 @@ import android.support.annotation.NonNull;
 public final class Message {
 
     @NonNull
-    private String senderUuid;
+    private final String senderUuid;
 
     @NonNull
-    private String message;
+    private final String message;
 
-    private long receivedTime;
+    private final long receivedTime;
 
     public Message(@NonNull final String senderUuid,
                    @NonNull final String message,

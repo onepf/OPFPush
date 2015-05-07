@@ -19,6 +19,7 @@ package org.onepf.pushchat.ui.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +29,7 @@ import org.onepf.pushchat.R;
 
 import java.util.Date;
 
-import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.MESSAGE;
-import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
-import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.SENDER_UUID;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.*;
 
 /**
  * @author Roman Savin
@@ -49,7 +48,8 @@ public class MessagesCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
-        final String sender = cursor.getString(cursor.getColumnIndexOrThrow(SENDER_UUID));
+        final String senderUuid = cursor.getString(cursor.getColumnIndexOrThrow(SENDER_UUID));
+        final String senderName = cursor.getString(cursor.getColumnIndexOrThrow(SENDER_NAME));
         final String message = cursor.getString(cursor.getColumnIndexOrThrow(MESSAGE));
         final long time = cursor.getLong(cursor.getColumnIndexOrThrow(RECEIVED_TIME));
 
@@ -57,7 +57,11 @@ public class MessagesCursorAdapter extends CursorAdapter {
         final TextView messageTextView = (TextView) view.findViewById(R.id.message_text);
         final TextView timeTextView = (TextView) view.findViewById(R.id.time);
 
-        senderTextView.setText(context.getString(R.string.sender_fmt, sender));
+        if (TextUtils.isEmpty(senderName)) {
+            senderTextView.setText(context.getString(R.string.sender_uuid_fmt, senderUuid));
+        } else {
+            senderTextView.setText(context.getString(R.string.sender_name_fmt, senderName, senderUuid));
+        }
         messageTextView.setText(message);
         timeTextView.setText(context.getString(R.string.time_fmt, new Date(time).toString()));
     }

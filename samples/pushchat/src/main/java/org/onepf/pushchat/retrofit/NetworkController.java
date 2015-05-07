@@ -23,6 +23,8 @@ import com.google.gson.GsonBuilder;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.controller.StateController;
+import org.onepf.pushchat.db.DatabaseHelper;
+import org.onepf.pushchat.db.DatabaseHelper.ContactsUuidsAsyncQueryHandler.QueryContactsUuidsCallback;
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
@@ -30,12 +32,13 @@ import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
-import org.onepf.pushchat.utils.ContactsProvider;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
+
+import java.util.Set;
 
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
 import static org.onepf.pushchat.ui.fragment.content.StateFragment.UpdateStateReceiver.PROVIDER_NAME_EXTRA_KEY;
@@ -85,12 +88,18 @@ public final class NetworkController {
     public void pushMessage(@NonNull final Context context,
                             @NonNull final String message,
                             @NonNull final Callback<PushMessageResponse> pushMessageCallback) {
-        final PushMessageRequestBody body = new PushMessageRequestBody(
-                ContactsProvider.getUuids(context),
-                getUuid(context),
-                message
-        );
-        pushService.push(body, pushMessageCallback);
+        DatabaseHelper.getInstance(context).queryAllContactsUuids(
+                new QueryContactsUuidsCallback() {
+                    @Override
+                    public void onComplete(@NonNull Set<String> uuids) {
+                        final PushMessageRequestBody body = new PushMessageRequestBody(
+                                uuids,
+                                getUuid(context),
+                                message
+                        );
+                        pushService.push(body, pushMessageCallback);
+                    }
+                });
     }
 
     public void exist(@NonNull final String uuid,

@@ -42,6 +42,9 @@ public final class ContentDescriptor {
         {
             addURI(AUTHORITY, MessagesContract.TABLE_NAME, MessagesContract.ALL_URI_CODE);
             addURI(AUTHORITY, MessagesContract.TABLE_NAME + "/#/", MessagesContract.URI_CODE);
+
+            addURI(AUTHORITY, ContactsContract.TABLE_NAME, ContactsContract.ALL_URI_CODE);
+            addURI(AUTHORITY, ContactsContract.TABLE_NAME + "/#/", ContactsContract.URI_CODE);
         }
 
         @Override
@@ -66,8 +69,23 @@ public final class ContentDescriptor {
         public static class MessageEntry {
             public static final String ID = BaseColumns._ID;
             public static final String SENDER_UUID = "sender_uuid";
+            public static final String SENDER_NAME = "sender_name";
             public static final String MESSAGE = "message";
             public static final String RECEIVED_TIME = "received_time";
+        }
+    }
+
+    public static class ContactsContract {
+        public static final String TABLE_NAME = "contacts";
+
+        public static final Uri TABLE_URI = CONTENT_BASE_URI.buildUpon().appendPath(TABLE_NAME).build();
+        public static final int ALL_URI_CODE = 2;
+        public static final int URI_CODE = 3;
+
+        public static class ContactEntry {
+            public static final String ID = BaseColumns._ID;
+            public static final String UUID = "uuid";
+            public static final String NAME = "name";
         }
     }
 
@@ -76,6 +94,9 @@ public final class ContentDescriptor {
             case MessagesContract.ALL_URI_CODE:
             case MessagesContract.URI_CODE:
                 return MessagesContract.TABLE_NAME;
+            case ContactsContract.ALL_URI_CODE:
+            case ContactsContract.URI_CODE:
+                return ContactsContract.TABLE_NAME;
         }
         throw new IllegalArgumentException("uriCode " + uriCode);
     }

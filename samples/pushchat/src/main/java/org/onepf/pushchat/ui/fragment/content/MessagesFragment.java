@@ -35,14 +35,13 @@ import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
 import org.onepf.pushchat.db.DatabaseHelper;
-import org.onepf.pushchat.model.Message;
+import org.onepf.pushchat.model.db.Message;
 import org.onepf.pushchat.model.PushState;
 import org.onepf.pushchat.model.response.push.FailedPushResult;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 import org.onepf.pushchat.retrofit.NetworkController;
 import org.onepf.pushchat.ui.adapter.MessagesCursorAdapter;
 import org.onepf.pushchat.ui.dialog.AlertDialogFragment;
-import org.onepf.pushchat.utils.ContactsProvider;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -119,7 +118,7 @@ public class MessagesFragment extends BaseContentFragment {
                 }
 
                 final Context context = getActivity();
-                if (ContactsProvider.getUuids(context).isEmpty()) {
+                if (DatabaseHelper.getInstance(context).isContactsTableEmpty()) {
                     final AlertDialogFragment dialogFragment = AlertDialogFragment
                             .newInstance(getString(R.string.empty_contact_list));
                     dialogFragment.show(getFragmentManager(), AlertDialogFragment.TAG);

@@ -27,14 +27,18 @@
     <!--Contacts strings-->
     <string name="add_contact_title">Add contact</string>
     <string name="uuid_hint">Type uuid…</string>
+    <string name="contact_name_hint">Type name…</string>
     <string name="uuid_not_exist">This uuid doesn\'t exist.</string>
     <string name="own_uuid_error">Can\'t add own uuid.</string>
     <string name="uuid_already_added">This uuid already added.</string>
     <string name="remove_contact_question">Do you want remove this contact?</string>
+    <string name="contact_name_fmt">Name : %s</string>
+    <string name="contact_uuid_fmt">UUID : %s</string>
 
     <!--Messages string-->
     <string name="time_fmt">Time : %s</string>
-    <string name="sender_fmt">Sender : %s</string>
+    <string name="sender_uuid_fmt">Sender : %s</string>
+    <string name="sender_name_fmt">Sender : %1$s (%2$s)</string>
     <string name="message_notification_title">Message</string>
     <string name="remove_messages">Remove messages</string>
     <string name="message_input_hint">Type message…</string>

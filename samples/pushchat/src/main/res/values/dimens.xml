@@ -1,6 +1,7 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+
     <dimen name="activity_offset">16dp</dimen>
+    <dimen name="list_item_offset">5dp</dimen>
 
     <dimen name="horizontal_separator_height">1dp</dimen>
     <dimen name="separator_margin">5dp</dimen>
@@ -8,6 +9,5 @@
     <dimen name="navigation_drawer_width">240dp</dimen>
 
     <dimen name="uuid_item_height">48dp</dimen>
-
     <dimen name="toolbar_item_size">24dp</dimen>
 </resources>

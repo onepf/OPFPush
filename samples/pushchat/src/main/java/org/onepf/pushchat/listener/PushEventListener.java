@@ -31,7 +31,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.db.DatabaseHelper;
-import org.onepf.pushchat.model.Message;
+import org.onepf.pushchat.model.db.Message;
 import org.onepf.pushchat.retrofit.NetworkController;
 import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.controller.StateController;
