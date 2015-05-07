@@ -16,6 +16,7 @@
 
 package org.onepf.pushchat.ui.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ public class AddContactDialogFragment extends DialogFragment {
         return new AddContactDialogFragment();
     }
 
+    @SuppressLint("InflateParams")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -62,7 +64,6 @@ public class AddContactDialogFragment extends DialogFragment {
         final Button okButton = (Button) view.findViewById(R.id.ok_button);
 
         uuidEditText.addTextChangedListener(new AfterTextChangedWatcher() {
-
             @Override
             public void afterTextChanged(final Editable s) {
                 okButton.setEnabled(!s.toString().isEmpty() && !nameEditText.getText().toString().isEmpty());
@@ -70,7 +71,6 @@ public class AddContactDialogFragment extends DialogFragment {
         });
 
         nameEditText.addTextChangedListener(new AfterTextChangedWatcher() {
-
             @Override
             public void afterTextChanged(final Editable s) {
                 okButton.setEnabled(!s.toString().isEmpty() && !uuidEditText.getText().toString().isEmpty());
