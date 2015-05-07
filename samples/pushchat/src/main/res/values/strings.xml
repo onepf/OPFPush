@@ -40,5 +40,7 @@
     <string name="message_input_hint">Type message…</string>
     <string name="empty_contact_list">Add at least one contact to send message.</string>
     <string name="sender_you">You</string>
+    <string name="sender_uuid_clipdata_label">Sender uuid.</string>
+    <string name="sender_uuid_copy_toast">Sender uuid was copied.</string>
 
 </resources>

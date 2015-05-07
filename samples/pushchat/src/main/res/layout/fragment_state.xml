@@ -7,7 +7,8 @@
     <TextView
         android:id="@+id/uuid_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true" />
 
     <View
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         android:id="@+id/state_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    
+
     <TextView
         android:id="@+id/provider_name_text"
         android:layout_width="match_parent"
@@ -29,7 +30,8 @@
     <TextView
         android:id="@+id/registration_id_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true" />
 
     <View
         android:layout_width="match_parent"

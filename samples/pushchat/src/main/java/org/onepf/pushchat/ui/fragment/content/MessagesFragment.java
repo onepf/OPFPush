@@ -16,10 +16,7 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,9 +29,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.controller.StateController;
@@ -52,6 +47,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
 import static org.onepf.pushchat.utils.Constants.*;
 
@@ -176,6 +172,23 @@ public class MessagesFragment extends BaseContentFragment {
 
         adapter = new MessagesCursorAdapter(getActivity());
         messagesListView.setAdapter(adapter);
+
+        messagesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //copy sender uuid.
+                final TextView senderTextView = (TextView) view.findViewById(R.id.sender);
+                final ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
+                clipboard.setPrimaryClip(ClipData.newPlainText(
+                        getString(R.string.sender_uuid_clipdata_label),
+                        senderTextView.getText()
+                ));
+
+                Toast.makeText(getActivity(), R.string.sender_uuid_copy_toast, Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
     }
 
     private void initLoaderManager() {
