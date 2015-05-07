@@ -235,9 +235,13 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             final Set<String> uuids = new HashSet<>();
             if (token == QUERY_UUIDS_TOKEN) {
                 cursor.moveToFirst();
-                do {
+                while (true) {
                     uuids.add(cursor.getString(cursor.getColumnIndexOrThrow(ContactEntry.UUID)));
-                } while (!cursor.isLast());
+                    if (cursor.isLast()) {
+                        break;
+                    }
+                    cursor.moveToNext();
+                }
             }
             cursor.close();
             callback.onComplete(uuids);
