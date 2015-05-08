@@ -25,7 +25,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +34,8 @@ import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.ContentDescriptor.MessagesContract;
 import org.onepf.pushchat.db.DatabaseHelper;
-import org.onepf.pushchat.model.db.Message;
 import org.onepf.pushchat.model.PushState;
+import org.onepf.pushchat.model.db.Message;
 import org.onepf.pushchat.model.response.push.FailedPushResult;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 import org.onepf.pushchat.retrofit.NetworkController;
@@ -59,6 +58,8 @@ public class MessagesFragment extends BaseContentFragment {
     private MessagesCursorAdapter adapter;
 
     private EditText messageEditText;
+
+    private Button sendButton;
 
     private UpdateStateReceiver receiver;
 
@@ -105,6 +106,7 @@ public class MessagesFragment extends BaseContentFragment {
         hideClearButton();
         loaderCallbacks = null;
         messageEditText = null;
+        sendButton = null;
         adapter = null;
     }
 
@@ -115,8 +117,13 @@ public class MessagesFragment extends BaseContentFragment {
 
     private void initMessagesEditText(@NonNull final View view) {
         messageEditText = (EditText) view.findViewById(R.id.message_input);
-        messageEditText.setOnEditorActionListener(onEditorActionListener());
-        messageEditText.setEnabled(StateController.getState(getActivity()) == PushState.REGISTERED);
+        sendButton = (Button) view.findViewById(R.id.message_send_button);
+
+        sendButton.setOnClickListener(onSendClickListener());
+
+        final boolean isRegistered = StateController.getState(getActivity()) == PushState.REGISTERED;
+        messageEditText.setEnabled(isRegistered);
+        sendButton.setEnabled(isRegistered);
     }
 
     private void initMessagesList(@NonNull final View view) {
@@ -134,14 +141,18 @@ public class MessagesFragment extends BaseContentFragment {
         loaderManager.initLoader(0, null, loaderCallbacks);
     }
 
-    private TextView.OnEditorActionListener onEditorActionListener() {
-        return new TextView.OnEditorActionListener() {
+    private View.OnClickListener onSendClickListener() {
+        return new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+            public void onClick(View v) {
+                if (messageEditText == null) {
+                    return;
+                }
+
                 //Action send. Perform checks and push message.
-                final String messageText = textView.getText().toString();
+                final String messageText = messageEditText.getText().toString();
                 if (TextUtils.isEmpty(messageText)) {
-                    return false;
+                    return;
                 }
 
                 final Context context = getActivity();
@@ -159,9 +170,8 @@ public class MessagesFragment extends BaseContentFragment {
                             messageText,
                             pushMessageCallback(messageText)
                     );
-                    textView.setText("");
+                    messageEditText.setText("");
                 }
-                return true;
             }
         };
     }
@@ -205,11 +215,17 @@ public class MessagesFragment extends BaseContentFragment {
         if (messageEditText != null) {
             messageEditText.setEnabled(true);
         }
+        if (sendButton != null) {
+            sendButton.setEnabled(true);
+        }
     }
 
     private void disableMessageEditText() {
         if (messageEditText != null) {
             messageEditText.setEnabled(false);
+        }
+        if (sendButton != null) {
+            sendButton.setEnabled(false);
         }
     }
 

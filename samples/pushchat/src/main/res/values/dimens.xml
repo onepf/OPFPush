@@ -2,6 +2,7 @@
 
     <dimen name="activity_offset">16dp</dimen>
     <dimen name="message_offset">10dp</dimen>
+    <dimen name="message_input_layout_offset">5dp</dimen>
 
     <dimen name="horizontal_separator_height">1dp</dimen>
     <dimen name="separator_margin">5dp</dimen>

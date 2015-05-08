@@ -46,5 +46,6 @@
     <string name="sender_you">You</string>
     <string name="sender_uuid_clipdata_label">Sender uuid.</string>
     <string name="sender_uuid_copy_toast">Sender uuid was copied.</string>
+    <string name="send_button">Send</string>
 
 </resources>
