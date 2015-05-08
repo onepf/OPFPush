@@ -14,7 +14,7 @@
         android:id="@+id/message_input_divider"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/message_divider_color"
+        android:background="@color/divider_color"
         android:layout_above="@+id/message_input_layout" />
 
     <RelativeLayout

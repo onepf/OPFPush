@@ -1,13 +1,27 @@
 <resources>
 
+    <!--Common offsets-->
     <dimen name="activity_offset">16dp</dimen>
     <dimen name="message_offset">10dp</dimen>
     <dimen name="message_input_layout_offset">5dp</dimen>
-
-    <dimen name="horizontal_separator_height">1dp</dimen>
     <dimen name="separator_margin">5dp</dimen>
 
+    <!--Navigation drawer-->
     <dimen name="navigation_drawer_width">240dp</dimen>
 
+    <!--Toolbar-->
     <dimen name="toolbar_item_size">24dp</dimen>
+
+    <!--About screen-->
+    <dimen name="opf_text_size">20sp</dimen>
+    <dimen name="about_big_text_size">48sp</dimen>
+    <dimen name="about_middle_text_size">24sp</dimen>
+    <dimen name="about_normal_text_size">18sp</dimen>
+    <dimen name="logo_icon_padding">10dp</dimen>
+    <dimen name="about_big_offset">48dp</dimen>
+    <dimen name="about_middle_offset">24dp</dimen>
+    <dimen name="about_small_offset">12dp</dimen>
+    <dimen name="about_divider_width">100dp</dimen>
+    <dimen name="about_divider_height">5dp</dimen>
+
 </resources>

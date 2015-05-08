@@ -35,7 +35,7 @@
     <string name="contact_name_fmt">Name : %s</string>
     <string name="contact_uuid_fmt">UUID : %s</string>
 
-    <!--Messages string-->
+    <!--Messages strings-->
     <string name="time_fmt">Time : %s</string>
     <string name="sender_uuid_fmt">Sender : %s</string>
     <string name="sender_name_fmt">Sender : %1$s (%2$s)</string>
@@ -47,5 +47,15 @@
     <string name="sender_uuid_clipdata_label">Sender uuid.</string>
     <string name="sender_uuid_copy_toast">Sender uuid was copied.</string>
     <string name="send_button">Send</string>
+
+    <!--About strings-->
+    <string name="about_text">OPFPush is an open source library which provides an easy way for developers to integrate android push notifications into their apps.\n\n
+        Currently OPFPush supports the following push providers: Google Cloud Messaging, Nokia Notification Push,
+        Amazon Device Messaging and provides possibility to use the system push provider for a specific device.
+    </string>
+    <string name="one_platform_foundation">One Platform Foundation</string>
+    <string name="opfpush">OPFPush</string>
+    <string name="open_push_notifications">Open Push Notifications</string>
+    <string name="view_on_github">View on github</string>
 
 </resources>

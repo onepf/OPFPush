@@ -37,7 +37,7 @@
         android:layout_height="1px"
         android:layout_marginTop="@dimen/message_offset"
         android:layout_marginBottom="@dimen/message_offset"
-        android:background="@color/message_divider_color" />
+        android:background="@color/divider_color" />
 
     <TextView
         android:id="@+id/message_text"

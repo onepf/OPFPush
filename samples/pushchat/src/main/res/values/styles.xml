@@ -2,8 +2,8 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
-        <item name="colorPrimary">@color/toolbar</item>
-        <item name="colorPrimaryDark">@color/toolbar</item>
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorPrimaryDark">@color/primary_color</item>
 
         <item name="actionOverflowMenuStyle">@android:style/Widget.Holo.Light.ListPopupWindow</item>
 

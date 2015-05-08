@@ -16,13 +16,16 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.TextView;
 import org.onepf.pushchat.R;
 
 /**
@@ -42,11 +45,37 @@ public class AboutFragment extends BaseContentFragment {
                              @Nullable final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_about, container, false);
 
+        final TextView onepfTextView = (TextView) view.findViewById(R.id.onepf_text);
+        final Button viewOnGithubButton = (Button) view.findViewById(R.id.view_on_github);
+
+        onepfTextView.setOnClickListener(onOnepfTextClickListener());
+        viewOnGithubButton.setOnClickListener(onViewGithubClickListener());
+
         return view;
     }
 
     @Override
     public int getTitleResId() {
         return R.string.title_about_fragment;
+    }
+
+    private View.OnClickListener onOnepfTextClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.onepf.org"));
+                startActivity(browserIntent);
+            }
+        };
+    }
+
+    private View.OnClickListener onViewGithubClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/onepf/OPFPush"));
+                startActivity(browserIntent);
+            }
+        };
     }
 }

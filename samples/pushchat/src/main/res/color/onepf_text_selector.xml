@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +15,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <color name="separator">#000</color>
+    <item android:state_pressed="true" android:color="@color/onepf_text_pressed" />
 
-    <color name="fab_ripple">#F06292</color>
-    <color name="fab">#E91E63</color>
-    <color name="fab_pressed">#C2185B</color>
+    <item android:color="@android:color/white" />
 
-    <color name="primary_color">#3F51B5</color>
-
-    <color name="text">#212121</color>
-    <color name="message_odd_item_background">#E0E0E0</color>
-    <color name="divider_color">#BDBDBD</color>
-    <color name="drawer_background">#E0E0E0</color>
-    <color name="onepf_text_pressed">#E0E0E0</color>
-
-</resources>
+</selector>

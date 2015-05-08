@@ -1,12 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/primary_color">
+
+            <TextView
+                android:id="@+id/onepf_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:padding="@dimen/activity_offset"
+                android:text="@string/one_platform_foundation"
+                android:textSize="@dimen/opf_text_size"
+                android:textStyle="bold"
+                android:textColor="@color/onepf_text_selector"
+                android:clickable="true"
+                android:drawableLeft="@drawable/onepf_logo"
+                android:drawablePadding="@dimen/logo_icon_padding" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_middle_offset"
+                android:layout_marginBottom="@dimen/about_small_offset"
+                android:gravity="center"
+                android:textSize="@dimen/about_big_text_size"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:text="@string/opfpush" />
+
+            <View
+                android:layout_width="@dimen/about_divider_width"
+                android:layout_height="@dimen/about_divider_height"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/about_small_offset"
+                android:background="@android:color/white" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/about_big_offset"
+                android:gravity="center"
+                android:textSize="@dimen/about_middle_text_size"
+                android:text="@string/open_push_notifications"
+                android:textColor="@android:color/white" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_offset"
+            android:text="@string/about_text"
+            android:textSize="@dimen/about_normal_text_size" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="@dimen/about_small_offset"
+            android:layout_marginBottom="@dimen/about_small_offset"
+            android:background="@color/divider_color" />
+
+        <Button
+            android:id="@+id/view_on_github"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="@dimen/about_middle_offset"
+            android:layout_marginRight="@dimen/activity_offset"
+            android:layout_marginLeft="@dimen/activity_offset"
+            android:text="@string/view_on_github" />
+
+    </LinearLayout>
+
+</ScrollView>

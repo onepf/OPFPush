@@ -15,7 +15,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/horizontal_separator_height"
+        android:layout_height="1px"
         android:layout_marginBottom="@dimen/separator_margin"
         android:layout_marginTop="@dimen/separator_margin"
         android:background="@color/separator" />
@@ -38,7 +38,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/horizontal_separator_height"
+        android:layout_height="1px"
         android:layout_marginBottom="@dimen/separator_margin"
         android:layout_marginTop="@dimen/separator_margin"
         android:background="@color/separator" />
