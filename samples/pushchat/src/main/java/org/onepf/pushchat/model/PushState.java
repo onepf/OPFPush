@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':gcm',
-        ':nokia',
-        ':adm',
-        ':unity-plugin',
-        ':pushchat'
+package org.onepf.pushchat.model;
 
-project(':gcm').projectDir = new File('opfpush-providers/gcm')
-project(':nokia').projectDir = new File('opfpush-providers/nokia')
-project(':adm').projectDir = new File('opfpush-providers/adm')
+/**
+ * @author Roman Savin
+ * @since 05.05.2015
+ */
+public enum PushState {
 
-project(':pushchat').projectDir = new File('samples/pushchat')
+    REGISTERED,
+
+    REGISTERING,
+
+    UNREGISTERED,
+
+    UNREGISTERING,
+
+    NO_AVAILABLE_PROVIDER
+}

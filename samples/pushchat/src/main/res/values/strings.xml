@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">PushChat</string>
+
+    <!--Action bar titles-->
+    <string name="title_state_fragment">State</string>
+    <string name="title_messages_fragment">Messages</string>
+    <string name="title_contacts_fragment">Contacts</string>
+    <string name="title_about_fragment">About</string>
+
+    <!--Menu strings-->
+    <string name="action_share">Share uuid</string>
+
+    <!--State strings-->
+    <string name="uuid_fmt">UUID : %s</string>
+    <string name="state_fmt">State : %s</string>
+    <string name="registering">Registering</string>
+    <string name="registered">Registered</string>
+    <string name="unregistered">Unregistered</string>
+    <string name="unregistering">Unregistering</string>
+    <string name="no_available_provider">No available provider</string>
+    <string name="register_button_text">Register</string>
+    <string name="unregister_button_text">Unregister</string>
+    <string name="provider_name_fmt">Provider name : %s</string>
+    <string name="registration_id_fmt">Registration id : %s</string>
+    <string name="share_intent_chooser_title">Send uuid to…</string>
+
+    <!--Contacts strings-->
+    <string name="add_contact_title">Add contact</string>
+    <string name="uuid_hint">Type uuid…</string>
+    <string name="contact_name_hint">Type name…</string>
+    <string name="uuid_not_exist">This uuid doesn\'t exist.</string>
+    <string name="own_uuid_error">Can\'t add own uuid.</string>
+    <string name="uuid_already_added">This uuid already added.</string>
+    <string name="remove_contact_question">Do you want remove this contact?</string>
+    <string name="contact_name_fmt">Name : %s</string>
+    <string name="contact_uuid_fmt">UUID : %s</string>
+
+    <!--Messages strings-->
+    <string name="time_fmt">Time : %s</string>
+    <string name="sender_uuid_fmt">Sender : %s</string>
+    <string name="sender_name_fmt">Sender : %1$s (%2$s)</string>
+    <string name="message_notification_title">Message</string>
+    <string name="remove_messages">Remove messages</string>
+    <string name="message_input_hint">Type message…</string>
+    <string name="empty_contact_list">Add at least one contact to send message.</string>
+    <string name="sender_you">You</string>
+    <string name="sender_uuid_clipdata_label">Sender uuid.</string>
+    <string name="sender_uuid_copy_toast">Sender uuid was copied.</string>
+    <string name="send_button">Send</string>
+
+    <!--About strings-->
+    <string name="about_text">OPFPush is an open source library which provides an easy way for developers to integrate android push notifications into their apps.\n\n
+        Currently OPFPush supports the following push providers: Google Cloud Messaging, Nokia Notification Push,
+        Amazon Device Messaging and provides possibility to use the system push provider for a specific device.
+    </string>
+    <string name="one_platform_foundation">One Platform Foundation</string>
+    <string name="opfpush">OPFPush</string>
+    <string name="open_push_notifications">Open Push Notifications</string>
+    <string name="view_on_github">View on github</string>
+
+</resources>

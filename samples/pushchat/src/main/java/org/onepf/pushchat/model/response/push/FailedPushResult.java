@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':gcm',
-        ':nokia',
-        ':adm',
-        ':unity-plugin',
-        ':pushchat'
+package org.onepf.pushchat.model.response.push;
 
-project(':gcm').projectDir = new File('opfpush-providers/gcm')
-project(':nokia').projectDir = new File('opfpush-providers/nokia')
-project(':adm').projectDir = new File('opfpush-providers/adm')
+import android.support.annotation.NonNull;
 
-project(':pushchat').projectDir = new File('samples/pushchat')
+/**
+ * @author Roman Savin
+ * @since 19.04.2015
+ */
+public final class FailedPushResult extends PushResult {
+
+    @NonNull
+    public final String errorMessage;
+
+    public FailedPushResult(@NonNull final PushReceiver pushReceiver,
+                            @NonNull final String errorMessage) {
+        super(pushReceiver);
+        this.errorMessage = errorMessage;
+    }
+}

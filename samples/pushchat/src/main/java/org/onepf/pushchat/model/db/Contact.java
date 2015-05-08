@@ -14,15 +14,34 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':gcm',
-        ':nokia',
-        ':adm',
-        ':unity-plugin',
-        ':pushchat'
+package org.onepf.pushchat.model.db;
 
-project(':gcm').projectDir = new File('opfpush-providers/gcm')
-project(':nokia').projectDir = new File('opfpush-providers/nokia')
-project(':adm').projectDir = new File('opfpush-providers/adm')
+import android.support.annotation.NonNull;
 
-project(':pushchat').projectDir = new File('samples/pushchat')
+/**
+ * @author Roman Savin
+ * @since 07.05.2015
+ */
+public final class Contact {
+
+    @NonNull
+    private final String name;
+
+    @NonNull
+    private final String uuid;
+
+    public Contact(@NonNull final String name, @NonNull final String uuid) {
+        this.name = name;
+        this.uuid = uuid;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    @NonNull
+    public String getUuid() {
+        return uuid;
+    }
+}

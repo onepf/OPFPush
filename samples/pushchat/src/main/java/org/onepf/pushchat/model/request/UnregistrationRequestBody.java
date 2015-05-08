@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-include ':opfpush',
-        ':gcm',
-        ':nokia',
-        ':adm',
-        ':unity-plugin',
-        ':pushchat'
+package org.onepf.pushchat.model.request;
 
-project(':gcm').projectDir = new File('opfpush-providers/gcm')
-project(':nokia').projectDir = new File('opfpush-providers/nokia')
-project(':adm').projectDir = new File('opfpush-providers/adm')
+import android.support.annotation.NonNull;
 
-project(':pushchat').projectDir = new File('samples/pushchat')
+/**
+ * @author Roman Savin
+ * @since 19.04.2015
+ */
+public final class UnregistrationRequestBody extends RequestBody {
+
+    public UnregistrationRequestBody(@NonNull final String uuid) {
+        super(uuid);
+    }
+}

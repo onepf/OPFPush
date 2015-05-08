@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/messages_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/message_input_divider"
+        android:dividerHeight="0dp" />
+
+    <View
+        android:id="@+id/message_input_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/divider_color"
+        android:layout_above="@+id/message_input_layout" />
+
+    <RelativeLayout
+        android:id="@+id/message_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="@dimen/message_input_layout_offset"
+        android:paddingTop="@dimen/message_input_layout_offset"
+        android:paddingLeft="@dimen/message_offset"
+        android:paddingRight="@dimen/message_offset"
+        android:background="@android:color/white">
+
+        <EditText
+            android:id="@+id/message_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/message_send_button"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:hint="@string/message_input_hint" />
+
+        <Button
+            android:id="@+id/message_send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/message_offset"
+            android:text="@string/send_button" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
