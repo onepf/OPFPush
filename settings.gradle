@@ -19,12 +19,10 @@ include ':opfpush',
         ':nokia',
         ':adm',
         ':unity-plugin',
-        ':opfpush-sample',
         ':pushchat'
 
 project(':gcm').projectDir = new File('opfpush-providers/gcm')
 project(':nokia').projectDir = new File('opfpush-providers/nokia')
 project(':adm').projectDir = new File('opfpush-providers/adm')
 
-project(':opfpush-sample').projectDir = new File('samples/opfpush-sample')
 project(':pushchat').projectDir = new File('samples/pushchat')
