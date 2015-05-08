@@ -15,11 +15,15 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/message_even_item_pressed">
+    android:color="@color/drawer_item_ripple">
 
     <item>
-        <selector>
-            <item android:drawable="@color/message_even_item_background" />
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item
+                android:state_activated="true"
+                android:drawable="@color/drawer_activated_item" />
+
+            <item android:drawable="@color/drawer_background" />
         </selector>
     </item>
 

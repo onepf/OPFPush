@@ -14,13 +14,10 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/message_even_item_pressed">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item>
-        <selector>
-            <item android:drawable="@color/message_even_item_background" />
-        </selector>
-    </item>
+    <item android:state_activated="true" android:drawable="@color/drawer_activated_item" />
 
-</ripple>
+    <item android:drawable="@color/drawer_background" />
+
+</selector>

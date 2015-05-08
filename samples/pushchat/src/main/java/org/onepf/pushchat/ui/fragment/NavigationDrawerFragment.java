@@ -76,8 +76,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView = (ListView) inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         drawerListView.setAdapter(new ArrayAdapter<>(
                 getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
+                R.layout.item_navigation_drawer,
+                R.id.drawer_item_text,
                 titles
         ));
         drawerListView.setOnItemClickListener(onItemClickListener());

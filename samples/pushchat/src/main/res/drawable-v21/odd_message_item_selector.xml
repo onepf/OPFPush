@@ -19,9 +19,7 @@
 
     <item>
         <selector>
-            <item>
-                <color android:color="@color/message_odd_item_background" />
-            </item>
+            <item android:drawable="@color/message_odd_item_background" />
         </selector>
     </item>
 

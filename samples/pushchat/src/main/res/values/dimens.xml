@@ -8,6 +8,7 @@
 
     <!--Navigation drawer-->
     <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="item_height">48dp</dimen>
 
     <!--Toolbar-->
     <dimen name="toolbar_item_size">24dp</dimen>

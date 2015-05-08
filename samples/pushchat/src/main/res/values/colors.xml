@@ -34,6 +34,8 @@
 
     <!--Navigation drawer colors-->
     <color name="drawer_background">#E0E0E0</color>
+    <color name="drawer_activated_item">#C5CAE9</color>
+    <color name="drawer_item_ripple">#7986CB</color>
 
     <!--About colors-->
     <color name="onepf_text_pressed">#E0E0E0</color>
