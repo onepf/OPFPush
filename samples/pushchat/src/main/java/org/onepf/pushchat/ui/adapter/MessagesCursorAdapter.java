@@ -60,7 +60,7 @@ public class MessagesCursorAdapter extends CursorAdapter {
         final View view = LayoutInflater.from(context).inflate(R.layout.item_message, parent, false);
 
         if (getItemViewType(cursor.getPosition()) == ODD_ITEM) {
-            view.setBackgroundResource(R.color.message_odd_item_background);
+            view.setBackgroundResource(R.drawable.odd_message_item_selector);
         }
 
         return view;

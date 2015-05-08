@@ -18,7 +18,7 @@
         android:layout_height="1px"
         android:layout_marginBottom="@dimen/separator_margin"
         android:layout_marginTop="@dimen/separator_margin"
-        android:background="@color/separator" />
+        android:background="@color/divider_color" />
 
     <TextView
         android:id="@+id/state_text"
@@ -41,7 +41,7 @@
         android:layout_height="1px"
         android:layout_marginBottom="@dimen/separator_margin"
         android:layout_marginTop="@dimen/separator_margin"
-        android:background="@color/separator" />
+        android:background="@color/divider_color" />
 
     <Button
         android:id="@+id/register_button"
