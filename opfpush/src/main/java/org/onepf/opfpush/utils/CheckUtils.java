@@ -19,6 +19,7 @@ package org.onepf.opfpush.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -185,11 +186,14 @@ public final class CheckUtils {
         }
     }
 
+    @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity", "PMD.StdCyclomaticComplexity", "PMD.ConsecutiveLiteralAppends"})
     @NonNull
     private static String prepareCheckReceiverReport(@NonNull final Context context,
                                                      @Nullable final String exceptionMessage,
                                                      @Nullable final String receiverName,
                                                      @NonNull final Intent broadcastIntent) {
+        final String packageName = context.getPackageName();
+
         final StringBuilder reportBuilder = new StringBuilder("checkReceiver error")
                 .append(LINE_SEPARATOR).append("Exception message : ").append(exceptionMessage)
                 .append(LINE_SEPARATOR).append("Expected receiverName : ").append(receiverName)
@@ -206,14 +210,14 @@ public final class CheckUtils {
             reportBuilder.append(LINE_SEPARATOR)
                     .append("queryBroadcastReceivers returns not empty list. List size : ").append(receivers.size())
                     .append(LINE_SEPARATOR)
-                    .append("PackageName : ").append(context.getPackageName());
+                    .append("PackageName : ").append(packageName);
 
             int emptyPackageNameCounter = 0;
             int emptyReceiverNameCounter = 0;
             for (ResolveInfo receiver : receivers) {
                 if (TextUtils.isEmpty(receiver.activityInfo.packageName)) {
                     ++emptyPackageNameCounter;
-                } else if (receiver.activityInfo.packageName.equals(context.getPackageName())) {
+                } else if (receiver.activityInfo.packageName.equals(packageName)) {
                     reportBuilder.append(LINE_SEPARATOR)
                             .append("Receiver with right package : ")
                             .append(receiver.activityInfo.name);
@@ -233,7 +237,27 @@ public final class CheckUtils {
                     .append("Receivers with empty name : ").append(emptyReceiverNameCounter);
         }
 
+        reportBuilder.append(LINE_SEPARATOR)
+                .append("Available receivers:");
+
+        PackageInfo receiversInfo;
+        try {
+            receiversInfo = packageManager.getPackageInfo(
+                    packageName, PackageManager.GET_RECEIVERS);
+        } catch (PackageManager.NameNotFoundException e) {
+            reportBuilder.append("Could not get receivers for package ").append(packageName);
+            return reportBuilder.toString();
+        }
+        ActivityInfo[] packageReceivers = receiversInfo.receivers;
+
+        for (ActivityInfo packageReceiver : packageReceivers) {
+            reportBuilder.append(LINE_SEPARATOR)
+                    .append("Receiver package : ")
+                    .append(packageReceiver.packageName)
+                    .append(" receiver name : ")
+                    .append(packageReceiver.name);
+        }
+
         return reportBuilder.toString();
     }
-
 }

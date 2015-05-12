@@ -28,7 +28,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionName "0.2.1"
+        versionName "0.2.2"
     }
 
     lintOptions {
@@ -61,12 +61,12 @@ check {
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:2.4'
+    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
 
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
     //noinspection NewerVersionAvailable
-    provided 'org.onepf:opfutils:0.1.21'
+    provided 'org.onepf:opfutils:0.1.22'
 }

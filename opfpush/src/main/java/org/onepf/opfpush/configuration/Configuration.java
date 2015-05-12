@@ -21,8 +21,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.CheckManifestHandler;
-import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.listener.EventListener;
+import org.onepf.opfpush.pushprovider.PushProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
