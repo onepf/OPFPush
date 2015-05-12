@@ -19,7 +19,7 @@ allprojects {
 
 Download [the latest AAR][adm-latest-aar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-adm:0.2.1@aar'
+compile 'org.onepf:opfpush-adm:0.2.2@aar'
 ```
     
 or Maven:
@@ -27,7 +27,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-adm</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <type>aar</type>
 </dependency>
 ```
@@ -35,7 +35,7 @@ or Maven:
 You can also use JAR dependency.
 Download [the latest JAR][adm-latest-jar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-adm:0.2.1'
+compile 'org.onepf:opfpush-adm:0.2.2'
 ```
 
 or Maven:
@@ -43,7 +43,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-adm</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 </dependency>
 ```
 
@@ -127,5 +127,5 @@ builder.addProviders(new ADMProvider(context));
 ```
 
 [1]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
-[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.aar
-[adm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.jar
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-adm-0.2.2.aar
+[adm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-adm-0.2.2.jar

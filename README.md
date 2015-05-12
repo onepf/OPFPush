@@ -25,8 +25,8 @@ provides possibility to use the system push provider for a specific device.
    Download [the latest AAR][opfpush-latest-aar] of OPFPush and [the latest JAR][opfutils-latest-jar] of OPFUtils
    or grab it via Gradle:
    ```groovy
-   compile 'org.onepf:opfpush:0.2.1@aar'
-   compile 'org.onepf:opfutils:0.1.21'
+   compile 'org.onepf:opfpush:0.2.2@aar'
+   compile 'org.onepf:opfutils:0.1.22'
    ```
 
    or Maven:
@@ -34,13 +34,13 @@ provides possibility to use the system push provider for a specific device.
    <dependency>
       <groupId>org.onepf</groupId>
       <artifactId>opfpush</artifactId>
-      <version>0.2.1</version>
+      <version>0.2.2</version>
       <type>aar</type>
    </dependency>
    <dependency>
        <groupId>org.onepf</groupId>
        <artifactId>opfutils</artifactId>
-       <version>0.1.21</version>
+       <version>0.1.22</version>
    </dependency>
    ```
 
@@ -103,7 +103,7 @@ See [the following section][opfpush-receiver-section]
 1. [Google Cloud Messaging][google-cloud-messaging].
     Download [the latest AAR][gcm-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-gcm:0.2.1@aar'
+    compile 'org.onepf:opfpush-gcm:0.2.2@aar'
     ```
     
     or Maven:
@@ -111,7 +111,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-gcm</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.2</version>
         <type>aar</type>
     </dependency>
     ```
@@ -121,7 +121,7 @@ See [the following section][opfpush-receiver-section]
 2. [Amazon Device Messaging][amazon-device-messaging].
     Download [the latest AAR][adm-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-adm:0.2.1@aar'
+    compile 'org.onepf:opfpush-adm:0.2.2@aar'
     ```
     
     or Maven:
@@ -129,7 +129,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-adm</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.2</version>
         <type>aar</type>
     </dependency>
     ```
@@ -139,7 +139,7 @@ See [the following section][opfpush-receiver-section]
 3. [Nokia Notifications][nokia-notifications].
     Download [the latest AAR][nokia-latest-aar] or grab via Gradle:
     ```groovy
-    compile 'org.onepf:opfpush-nokia:0.2.1@aar'
+    compile 'org.onepf:opfpush-nokia:0.2.2@aar'
     ```
         
     or Maven:
@@ -147,7 +147,7 @@ See [the following section][opfpush-receiver-section]
     <dependency>
         <groupId>org.onepf</groupId>
         <artifactId>opfpush-nokia</artifactId>
-        <version>0.2.1</version>
+        <version>0.2.2</version>
         <type>aar</type>
     </dependency>
     ```
@@ -194,7 +194,7 @@ To create a custom push provider see [the following section][custom-push-provide
 [amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
 [opfutils]: https://github.com/onepf/OPFUtils
-[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.21/opfutils-0.1.21.jar
+[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.22/opfutils-0.1.22.jar
 [jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies
 [opfpush-receiver-section]: https://github.com/onepf/OPFPush/wiki/Using-of-OPFPushReceiver
 [custom-push-provider]: https://github.com/onepf/OPFPush/wiki/Create-custom-push-provider
@@ -202,8 +202,8 @@ To create a custom push provider see [the following section][custom-push-provide
 [opfpush-gcm]: ./opfpush-providers/gcm
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
-[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-0.2.1.aar
-[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-gcm-0.2.1.aar
-[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-adm-0.2.1.aar
-[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.1/opfpush-nokia-0.2.1.aar
+[opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-0.2.2.aar
+[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-gcm-0.2.2.aar
+[adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-adm-0.2.2.aar
+[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-nokia-0.2.2.aar
 [easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM
