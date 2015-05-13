@@ -49,5 +49,4 @@
 
 -keep class sun.misc.Unsafe { *; }
 #your package path where your gson models are stored
--keep class org.onepf.opfpush.pushsample.request.** { *; }
--keep class org.onepf.opfpush.pushsample.response.** { *; }
+-keep class org.onepf.pushchat.model.** { *; }
