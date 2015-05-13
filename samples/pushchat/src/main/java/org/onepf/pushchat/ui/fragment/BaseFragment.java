@@ -18,6 +18,7 @@ package org.onepf.pushchat.ui.fragment;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import com.squareup.leakcanary.RefWatcher;
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.ui.activity.MainActivity;
 
@@ -26,6 +27,13 @@ import org.onepf.pushchat.ui.activity.MainActivity;
  * @since 29.04.2015
  */
 public class BaseFragment extends Fragment {
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        final RefWatcher refWatcher = getPushChatApplication().getRefWatcher();
+        refWatcher.watch(this);
+    }
 
     @Nullable
     protected MainActivity getMainActivity() {
