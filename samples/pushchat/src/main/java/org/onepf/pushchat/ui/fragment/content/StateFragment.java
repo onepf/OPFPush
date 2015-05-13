@@ -43,6 +43,8 @@ import static org.onepf.pushchat.utils.Constants.*;
  */
 public class StateFragment extends BaseContentFragment {
 
+    public static final int POSITION = 0;
+
     private TextView stateTextView;
 
     private TextView providerNameTextView;
@@ -94,6 +96,11 @@ public class StateFragment extends BaseContentFragment {
     @Override
     public int getTitleResId() {
         return R.string.title_state_fragment;
+    }
+
+    @Override
+    public int getPosition() {
+        return POSITION;
     }
 
     private void initState() {

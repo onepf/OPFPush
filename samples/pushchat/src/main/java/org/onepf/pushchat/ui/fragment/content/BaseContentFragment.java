@@ -17,9 +17,13 @@
 package org.onepf.pushchat.ui.fragment.content;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import org.onepf.pushchat.ui.activity.MainActivity;
 import org.onepf.pushchat.ui.fragment.BaseFragment;
 
 /**
@@ -30,28 +34,67 @@ public abstract class BaseContentFragment extends BaseFragment {
 
     public abstract int getTitleResId();
 
+    public abstract int getPosition();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setNavigationDrawerCheckedItem();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        setActionBarTitle();
+    }
+
     protected void showProgressBar() {
-        getMainActivity().showProgressbar();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.showProgressbar();
+        }
     }
 
     protected void hideProgressBar() {
-        getMainActivity().hideProgressBar();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.hideProgressBar();
+        }
     }
 
     protected void showShareButton() {
-        getMainActivity().showShareButton();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.showShareButton();
+        }
     }
 
     protected void hideShareButton() {
-        getMainActivity().hideShareButton();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.hideShareButton();
+        }
     }
 
     protected void showClearButton() {
-        getMainActivity().showClearButton();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.showClearButton();
+        }
     }
 
     protected void hideClearButton() {
-        getMainActivity().hideClearButton();
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.hideClearButton();
+        }
     }
 
     protected void hideKeyboard(@Nullable final View view) {
@@ -59,6 +102,20 @@ public abstract class BaseContentFragment extends BaseFragment {
             final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                     Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    protected void setActionBarTitle() {
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.getSupportActionBar().setTitle(getString(getTitleResId()));
+        }
+    }
+
+    protected void setNavigationDrawerCheckedItem() {
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.setNavigationDrawerCheckedItem(getPosition());
         }
     }
 }

@@ -5,7 +5,8 @@
     android:paddingTop="@dimen/activity_offset"
     android:paddingLeft="@dimen/activity_offset"
     android:paddingRight="@dimen/activity_offset"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/fragment_background">
 
     <TextView
         android:id="@+id/uuid_text"

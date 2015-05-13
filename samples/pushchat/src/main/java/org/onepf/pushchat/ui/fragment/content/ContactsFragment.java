@@ -43,6 +43,8 @@ import org.onepf.pushchat.ui.dialog.AlertDialogFragment;
  */
 public class ContactsFragment extends BaseContentFragment {
 
+    public static final int POSITION = 2;
+
     private ContactsCursorAdapter adapter;
     private ListView contactsListView;
     private LoaderManager.LoaderCallbacks loaderCallbacks;
@@ -76,6 +78,11 @@ public class ContactsFragment extends BaseContentFragment {
     @Override
     public int getTitleResId() {
         return R.string.title_contacts_fragment;
+    }
+
+    @Override
+    public int getPosition() {
+        return POSITION;
     }
 
     private void initContactsList(@NonNull final View view) {

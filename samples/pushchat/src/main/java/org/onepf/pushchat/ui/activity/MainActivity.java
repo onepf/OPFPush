@@ -29,6 +29,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
@@ -47,7 +48,6 @@ import static android.content.Intent.ACTION_SEND;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static org.onepf.pushchat.model.PushState.REGISTERED;
-import static org.onepf.pushchat.ui.ContentFragmentFactory.MESSAGES_FRAGMENT_POSITION;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.*;
 
 
@@ -55,13 +55,11 @@ public class MainActivity extends ActionBarActivity {
 
     public static final String OPEN_MESSAGES_FRAGMENT_ACTION = "OPEN_MESSAGES_FRAGMENT_ACTION";
 
-    private static final String TOOLBAR_TITLE_KEY = "TOOLBAR_TITLE_KEY";
-
     private static final String IS_SHARE_MENU_ITEM_VISIBLE_KEY = "IS_SHARE_MENU_ITEM_VISIBLE_KEY";
 
     private static final String IS_CLEAR_MENU_ITEM_VISIBLE_KEY = "IS_CLEAR_MENU_ITEM_VISIBLE_KEY";
 
-    private Toolbar toolbar;
+    private NavigationDrawerFragment navigationDrawerFragment = NavigationDrawerFragment.newInstance();
 
     private DrawerLayout drawerLayout;
 
@@ -76,8 +74,6 @@ public class MainActivity extends ActionBarActivity {
 
     private boolean isClearMenuItemVisible;
 
-    private String title;
-
     private MainActivityReceiver receiver;
 
     @Override
@@ -86,9 +82,16 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
+        setupNavigationDrawer();
         if (savedInstanceState == null) {
             isShareMenuItemVisible = false;
+
+            FragmentUtils.add(
+                    getSupportFragmentManager(),
+                    navigationDrawerFragment,
+                    R.id.navaigation_drawer_container,
+                    NavigationDrawerFragment.class.getName()
+            );
 
             final BaseContentFragment fragment;
             if (StateController.getState(this) == REGISTERED) {
@@ -97,26 +100,21 @@ public class MainActivity extends ActionBarActivity {
                 fragment = StateFragment.newInstance();
             }
 
-            title = getString(fragment.getTitleResId());
-
             FragmentUtils.add(
                     getSupportFragmentManager(),
                     fragment,
                     fragment.getClass().getName()
             );
         } else {
-            title = savedInstanceState.getString(TOOLBAR_TITLE_KEY);
             isShareMenuItemVisible = savedInstanceState.getBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, false);
             isClearMenuItemVisible = savedInstanceState.getBoolean(IS_CLEAR_MENU_ITEM_VISIBLE_KEY, false);
         }
-        setupNavigationDrawer();
     }
 
     @Override
     protected void onPostCreate(@Nullable final Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
-        setToolbarTitle(title);
     }
 
     @Override
@@ -134,18 +132,14 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (OPEN_MESSAGES_FRAGMENT_ACTION.equals(intent.getAction())) {
-            ((NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer))
-                    .selectItem(MESSAGES_FRAGMENT_POSITION);
+        if (OPEN_MESSAGES_FRAGMENT_ACTION.equals(intent.getAction()) && navigationDrawerFragment != null) {
+            navigationDrawerFragment.selectItem(MessagesFragment.POSITION);
         }
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (toolbar != null) {
-            outState.putString(TOOLBAR_TITLE_KEY, title);
-        }
         outState.putBoolean(IS_SHARE_MENU_ITEM_VISIBLE_KEY, isShareMenuItemVisible);
         outState.putBoolean(IS_CLEAR_MENU_ITEM_VISIBLE_KEY, isClearMenuItemVisible);
     }
@@ -187,10 +181,12 @@ public class MainActivity extends ActionBarActivity {
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
-    public void setToolbarTitle(@NonNull final String title) {
-        this.title = title;
-        if (toolbar != null) {
-            toolbar.setTitle(title);
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(Gravity.START)) {
+            drawerLayout.closeDrawer(Gravity.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -232,7 +228,13 @@ public class MainActivity extends ActionBarActivity {
         invalidateOptionsMenu();
     }
 
-    public PushChatApplication getPushChatApplication() {
+    public void setNavigationDrawerCheckedItem(final int position) {
+        if (navigationDrawerFragment != null) {
+            navigationDrawerFragment.setItemChecked(position);
+        }
+    }
+
+    private PushChatApplication getPushChatApplication() {
         return (PushChatApplication) getApplication();
     }
 
@@ -255,7 +257,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void setupNavigationDrawer() {
-        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

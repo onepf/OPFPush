@@ -25,26 +25,32 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import org.onepf.pushchat.R;
+import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.ui.ContentFragmentFactory;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
+import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
+import org.onepf.pushchat.ui.fragment.content.StateFragment;
 import org.onepf.pushchat.utils.FragmentUtils;
-import org.onepf.pushchat.controller.StateController;
 
 import static org.onepf.pushchat.model.PushState.REGISTERED;
-import static org.onepf.pushchat.ui.ContentFragmentFactory.MESSAGES_FRAGMENT_POSITION;
-import static org.onepf.pushchat.ui.ContentFragmentFactory.STATE_FRAGMENT_POSITION;
 
 public class NavigationDrawerFragment extends BaseFragment {
 
+    private static final String FIRST_SELECTED_POSITION_KEY = "FIRST_SELECTED_POSITION_KEY";
     private static final String STATE_SELECTED_POSITION_KEY = "STATE_SELECTED_POSITION_KEY";
 
     private ListView drawerListView;
 
+    private int firstFragmentPosition = 0;
+
     private int currentSelectedPosition = 0;
 
     private String[] titles;
+
+    public static NavigationDrawerFragment newInstance() {
+        return new NavigationDrawerFragment();
+    }
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -58,15 +64,14 @@ public class NavigationDrawerFragment extends BaseFragment {
         };
 
         if (savedInstanceState == null) {
-            currentSelectedPosition =
-                    StateController.getState(getActivity()) == REGISTERED ?
-                            MESSAGES_FRAGMENT_POSITION :
-                            STATE_FRAGMENT_POSITION;
+            firstFragmentPosition = StateController.getState(getActivity()) == REGISTERED ?
+                    MessagesFragment.POSITION :
+                    StateFragment.POSITION;
+            currentSelectedPosition = firstFragmentPosition;
         } else {
+            firstFragmentPosition = savedInstanceState.getInt(FIRST_SELECTED_POSITION_KEY);
             currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION_KEY);
         }
-
-        selectItem(currentSelectedPosition);
     }
 
     @Override
@@ -91,15 +96,20 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView = null;
     }
 
-    public void selectItem(final int position) {
+    public void setItemChecked(final int position) {
         currentSelectedPosition = position;
         if (drawerListView != null) {
             drawerListView.setItemChecked(position, true);
         }
+    }
 
+    public void selectItem(final int position) {
+        selectItem(position, false);
+    }
+
+    private void selectItem(final int position, final boolean addToBackStack) {
         final BaseContentFragment contentFragment = ContentFragmentFactory.getFragmentByPosition(position);
-        setToolbarTitle(getString(contentFragment.getTitleResId()));
-        FragmentUtils.replace(getFragmentManager(), contentFragment, contentFragment.getClass().getName());
+        FragmentUtils.replace(getFragmentManager(), contentFragment, contentFragment.getClass().getName(), addToBackStack);
 
         closeDrawer();
     }
@@ -107,6 +117,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(FIRST_SELECTED_POSITION_KEY, firstFragmentPosition);
         outState.putInt(STATE_SELECTED_POSITION_KEY, currentSelectedPosition);
     }
 
@@ -114,7 +125,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-                selectItem(position);
+                if (position == firstFragmentPosition) {
+                    getFragmentManager().popBackStack();
+                }
+                selectItem(position, currentSelectedPosition == firstFragmentPosition);
             }
         };
     }

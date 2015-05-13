@@ -18,6 +18,8 @@ package org.onepf.pushchat;
 
 import android.app.Application;
 
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.adm.ADMProvider;
 import org.onepf.opfpush.configuration.Configuration;
@@ -39,9 +41,12 @@ public class PushChatApplication extends Application {
 
     private String uuid;
 
+    private RefWatcher refWatcher;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        refWatcher = LeakCanary.install(this);
 
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         OPFLog.logMethod();
@@ -64,5 +69,9 @@ public class PushChatApplication extends Application {
 
     public String getUUID() {
         return uuid;
+    }
+
+    public RefWatcher getRefWatcher() {
+        return refWatcher;
     }
 }

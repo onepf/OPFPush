@@ -55,6 +55,8 @@ import static org.onepf.pushchat.utils.Constants.*;
  */
 public class MessagesFragment extends BaseContentFragment {
 
+    public static final int POSITION = 1;
+
     private MessagesCursorAdapter adapter;
 
     private EditText messageEditText;
@@ -113,6 +115,11 @@ public class MessagesFragment extends BaseContentFragment {
     @Override
     public int getTitleResId() {
         return R.string.title_messages_fragment;
+    }
+
+    @Override
+    public int getPosition() {
+        return 1;
     }
 
     private void initMessagesEditText(@NonNull final View view) {

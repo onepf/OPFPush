@@ -25,11 +25,6 @@ import org.onepf.pushchat.ui.fragment.content.*;
  */
 public final class ContentFragmentFactory {
 
-    public static final int STATE_FRAGMENT_POSITION = 0;
-    public static final int MESSAGES_FRAGMENT_POSITION = 1;
-    public static final int CONTACTS_FRAGMENT_POSITION = 2;
-    public static final int ABOUT_FRAGMENT_POSITION = 3;
-
     private ContentFragmentFactory() {
         throw new UnsupportedOperationException();
     }
@@ -37,13 +32,13 @@ public final class ContentFragmentFactory {
     @NonNull
     public static BaseContentFragment getFragmentByPosition(final int position) {
         switch (position) {
-            case STATE_FRAGMENT_POSITION:
+            case StateFragment.POSITION:
                 return StateFragment.newInstance();
-            case MESSAGES_FRAGMENT_POSITION:
+            case MessagesFragment.POSITION:
                 return MessagesFragment.newInstance();
-            case CONTACTS_FRAGMENT_POSITION:
+            case ContactsFragment.POSITION:
                 return ContactsFragment.newInstance();
-            case ABOUT_FRAGMENT_POSITION:
+            case AboutFragment.POSITION:
                 return AboutFragment.newInstance();
             default:
                 throw new IllegalArgumentException("Wrong position");
