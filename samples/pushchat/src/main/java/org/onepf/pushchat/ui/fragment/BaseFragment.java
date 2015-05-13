@@ -16,9 +16,8 @@
 
 package org.onepf.pushchat.ui.fragment;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.ui.activity.MainActivity;
 
@@ -28,20 +27,19 @@ import org.onepf.pushchat.ui.activity.MainActivity;
  */
 public class BaseFragment extends Fragment {
 
-    @NonNull
+    @Nullable
     protected MainActivity getMainActivity() {
         return (MainActivity) getActivity();
     }
 
     protected void closeDrawer() {
-        getMainActivity().closeDrawer();
-    }
-
-    protected void setToolbarTitle(@NonNull final String title) {
-        getMainActivity().setToolbarTitle(title);
+        final MainActivity activity = getMainActivity();
+        if (activity != null) {
+            activity.closeDrawer();
+        }
     }
 
     protected PushChatApplication getPushChatApplication() {
-        return getMainActivity().getPushChatApplication();
+        return (PushChatApplication) getActivity().getApplication();
     }
 }

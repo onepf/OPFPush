@@ -20,6 +20,7 @@
     <color name="primary_color">#3F51B5</color>
     <color name="text">#212121</color>
     <color name="divider_color">#BDBDBD</color>
+    <color name="fragment_background">#EEEEEE</color>
 
     <!--FAB colors-->
     <color name="fab_ripple">#E57373</color>

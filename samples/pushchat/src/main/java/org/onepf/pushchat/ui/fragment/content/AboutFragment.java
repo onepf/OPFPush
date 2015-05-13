@@ -34,6 +34,8 @@ import org.onepf.pushchat.R;
  */
 public class AboutFragment extends BaseContentFragment {
 
+    public static final int POSITION = 3;
+
     @NonNull
     public static AboutFragment newInstance() {
         return new AboutFragment();
@@ -57,6 +59,11 @@ public class AboutFragment extends BaseContentFragment {
     @Override
     public int getTitleResId() {
         return R.string.title_about_fragment;
+    }
+
+    @Override
+    public int getPosition() {
+        return POSITION;
     }
 
     private View.OnClickListener onOnepfTextClickListener() {

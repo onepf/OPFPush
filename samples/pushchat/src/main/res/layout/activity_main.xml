@@ -34,8 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <fragment
-            android:id="@+id/navigation_drawer"
+        <FrameLayout
+            android:id="@+id/navaigation_drawer_container"
             android:name="org.onepf.pushchat.ui.fragment.NavigationDrawerFragment"
             android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="match_parent"
