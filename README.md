@@ -1,5 +1,7 @@
 # OPFPush
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-OPFPush-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1809)
+
 OPFPush is an open source library which provides an easy way for developers to integrate android 
 push notifications into their apps.
 
