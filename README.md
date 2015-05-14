@@ -15,7 +15,7 @@ provides possibility to use the system push provider for a specific device.
 - [Implemented Push Services](#user-content-implemented-push-services)
 - [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
-- [Sample][#sample]
+- [Sample](#sample)
 - [License](#user-content-license)
 
 
