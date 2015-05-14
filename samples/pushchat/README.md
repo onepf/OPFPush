@@ -5,6 +5,8 @@ it for push messages in their own applications.
 
 **State**
 
+![alt tag](https://lh3.googleusercontent.com/74FqWBpauyVRCIgt4mZqMcp_MsG-brxf4TCHmLeT0QJDa24xb7oH58dtX27L4Ty7uh46=h900-rw)
+
 OPFPush tries to register on an available push provider. After successful registration you get the registration id.
 Then the registration id, the name of the push provider and uuid are sent to the OPFPush 3rd-party server. 
 UUID is used by the server for mapping specific device and its registration id. So the application doesn't use the registration id to send messages.
@@ -14,10 +16,14 @@ Also, you can unregister. After successful unregistration your uuid and registra
 
 **Contacts**
 
+![alt tag](https://lh3.googleusercontent.com/xhsidfhxYh8FAlllogrYQoW2TCv9IBRlwXplgYOLGBouXwZJBg4v7Y_EFsIIaPMfx2hM=h900-rw)
+
 You can add uuids to the contact list. After that you can send messages to all uuids from your contact list.
 If you receive a message from an unknown sender you can copy its uuid by long click on the message item and save it to the contact list. 
 
 **Messages**
+
+![alt tag](https://lh3.googleusercontent.com/tJgvJTmKJ0aWMMKpA7cXC4ySQ-syf-BaMT4OdO9G3CtRHS_-6vgyc80K5i-d_eJkqw=h900-rw)
 
 Messages are sent to the server with a list of receivers (uuids from your contact list). 
 The OPFPush server uses specific push service (GCM, ADM or Nokia Notifications) for each uuid. 
