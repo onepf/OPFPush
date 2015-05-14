@@ -175,7 +175,7 @@ To create a custom push provider see [the following section][custom-push-provide
 
 ## Sample
 
-Look through OPFPush library in use in our [sample application][sample].
+Take a look at the usage of the OPFPush library in our [sample application][sample].
 
 ## License
 
