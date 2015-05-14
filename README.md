@@ -15,6 +15,7 @@ provides possibility to use the system push provider for a specific device.
 - [Implemented Push Services](#user-content-implemented-push-services)
 - [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
+- [Sample][#sample]
 - [License](#user-content-license)
 
 
@@ -172,6 +173,9 @@ To create a custom push provider see [the following section][custom-push-provide
 | Retry register after changing [ANDROID_ID][android-id] |   -   |   -   |          -          |      +      |
 
 
+## Sample
+
+Look through OPFPush library in use in our [sample application][sample].
 
 ## License
 
@@ -207,3 +211,4 @@ To create a custom push provider see [the following section][custom-push-provide
 [adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-adm-0.2.2.aar
 [nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-nokia-0.2.2.aar
 [easiest-gcm]: https://github.com/onepf/OPFPush/wiki/The-easiest-way-to-implement-GCM
+[sample]: https://github.com/onepf/OPFPush/tree/master/samples/pushchat
