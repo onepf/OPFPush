@@ -69,7 +69,7 @@ provides possibility to use the system push provider for a specific device.
    
 **OPFPush setup**
 
-To setup `OPFPush` add the following peace of code to your `Application.onCreate()` method:
+To setup `OPFPush` add the following piece of code to your `Application.onCreate()` method:
 ```java
 //Enable OPFLogs:
 OPFLog.setEnabled(BuildConfig.DEBUG, true); //debug logs will be enabled only in debug build.
