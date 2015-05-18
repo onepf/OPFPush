@@ -95,7 +95,7 @@ android {
 
 dependencies {
     //material
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
 
     //opfpush
@@ -107,7 +107,7 @@ dependencies {
 
     //push providers dependencies
     provided 'com.amazon:amazon-device-messaging:1.0.1'
-    compile 'com.google.android.gms:play-services:7.0.0'
+    compile 'com.google.android.gms:play-services:7.3.0'
     compile 'com.nokia:push:1.0'
 
     //network
@@ -115,6 +115,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
 
     //leakcanary
+    //noinspection NewerVersionAvailable
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
+    //noinspection NewerVersionAvailable
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
 }

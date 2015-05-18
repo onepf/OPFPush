@@ -113,7 +113,7 @@ dependencies {
     //noinspection NewerVersionAvailable
     compile 'org.onepf:opfpush:0.2.2@aar'
     //noinspection NewerVersionAvailable
-    compile 'com.google.android.gms:play-services-gcm:7.0.0'
+    compile 'com.google.android.gms:play-services-gcm:7.3.0'
 
     provided 'com.android.support:support-annotations:19.1.0'
     provided 'com.google.code.findbugs:annotations:3.0.0'
