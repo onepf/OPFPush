@@ -17,11 +17,6 @@
 package org.onepf.opfpush.unity;
 
 import android.app.Application;
-import android.util.Log;
-import org.onepf.opfutils.OPFLog;
-
-import java.io.IOException;
-import java.util.Scanner;
 
 /**
  * @author Roman Savin
@@ -33,18 +28,6 @@ public class OPFPushApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        final Scanner scanner;
-        try {
-            scanner = new Scanner(getAssets().open("configuration.txt"));
-
-            if (scanner.hasNextLine()) {
-                final String string = scanner.nextLine();
-                Log.d("OPF", "Raw : " + string);
-            } else {
-                Log.d("OPF", "Raw : nothing");
-            }
-        } catch (IOException e) {
-            OPFLog.e(e.getMessage());
-        }
+        OPFPushInitializer.init(this);
     }
 }
