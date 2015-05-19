@@ -85,7 +85,8 @@ android {
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'IconExpectedSize',
-                'IconDensities', 'AlwaysShowAction', 'RtlEnabled', 'Overdraw', 'UnusedIds', 'RtlHardcoded'
+                'IconDensities', 'AlwaysShowAction', 'RtlEnabled', 'Overdraw', 'UnusedIds', 'RtlHardcoded',
+                'GradleDynamicVersion'
     }
 
     packagingOptions {
@@ -100,10 +101,18 @@ dependencies {
 
     //opfpush
     compile 'org.onepf:opfutils:0.1.22'
-    compile 'org.onepf:opfpush:0.2.2@aar'
-    compile 'org.onepf:opfpush-adm:0.2.2@aar'
-    compile 'org.onepf:opfpush-gcm:0.2.2@aar'
-    compile 'org.onepf:opfpush-nokia:0.2.2@aar'
+    compile ('org.onepf:opfpush:0.2.+@aar') {
+        changing = true
+    }
+    compile ('org.onepf:opfpush-adm:0.2.+@aar') {
+        changing = true
+    }
+    compile ('org.onepf:opfpush-gcm:0.2.+@aar') {
+        changing = true
+    }
+    compile ('org.onepf:opfpush-nokia:0.2.+@aar') {
+        changing = true
+    }
 
     //push providers dependencies
     provided 'com.amazon:amazon-device-messaging:1.0.1'
