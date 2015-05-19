@@ -20,27 +20,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.unity3d.player.UnityPlayer;
-
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.receiver.OPFPushReceiver;
-import org.onepf.opfpush.unity.model.MessageEvent;
-import org.onepf.opfpush.unity.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.unity.model.RegisteredEvent;
-import org.onepf.opfpush.unity.model.UnregisteredEvent;
-import org.onepf.opfpush.unity.util.NotificationUtils;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Map;
-
-import de.greenrobot.event.EventBus;
-
-import static org.onepf.opfpush.unity.util.Constants.MESSAGE_EXTRA_KEY;
-import static org.onepf.opfpush.unity.util.Constants.PAYLOAD_EXTRA_KEY;
 
 /**
  * @author Roman Savin
@@ -50,36 +36,12 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
 
     private static final String EVENT_RECEIVER = "OPFPush";
     private static final String INIT_SUCCEEDED_CALLBACK = "OnInitSucceeded";
-    private static final String INIT_FAILED_CALLBACK = "OnInitFailed";
 
     @Override
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
         OPFLog.logMethod(context, providerName, OPFUtils.toString(extras));
-        if (extras == null) {
-            return;
-        }
-
-        String message = null;
-        if (extras.containsKey(MESSAGE_EXTRA_KEY)) {
-            message = extras.getString(MESSAGE_EXTRA_KEY);
-        } else if (extras.containsKey(PAYLOAD_EXTRA_KEY)) {
-            message = extras.getString(PAYLOAD_EXTRA_KEY);
-        }
-
-        if (message != null) {
-            try {
-                NotificationUtils.showNotification(
-                        context,
-                        "Message",
-                        message
-                );
-                EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                OPFLog.e(e.getCause().toString());
-            }
-        }
     }
 
     @Override
@@ -94,8 +56,6 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
-
         UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, registrationId);
     }
 
@@ -104,13 +64,11 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
         OPFLog.logMethod(providerName, oldRegistrationId);
-        EventBus.getDefault().postSticky(new UnregisteredEvent(oldRegistrationId));
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
-        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));
     }
 }

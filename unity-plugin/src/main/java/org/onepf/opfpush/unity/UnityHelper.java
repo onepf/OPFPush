@@ -17,14 +17,19 @@
 package org.onepf.opfpush.unity;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import com.unity3d.player.UnityPlayer;
 
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.configuration.Configuration;
 
-public class UnityHelper {
+public final class UnityHelper {
 
-    public static void init(final Context context, final Configuration config) {
+    private UnityHelper() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static void init(@NonNull final Context context, @NonNull final Configuration config) {
         UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
