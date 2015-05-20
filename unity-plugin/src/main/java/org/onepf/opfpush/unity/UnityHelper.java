@@ -16,26 +16,14 @@
 
 package org.onepf.opfpush.unity;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import com.unity3d.player.UnityPlayer;
-
 import org.onepf.opfpush.OPFPush;
-import org.onepf.opfpush.configuration.Configuration;
 
+@SuppressWarnings("unused")
 public final class UnityHelper {
 
     private UnityHelper() {
         throw new UnsupportedOperationException();
-    }
-
-    public static void init(@NonNull final Context context, @NonNull final Configuration config) {
-        UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                OPFPush.init(context, config);
-            }
-        });
     }
 
     public static void register() {
@@ -43,6 +31,15 @@ public final class UnityHelper {
             @Override
             public void run() {
                 OPFPush.getHelper().register();
+            }
+        });
+    }
+
+    public static void unregister() {
+        UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                OPFPush.getHelper().unregister();
             }
         });
     }

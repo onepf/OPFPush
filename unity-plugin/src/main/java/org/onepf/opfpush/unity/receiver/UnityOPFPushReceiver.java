@@ -35,13 +35,19 @@ import java.util.Map;
 public class UnityOPFPushReceiver extends OPFPushReceiver {
 
     private static final String EVENT_RECEIVER = "OPFPush";
-    private static final String INIT_SUCCEEDED_CALLBACK = "OnInitSucceeded";
+    private static final String MESSAGE_CALLBACK = "OnMessage";
+    private static final String DELETED_MESSAGES_CALLBACK = "OnDeletedMessages";
+    private static final String REGISTERED_CALLBACK = "OnRegistered";
+    private static final String UNREGISTERED_CALLBACK = "OnUnregistered";
+    private static final String NO_AVAILABLE_PROVIDER_CALLBACK = "OnNoAvailableProvider";
 
     @Override
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
         OPFLog.logMethod(context, providerName, OPFUtils.toString(extras));
+        //TODO: send real message and providerName
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, MESSAGE_CALLBACK, "message");
     }
 
     @Override
@@ -49,6 +55,8 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
                                   @NonNull final String providerName,
                                   final int messagesCount) {
         OPFLog.logMethod(providerName, messagesCount);
+        //TODO: send providerName
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, DELETED_MESSAGES_CALLBACK, String.valueOf(messagesCount));
     }
 
     @Override
@@ -56,7 +64,8 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, INIT_SUCCEEDED_CALLBACK, registrationId);
+        //TODO: send providerName
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, REGISTERED_CALLBACK, registrationId);
     }
 
     @Override
@@ -64,11 +73,15 @@ public class UnityOPFPushReceiver extends OPFPushReceiver {
                                @NonNull final String providerName,
                                @Nullable final String oldRegistrationId) {
         OPFLog.logMethod(providerName, oldRegistrationId);
+        //TODO: send provider name
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, UNREGISTERED_CALLBACK, oldRegistrationId);
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
+        //TODO: send pushErrors
+        UnityPlayer.UnitySendMessage(EVENT_RECEIVER, NO_AVAILABLE_PROVIDER_CALLBACK, "errors");
     }
 }
