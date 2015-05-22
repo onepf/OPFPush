@@ -26,6 +26,7 @@ import org.onepf.opfpush.adm.ADMProvider;
 import org.onepf.opfpush.configuration.Configuration;
 import org.onepf.opfpush.gcm.GCMProvider;
 import org.onepf.opfpush.nokia.NokiaNotificationsProvider;
+import org.onepf.opfpush.unity.listener.PushEventListener;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.IOException;
@@ -113,6 +114,7 @@ public final class OPFPushInitializer {
         }
         OPFLog.setEnabled(isDebug, isLogEnabled);
 
+        configBuilder.setEventListener(new PushEventListener());
         return configBuilder.build();
     }
 
@@ -130,7 +132,7 @@ public final class OPFPushInitializer {
                                      @NonNull final Configuration.Builder configBuilder,
                                      @NonNull final JsonReader jsonReader) throws IOException {
         String providerName = null;
-        List<String> senderIds = new ArrayList<>();
+        final List<String> senderIds = new ArrayList<>();
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             final String name = jsonReader.nextName();

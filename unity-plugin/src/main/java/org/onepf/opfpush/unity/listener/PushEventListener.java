@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.unity.receiver;
+package org.onepf.opfpush.unity.listener;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.unity3d.player.UnityPlayer;
+import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfpush.receiver.OPFPushReceiver;
 import org.onepf.opfpush.unity.utils.UnityJsonGenerator;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
@@ -32,9 +32,9 @@ import java.util.Map;
 
 /**
  * @author Roman Savin
- * @since 25.12.14
+ * @since 22.05.2015
  */
-public class UnityOPFPushReceiver extends OPFPushReceiver {
+public class PushEventListener implements EventListener {
 
     private static final String EVENT_RECEIVER = "OPFPush";
     private static final String MESSAGE_CALLBACK = "OnMessage";
