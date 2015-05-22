@@ -30,6 +30,8 @@ import org.onepf.opfutils.OPFLog;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -47,6 +49,7 @@ public final class OPFPushInitializer {
 
     private static final String NAME_FIELD = "name";
     private static final String SENDER_ID_FIELD = "senderId";
+    private static final String SENDER_IDS_ARRAY_FIELD = "senderIdsArray";
 
     private static final String GCM_PROVIDER_NAME = "gcm";
     private static final String ADM_PROVIDER_NAME = "adm";
@@ -127,7 +130,7 @@ public final class OPFPushInitializer {
                                      @NonNull final Configuration.Builder configBuilder,
                                      @NonNull final JsonReader jsonReader) throws IOException {
         String providerName = null;
-        String senderId = "";
+        List<String> senderIds = new ArrayList<>();
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             final String name = jsonReader.nextName();
@@ -136,7 +139,10 @@ public final class OPFPushInitializer {
                     providerName = jsonReader.nextString();
                     break;
                 case SENDER_ID_FIELD:
-                    senderId = jsonReader.nextString();
+                    senderIds.add(jsonReader.nextString());
+                    break;
+                case SENDER_IDS_ARRAY_FIELD:
+                    readSenderIdArray(senderIds, jsonReader);
                     break;
                 default:
                     jsonReader.skipValue();
@@ -145,28 +151,46 @@ public final class OPFPushInitializer {
         }
         jsonReader.endObject();
 
-        addProvider(context, configBuilder, providerName, senderId);
+        addProvider(context, configBuilder, providerName, senderIds);
+    }
+
+    private static void readSenderIdArray(@NonNull final List<String> senderIds,
+                                          @NonNull JsonReader jsonReader) throws IOException {
+        jsonReader.beginArray();
+        while (jsonReader.hasNext()) {
+            senderIds.add(jsonReader.nextString());
+        }
+        jsonReader.endArray();
     }
 
     private static void addProvider(@NonNull final Context context,
                                     @NonNull final Configuration.Builder configBuilder,
                                     @Nullable final String providerName,
-                                    @Nullable final String senderId) {
-        final String addedSenderId = senderId == null ? "" : senderId;
+                                    @NonNull final List<String> senderIds) {
+
         if (providerName != null) {
             final String addedProviderName = providerName.toLowerCase(Locale.US);
             switch (addedProviderName) {
                 case GCM_PROVIDER_NAME:
-                    configBuilder.addProviders(new GCMProvider(context, addedSenderId));
+                    configBuilder.addProviders(new GCMProvider(context, safeGetFirstSenderId(senderIds)));
                     break;
                 case ADM_PROVIDER_NAME:
                     configBuilder.addProviders(new ADMProvider(context));
                     break;
                 case NOKIA_PROVIDER_NAME:
-                    //todo add array of sender ids
-                    configBuilder.addProviders(new NokiaNotificationsProvider(context, addedSenderId));
+                    configBuilder.addProviders(new NokiaNotificationsProvider(context,
+                            senderIds.toArray(new String[senderIds.size()])));
                     break;
             }
         }
+    }
+
+    @NonNull
+    private static String safeGetFirstSenderId(@NonNull final List<String> senderIds) {
+        if (senderIds.isEmpty()) {
+            return "";
+        }
+
+        return senderIds.get(0);
     }
 }
