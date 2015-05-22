@@ -17,6 +17,7 @@
 package org.onepf.opfpush.unity;
 
 import android.app.Application;
+import org.onepf.opfpush.unity.utils.OPFPushInitializer;
 
 /**
  * @author Roman Savin

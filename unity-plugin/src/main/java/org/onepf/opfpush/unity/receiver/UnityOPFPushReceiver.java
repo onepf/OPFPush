@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import com.unity3d.player.UnityPlayer;
 import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.receiver.OPFPushReceiver;
-import org.onepf.opfpush.unity.UnityJsonGenerator;
+import org.onepf.opfpush.unity.utils.UnityJsonGenerator;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 

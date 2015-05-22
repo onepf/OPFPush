@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.unity;
+package org.onepf.opfpush.unity.utils;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
