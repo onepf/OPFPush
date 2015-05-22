@@ -22,6 +22,7 @@ import android.app.Application;
  * @author Roman Savin
  * @since 15.05.2015
  */
+@SuppressWarnings("unused")
 public class OPFPushApplication extends Application {
 
     @Override
