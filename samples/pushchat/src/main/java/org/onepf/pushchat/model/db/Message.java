@@ -28,15 +28,15 @@ public final class Message {
     private final String senderUuid;
 
     @NonNull
-    private final String message;
+    private final String messageText;
 
     private final long receivedTime;
 
     public Message(@NonNull final String senderUuid,
-                   @NonNull final String message,
+                   @NonNull final String messageText,
                    final long receivedTime) {
         this.senderUuid = senderUuid;
-        this.message = message;
+        this.messageText = messageText;
         this.receivedTime = receivedTime;
     }
 
@@ -46,8 +46,8 @@ public final class Message {
     }
 
     @NonNull
-    public String getMessage() {
-        return message;
+    public String getMessageText() {
+        return messageText;
     }
 
     public long getReceivedTime() {

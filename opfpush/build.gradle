@@ -20,20 +20,10 @@ apply plugin: 'com.android.library'
 apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/opf-commons-gradle/opf-commons.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
         versionName "0.2.3-SNAPSHOT"
-    }
-
-    lintOptions {
-        abortOnError true
-        checkAllWarnings true
-        warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
     }
 }
 

@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
  * @author Roman Savin
  * @since 19.04.2015
  */
+//CHECKSTYLE:OFF
 public final class PushMessageResponse {
 
     @Nullable

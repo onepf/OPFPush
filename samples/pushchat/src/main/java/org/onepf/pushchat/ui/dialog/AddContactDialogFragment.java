@@ -139,7 +139,8 @@ public class AddContactDialogFragment extends DialogFragment {
         };
     }
 
-    private static abstract class AfterTextChangedWatcher implements TextWatcher {
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    private abstract static class AfterTextChangedWatcher implements TextWatcher {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {

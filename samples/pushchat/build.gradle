@@ -16,42 +16,9 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
-
-ext {
-    projectLocalPropertiesFile = project.rootProject.file('local.properties')
-    projectLocalProperties = loadLocalProperties(projectLocalPropertiesFile)
-
-    storeFile = getFile(getLocalProperty('opfpush-sample.signing'))
-    storePassword = getLocalProperty('StorePassword')
-    keyAlias = getLocalProperty('KeyAlias')
-    keyPassword = getLocalProperty('KeyPassword')
-}
-
-def loadLocalProperties(propertiesFile) {
-    def localProperties = new Properties()
-    if (propertiesFile.exists()) {
-        localProperties.load(propertiesFile.newDataInputStream())
-    }
-    return localProperties
-}
-
-def getLocalProperty(propertyName) {
-    return project.projectLocalProperties.getProperty(propertyName)
-}
-
-def getFile(path) {
-    if (path != null) {
-        return file(path)
-    }
-}
-
-def isSigningKeySpecified() {
-    return project.storeFile != null && project.storePassword != null && project.keyAlias != null && project.keyPassword != null
-}
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/opf-commons-gradle/opf-commons.gradle'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.onepf.opfpush.pushsample"
@@ -61,20 +28,11 @@ android {
         versionName "0.2.2"
     }
 
-    signingConfigs {
-        release {
-            storeFile project.storeFile
-            storePassword project.storePassword
-            keyAlias project.keyAlias
-            keyPassword project.keyPassword
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles 'proguard-project.txt'
-            if (isSigningKeySpecified()) {
+            if (project.isSigningKeySpecified) {
                 signingConfig signingConfigs.release
             }
         }
@@ -88,10 +46,6 @@ android {
                 'IconDensities', 'AlwaysShowAction', 'RtlEnabled', 'Overdraw', 'UnusedIds', 'RtlHardcoded',
                 'GradleDynamicVersion'
     }
-
-    packagingOptions {
-        exclude 'LICENSE.txt'
-    }
 }
 
 dependencies {
@@ -101,16 +55,16 @@ dependencies {
 
     //opfpush
     compile 'org.onepf:opfutils:0.1.22'
-    compile ('org.onepf:opfpush:0.2.+@aar') {
+    compile('org.onepf:opfpush:0.2.+@aar') {
         changing = true
     }
-    compile ('org.onepf:opfpush-adm:0.2.+@aar') {
+    compile('org.onepf:opfpush-adm:0.2.+@aar') {
         changing = true
     }
-    compile ('org.onepf:opfpush-gcm:0.2.+@aar') {
+    compile('org.onepf:opfpush-gcm:0.2.+@aar') {
         changing = true
     }
-    compile ('org.onepf:opfpush-nokia:0.2.+@aar') {
+    compile('org.onepf:opfpush-nokia:0.2.+@aar') {
         changing = true
     }
 

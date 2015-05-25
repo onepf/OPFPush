@@ -38,7 +38,8 @@ public final class ContentDescriptor {
         throw new UnsupportedOperationException();
     }
 
-    public static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH) {
+    @SuppressWarnings("PMD.NonStaticInitializer")
+    public static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH) {
         {
             addURI(AUTHORITY, MessagesContract.TABLE_NAME, MessagesContract.ALL_URI_CODE);
             addURI(AUTHORITY, MessagesContract.TABLE_NAME + "/#/", MessagesContract.URI_CODE);
