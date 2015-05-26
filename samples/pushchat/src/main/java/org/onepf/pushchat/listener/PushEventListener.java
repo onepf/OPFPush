@@ -130,14 +130,13 @@ public class PushEventListener implements EventListener {
 
         if (pushErrors.containsKey(GCMConstants.PROVIDER_NAME)) {
             final UnrecoverablePushError gcmError = pushErrors.get(GCMConstants.PROVIDER_NAME);
+            final Integer errorCode = gcmError.getAvailabilityErrorCode();
             if (gcmError.getType() == AVAILABILITY_ERROR
-                    && gcmError.getAvailabilityErrorCode() != null) {
-                final int errorCode = gcmError.getAvailabilityErrorCode();
-                if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
-                    final Intent intent = new Intent(SHOW_GCM_ERROR_DIALOG_ACTION);
-                    intent.putExtra(GCM_ERROR_CODE_EXTRA_KEY, errorCode);
-                    context.sendBroadcast(intent);
-                }
+                    && errorCode != null
+                    && GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+                final Intent intent = new Intent(SHOW_GCM_ERROR_DIALOG_ACTION);
+                intent.putExtra(GCM_ERROR_CODE_EXTRA_KEY, errorCode);
+                context.sendBroadcast(intent);
             }
         }
     }

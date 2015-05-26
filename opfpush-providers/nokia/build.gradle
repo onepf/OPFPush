@@ -16,36 +16,13 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply plugin: 'com.noveogroup.android.check'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
         versionName "0.2.3-SNAPSHOT"
-    }
-
-    lintOptions {
-        abortOnError true
-        checkAllWarnings true
-        warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage', 'GradleDynamicVersion'
-    }
-}
-
-check {
-    abortOnError true
-
-    checkstyle {
-        config rootProject.file('config/checkstyle.xml')
-    }
-
-    pmd {
-        config rootProject.file('config/pmd.xml')
     }
 }
 

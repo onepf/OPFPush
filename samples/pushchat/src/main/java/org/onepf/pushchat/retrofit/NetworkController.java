@@ -42,7 +42,9 @@ import retrofit.converter.GsonConverter;
 import java.util.Set;
 
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
-import static org.onepf.pushchat.utils.Constants.*;
+import static org.onepf.pushchat.utils.Constants.PROVIDER_NAME_EXTRA_KEY;
+import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin
@@ -52,6 +54,7 @@ public final class NetworkController {
 
     private final PushService pushService;
 
+    @SuppressWarnings("PMD.AccessorClassGeneration")
     private static final class NetworkControllerHolder {
         private static final NetworkController INSTANCE = new NetworkController();
     }

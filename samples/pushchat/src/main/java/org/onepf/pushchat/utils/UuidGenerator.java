@@ -56,8 +56,8 @@ public final class UuidGenerator {
         final TelephonyManager telephonyManager;
         telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-        final String IMEI = telephonyManager.getDeviceId();
-        final String IMSI = telephonyManager.getSubscriberId();
+        final String imei = telephonyManager.getDeviceId();
+        final String imsi = telephonyManager.getSubscriberId();
 
         final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         final WifiInfo wInfo = wifiManager.getConnectionInfo();
@@ -68,14 +68,15 @@ public final class UuidGenerator {
 
         //noinspection StringBufferReplaceableByString
         final StringBuilder uuidBuilder = new StringBuilder()
-                .append(IMEI == null ? "" : IMEI)
-                .append(IMSI == null ? "" : IMSI)
+                .append(imei == null ? "" : imei)
+                .append(imsi == null ? "" : imsi)
                 .append(macAddress == null ? "" : macAddress)
                 .append(androidId);
 
         return crypt(uuidBuilder.toString());
     }
 
+    @SuppressWarnings("checkstyle:magicnumber")
     @NonNull
     private static String crypt(@NonNull final String string) {
         if (DIGESTER == null || TextUtils.isEmpty(string)) {
@@ -89,7 +90,7 @@ public final class UuidGenerator {
 
         for (byte hashByte : hashBytes) {
             if ((0xff & hashByte) < 0x10) {
-                hexString.append("0").append(Integer.toHexString((0xFF & hashByte)));
+                hexString.append('0').append(Integer.toHexString(0xFF & hashByte));
             } else {
                 hexString.append(Integer.toHexString(0xFF & hashByte));
             }

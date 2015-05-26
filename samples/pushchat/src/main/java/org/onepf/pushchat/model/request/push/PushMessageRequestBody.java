@@ -25,6 +25,7 @@ import java.util.Set;
  * @author Roman Savin
  * @since 19.04.2015
  */
+//CHECKSTYLE:OFF
 public final class PushMessageRequestBody {
 
     @SerializedName("uuids")

@@ -17,7 +17,11 @@
 package org.onepf.pushchat.ui;
 
 import android.support.annotation.NonNull;
-import org.onepf.pushchat.ui.fragment.content.*;
+import org.onepf.pushchat.ui.fragment.content.AboutFragment;
+import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
+import org.onepf.pushchat.ui.fragment.content.ContactsFragment;
+import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
+import org.onepf.pushchat.ui.fragment.content.StateFragment;
 
 /**
  * @author Roman Savin

@@ -39,6 +39,7 @@ import java.util.Set;
  * @author Roman Savin
  * @since 06.05.2015
  */
+@SuppressWarnings("PMD.NonThreadSafeSingleton")
 public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "org.onepf.pushchat.db";
@@ -47,26 +48,26 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_CONTACTS_TABLE =
-            "CREATE TABLE " + ContactsContract.TABLE_NAME + " ( " +
-                    ContactEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
-                    ContactEntry.NAME + " TEXT" + COMMA_SEP +
-                    ContactEntry.UUID + " TEXT UNIQUE NOT NULL" +
-                    " )";
+            "CREATE TABLE " + ContactsContract.TABLE_NAME + " ( "
+                    + ContactEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP
+                    + ContactEntry.NAME + " TEXT" + COMMA_SEP
+                    + ContactEntry.UUID + " TEXT UNIQUE NOT NULL"
+                    + " )";
 
     private static final String SQL_CREATE_MESSAGES_TABLE =
-            "CREATE TABLE " + MessagesContract.TABLE_NAME + " ( " +
-                    MessageEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
-                    MessageEntry.SENDER_UUID + " TEXT NOT NULL" + COMMA_SEP +
-                    MessageEntry.SENDER_NAME + " TEXT" + COMMA_SEP +
-                    MessageEntry.MESSAGE + " TEXT NOT NULL" + COMMA_SEP +
-                    MessageEntry.RECEIVED_TIME + " LONG" +
-                    " )";
+            "CREATE TABLE " + MessagesContract.TABLE_NAME + " ( "
+                    + MessageEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP
+                    + MessageEntry.SENDER_UUID + " TEXT NOT NULL" + COMMA_SEP
+                    + MessageEntry.SENDER_NAME + " TEXT" + COMMA_SEP
+                    + MessageEntry.MESSAGE + " TEXT NOT NULL" + COMMA_SEP
+                    + MessageEntry.RECEIVED_TIME + " LONG"
+                    + " )";
 
-    private static final String SQL_DELETE_CONTACTS_TABLE = "DROP TABLE IF EXISTS " +
-            ContactsContract.TABLE_NAME;
+    private static final String SQL_DELETE_CONTACTS_TABLE = "DROP TABLE IF EXISTS "
+            + ContactsContract.TABLE_NAME;
 
-    private static final String SQL_DELETE_MESSAGES_TABLE = "DROP TABLE IF EXISTS " +
-            MessagesContract.TABLE_NAME;
+    private static final String SQL_DELETE_MESSAGES_TABLE = "DROP TABLE IF EXISTS "
+            + MessagesContract.TABLE_NAME;
 
     private static final int MESSAGE_OPERATION_TOKEN = 1;
     private static final int CONTACT_OPERATION_TOKEN = 2;
@@ -79,7 +80,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     @NonNull
     private final AsyncQueryHandler asyncQueryHandler;
 
-    private volatile static DatabaseHelper instance;
+    private static volatile DatabaseHelper instance;
 
     private DatabaseHelper(@NonNull final Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -87,7 +88,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         this.asyncQueryHandler = new CommonAsyncQueryHandler(context.getContentResolver());
     }
 
-    public synchronized static DatabaseHelper getInstance(@NonNull final Context context) {
+    public static DatabaseHelper getInstance(@NonNull final Context context) {
         if (instance == null) {
             synchronized (DatabaseHelper.class) {
                 if (instance == null) {
@@ -138,7 +139,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 final ContentValues contentValues = new ContentValues();
                 contentValues.put(MessageEntry.SENDER_UUID, message.getSenderUuid());
                 contentValues.put(MessageEntry.SENDER_NAME, name);
-                contentValues.put(MessageEntry.MESSAGE, message.getMessage());
+                contentValues.put(MessageEntry.MESSAGE, message.getMessageText());
                 contentValues.put(MessageEntry.RECEIVED_TIME, message.getReceivedTime());
 
                 asyncQueryHandler.startInsert(MESSAGE_OPERATION_TOKEN, null, MessagesContract.TABLE_URI, contentValues);
