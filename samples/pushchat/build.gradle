@@ -16,7 +16,7 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/opf-commons-gradle/opf-commons.gradle'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle'
 
 android {
 
@@ -32,7 +32,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles 'proguard-project.txt'
-            if (project.isSigningKeySpecified) {
+            if (project.isApkSigningCredentialsSpecified) {
                 signingConfig signingConfigs.release
             }
         }
