@@ -35,7 +35,10 @@ import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.model.PushState;
 
 import static org.onepf.pushchat.model.PushState.NO_AVAILABLE_PROVIDER;
-import static org.onepf.pushchat.utils.Constants.*;
+import static org.onepf.pushchat.utils.Constants.PROVIDER_NAME_EXTRA_KEY;
+import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.REGISTRATION_ID_EXTRA_KEY;
+import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin
@@ -155,9 +158,9 @@ public class StateFragment extends BaseContentFragment {
         hideProgressBar();
         hideShareButton();
 
-        stateTextView.setText(getString(R.string.state_fmt, isNoAvailableProvider ?
-                        getString(R.string.no_available_provider) :
-                        getString(R.string.unregistered))
+        stateTextView.setText(getString(R.string.state_fmt, isNoAvailableProvider
+                        ? getString(R.string.no_available_provider)
+                        : getString(R.string.unregistered))
         );
         providerNameTextView.setVisibility(View.GONE);
         registrationIdTextView.setVisibility(View.GONE);

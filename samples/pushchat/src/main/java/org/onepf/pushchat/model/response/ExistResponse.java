@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Roman Savin
  * @since 06.05.2015
  */
+//CHECKSTYLE:OFF
 public final class ExistResponse {
 
     @SerializedName("exist")

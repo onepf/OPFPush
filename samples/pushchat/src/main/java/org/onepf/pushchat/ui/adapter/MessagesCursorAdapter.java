@@ -29,7 +29,10 @@ import org.onepf.pushchat.R;
 
 import java.util.Date;
 
-import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.*;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.MESSAGE;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.SENDER_NAME;
+import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.SENDER_UUID;
 
 /**
  * @author Roman Savin

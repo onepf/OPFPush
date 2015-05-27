@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Roman Savin
  * @since 19.04.2015
  */
+//CHECKSTYLE:OFF
 public abstract class RequestBody {
 
     @SerializedName("uuid")

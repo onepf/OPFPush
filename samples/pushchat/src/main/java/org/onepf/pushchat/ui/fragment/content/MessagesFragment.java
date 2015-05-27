@@ -16,7 +16,12 @@
 
 package org.onepf.pushchat.ui.fragment.content;
 
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,7 +33,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.NotificationController;
 import org.onepf.pushchat.controller.StateController;
@@ -47,7 +56,9 @@ import retrofit.client.Response;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static org.onepf.pushchat.db.ContentDescriptor.MessagesContract.MessageEntry.RECEIVED_TIME;
-import static org.onepf.pushchat.utils.Constants.*;
+import static org.onepf.pushchat.utils.Constants.LINE_SEPARATOR;
+import static org.onepf.pushchat.utils.Constants.REGISTERED_ACTION;
+import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
 
 /**
  * @author Roman Savin

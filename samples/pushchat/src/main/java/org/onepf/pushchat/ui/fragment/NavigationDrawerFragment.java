@@ -42,9 +42,9 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     private ListView drawerListView;
 
-    private int firstFragmentPosition = 0;
+    private int firstFragmentPosition;
 
-    private int currentSelectedPosition = 0;
+    private int currentSelectedPosition;
 
     private String[] titles;
 
@@ -64,9 +64,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         };
 
         if (savedInstanceState == null) {
-            firstFragmentPosition = StateController.getState(getActivity()) == REGISTERED ?
-                    MessagesFragment.POSITION :
-                    StateFragment.POSITION;
+            firstFragmentPosition = StateController.getState(getActivity()) == REGISTERED
+                    ? MessagesFragment.POSITION
+                    : StateFragment.POSITION;
             currentSelectedPosition = firstFragmentPosition;
         } else {
             firstFragmentPosition = savedInstanceState.getInt(FIRST_SELECTED_POSITION_KEY);

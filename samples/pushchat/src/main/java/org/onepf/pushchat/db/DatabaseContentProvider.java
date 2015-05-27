@@ -22,12 +22,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.text.TextUtils;
-import org.onepf.opfutils.OPFLog;
 
 /**
  * @author Roman Savin
  * @since 06.05.2015
  */
+@SuppressWarnings("PMD.UseObjectForClearerAPI")
 public class DatabaseContentProvider extends ContentProvider {
 
     private DatabaseHelper dbHelper;
@@ -44,7 +44,7 @@ public class DatabaseContentProvider extends ContentProvider {
                         final String selection,
                         final String[] selectionArgs,
                         final String orderBy) {
-        final int uriType = ContentDescriptor.uriMatcher.match(uri);
+        final int uriType = ContentDescriptor.URI_MATCHER.match(uri);
         final String tableName = ContentDescriptor.getTableName(uriType);
 
         final SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -60,7 +60,7 @@ public class DatabaseContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(final Uri uri, final ContentValues contentValues) {
-        final int uriType = ContentDescriptor.uriMatcher.match(uri);
+        final int uriType = ContentDescriptor.URI_MATCHER.match(uri);
         final String tableName = ContentDescriptor.getTableName(uriType);
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -77,7 +77,7 @@ public class DatabaseContentProvider extends ContentProvider {
 
     @Override
     public int delete(final Uri uri, final String selection, final String[] selectionArgs) {
-        final int uriType = ContentDescriptor.uriMatcher.match(uri);
+        final int uriType = ContentDescriptor.URI_MATCHER.match(uri);
         final String tableName = ContentDescriptor.getTableName(uriType);
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -91,20 +91,11 @@ public class DatabaseContentProvider extends ContentProvider {
                       final ContentValues contentValues,
                       final String selection,
                       final String[] selectionArgs) {
-        final int uriType = ContentDescriptor.uriMatcher.match(uri);
+        final int uriType = ContentDescriptor.URI_MATCHER.match(uri);
         final String tableName = ContentDescriptor.getTableName(uriType);
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        int result;
-        try {
-            result = db.update(tableName, contentValues, selection, selectionArgs);
-        } catch (Throwable e) {
-            OPFLog.e("Unable to update SQLiteDatabase");
-            result = 0;
-        }
-
-        return result;
+        return db.update(tableName, contentValues, selection, selectionArgs);
     }
-
 }

@@ -48,7 +48,9 @@ import static android.content.Intent.ACTION_SEND;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static org.onepf.pushchat.model.PushState.REGISTERED;
-import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.*;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.HIDE_PROGRESS_BAR_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
+import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_PROGRESS_BAR_ACTION;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -59,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String IS_CLEAR_MENU_ITEM_VISIBLE_KEY = "IS_CLEAR_MENU_ITEM_VISIBLE_KEY";
 
-    private NavigationDrawerFragment navigationDrawerFragment = NavigationDrawerFragment.newInstance();
+    private final NavigationDrawerFragment navigationDrawerFragment = NavigationDrawerFragment.newInstance();
 
     private DrawerLayout drawerLayout;
 

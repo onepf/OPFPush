@@ -20,7 +20,10 @@ gradle-app.setting
 # User-specific stuff:
 .idea/workspace.xml
 .idea/tasks.xml
-.idea/dictionaries
+.idea/compiler.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/scopes/
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids

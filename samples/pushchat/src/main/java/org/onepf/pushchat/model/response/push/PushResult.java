@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
  * @author Roman Savin
  * @since 19.04.2015
  */
+//CHECKSTYLE:OFF
 public class PushResult {
 
     @NonNull

@@ -72,7 +72,7 @@ public final class OPFPush {
         OPFChecks.checkThread(true);
 
         if (helper != null) {
-            throw new InitException(false);
+            throw new InitException(true);
         }
 
         if (OPFUtils.isMainProcess(context)) {
