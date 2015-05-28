@@ -26,6 +26,15 @@ import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.pushprovider.PushProvider;
 
 /**
+ * The helper class to manage push providers.
+ * <p/>
+ * Use {@link #register()} to start a registration and {@link #unregister()} for start an unregistration.
+ * The registration and unregistration operations are asynchronous. You can handle results of these operations
+ * via the implementation of the {@link org.onepf.opfpush.listener.EventListener} interface or the extension of
+ * the {@link org.onepf.opfpush.receiver.OPFPushReceiver} class.
+ * <p/>
+ * You must initialize the {@link org.onepf.opfpush.OPFPush} class before start using the {@code OPFPushHelper}.
+ *
  * @author Roman Savin
  * @since 20.03.2015
  */
