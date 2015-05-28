@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.unity.model;
+package org.onepf.opfpush.unity;
 
-import android.support.annotation.Nullable;
+import android.app.Application;
+import org.onepf.opfpush.unity.utils.OPFPushInitializer;
 
 /**
  * @author Roman Savin
- * @since 10.12.14
+ * @since 15.05.2015
  */
-public class UnregisteredEvent {
+@SuppressWarnings("unused")
+public class OPFPushApplication extends Application {
 
-    @Nullable
-    private String registrationId;
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-    public UnregisteredEvent(@Nullable final String registrationId) {
-        this.registrationId = registrationId;
-    }
-
-    @Nullable
-    public String getRegistrationId() {
-        return registrationId;
+        OPFPushInitializer.init(this);
     }
 }

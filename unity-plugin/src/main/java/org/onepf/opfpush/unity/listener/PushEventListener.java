@@ -20,67 +20,39 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import com.unity3d.player.UnityPlayer;
 import org.onepf.opfpush.listener.EventListener;
 import org.onepf.opfpush.model.UnrecoverablePushError;
-import org.onepf.opfpush.unity.R;
-import org.onepf.opfpush.unity.model.MessageEvent;
-import org.onepf.opfpush.unity.model.NoAvailableProviderEvent;
-import org.onepf.opfpush.unity.model.RegisteredEvent;
-import org.onepf.opfpush.unity.model.UnregisteredEvent;
-import org.onepf.opfpush.unity.util.NotificationUtils;
+import org.onepf.opfpush.unity.utils.UnityJsonGenerator;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.io.IOException;
 import java.util.Map;
-
-import de.greenrobot.event.EventBus;
-
-import static org.onepf.opfpush.unity.util.Constants.MESSAGE_EXTRA_KEY;
-import static org.onepf.opfpush.unity.util.Constants.PAYLOAD_EXTRA_KEY;
 
 /**
  * @author Roman Savin
- * @since 09.12.14
+ * @since 22.05.2015
  */
-public class UnityEventListener implements EventListener {
+public class PushEventListener implements EventListener {
 
-    @NonNull
-    private Context appContext;
-
-    public UnityEventListener(@NonNull final Context context) {
-        this.appContext = context.getApplicationContext();
-    }
+    private static final String EVENT_RECEIVER = "OPFPush";
+    private static final String MESSAGE_CALLBACK = "OnMessage";
+    private static final String DELETED_MESSAGES_CALLBACK = "OnDeletedMessages";
+    private static final String REGISTERED_CALLBACK = "OnRegistered";
+    private static final String UNREGISTERED_CALLBACK = "OnUnregistered";
+    private static final String NO_AVAILABLE_PROVIDER_CALLBACK = "OnNoAvailableProvider";
 
     @Override
     public void onMessage(@NonNull final Context context,
                           @NonNull final String providerName,
                           @Nullable final Bundle extras) {
-        OPFLog.logMethod(providerName, OPFUtils.toString(extras));
-        if (extras == null) {
-            return;
-        }
-
-        String message = null;
-        if (extras.containsKey(MESSAGE_EXTRA_KEY)) {
-            message = extras.getString(MESSAGE_EXTRA_KEY);
-        } else if (extras.containsKey(PAYLOAD_EXTRA_KEY)) {
-            message = extras.getString(PAYLOAD_EXTRA_KEY);
-        }
-
-        if (message != null) {
-            try {
-                NotificationUtils.showNotification(
-                        appContext,
-                        appContext.getString(R.string.message_notification_title),
-                        message
-                );
-                EventBus.getDefault().postSticky(new MessageEvent(URLDecoder.decode(message, "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                OPFLog.e(e.getCause().toString());
-            }
+        OPFLog.logMethod(context, providerName, OPFUtils.toString(extras));
+        try {
+            UnityPlayer.UnitySendMessage(EVENT_RECEIVER, MESSAGE_CALLBACK,
+                    UnityJsonGenerator.getOnMessageJson(providerName, extras));
+        } catch (IOException e) {
+            OPFLog.e(e.getMessage());
         }
     }
 
@@ -89,6 +61,12 @@ public class UnityEventListener implements EventListener {
                                   @NonNull final String providerName,
                                   final int messagesCount) {
         OPFLog.logMethod(providerName, messagesCount);
+        try {
+            UnityPlayer.UnitySendMessage(EVENT_RECEIVER, DELETED_MESSAGES_CALLBACK,
+                    UnityJsonGenerator.getOnDeletedJson(providerName, messagesCount));
+        } catch (IOException e) {
+            OPFLog.e(e.getMessage());
+        }
     }
 
     @Override
@@ -96,21 +74,36 @@ public class UnityEventListener implements EventListener {
                              @NonNull final String providerName,
                              @NonNull final String registrationId) {
         OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new RegisteredEvent(registrationId));
+        try {
+            UnityPlayer.UnitySendMessage(EVENT_RECEIVER, REGISTERED_CALLBACK,
+                    UnityJsonGenerator.getOnRegisteredJson(providerName, registrationId));
+        } catch (IOException e) {
+            OPFLog.e(e.getMessage());
+        }
     }
 
     @Override
     public void onUnregistered(@NonNull final Context context,
                                @NonNull final String providerName,
-                               @Nullable final String registrationId) {
-        OPFLog.logMethod(providerName, registrationId);
-        EventBus.getDefault().postSticky(new UnregisteredEvent(registrationId));
+                               @Nullable final String oldRegistrationId) {
+        OPFLog.logMethod(providerName, oldRegistrationId);
+        try {
+            UnityPlayer.UnitySendMessage(EVENT_RECEIVER, UNREGISTERED_CALLBACK,
+                    UnityJsonGenerator.getOnUnregisteredJson(providerName, oldRegistrationId));
+        } catch (IOException e) {
+            OPFLog.e(e.getMessage());
+        }
     }
 
     @Override
     public void onNoAvailableProvider(@NonNull final Context context,
                                       @NonNull final Map<String, UnrecoverablePushError> pushErrors) {
         OPFLog.logMethod(context, pushErrors);
-        EventBus.getDefault().postSticky(new NoAvailableProviderEvent(pushErrors));
+        try {
+            UnityPlayer.UnitySendMessage(EVENT_RECEIVER, NO_AVAILABLE_PROVIDER_CALLBACK,
+                    UnityJsonGenerator.getOnNoAvailableProviderJson(pushErrors));
+        } catch (IOException e) {
+            OPFLog.e(e.getMessage());
+        }
     }
 }

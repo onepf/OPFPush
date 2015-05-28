@@ -16,37 +16,23 @@
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 2
-        versionName "2.0"
-    }
-
-    android {
-        lintOptions {
-            abortOnError false
-        }
+        versionName "0.2.2-SNAPSHOT"
     }
 }
 
 dependencies {
     provided files('libs/unity-engine.jar')
-    compile project(':adm')
-    compile(project(':gcm')) {
-        transitive = false
-    }
-    compile project(':nokia')
 
-    compile 'com.google.android.gms:play-services-gcm:7.3.0'
-    compile 'com.nokia:push:1.0'
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.20'
-    provided 'com.amazon:amazon-device-messaging:1.0.1'
+    //opfpush
+    compile 'org.onepf:opfutils:0.1.22'
+    compile 'org.onepf:opfpush:0.2.2@aar'
+    compile 'org.onepf:opfpush-adm:0.2.2@aar'
+    compile 'org.onepf:opfpush-gcm:0.2.2@aar'
+    compile 'org.onepf:opfpush-nokia:0.2.2@aar'
 }
