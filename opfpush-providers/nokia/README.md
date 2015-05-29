@@ -19,7 +19,7 @@ allprojects {
 
 Download [the latest AAR][nokia-latest-aar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-nokia:0.2.2@aar'
+compile 'org.onepf:opfpush-nokia:0.2.3@aar'
 ```
         
 or Maven:
@@ -27,7 +27,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-nokia</artifactId>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
     <type>aar</type>
 </dependency>
 ```
@@ -35,7 +35,7 @@ or Maven:
 You can also use JAR dependency.
 Download [the latest JAR][nokia-latest-jar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-nokia:0.2.2'
+compile 'org.onepf:opfpush-nokia:0.2.3'
 ```
 
 or Maven:
@@ -43,7 +43,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-nokia</artifactId>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
 </dependency>
 ```
 
@@ -99,5 +99,5 @@ builder.addProviders(new NokiaNotificationsProvider(context, NOKIA_NOTIFICATION_
 ```
 
 [Nokia Notifications Page]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications.html
-[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-nokia-0.2.2.aar
-[nokia-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/opfpush-nokia-0.2.2.jar
+[nokia-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-nokia-0.2.3.aar
+[nokia-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-nokia-0.2.3.jar

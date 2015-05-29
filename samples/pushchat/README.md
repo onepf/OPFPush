@@ -42,6 +42,6 @@ You can also use [OPFPush web page][opfpush-server-link] to send messages to you
 You can build it from sources or download [the latest debug apk][sample-latest-apk].
 It is freely available on [Google play][sample-play-link] and [Amazon store][sample-amazon-link].
 
-[sample-latest-apk]: https://github.com/onepf/OPFPush/releases/download/v0.2.2/pushchat-debug.apk
+[sample-latest-apk]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/pushchat-debug.apk
 [sample-play-link]: https://play.google.com/store/apps/details?id=org.onepf.opfpush.pushsample
 [sample-amazon-link]: http://www.amazon.com/OPF-Test-Account-Push-Chat/dp/B00XLWG116/ref=sr_1_1?s=mobile-apps&ie=UTF8&qid=1431601453&sr=1-1&keywords=Push+chat

@@ -22,7 +22,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionName "0.2.3-SNAPSHOT"
+        versionName "0.2.3"
     }
 }
 
@@ -32,9 +32,7 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
-    compile ('org.onepf:opfpush:0.2.+@aar') {
-        changing = true
-    }
+    compile 'org.onepf:opfpush:0.2.3@aar'
     //noinspection NewerVersionAvailable
     compile 'com.google.android.gms:play-services-gcm:7.3.0'
 
