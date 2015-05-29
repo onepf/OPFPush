@@ -56,16 +56,10 @@ provides possibility to use the system push provider for a specific device.
 
 **Project files setup**
 
-1. Add specific permissions and receivers to the AndroidManifest.xml file for each used push provider. 
-   You can find more information in README.md files of implemented providers. 
-   See the section [Implemented Push Services](#user-content-implemented-push-services).
-
-2. Add the following line to your `proguard-project.txt` file:
-    ```
-    -dontwarn edu.umd.cs.findbugs.annotations.*
-    ```
-3. Add the proguard rules specific for the each used push provider that you can find in provider README.md file.
-   See the section [Implemented Push Services](#user-content-implemented-push-services).
+Add specific permissions and receivers to the AndroidManifest.xml file for each used push provider.
+Add the proguard rules specific for the each used push provider.
+You can find more information in the README.md files of implemented providers. 
+See the section [Implemented Push Services](#user-content-implemented-push-services).
    
 **OPFPush setup**
 
