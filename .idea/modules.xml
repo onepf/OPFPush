@@ -8,7 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/opfpush-providers/nokia/nokia.iml" filepath="$PROJECT_DIR$/opfpush-providers/nokia/nokia.iml" />
       <module fileurl="file://$PROJECT_DIR$/opfpush/opfpush.iml" filepath="$PROJECT_DIR$/opfpush/opfpush.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/pushchat/pushchat.iml" filepath="$PROJECT_DIR$/samples/pushchat/pushchat.iml" />
-      <module fileurl="file://$PROJECT_DIR$/unity-plugin/unity-plugin.iml" filepath="$PROJECT_DIR$/unity-plugin/unity-plugin.iml" />
     </modules>
   </component>
 </project>

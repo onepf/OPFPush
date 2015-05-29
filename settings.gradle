@@ -18,7 +18,6 @@ include ':opfpush',
         ':gcm',
         ':nokia',
         ':adm',
-        ':unity-plugin',
         ':pushchat'
 
 project(':gcm').projectDir = new File('opfpush-providers/gcm')
