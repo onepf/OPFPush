@@ -27,6 +27,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import com.google.android.gms.iid.InstanceID;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
@@ -43,6 +44,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.google.android.gms.gcm.GoogleCloudMessaging.INSTANCE_ID_SCOPE;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.C2DM_ACTION_RECEIVE;
@@ -198,7 +200,8 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderID);
     }
 
-    private void close() {
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
+    private synchronized void close() {
         OPFLog.logMethod();
 
         if (registrationExecutor != null) {
@@ -237,7 +240,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
             try {
                 final String registrationId =
-                        GoogleCloudMessaging.getInstance(getContext()).register(senderID);
+                        InstanceID.getInstance(getContext()).getToken(senderID, INSTANCE_ID_SCOPE);
                 if (TextUtils.isEmpty(registrationId)) {
                     OPFLog.w("Registration id is empty");
                     onAuthError();
@@ -309,7 +312,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             OPFLog.logMethod();
 
             try {
-                GoogleCloudMessaging.getInstance(getContext()).unregister();
+                InstanceID.getInstance(getContext()).deleteToken(senderID, INSTANCE_ID_SCOPE);
                 close();
 
                 onUnregistrationSuccess();
