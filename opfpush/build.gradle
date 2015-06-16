@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+    }
+}
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'

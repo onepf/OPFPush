@@ -17,7 +17,7 @@
 apply plugin: 'idea'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.2.1'
 }
 
 buildscript {
@@ -28,25 +28,15 @@ buildscript {
     dependencies {
         //noinspection GradleDependency
         classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
         classpath 'com.noveogroup.android:check:1.1.2'
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
     }
-}
-
-def isReleaseBuild() {
-    return !VERSION_NAME.endsWith("SNAPSHOT")
-}
-
-def useTestRepo() {
-    return true
 }
 
 allprojects {
     group = GROUP
 
     repositories {
-        maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         jcenter()
     }
 
