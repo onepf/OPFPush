@@ -20,9 +20,34 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application>
+        <receiver
+            android:name="org.onepf.opfpush.gcm.GCMRegistrationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION" />
+                <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION" />
+            </intent-filter>
+        </receiver>
+
         <service
-            android:name=".GCMService"
+            android:name=".GCMRegistrationService"
             android:exported="false" />
+
+        <service
+            android:name=".GCMMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".GCMInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
 
         <service
             android:name=".SendMessageService"

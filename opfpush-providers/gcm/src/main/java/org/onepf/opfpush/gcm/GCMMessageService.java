@@ -16,30 +16,33 @@
 
 package org.onepf.opfpush.gcm;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
-
+import com.google.android.gms.gcm.GcmListenerService;
+import org.onepf.opfpush.OPFConstants;
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
+import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
+
 /**
- * Forwards the Google Cloud Messaging (GCM) messages to {@link GCMService}.
- *
  * @author Roman Savin
+ * @since 16.06.2015
  */
-public class GCMReceiver extends WakefulBroadcastReceiver {
+public class GCMMessageService extends GcmListenerService {
 
     @Override
-    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.logMethod(context, OPFUtils.toString(intent));
+    public void onMessageReceived(@NonNull final String from, @NonNull final Bundle data) {
+        //todo what is from parameter?
+        OPFLog.logMethod(from, OPFUtils.toString(data));
+        OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, data);
+    }
 
-        intent.setComponent(new ComponentName(context, GCMService.class));
-        startWakefulService(context, intent);
-        if (isOrderedBroadcast()) {
-            setResultCode(Activity.RESULT_OK);
-        }
+    @Override
+    public void onDeletedMessages() {
+        OPFLog.logMethod();
+        OPFPush.getHelper().getReceivedMessageHandler()
+                .onDeletedMessages(PROVIDER_NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
     }
 }

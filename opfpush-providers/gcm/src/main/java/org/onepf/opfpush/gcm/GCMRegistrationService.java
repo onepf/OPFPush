@@ -20,10 +20,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import org.onepf.opfpush.OPFConstants;
 import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.RecoverablePushError;
@@ -38,17 +34,17 @@ import static org.onepf.opfpush.model.UnrecoverablePushError.Type.PROVIDER_SPECI
 
 /**
  * This {@link IntentService} does the actual handling of the GCM message.
- * {@link org.onepf.opfpush.gcm.GCMReceiver} (a {@code WakefulBroadcastReceiver}) holds a
+ * {@link GCMRegistrationReceiver} (a {@code WakefulBroadcastReceiver}) holds a
  * partial wake lock for this service while the service does its work. When the
  * service is finished, it calls {@code completeWakefulIntent()} to release the
  * wake lock.
  *
  * @author Roman Savin
  */
-public class GCMService extends IntentService {
+public class GCMRegistrationService extends IntentService {
 
-    public GCMService() {
-        super("GCMService");
+    public GCMRegistrationService() {
+        super("GCMRegistrationService");
     }
 
     @Override
@@ -70,26 +66,8 @@ public class GCMService extends IntentService {
             } else {
                 onUnregistered(intent.getStringExtra(GCMConstants.EXTRA_REGISTRATION_ID));
             }
-        } else if (intent.getExtras() != null) {
-            final String messageType = GoogleCloudMessaging.getInstance(this).getMessageType(intent);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                onDeletedMessages();
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                onMessage(intent);
-            }
         }
-        GCMReceiver.completeWakefulIntent(intent);
-    }
-
-    private void onMessage(@NonNull final Intent intent) {
-        OPFLog.logMethod(OPFUtils.toString(intent));
-        OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, intent.getExtras());
-    }
-
-    private void onDeletedMessages() {
-        OPFLog.logMethod();
-        OPFPush.getHelper().getReceivedMessageHandler()
-                .onDeletedMessages(PROVIDER_NAME, OPFConstants.MESSAGES_COUNT_UNKNOWN);
+        GCMRegistrationReceiver.completeWakefulIntent(intent);
     }
 
     private void onRegistered(@NonNull final String registrationId) {

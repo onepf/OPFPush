@@ -108,14 +108,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
         CheckUtils.checkPermission(context, c2dmPermission, checkManifestHandler);
 
-        CheckUtils.checkService(context, new ComponentName(context, GCMService.class), checkManifestHandler);
+        CheckUtils.checkService(context, new ComponentName(context, GCMRegistrationService.class), checkManifestHandler);
         CheckUtils.checkService(context, new ComponentName(context, SendMessageService.class), checkManifestHandler);
 
         final Intent c2dmReceiveBroadcastIntent = new Intent(C2DM_ACTION_RECEIVE);
         final Intent registrationBroadcastIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
         final Intent unregistrationBroadcastIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
 
-        final String gcmReceiverName = GCMReceiver.class.getName();
+        final String gcmReceiverName = GCMRegistrationReceiver.class.getName();
 
         CheckUtils.checkReceiver(context, gcmReceiverName, c2dmReceiveBroadcastIntent,
                 PERMISSION_SEND, checkManifestHandler);

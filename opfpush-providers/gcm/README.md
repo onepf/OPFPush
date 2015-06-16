@@ -49,7 +49,7 @@ also add the following receiver:
 
 ```xml
 <receiver
-    android:name="org.onepf.opfpush.gcm.GCMReceiver"
+    android:name="org.onepf.opfpush.gcm.GCMRegistrationReceiver"
     android:exported="true"
     android:permission="com.google.android.c2dm.permission.SEND">
     <intent-filter>
@@ -71,7 +71,7 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 
 <application>
     <service
-        android:name="org.onepf.opfpush.gcm.GCMService"
+        android:name="org.onepf.opfpush.gcm.GCMRegistrationService"
         android:exported="false" />
 
     <service
