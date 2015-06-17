@@ -31,9 +31,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles 'proguard-project.txt'
-            if (project.isApkSigningCredentialsSpecified) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig getOpfSigningConfig()
         }
     }
 
