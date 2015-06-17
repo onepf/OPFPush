@@ -26,7 +26,9 @@ android {
 }
 
 dependencies {
-    compile 'org.onepf:opfpush:0.2.3@aar'
+    compile ('org.onepf:opfpush:0.2.+@aar') {
+        changing = true
+    }
     compile 'com.nokia:push:1.0'
 
     provided 'com.android.support:support-annotations:19.1.0'

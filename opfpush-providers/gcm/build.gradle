@@ -31,7 +31,9 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
-    compile 'org.onepf:opfpush:0.2.3@aar'
+    compile ('org.onepf:opfpush:0.2.+@aar') {
+        changing = true
+    }
     //noinspection NewerVersionAvailable
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
 
