@@ -31,9 +31,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles 'proguard-project.txt'
-            if (project.isApkSigningCredentialsSpecified) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig getOpfSigningConfig()
         }
     }
 
@@ -49,6 +47,7 @@ android {
 
 dependencies {
     //material
+    //noinspection ObsoleteGradleDependency
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
 
@@ -61,6 +60,7 @@ dependencies {
 
     //push providers dependencies
     provided 'com.amazon:amazon-device-messaging:1.0.1'
+    //noinspection ObsoleteGradleDependency
     compile 'com.google.android.gms:play-services:7.3.0'
     compile 'com.nokia:push:1.0'
 
