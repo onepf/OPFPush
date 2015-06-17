@@ -21,7 +21,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionName "0.2.3-SNAPSHOT"
+        versionName "0.2.4-SNAPSHOT"
     }
 }
 
@@ -30,8 +30,16 @@ dependencies {
 
     //opfpush
     compile 'org.onepf:opfutils:0.1.22'
-    compile 'org.onepf:opfpush:0.2.3@aar'
-    compile 'org.onepf:opfpush-adm:0.2.3@aar'
-    compile 'org.onepf:opfpush-gcm:0.2.3@aar'
-    compile 'org.onepf:opfpush-nokia:0.2.3@aar'
+    compile('org.onepf:opfpush:0.2.+@aar') {
+        changing = true
+    }
+    compile('org.onepf:opfpush-adm:0.2.+@aar') {
+        changing = true
+    }
+    compile('org.onepf:opfpush-gcm:0.2.+@aar') {
+        changing = true
+    }
+    compile('org.onepf:opfpush-nokia:0.2.+@aar') {
+        changing = true
+    }
 }
