@@ -30,11 +30,10 @@ import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
  * @author Roman Savin
  * @since 16.06.2015
  */
-public class GCMMessageService extends GcmListenerService {
+public class GCMService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(@NonNull final String from, @NonNull final Bundle data) {
-        //todo what is from parameter?
         OPFLog.logMethod(from, OPFUtils.toString(data));
         OPFPush.getHelper().getReceivedMessageHandler().onMessage(PROVIDER_NAME, data);
     }

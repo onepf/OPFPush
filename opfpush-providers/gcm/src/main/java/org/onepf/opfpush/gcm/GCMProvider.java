@@ -22,20 +22,22 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GcmReceiver;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import com.google.android.gms.iid.InstanceID;
 import org.onepf.opfpush.BasePushProvider;
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.Message;
+import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.model.RecoverablePushError;
+import org.onepf.opfpush.model.UnrecoverablePushError;
 import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 import org.onepf.opfutils.exception.WrongThreadException;
 
 import java.io.IOException;
@@ -45,17 +47,19 @@ import java.util.concurrent.Executors;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.google.android.gms.gcm.GoogleCloudMessaging.INSTANCE_ID_SCOPE;
-import static org.onepf.opfpush.gcm.GCMConstants.ACTION_REGISTRATION_CALLBACK;
-import static org.onepf.opfpush.gcm.GCMConstants.ACTION_UNREGISTRATION_CALLBACK;
 import static org.onepf.opfpush.gcm.GCMConstants.C2DM_ACTION_RECEIVE;
+import static org.onepf.opfpush.gcm.GCMConstants.ERROR_AUTHENTICATION_FAILED;
+import static org.onepf.opfpush.gcm.GCMConstants.ERROR_SERVICE_NOT_AVAILABLE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_CLOUD_MESSAGING_CLASS_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_PLAY_APP_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.GOOGLE_SERVICES_FRAMEWORK_PACKAGE;
 import static org.onepf.opfpush.gcm.GCMConstants.MESSAGES_TO_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_C2D_MESSAGE_SUFFIX;
 import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_RECEIVE;
-import static org.onepf.opfpush.gcm.GCMConstants.PERMISSION_SEND;
 import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
+import static org.onepf.opfpush.model.RecoverablePushError.Type.SERVICE_NOT_AVAILABLE;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.AUTHENTICATION_FAILED;
+import static org.onepf.opfpush.model.UnrecoverablePushError.Type.PROVIDER_SPECIFIC_ERROR;
 
 /**
  * Google Cloud Messaging push provider implementation.
@@ -108,21 +112,11 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         final String c2dmPermission = context.getPackageName() + PERMISSION_C2D_MESSAGE_SUFFIX;
         CheckUtils.checkPermission(context, c2dmPermission, checkManifestHandler);
 
-        CheckUtils.checkService(context, new ComponentName(context, GCMRegistrationService.class), checkManifestHandler);
         CheckUtils.checkService(context, new ComponentName(context, SendMessageService.class), checkManifestHandler);
+        CheckUtils.checkService(context, new ComponentName(context, GCMService.class), checkManifestHandler);
+        CheckUtils.checkService(context, new ComponentName(context, GCMInstanceIDListenerService.class), checkManifestHandler);
 
-        final Intent c2dmReceiveBroadcastIntent = new Intent(C2DM_ACTION_RECEIVE);
-        final Intent registrationBroadcastIntent = new Intent(ACTION_REGISTRATION_CALLBACK);
-        final Intent unregistrationBroadcastIntent = new Intent(ACTION_UNREGISTRATION_CALLBACK);
-
-        final String gcmReceiverName = GCMRegistrationReceiver.class.getName();
-
-        CheckUtils.checkReceiver(context, gcmReceiverName, c2dmReceiveBroadcastIntent,
-                PERMISSION_SEND, checkManifestHandler);
-        CheckUtils.checkReceiver(context, gcmReceiverName, registrationBroadcastIntent,
-                PERMISSION_SEND, checkManifestHandler);
-        CheckUtils.checkReceiver(context, gcmReceiverName, unregistrationBroadcastIntent,
-                PERMISSION_SEND, checkManifestHandler);
+        CheckUtils.checkReceiver(context, GcmReceiver.class.getName(), new Intent(C2DM_ACTION_RECEIVE), checkManifestHandler);
     }
 
     @NonNull
@@ -176,6 +170,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @Override
     public void onUnavailable() {
         OPFLog.logMethod();
+        preferencesProvider.reset();
         close();
     }
 
@@ -211,7 +206,6 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             registrationExecutor = null;
         }
 
-        preferencesProvider.reset();
         GoogleCloudMessaging.getInstance(getContext()).close();
     }
 
@@ -267,33 +261,23 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         private void onServicesNotAvailable() {
             OPFLog.logMethod();
-
-            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-            getContext().sendBroadcast(intent);
+            onError(ERROR_SERVICE_NOT_AVAILABLE);
         }
 
         private void onRegistrationSuccess(@NonNull final String registrationId) {
             OPFLog.logMethod(registrationId);
             preferencesProvider.saveRegistrationId(registrationId);
-
-            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, registrationId);
-
-            OPFLog.d("Send broadcast intent : " + OPFUtils.toString(intent));
-            getContext().sendBroadcast(intent);
+            OPFPush.getHelper().getReceivedMessageHandler().onRegistered(PROVIDER_NAME, registrationId);
         }
 
         private void onAuthError() {
             OPFLog.logMethod();
-            onError(GCMConstants.ERROR_AUTHENTICATION_FAILED);
+            onError(ERROR_AUTHENTICATION_FAILED);
         }
 
         private void onError(@NonNull final String errorId) {
             OPFLog.logMethod(errorId);
-            final Intent intent = new Intent(GCMConstants.ACTION_REGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
-            getContext().sendBroadcast(intent);
+            OPFPush.getHelper().getReceivedMessageHandler().onRegistrationError(PROVIDER_NAME, convertError(errorId));
         }
     }
 
@@ -313,8 +297,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
             try {
                 InstanceID.getInstance(getContext()).deleteToken(senderID, INSTANCE_ID_SCOPE);
-                close();
-
+                preferencesProvider.reset();
                 onUnregistrationSuccess();
             } catch (IOException e) {
                 OPFLog.i("Error while unregister GCM.", e);
@@ -331,31 +314,33 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
                         break;
                 }
             }
+            close();
         }
 
         private void onServicesNotAvailable() {
             OPFLog.logMethod();
-
-            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, GCMConstants.ERROR_SERVICE_NOT_AVAILABLE);
-            getContext().sendBroadcast(intent);
+            onError(ERROR_SERVICE_NOT_AVAILABLE);
         }
 
         private void onUnregistrationSuccess() {
             OPFLog.logMethod();
-
-            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_REGISTRATION_ID, oldRegistrationId);
-
-            OPFLog.d("Send broadcast intent : " + OPFUtils.toString(intent));
-            getContext().sendBroadcast(intent);
+            OPFPush.getHelper().getReceivedMessageHandler().onUnregistered(PROVIDER_NAME, oldRegistrationId);
         }
 
         private void onError(@NonNull final String errorId) {
             OPFLog.logMethod(errorId);
-            final Intent intent = new Intent(GCMConstants.ACTION_UNREGISTRATION_CALLBACK);
-            intent.putExtra(GCMConstants.EXTRA_ERROR_ID, errorId);
-            getContext().sendBroadcast(intent);
+            OPFPush.getHelper().getReceivedMessageHandler().onUnregistrationError(PROVIDER_NAME, convertError(errorId));
+        }
+    }
+
+    private PushError convertError(@NonNull final String errorId) {
+        switch (errorId) {
+            case ERROR_SERVICE_NOT_AVAILABLE:
+                return new RecoverablePushError(SERVICE_NOT_AVAILABLE, PROVIDER_NAME, errorId);
+            case ERROR_AUTHENTICATION_FAILED:
+                return new UnrecoverablePushError(AUTHENTICATION_FAILED, PROVIDER_NAME, errorId);
+            default:
+                return new UnrecoverablePushError(PROVIDER_SPECIFIC_ERROR, PROVIDER_NAME, errorId);
         }
     }
 }
