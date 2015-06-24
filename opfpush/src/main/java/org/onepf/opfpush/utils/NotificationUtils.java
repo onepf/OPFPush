@@ -84,7 +84,8 @@ public final class NotificationUtils {
         final Notification.Builder notificationBuilder = new Notification.Builder(context)
                 .setContentTitle(notificationPayload.getTitle())
                 .setSmallIcon(iconDrawableId)
-                .setContentText(notificationPayload.getBody());
+                .setContentText(notificationPayload.getBody())
+                .setAutoCancel(true);
 
         final String sound = notificationPayload.getSound();
         if (!TextUtils.isEmpty(sound)) {
@@ -120,7 +121,6 @@ public final class NotificationUtils {
     @SuppressLint("NewApi")
     private static void safeSetColor(@NonNull final Notification.Builder notificationBuilder,
                                      @NonNull final String color) {
-        //todo: check on not lolipop devices
         if (!COLOR_PATTERN.matcher(color).matches()) {
             OPFLog.i(String.format(US, "Color \"%s\" doesn't match to #rrggbb format.", color));
         } else if (!isSetColorSupported()) {

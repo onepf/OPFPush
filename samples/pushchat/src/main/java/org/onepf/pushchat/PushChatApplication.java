@@ -17,7 +17,6 @@
 package org.onepf.pushchat;
 
 import android.app.Application;
-
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import org.onepf.opfpush.OPFPush;
