@@ -19,6 +19,8 @@ package org.onepf.opfpush;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -686,6 +688,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
     @SuppressWarnings("UnusedDeclaration")
     private final class ReceivedMessageHandlerImpl implements ReceivedMessageHandler {
 
+        private final Handler handler = new Handler(Looper.getMainLooper());
         /**
          * A push provider calls this method when a new message is received.
          *
@@ -699,12 +702,20 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             if (currentProvider != null && providerName.equals(currentProvider.getName())) {
                 settings.saveState(REGISTERED);
 
-                final NotificationMaker notificationMaker = currentProvider.getNotificationMaker();
-                if (extras != null && notificationMaker.needShowNotification(extras)) {
-                    notificationMaker.showNotification(appContext, extras);
-                } else {
-                    eventListenerWrapper.onMessage(appContext, providerName, extras);
-                }
+                //noinspection InnerClassTooDeeplyNested
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //All operations with NotificationMaker should are performed in the main thread.
+                        //It saves users from having to make thread safe NotificationMaker.
+                        final NotificationMaker notificationMaker = currentProvider.getNotificationMaker();
+                        if (extras != null && notificationMaker.needShowNotification(extras)) {
+                            notificationMaker.showNotification(appContext, extras);
+                        } else {
+                            eventListenerWrapper.onMessage(appContext, providerName, extras);
+                        }
+                    }
+                });
             } else {
                 OPFLog.w("Ignore onMessage from provider " + providerName
                         + ". Current provider is " + currentProvider);
