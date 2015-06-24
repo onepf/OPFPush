@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfpush.nokia.NokiaPushConstants.NOKIA_MANUFACTURER;
@@ -45,6 +46,18 @@ public class NokiaNotificationsProvider implements NokiaPushProvider {
         if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
             OPFLog.d("It's a Nokia device.");
             provider = new NokiaNotificationsProviderImpl(context, sendersIds);
+        } else {
+            OPFLog.d("It's no a Nokia device.");
+            provider = new NokiaNotificationsProviderStub();
+        }
+    }
+
+    public NokiaNotificationsProvider(@NonNull final Context context,
+                                      @NonNull final NotificationMaker notificationMaker,
+                                      @NonNull final String... sendersIds) {
+        if (Build.MANUFACTURER.equals(NOKIA_MANUFACTURER)) {
+            OPFLog.d("It's a Nokia device.");
+            provider = new NokiaNotificationsProviderImpl(context, notificationMaker, sendersIds);
         } else {
             OPFLog.d("It's no a Nokia device.");
             provider = new NokiaNotificationsProviderStub();
@@ -88,6 +101,12 @@ public class NokiaNotificationsProvider implements NokiaPushProvider {
     @Override
     public String getHostAppPackage() {
         return provider.getHostAppPackage();
+    }
+
+    @NonNull
+    @Override
+    public NotificationMaker getNotificationMaker() {
+        return provider.getNotificationMaker();
     }
 
     @Override

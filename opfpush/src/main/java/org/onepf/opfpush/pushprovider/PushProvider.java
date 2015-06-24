@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 
 /**
  * The {@code PushProvider} interface represent the provider for push notification from the server to
@@ -91,6 +92,10 @@ public interface PushProvider {
      */
     @Nullable
     String getHostAppPackage();
+
+    //TODO javadoc
+    @NonNull
+    NotificationMaker getNotificationMaker();
 
     /**
      * Verify that application manifest contains all needed permissions.

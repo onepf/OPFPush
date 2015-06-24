@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
@@ -45,6 +46,17 @@ public class ADMProvider implements PushProvider {
         if (Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
             OPFLog.d("It's an Amazon device.");
             provider = new ADMProviderImpl(context.getApplicationContext());
+        } else {
+            OPFLog.d("It's no an Amazon device.");
+            provider = new ADMProviderStub();
+        }
+    }
+
+    public ADMProvider(@NonNull final Context context,
+                       @NonNull final NotificationMaker notificationMaker) {
+        if (Build.MANUFACTURER.equals(AMAZON_MANUFACTURER)) {
+            OPFLog.d("It's an Amazon device.");
+            provider = new ADMProviderImpl(context.getApplicationContext(), notificationMaker);
         } else {
             OPFLog.d("It's no an Amazon device.");
             provider = new ADMProviderStub();
@@ -88,6 +100,12 @@ public class ADMProvider implements PushProvider {
     @Override
     public String getHostAppPackage() {
         return provider.getHostAppPackage();
+    }
+
+    @NonNull
+    @Override
+    public NotificationMaker getNotificationMaker() {
+        return provider.getNotificationMaker();
     }
 
     @Override

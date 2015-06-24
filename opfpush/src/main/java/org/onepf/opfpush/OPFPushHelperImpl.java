@@ -32,6 +32,7 @@ import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
@@ -697,7 +698,13 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             OPFLog.logMethod(providerName);
             if (currentProvider != null && providerName.equals(currentProvider.getName())) {
                 settings.saveState(REGISTERED);
-                eventListenerWrapper.onMessage(appContext, providerName, extras);
+
+                final NotificationMaker notificationMaker = currentProvider.getNotificationMaker();
+                if (extras != null && notificationMaker.needShowNotification(extras)) {
+                    notificationMaker.showNotification(appContext, extras);
+                } else {
+                    eventListenerWrapper.onMessage(appContext, providerName, extras);
+                }
             } else {
                 OPFLog.w("Ignore onMessage from provider " + providerName
                         + ". Current provider is " + currentProvider);

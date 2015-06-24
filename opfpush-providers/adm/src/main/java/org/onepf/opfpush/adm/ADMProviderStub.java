@@ -16,11 +16,13 @@
 
 package org.onepf.opfpush.adm;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFLog;
 
@@ -76,6 +78,23 @@ class ADMProviderStub implements PushProvider {
     public String getHostAppPackage() {
         OPFLog.logMethod();
         return null;
+    }
+
+    @NonNull
+    @Override
+    public NotificationMaker getNotificationMaker() {
+        OPFLog.logMethod();
+        return new NotificationMaker() {
+            @Override
+            public boolean needShowNotification(@NonNull Bundle bundle) {
+                return false;
+            }
+
+            @Override
+            public void showNotification(@NonNull Context context, @NonNull Bundle bundle) {
+                //nothing
+            }
+        };
     }
 
     @Override

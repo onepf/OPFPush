@@ -35,6 +35,7 @@ import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.RecoverablePushError;
 import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.pushprovider.SenderPushProvider;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
@@ -77,13 +78,18 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     private ExecutorService registrationExecutor;
 
     @NonNull
-    private final PreferencesProvider preferencesProvider;
+    private final PreferencesProvider preferencesProvider = PreferencesProvider.getInstance(getContext());
 
     public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
         super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE);
-
         this.senderID = senderID;
-        preferencesProvider = PreferencesProvider.getInstance(context);
+    }
+
+    public GCMProvider(@NonNull final Context context,
+                       @NonNull final NotificationMaker notificationMaker,
+                       @NonNull final String senderID) {
+        super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE, notificationMaker);
+        this.senderID = senderID;
     }
 
     @Override

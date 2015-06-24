@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
+import org.onepf.opfpush.notification.OPFNotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFUtils;
@@ -51,6 +53,9 @@ public abstract class BasePushProvider implements PushProvider {
     @NonNull
     private final String hostAppPackage;
 
+    @NonNull
+    private final NotificationMaker notificationMaker;
+
     /**
      * Creates a push provider.
      *
@@ -62,9 +67,18 @@ public abstract class BasePushProvider implements PushProvider {
     protected BasePushProvider(@NonNull final Context context,
                                @NonNull final String name,
                                @NonNull final String hostAppPackage) {
+        this(context, name, hostAppPackage, new OPFNotificationMaker());
+    }
+
+    //TODO javadoc
+    protected BasePushProvider(@NonNull final Context context,
+                               @NonNull final String name,
+                               @NonNull final String hostAppPackage,
+                               @NonNull final NotificationMaker notificationMaker) {
         this.appContext = context.getApplicationContext();
         this.name = name;
         this.hostAppPackage = hostAppPackage;
+        this.notificationMaker = notificationMaker;
     }
 
     @NonNull
@@ -114,6 +128,12 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public String getHostAppPackage() {
         return hostAppPackage;
+    }
+
+    @NonNull
+    @Override
+    public NotificationMaker getNotificationMaker() {
+        return notificationMaker;
     }
 
     @Override

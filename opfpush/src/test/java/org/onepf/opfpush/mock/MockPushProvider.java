@@ -7,6 +7,8 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
 import org.onepf.opfpush.model.PushError;
+import org.onepf.opfpush.notification.NotificationMaker;
+import org.onepf.opfpush.notification.OPFNotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.testutil.Util;
 
@@ -99,6 +101,12 @@ public final class MockPushProvider implements PushProvider {
     @Override
     public String getHostAppPackage() {
         return hostAppPackage;
+    }
+
+    @NonNull
+    @Override
+    public NotificationMaker getNotificationMaker() {
+        return new OPFNotificationMaker();
     }
 
     @Override
