@@ -31,7 +31,7 @@ import org.onepf.opfutils.OPFUtils;
  */
 public final class OPFNotificationMaker implements NotificationMaker {
 
-    private static final String SHOW_NOTIFICATION_KEY = "show_opf_notification";
+    private static final String SHOW_NOTIFICATION_KEY = "opf_notification";
 
     @NonNull
     private NotificationPreparer notificationPreparer;
@@ -47,7 +47,7 @@ public final class OPFNotificationMaker implements NotificationMaker {
     @Override
     public boolean needShowNotification(@NonNull final Bundle bundle) {
         OPFLog.logMethod(OPFUtils.toString(bundle));
-        return bundle.getBoolean(SHOW_NOTIFICATION_KEY);
+        return Boolean.parseBoolean(bundle.getString(SHOW_NOTIFICATION_KEY));
     }
 
     @Override
