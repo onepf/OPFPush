@@ -17,11 +17,20 @@
 package org.onepf.opfpush.gcm;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
+import org.onepf.opfpush.OPFPush;
+import org.onepf.opfutils.OPFLog;
 
 /**
+ * TODO javadoc
+ *
  * @author Roman Savin
  * @since 16.06.2015
  */
 public class GCMInstanceIDListenerService extends InstanceIDListenerService {
-    //todo implement
+
+    @Override
+    public void onTokenRefresh() {
+        OPFLog.logMethod();
+        OPFPush.getHelper().onNeedRetryRegistration();
+    }
 }

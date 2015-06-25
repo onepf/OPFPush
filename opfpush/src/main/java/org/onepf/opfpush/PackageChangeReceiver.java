@@ -50,7 +50,7 @@ public final class PackageChangeReceiver extends BroadcastReceiver {
         } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)
                 && context.getPackageName().equals(getAppPackage(intent))) {
             OPFLog.d("Application updated.");
-            helper.onNeedRetryRegister();
+            helper.onNeedRetryRegistration();
         }
     }
 

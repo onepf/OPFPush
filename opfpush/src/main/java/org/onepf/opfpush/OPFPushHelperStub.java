@@ -83,6 +83,11 @@ public class OPFPushHelperStub extends OPFPushHelper {
     }
 
     @Override
+    public void onNeedRetryRegistration() {
+        OPFLog.logMethod();
+    }
+
+    @Override
     void init(@NonNull final Configuration initialConfiguration) {
         OPFLog.logMethod(initialConfiguration);
     }
@@ -106,11 +111,6 @@ public class OPFPushHelperStub extends OPFPushHelper {
     @Override
     void unregister(@NonNull final String providerName) {
         OPFLog.logMethod(providerName);
-    }
-
-    @Override
-    void onNeedRetryRegister() {
-        OPFLog.logMethod();
     }
 
     @Override

@@ -280,6 +280,18 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         return settings.getState() == REGISTERING;
     }
 
+    @Override
+    public void onNeedRetryRegistration() {
+        OPFLog.logMethod();
+        OPFLog.d("Current provider : " + currentProvider);
+        settings.clear();
+        if (currentProvider != null) {
+            currentProvider.onRegistrationInvalid();
+            currentProvider = null;
+        }
+        register();
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -362,18 +374,6 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         synchronized (registrationLock) {
             unregister(getProviderWithException(providerName));
         }
-    }
-
-    @Override
-    void onNeedRetryRegister() {
-        OPFLog.logMethod();
-        OPFLog.d("Current provider : " + currentProvider);
-        settings.clear();
-        if (currentProvider != null) {
-            currentProvider.onRegistrationInvalid();
-            currentProvider = null;
-        }
-        register();
     }
 
     @SuppressWarnings("PMD.OneDeclarationPerLine")
@@ -689,6 +689,7 @@ final class OPFPushHelperImpl extends OPFPushHelper {
     private final class ReceivedMessageHandlerImpl implements ReceivedMessageHandler {
 
         private final Handler handler = new Handler(Looper.getMainLooper());
+
         /**
          * A push provider calls this method when a new message is received.
          *
