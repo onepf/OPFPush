@@ -46,6 +46,9 @@ public final class GCMConstants {
 
     static final String GOOGLE_SERVICES_FRAMEWORK_PACKAGE = "com.google.android.gsf";
 
+    static final String GCM_NOT_CURRENT_PROVIDER_ERROR = "GCM is no current provider";
+    static final String REGISTRATION_ID_NOT_OBTAINED_ERROR = "Registration token isn't obtained";
+
     private GCMConstants() {
         throw new UnsupportedOperationException();
     }

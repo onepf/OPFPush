@@ -49,4 +49,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="@dimen/separator_margin"
+        android:layout_marginTop="@dimen/separator_margin"
+        android:background="@color/divider_color" />
+
+    <EditText
+        android:id="@+id/topic_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/topic_hint" />
+
+    <Button
+        android:id="@+id/subscribe_topic_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/separator_margin"
+        android:text="@string/subscribe_to_topic" />
+
+    <Button
+        android:id="@+id/unsubscribe_topic_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/separator_margin"
+        android:text="@string/unsubscribe_from_topic" />
+
 </LinearLayout>

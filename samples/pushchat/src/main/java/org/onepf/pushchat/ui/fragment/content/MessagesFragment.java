@@ -112,6 +112,7 @@ public class MessagesFragment extends BaseContentFragment {
         hideKeyboard(getView());
     }
 
+    @SuppressWarnings("AssignmentToNull")
     @Override
     public void onDestroyView() {
         super.onDestroyView();

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">PushChat</string>
 
+    <!--Common strings-->
+    <string name="topic_fmt">/topics/%s</string>
+
     <!--Action bar titles-->
     <string name="title_state_fragment">State</string>
     <string name="title_messages_fragment">Messages</string>
@@ -23,6 +26,9 @@
     <string name="provider_name_fmt">Provider name : %s</string>
     <string name="registration_id_fmt">Registration id : %s</string>
     <string name="share_intent_chooser_title">Send uuid to…</string>
+    <string name="topic_hint">Topic</string>
+    <string name="subscribe_to_topic">Subscribe</string>
+    <string name="unsubscribe_from_topic">Unsubscribe</string>
 
     <!--Contacts strings-->
     <string name="add_contact_title">Add contact</string>
