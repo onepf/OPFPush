@@ -42,7 +42,6 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.WrongThreadException;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -72,7 +71,9 @@ import static org.onepf.opfpush.model.UnrecoverablePushError.Type.PROVIDER_SPECI
 @SuppressWarnings("PMD.GodClass")
 public class GCMProvider extends BasePushProvider implements SenderPushProvider {
 
-    private final String senderID;
+    private static final String SENDER_ID_SEPARATOR = ",";
+
+    private final String senderIDs;
 
     //TODO: refactor executor
     @Nullable
@@ -81,16 +82,16 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
     @NonNull
     private final PreferencesProvider preferencesProvider = PreferencesProvider.getInstance(getContext());
 
-    public GCMProvider(@NonNull final Context context, @NonNull final String senderID) {
+    public GCMProvider(@NonNull final Context context, @NonNull final String... senderIDs) {
         super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE);
-        this.senderID = senderID;
+        this.senderIDs = buildSenderIdsString(senderIDs);
     }
 
     public GCMProvider(@NonNull final Context context,
                        @NonNull final NotificationMaker notificationMaker,
-                       @NonNull final String senderID) {
+                       @NonNull final String... senderIDs) {
         super(context, PROVIDER_NAME, GOOGLE_PLAY_APP_PACKAGE, notificationMaker);
-        this.senderID = senderID;
+        this.senderIDs = buildSenderIdsString(senderIDs);
     }
 
     @Override
@@ -192,14 +193,14 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
 
         final Intent intent = new Intent(getContext(), SendMessageService.class);
         intent.putExtra(SendMessageService.EXTRA_MESSAGE, message);
-        intent.putExtra(SendMessageService.EXTRA_MESSAGES_TO, senderID + MESSAGES_TO_SUFFIX);
+        intent.putExtra(SendMessageService.EXTRA_MESSAGES_TO, senderIDs + MESSAGES_TO_SUFFIX);
         getContext().startService(intent);
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s (senderId: '%s')", PROVIDER_NAME, senderID);
+        return PROVIDER_NAME;
     }
 
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
@@ -232,16 +233,31 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
         return permissionState == PERMISSION_GRANTED;
     }
 
+    private static String buildSenderIdsString(@NonNull final String[] senderIds) {
+        OPFLog.logMethod(senderIds);
+
+        final StringBuilder senderIdsBuilder = new StringBuilder();
+        final int arrayLength = senderIds.length;
+        for (int i = 0; i < arrayLength; ++i) {
+            senderIdsBuilder.append(senderIds[i]);
+            if (i < arrayLength - 1) {
+                senderIdsBuilder.append(SENDER_ID_SEPARATOR);
+            }
+        }
+
+        return senderIdsBuilder.toString();
+    }
+
     private final class RegisterTask implements Runnable {
 
         @Override
         @SuppressWarnings("PMD.PreserveStackTrace")
         public void run() {
-            OPFLog.logMethod();
+            OPFLog.logMethod(senderIDs);
 
             try {
                 final String registrationId =
-                        InstanceID.getInstance(getContext()).getToken(senderID, INSTANCE_ID_SCOPE);
+                        InstanceID.getInstance(getContext()).getToken(senderIDs, INSTANCE_ID_SCOPE);
                 if (TextUtils.isEmpty(registrationId)) {
                     OPFLog.w("Registration id is empty");
                     onAuthError();
@@ -303,7 +319,7 @@ public class GCMProvider extends BasePushProvider implements SenderPushProvider 
             OPFLog.logMethod();
 
             try {
-                InstanceID.getInstance(getContext()).deleteToken(senderID, INSTANCE_ID_SCOPE);
+                InstanceID.getInstance(getContext()).deleteToken(senderIDs, INSTANCE_ID_SCOPE);
                 preferencesProvider.reset();
                 onUnregistrationSuccess();
             } catch (IOException e) {
