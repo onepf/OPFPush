@@ -21,7 +21,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 /**
- * TODO: javadoc
+ * Notification model class. It has the same fields as the {@code notification} parameter of a GCM downstream message.
+ * https://developers.google.com/cloud-messaging/server-ref#notification-payload-support
  *
  * @author Roman Savin
  * @since 23.06.2015
@@ -66,36 +67,73 @@ public final class NotificationPayload {
         this.clickAction = clickAction;
     }
 
+    /**
+     * Returns the field that indicates notification title.
+     *
+     * @return The field that indicates notification title.
+     */
     @NonNull
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Returns the field that indicates notification icon.
+     *
+     * @return The field that indicates notification icon.
+     */
     @NonNull
     public String getIcon() {
         return icon;
     }
 
+    /**
+     * Returns the field that indicates notification body text.
+     *
+     * @return The field that indicates notification body text.
+     */
     @Nullable
     public String getBody() {
         return body;
     }
 
+    /**
+     * Returns the field that indicates sound to be played.
+     *
+     * @return The field that indicates sound to be played. Supports only {@code default} currently.
+     */
     @Nullable
     public String getSound() {
         return sound;
     }
 
+    /**
+     * Indicates whether each notification message results in a new entry on the notification center on Android.
+     * If not set, each request creates a new notification. If set, and a notification with the same tag is already being shown,
+     * the new notification replaces the existing one in notification center.
+     *
+     * @return Notification tag.
+     */
     @Nullable
     public String getTag() {
         return tag;
     }
 
+    /**
+     * Returns the field that indicates color of the icon, expressed in #rrggbb format.
+     *
+     * @return The field that indicates color of the icon, expressed in #rrggbb format.
+     */
     @Nullable
     public String getColor() {
         return color;
     }
 
+    /**
+     * The action associated with a user click on the notification.
+     *
+     * @return The action associated with a user click on the notification.
+     */
     @Nullable
     public String getClickAction() {
         return clickAction;
@@ -137,36 +175,80 @@ public final class NotificationPayload {
         @Nullable
         private String clickAction;
 
+        /**
+         * Indicates notification title.
+         *
+         * @param title Notification title. Required parameter.
+         * @return Builder instance.
+         */
         public Builder setTitle(@NonNull final String title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * Indicates notification icon. Sets value to myicon for drawable resource myicon.png. Required parameter.
+         *
+         * @param icon Notification icon. Required parameter.
+         * @return Builder instance.
+         */
         public Builder setIcon(@NonNull final String icon) {
             this.icon = icon;
             return this;
         }
 
+        /**
+         * Indicates notification body text.
+         *
+         * @param body Notification body text. Optional parameter.
+         * @return Builder instance.
+         */
         public Builder setBody(@Nullable final String body) {
             this.body = body;
             return this;
         }
 
+        /**
+         * Indicates sound to be played. Supports only default currently.
+         *
+         * @param sound Notification sound. Optional parameter.
+         * @return Builder instance.
+         */
         public Builder setSound(@Nullable final String sound) {
             this.sound = sound;
             return this;
         }
 
+        /**
+         * Indicates whether each notification message results in a new entry on the notification center on Android.
+         * If not set, each request creates a new notification. If set, and a notification with the same tag is already
+         * being shown, the new notification replaces the existing one in notification center.
+         *
+         * @param tag Notification tag. Optional parameter.
+         * @return Builder instance.
+         */
         public Builder setTag(@Nullable final String tag) {
             this.tag = tag;
             return this;
         }
 
+        /**
+         * Indicates color of the icon, expressed in #rrggbb format.
+         *
+         * @param color Indicates color of the icon, expressed in #rrggbb format.
+         * @return Builder instance.
+         */
         public Builder setColor(@Nullable final String color) {
             this.color = color;
             return this;
         }
 
+        /**
+         * The action associated with a user click on the notification.
+         *
+         * @param clickAction The action associated with a user click on the notification.
+         * @return Builder instance.
+         */
         public Builder setClickAction(@Nullable final String clickAction) {
             this.clickAction = clickAction;
             return this;

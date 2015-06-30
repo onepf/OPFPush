@@ -41,7 +41,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static java.util.Locale.US;
 
 /**
- * TODO: javadoc
+ * Utils class intended to create notifications from {@code bundle} using a {@link NotificationPreparer} instance.
  *
  * @author Roman Savin
  * @since 23.06.2015
@@ -59,11 +59,24 @@ public final class NotificationUtils {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Creates a notification from {@code bundle} using the {@link OPFNotificationPreparer}.
+     *
+     * @param context The context instance.
+     * @param bundle  Notification data.
+     */
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final Bundle bundle) {
         showNotification(context, bundle, new OPFNotificationPreparer());
     }
 
+    /**
+     * Creates a notification from {@code bundle}.
+     *
+     * @param context              The context instance.
+     * @param bundle               Notification data.
+     * @param notificationPreparer The notification preparer intended to convert bundle to the {@link NotificationPayload} object.
+     */
     public static void showNotification(@NonNull final Context context,
                                         @NonNull final Bundle bundle,
                                         @NonNull final NotificationPreparer notificationPreparer) {

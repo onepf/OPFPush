@@ -57,7 +57,7 @@ public abstract class BasePushProvider implements PushProvider {
     private final NotificationMaker notificationMaker;
 
     /**
-     * Creates a push provider.
+     * Creates a push provider. The created provider uses {@link OPFNotificationMaker}.
      *
      * @param context        The {@link android.content.Context} instance.
      * @param name           The name of the provider.
@@ -70,7 +70,15 @@ public abstract class BasePushProvider implements PushProvider {
         this(context, name, hostAppPackage, new OPFNotificationMaker());
     }
 
-    //TODO javadoc
+    /**
+     * Creates a push provider.
+     *
+     * @param context           The {@link android.content.Context} instance.
+     * @param name              The name of the provider.
+     * @param hostAppPackage    The package of the application that handle push messages from the server
+     *                          and deliver it to the user application.
+     * @param notificationMaker The {@link NotificationMaker} instance.
+     */
     protected BasePushProvider(@NonNull final Context context,
                                @NonNull final String name,
                                @NonNull final String hostAppPackage,
