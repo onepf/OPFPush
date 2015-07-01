@@ -43,7 +43,7 @@ import static org.onepf.opfpush.gcm.GCMConstants.REGISTRATION_ID_NOT_OBTAINED_ER
  */
 public final class GCMPubSubHelper {
 
-    private static volatile GCMPubSubHelper instance = null;
+    private static volatile GCMPubSubHelper instance;
 
     @NonNull
     private final GcmPubSub gcmPubSub;
@@ -58,7 +58,7 @@ public final class GCMPubSubHelper {
         this.gcmPubSub = GcmPubSub.getInstance(context);
     }
 
-    @SuppressWarnings("DoubleCheckedLocking")
+    @SuppressWarnings({"DoubleCheckedLocking", "PMD.NonThreadSafeSingleton"})
     public static GCMPubSubHelper getInstance(@NonNull final Context context) {
         if (instance == null) {
             synchronized (GCMPubSubHelper.class) {

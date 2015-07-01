@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.application'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle'
+apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle')
 
 android {
 
