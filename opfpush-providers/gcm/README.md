@@ -49,16 +49,13 @@ also add the following receiver:
 
 ```xml
 <receiver
-    android:name="org.onepf.opfpush.gcm.GCMRegistrationReceiver"
+    android:name="com.google.android.gms.gcm.GcmReceiver"
     android:exported="true"
     android:permission="com.google.android.c2dm.permission.SEND">
     <intent-filter>
-        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-        <category android:name="${applicationId}" />
-    </intent-filter>
-    <intent-filter>
-        <action android:name="org.onepf.opfpush.gcm.intent.UNREGISTRATION" />
-        <action android:name="org.onepf.opfpush.gcm.intent.REGISTRATION" />
+         <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+         <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+         <category android:name="${applicationId}"/>
     </intent-filter>
 </receiver>
 ```
@@ -67,17 +64,27 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 
 ```xml
 <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
 <application>
     <service
-        android:name="org.onepf.opfpush.gcm.GCMRegistrationService"
-        android:exported="false" />
+        android:name=".GCMService"
+        android:exported="false">
+        <intent-filter>
+             <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        </intent-filter>
+    </service>
+    
+    <service
+        android:name=".GCMInstanceIDListenerService"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.google.android.gms.iid.InstanceID" />
+        </intent-filter>
+    </service>
 
     <service
         android:name="org.onepf.opfpush.gcm.SendMessageService"
         android:exported="false" />
-
 </application>
 ```
 

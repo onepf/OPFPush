@@ -14,6 +14,7 @@ provides possibility to use the system push provider for a specific device.
 - [Download](#user-content-download)
 - [How To Use](#user-content-how-to-use)
 - [Using of OPFPushReceiver](#user-content-using-of-opfpushreceiver)
+- [Notification payload support](#user-content-notification-payload-support)
 - [Implemented Push Services](#user-content-implemented-push-services)
 - [Create Custom Push Provider](#user-content-create-custom-push-provider)
 - [Comparison of most popular push services](#user-content-comparison-of-most-popular-push-services)
@@ -95,6 +96,12 @@ to implement GCM using OPFPush library.
 You can use `BroadcastReceiver` instead of `EventListener` for receiving push events. 
 See [the following section][opfpush-receiver-section]
 
+##Notification payload support
+
+[GCM Notification payload support][gcm-notification-payload-support] was added to the library.
+Also we have implemented a similar mechanism for all supported push providers.
+See [the following section][opf-notification-payload-support]
+
 ## Implemented Push Services
 
 1. [Google Cloud Messaging][google-cloud-messaging].
@@ -160,6 +167,8 @@ To create a custom push provider see [the following section][custom-push-provide
 | Criteria                            | GCM   | ADM   | Nokia Notifications | OPFPush     |
 | :---------------------------------- | :---: | :---: | :-----------------: | :---------: |
 | Receive messages                    |   +   |   +   |          +          |      +      |
+| Multiple senders                    |   +   |   -   |          +          |      +      |
+| Notification payload support        |   +   |   -   |          -          |      -      |
 | Asynchronous registration and unregistration |   -   |   +   |          +          |      +      |
 | Retry register on fail              |   -   |   +   |          +          |      +      |
 | Retry register on fail after reboot |   -   |   -   |          -          |      +      |
@@ -202,6 +211,8 @@ Take a look at the usage of the OPFPush library in our [sample application][samp
 [opfpush-gcm]: ./opfpush-providers/gcm
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
+[gcm-notification-payload-support]: https://developers.google.com/cloud-messaging/server-ref#notification-payload-support
+[opf-notification-payload-support]: https://todo/
 [opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-0.2.3.aar
 [gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-gcm-0.2.3.aar
 [adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-adm-0.2.3.aar
