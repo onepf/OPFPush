@@ -212,7 +212,7 @@ Take a look at the usage of the OPFPush library in our [sample application][samp
 [opfpush-adm]: ./opfpush-providers/adm
 [opfpush-nokia]: ./opfpush-providers/nokia
 [gcm-notification-payload-support]: https://developers.google.com/cloud-messaging/server-ref#notification-payload-support
-[opf-notification-payload-support]: https://todo/
+[opf-notification-payload-support]: https://github.com/onepf/OPFPush/wiki/Notification-payload-support
 [opfpush-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-0.2.3.aar
 [gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-gcm-0.2.3.aar
 [adm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-adm-0.2.3.aar
