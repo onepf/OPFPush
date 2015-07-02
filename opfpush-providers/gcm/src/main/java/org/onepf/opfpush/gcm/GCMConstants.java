@@ -32,8 +32,8 @@ public final class GCMConstants {
      */
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 
-    public static final String GCM_NOT_CURRENT_PROVIDER_ERROR = "GCM is no current provider";
-    public static final String REGISTRATION_ID_NOT_OBTAINED_ERROR = "Registration token isn't obtained";
+    public static final String GCM_NOT_CURRENT_PROVIDER_ERROR = "GCM is not the current provider";
+    public static final String REGISTRATION_ID_NOT_OBTAINED_ERROR = "Registration token hasn't been obtained yet";
 
     static final String C2DM_ACTION_RECEIVE = "com.google.android.c2dm.intent.RECEIVE";
     static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";

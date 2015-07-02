@@ -21,7 +21,6 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfutils.OPFLog;
 
 /**
- * The inheritor of the {@link InstanceIDListenerService}.
  * It performs reregistration of the GCMProvider in the implementation of the {@code onTokenRefresh()} method.
  *
  * @author Roman Savin
