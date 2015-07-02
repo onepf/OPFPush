@@ -58,10 +58,10 @@ public final class OPFNotificationMaker implements NotificationMaker {
     }
 
     /**
-     * Returns {@code true} if the {@code bundle} contains an extra by the "opf_notification" key and it is "true" String.
+     * Returns {@code true} if the {@code bundle} contains the “true” value by the “opf_notification” key.
      *
      * @param bundle The bundle received from a push provider.
-     * @return {@code true} if the {@code bundle} contains an extra by the "opf_notification" key and it is "true" String. False otherwise.
+     * @return {@code true} if the {@code bundle} contains the “true” value by the “opf_notification” key. False otherwise.
      */
     @Override
     public boolean needShowNotification(@NonNull final Bundle bundle) {
