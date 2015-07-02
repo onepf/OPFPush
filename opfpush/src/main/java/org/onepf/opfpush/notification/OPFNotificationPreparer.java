@@ -25,7 +25,9 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 /**
- * TODO: javadoc
+ * The default implementation of the {@link NotificationPreparer} interface.
+ * It uses the same keys as GCM downstream messages parameters.
+ * https://developers.google.com/cloud-messaging/server-ref#notification-payload-support
  *
  * @author Roman Savin
  * @since 23.06.2015

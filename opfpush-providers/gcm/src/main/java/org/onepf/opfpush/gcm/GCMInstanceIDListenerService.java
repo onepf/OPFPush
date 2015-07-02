@@ -21,7 +21,7 @@ import org.onepf.opfpush.OPFPush;
 import org.onepf.opfutils.OPFLog;
 
 /**
- * TODO javadoc
+ * It performs reregistration of the GCMProvider in the implementation of the {@code onTokenRefresh()} method.
  *
  * @author Roman Savin
  * @since 16.06.2015

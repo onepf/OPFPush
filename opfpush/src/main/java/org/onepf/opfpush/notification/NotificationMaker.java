@@ -21,14 +21,26 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 /**
- * TODO: javadoc
+ * The interface intended to create notifications from bundle data.
  *
  * @author Roman Savin
  * @since 23.06.2015
  */
 public interface NotificationMaker {
 
+    /**
+     * Returns true if a notification must be shown for the bundle. False otherwise.
+     *
+     * @param bundle The bundle received from a push provider.
+     * @return Returns true if a notification should be shown for the bundle. False otherwise.
+     */
     boolean needShowNotification(@NonNull final Bundle bundle);
 
+    /**
+     * Shows notification using bundle data.
+     *
+     * @param context The Context instance.
+     * @param bundle  Received data.
+     */
     void showNotification(@NonNull final Context context, @NonNull final Bundle bundle);
 }

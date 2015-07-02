@@ -93,16 +93,20 @@ public interface PushProvider {
     @Nullable
     String getHostAppPackage();
 
-    //TODO javadoc
+    /**
+     * Returns the {@link NotificationMaker} object associated with provider.
+     *
+     * @return The {@link NotificationMaker} instance.
+     */
     @NonNull
     NotificationMaker getNotificationMaker();
 
     /**
      * Verify that application manifest contains all needed permissions.
      *
+     * @param checkManifestHandler If not null an exception isn't thrown.
      * @throws java.lang.IllegalStateException If not all required permissions and components have been
      *                                         described in the AndroidManifest.xml file.
-     * @param checkManifestHandler If not null an exception isn't thrown.
      */
     void checkManifest(@Nullable CheckManifestHandler checkManifestHandler);
 

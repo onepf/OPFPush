@@ -36,7 +36,8 @@ import static org.onepf.opfpush.gcm.GCMConstants.PROVIDER_NAME;
 import static org.onepf.opfpush.gcm.GCMConstants.REGISTRATION_ID_NOT_OBTAINED_ERROR;
 
 /**
- * TODO javadoc
+ * The helper class which performs {@link GcmPubSub#subscribe(String, String, Bundle)} and {@link GcmPubSub#unsubscribe(String, String)}
+ * in the worker thread using the saved registration id.
  *
  * @author Roman Savin
  * @since 26.06.2015
@@ -71,6 +72,22 @@ public final class GCMPubSubHelper {
         return instance;
     }
 
+    /**
+     * Invokes {@link GcmPubSub#subscribe(String, String, Bundle)} asynchronously.
+     * Registration id saved in {@link OPFPushHelper} is used for subscribing.
+     *
+     * It checks current provider name: if {@link OPFPushHelper#getProviderName()} isn't equal to {@link GCMConstants#PROVIDER_NAME}
+     * the {@link org.onepf.opfpush.gcm.GCMPubSubHelper.Callback#onError(String)} method will be called with
+     * {@link GCMConstants#GCM_NOT_CURRENT_PROVIDER_ERROR} as the argument.
+     *
+     * Also it checks if the registration id is already obtained: if {@link OPFPushHelper#getRegistrationId()} returns null
+     * the {@link org.onepf.opfpush.gcm.GCMPubSubHelper.Callback#onError(String)} method will be called with
+     * {@link GCMConstants#REGISTRATION_ID_NOT_OBTAINED_ERROR} as the argument.
+     *
+     * @param topic    Developer defined topic name. Must match the following regular expression: "/topics/[a-zA-Z0-9-_.~%]{1,900}".
+     * @param extras   An additional information (optional).
+     * @param callback The callback instance. Can be null.
+     */
     public void subscribe(@NonNull final String topic,
                           @Nullable final Bundle extras,
                           @Nullable final Callback callback) {
@@ -96,6 +113,21 @@ public final class GCMPubSubHelper {
         }
     }
 
+    /**
+     * Invokes {@link GcmPubSub#unsubscribe(String, String)} asynchronously.
+     * Registration id saved in {@link OPFPushHelper} is used for unsubscribing.
+     *
+     * It checks current provider name: if {@link OPFPushHelper#getProviderName()} isn't equal to {@link GCMConstants#PROVIDER_NAME}
+     * the {@link org.onepf.opfpush.gcm.GCMPubSubHelper.Callback#onError(String)} method will be called with
+     * {@link GCMConstants#GCM_NOT_CURRENT_PROVIDER_ERROR} as the argument.
+     *
+     * Also it checks if the registration id is already obtained: if {@link OPFPushHelper#getRegistrationId()} returns null
+     * the {@link org.onepf.opfpush.gcm.GCMPubSubHelper.Callback#onError(String)} method will be called with
+     * {@link GCMConstants#REGISTRATION_ID_NOT_OBTAINED_ERROR} as the argument.
+     *
+     * @param topic    From which to stop receiving messages.
+     * @param callback The callback instance. Can be null.
+     */
     public void unsubscribe(@NonNull final String topic,
                             @Nullable final Callback callback) {
         final OPFPushHelper helper = OPFPush.getHelper();
@@ -131,7 +163,14 @@ public final class GCMPubSubHelper {
         return true;
     }
 
-    public class CallbackMainThreadWrapper implements Callback {
+    public interface Callback {
+
+        void onSuccess();
+
+        void onError(@Nullable final String error);
+    }
+
+    private class CallbackMainThreadWrapper implements Callback {
 
         @NonNull
         private final Handler handler = new Handler(Looper.getMainLooper());
@@ -168,12 +207,5 @@ public final class GCMPubSubHelper {
                 });
             }
         }
-    }
-
-    public interface Callback {
-
-        void onSuccess();
-
-        void onError(@Nullable final String error);
     }
 }

@@ -22,13 +22,19 @@ import android.support.annotation.Nullable;
 import org.onepf.opfpush.model.NotificationPayload;
 
 /**
- * TODO: javadoc
+ * The interface intended to define preparing an {@link NotificationPayload} instance from the {@code bundle}.
  *
  * @author Roman Savin
  * @since 23.06.2015
  */
 public interface NotificationPreparer {
 
+    /**
+     * Converts the {@code bundle} to the {@code NotificationPayload} instance.
+     *
+     * @param bundle The data for converting.
+     * @return The prepared {@link NotificationPayload} instance.
+     */
     @Nullable
     NotificationPayload prepare(@NonNull final Bundle bundle);
 }
