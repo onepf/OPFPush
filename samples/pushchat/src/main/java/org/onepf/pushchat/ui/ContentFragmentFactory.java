@@ -22,6 +22,7 @@ import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.ContactsFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
 import org.onepf.pushchat.ui.fragment.content.StateFragment;
+import org.onepf.pushchat.ui.fragment.content.TopicsFragment;
 
 /**
  * @author Roman Savin
@@ -38,6 +39,8 @@ public final class ContentFragmentFactory {
         switch (position) {
             case StateFragment.POSITION:
                 return StateFragment.newInstance();
+            case TopicsFragment.POSITION:
+                return TopicsFragment.newInstance();
             case MessagesFragment.POSITION:
                 return MessagesFragment.newInstance();
             case ContactsFragment.POSITION:

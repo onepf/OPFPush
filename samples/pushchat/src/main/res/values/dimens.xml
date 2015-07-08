@@ -5,10 +5,10 @@
     <dimen name="message_offset">10dp</dimen>
     <dimen name="message_input_layout_offset">5dp</dimen>
     <dimen name="separator_margin">5dp</dimen>
+    <dimen name="item_height">48dp</dimen>
 
     <!--Navigation drawer-->
     <dimen name="navigation_drawer_width">240dp</dimen>
-    <dimen name="item_height">48dp</dimen>
 
     <!--Toolbar-->
     <dimen name="toolbar_item_size">24dp</dimen>

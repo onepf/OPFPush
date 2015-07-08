@@ -66,7 +66,7 @@ import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
  */
 public class MessagesFragment extends BaseContentFragment {
 
-    public static final int POSITION = 1;
+    public static final int POSITION = 2;
 
     private MessagesCursorAdapter adapter;
 
@@ -74,6 +74,7 @@ public class MessagesFragment extends BaseContentFragment {
 
     private Button sendButton;
 
+    @Nullable
     private UpdateStateReceiver receiver;
 
     private MessagesLoaderCallbacks loaderCallbacks;
@@ -131,7 +132,7 @@ public class MessagesFragment extends BaseContentFragment {
 
     @Override
     public int getPosition() {
-        return 1;
+        return POSITION;
     }
 
     private void initMessagesEditText(@NonNull final View view) {
@@ -230,24 +231,6 @@ public class MessagesFragment extends BaseContentFragment {
         }
     }
 
-    private void enableMessageEditText() {
-        if (messageEditText != null) {
-            messageEditText.setEnabled(true);
-        }
-        if (sendButton != null) {
-            sendButton.setEnabled(true);
-        }
-    }
-
-    private void disableMessageEditText() {
-        if (messageEditText != null) {
-            messageEditText.setEnabled(false);
-        }
-        if (sendButton != null) {
-            sendButton.setEnabled(false);
-        }
-    }
-
     private Callback<PushMessageResponse> pushMessageCallback(@NonNull final String messageText) {
         return new Callback<PushMessageResponse>() {
 
@@ -304,6 +287,24 @@ public class MessagesFragment extends BaseContentFragment {
                 case UNREGISTERED_ACTION:
                     disableMessageEditText();
                     break;
+            }
+        }
+
+        private void enableMessageEditText() {
+            if (messageEditText != null) {
+                messageEditText.setEnabled(true);
+            }
+            if (sendButton != null) {
+                sendButton.setEnabled(true);
+            }
+        }
+
+        private void disableMessageEditText() {
+            if (messageEditText != null) {
+                messageEditText.setEnabled(false);
+            }
+            if (sendButton != null) {
+                sendButton.setEnabled(false);
             }
         }
     }

@@ -34,7 +34,7 @@ import org.onepf.pushchat.R;
  */
 public class AboutFragment extends BaseContentFragment {
 
-    public static final int POSITION = 3;
+    public static final int POSITION = 4;
 
     @NonNull
     public static AboutFragment newInstance() {

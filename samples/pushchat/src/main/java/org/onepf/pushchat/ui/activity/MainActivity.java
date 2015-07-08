@@ -26,10 +26,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
@@ -53,7 +52,7 @@ import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.S
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_PROGRESS_BAR_ACTION;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     public static final String OPEN_MESSAGES_FRAGMENT_ACTION = "OPEN_MESSAGES_FRAGMENT_ACTION";
 
@@ -76,6 +75,7 @@ public class MainActivity extends ActionBarActivity {
 
     private boolean isClearMenuItemVisible;
 
+    @Nullable
     private MainActivityReceiver receiver;
 
     @Override
@@ -185,8 +185,8 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(Gravity.START)) {
-            drawerLayout.closeDrawer(Gravity.START);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -269,12 +269,6 @@ public class MainActivity extends ActionBarActivity {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void showGcmErrorDialog(final int errorCode) {
-        if (errorCode != -1) {
-            GooglePlayServicesUtil.showErrorDialogFragment(errorCode, this, 0);
-        }
-    }
-
     private void onShareClick() {
         final Intent intent = new Intent(ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT,
@@ -308,6 +302,12 @@ public class MainActivity extends ActionBarActivity {
                 case SHOW_GCM_ERROR_DIALOG_ACTION:
                     showGcmErrorDialog(intent.getIntExtra(GCM_ERROR_CODE_EXTRA_KEY, -1));
                     break;
+            }
+        }
+
+        private void showGcmErrorDialog(final int errorCode) {
+            if (errorCode != -1) {
+                GooglePlayServicesUtil.showErrorDialogFragment(errorCode, MainActivity.this, 0);
             }
         }
     }

@@ -34,7 +34,8 @@ import org.onepf.pushchat.utils.UuidGenerator;
  */
 public class PushChatApplication extends Application {
 
-    private static final String GCM_SENDER_ID = "707033278505";
+    //todo change to prod
+    private static final String GCM_SENDER_ID = "49031355199";
 
     private static final String NOKIA_SENDER_ID = "pushsample";
 

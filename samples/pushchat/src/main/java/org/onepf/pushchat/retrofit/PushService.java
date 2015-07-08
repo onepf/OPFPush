@@ -19,10 +19,12 @@ package org.onepf.pushchat.retrofit;
 import android.support.annotation.NonNull;
 
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
+import org.onepf.pushchat.model.request.SubscribeOrUnsubscribeRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
 import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
+import org.onepf.pushchat.model.response.TopicsResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 
@@ -53,4 +55,12 @@ public interface PushService {
     @GET("/exist")
     void exist(@Query("uuid") @NonNull final String uuid,
                final Callback<ExistResponse> callback);
+
+    @GET("/getTopicsByUuid")
+    void getTopics(@Query("uuid") @NonNull final String uuid,
+                   @NonNull final Callback<TopicsResponse> callback);
+
+    @POST("/subscribe")
+    void subscribe(@Body @NonNull final SubscribeOrUnsubscribeRequestBody body,
+                   @NonNull final Callback<Object> callback);
 }

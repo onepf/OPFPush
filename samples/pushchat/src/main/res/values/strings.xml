@@ -6,6 +6,7 @@
 
     <!--Action bar titles-->
     <string name="title_state_fragment">State</string>
+    <string name="title_topics_fragment">Topics</string>
     <string name="title_messages_fragment">Messages</string>
     <string name="title_contacts_fragment">Contacts</string>
     <string name="title_about_fragment">About</string>
@@ -26,9 +27,13 @@
     <string name="provider_name_fmt">Provider name : %s</string>
     <string name="registration_id_fmt">Registration id : %s</string>
     <string name="share_intent_chooser_title">Send uuid to…</string>
+
+    <!--Topics string-->
     <string name="topic_hint">Topic</string>
     <string name="subscribe_to_topic">Subscribe</string>
     <string name="unsubscribe_from_topic">Unsubscribe</string>
+    <string name="provider_not_support_topics">%s doesn\'t support topics.</string>
+
 
     <!--Contacts strings-->
     <string name="add_contact_title">Add contact</string>

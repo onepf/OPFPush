@@ -43,7 +43,7 @@ import org.onepf.pushchat.ui.dialog.AlertDialogFragment;
  */
 public class ContactsFragment extends BaseContentFragment {
 
-    public static final int POSITION = 2;
+    public static final int POSITION = 3;
 
     private ContactsCursorAdapter adapter;
     private ListView contactsListView;
@@ -67,6 +67,7 @@ public class ContactsFragment extends BaseContentFragment {
         return view;
     }
 
+    @SuppressWarnings("AssignmentToNull")
     @Override
     public void onDestroyView() {
         super.onDestroyView();

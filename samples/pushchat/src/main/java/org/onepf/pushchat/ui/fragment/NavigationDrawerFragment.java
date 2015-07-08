@@ -58,6 +58,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         titles = new String[]{
                 getString(R.string.title_state_fragment),
+                getString(R.string.title_topics_fragment),
                 getString(R.string.title_messages_fragment),
                 getString(R.string.title_contacts_fragment),
                 getString(R.string.title_about_fragment)
@@ -90,6 +91,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         return drawerListView;
     }
 
+    @SuppressWarnings("AssignmentToNull")
     @Override
     public void onDestroyView() {
         super.onDestroyView();
