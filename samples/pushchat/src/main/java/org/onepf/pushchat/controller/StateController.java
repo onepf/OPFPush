@@ -84,7 +84,7 @@ public final class StateController {
                 .apply();
     }
 
-    private static boolean isRegIdSavedOnServer(@NonNull final Context context) {
+    public static boolean isRegIdSavedOnServer(@NonNull final Context context) {
         final SharedPreferences sharedPreferences = context
                 .getSharedPreferences(STATE_PREFS_NAME, MODE_PRIVATE);
         return sharedPreferences.getBoolean(IS_REGID_SAVED_KEY, false);

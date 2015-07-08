@@ -33,10 +33,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import org.onepf.opfpush.OPFPush;
+import org.onepf.opfpush.OPFPushHelper;
 import org.onepf.pushchat.PushChatApplication;
 import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.DatabaseHelper;
+import org.onepf.pushchat.retrofit.NetworkController;
 import org.onepf.pushchat.ui.fragment.NavigationDrawerFragment;
 import org.onepf.pushchat.ui.fragment.content.BaseContentFragment;
 import org.onepf.pushchat.ui.fragment.content.MessagesFragment;
@@ -82,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final OPFPushHelper helper = OPFPush.getHelper();
+        if (helper.isRegistered() &&
+                helper.getProviderName() != null &&
+                helper.getRegistrationId() != null &&
+                !StateController.isRegIdSavedOnServer(this)) {
+            NetworkController.getInstance().register(this, helper.getProviderName(), helper.getRegistrationId());
+        }
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         setupNavigationDrawer();
