@@ -63,4 +63,8 @@ public interface PushService {
     @POST("/subscribe")
     void subscribe(@Body @NonNull final SubscribeOrUnsubscribeRequestBody body,
                    @NonNull final Callback<Object> callback);
+
+    @POST("/unsubscribe")
+    void unsubscribe(@Body @NonNull final SubscribeOrUnsubscribeRequestBody body,
+                     @NonNull final Callback<Object> callback);
 }

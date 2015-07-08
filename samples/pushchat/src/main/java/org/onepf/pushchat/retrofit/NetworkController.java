@@ -121,6 +121,12 @@ public final class NetworkController {
         pushService.subscribe(new SubscribeOrUnsubscribeRequestBody(topic, getUuid(context)), callback);
     }
 
+    public void unsubscribe(@NonNull final Context context,
+                            @NonNull final String topic,
+                            @NonNull final Callback<Object> callback) {
+        pushService.unsubscribe(new SubscribeOrUnsubscribeRequestBody(topic, getUuid(context)), callback);
+    }
+
     private String getUuid(@NonNull final Context context) {
         final PushChatApplication application = (PushChatApplication) context.getApplicationContext();
         return application.getUUID();

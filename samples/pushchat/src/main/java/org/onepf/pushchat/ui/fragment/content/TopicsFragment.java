@@ -30,6 +30,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,7 @@ import org.onepf.pushchat.R;
 import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.model.response.TopicsResponse;
 import org.onepf.pushchat.retrofit.NetworkController;
+import org.onepf.pushchat.ui.dialog.UnsubscribeDialogFragment;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -107,6 +109,7 @@ public class TopicsFragment extends BaseContentFragment {
         subscribeButton.setOnClickListener(new OnSubscribeClickListener());
         topicEditText.addTextChangedListener(new TopicTextWatcher());
         topicsListView.setAdapter(adapter);
+        topicsListView.setOnItemLongClickListener(new OnTopicItemLongLickListener());
 
         registerReceiver();
         initViews();
@@ -211,62 +214,6 @@ public class TopicsFragment extends BaseContentFragment {
         }
     }
 
-/*    private View.OnClickListener onUnsubscribeClickListener() {
-        //todo
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Context context = getActivity();
-                final String topic = getString(R.string.topic_fmt, topicEditText.getText().toString());
-                topicEditText.setText("");
-                GCMPubSubHelper.getInstance(context).unsubscribe(
-                        topic,
-                        new PubSubCallback(
-                                String.format(
-                                        US,
-                                        "Unsubscribtion from topic %s has been performed successfully.",
-                                        topic
-                                ),
-                                String.format(
-                                        US,
-                                        "Unsubscribtion from topic %s hasn't been performed.",
-                                        topic
-                                )
-                        )
-                );
-            }
-        };
-    }*/
-/*
-    private final class PubSubCallback implements GCMPubSubHelper.Callback {
-
-        @NonNull
-        private final String successString;
-
-        @NonNull
-        private final String errorString;
-
-        public PubSubCallback(@NonNull final String successString,
-                              @NonNull final String errorString) {
-            this.successString = successString;
-            this.errorString = errorString;
-        }
-
-        @Override
-        public void onSuccess() {
-            Toast.makeText(getActivity(), successString, LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onError(@Nullable final String error) {
-            Toast.makeText(
-                    getActivity(),
-                    String.format(US, "%1$s Error message : %2$s", errorString, error),
-                    LENGTH_SHORT
-            ).show();
-        }
-    }*/
-
     private final class TopicTextWatcher implements TextWatcher {
         @Override
         public void afterTextChanged(final Editable s) {
@@ -282,6 +229,26 @@ public class TopicsFragment extends BaseContentFragment {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             //nothing
+        }
+    }
+
+    private final class OnTopicItemLongLickListener implements AdapterView.OnItemLongClickListener {
+
+        @Override
+        public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+            if (adapter == null) {
+                return false;
+            }
+            final String topic = adapter.getItem(position);
+            final UnsubscribeDialogFragment unsubscribeDialogFragment = UnsubscribeDialogFragment.newInstance(topic);
+            unsubscribeDialogFragment.setOnUnsubscribeCallback(new UnsubscribeDialogFragment.OnUnsubscribeCallback() {
+                @Override
+                public void onUnsubscribe() {
+                    adapter.remove(topic);
+                }
+            });
+            unsubscribeDialogFragment.show(getFragmentManager(), UnsubscribeDialogFragment.TAG);
+            return true;
         }
     }
 

@@ -33,7 +33,7 @@
     <string name="subscribe_to_topic">Subscribe</string>
     <string name="unsubscribe_from_topic">Unsubscribe</string>
     <string name="provider_not_support_topics">%s doesn\'t support topics.</string>
-
+    <string name="unsubscribe_question_fmt">Do you want to unsubscribe from topic \"%s\"</string>
 
     <!--Contacts strings-->
     <string name="add_contact_title">Add contact</string>
