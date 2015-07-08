@@ -26,7 +26,7 @@ buildscript {
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle'
+apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle')
 
 android {
     defaultConfig {
