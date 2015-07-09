@@ -25,6 +25,7 @@ import java.util.List;
  * @author Roman Savin
  * @since 02.07.2015
  */
+//CHECKSTYLE:OFF
 public final class TopicsResponse {
 
     @SerializedName("topics")

@@ -87,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final OPFPushHelper helper = OPFPush.getHelper();
-        if (helper.isRegistered() &&
-                helper.getProviderName() != null &&
-                helper.getRegistrationId() != null &&
-                !StateController.isRegIdSavedOnServer(this)) {
+        if (helper.isRegistered()
+                && helper.getProviderName() != null
+                && helper.getRegistrationId() != null
+                && !StateController.isRegIdSavedOnServer(this)) {
             NetworkController.getInstance().register(this, helper.getProviderName(), helper.getRegistrationId());
         }
 
