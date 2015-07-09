@@ -95,7 +95,8 @@ public class UnsubscribeDialogFragment extends DialogFragment {
         @Override
         public void onClick(final DialogInterface dialog, final int which) {
             final Context context = getActivity();
-            GCMPubSubHelper.getInstance(context).subscribe(topic, null, new OnGcmUnsubscribeCallback(topic));
+            GCMPubSubHelper.getInstance(context).unsubscribe(topic, new OnGcmUnsubscribeCallback(topic));
+            NetworkController.getInstance().unsubscribe(context, topic, new OnServerUnsubscribeCallback(topic));
         }
     }
 
@@ -111,12 +112,6 @@ public class UnsubscribeDialogFragment extends DialogFragment {
         @Override
         public void onSuccess() {
             OPFLog.logMethod();
-            final Context context = getActivity();
-            if (context == null) {
-                return;
-            }
-
-            NetworkController.getInstance().unsubscribe(context, topic, new OnServerUnsubscribeCallback(topic));
         }
 
         @Override
