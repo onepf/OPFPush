@@ -119,7 +119,7 @@ public class UnsubscribeDialogFragment extends DialogFragment {
             OPFLog.logMethod(error);
             final Context context = getActivity();
             if (context != null) {
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, error, LENGTH_SHORT).show();
             }
         }
     }

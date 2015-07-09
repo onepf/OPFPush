@@ -64,6 +64,7 @@ import static org.onepf.pushchat.utils.Constants.UNREGISTERED_ACTION;
  * @author Roman Savin
  * @since 02.07.2015
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class TopicsFragment extends BaseContentFragment {
 
     public static final int POSITION = 1;

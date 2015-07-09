@@ -54,7 +54,7 @@ import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.H
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_GCM_ERROR_DIALOG_ACTION;
 import static org.onepf.pushchat.ui.activity.MainActivity.MainActivityReceiver.SHOW_PROGRESS_BAR_ACTION;
 
-
+@SuppressWarnings("PMD.GodClass")
 public class MainActivity extends AppCompatActivity {
 
     public static final String OPEN_MESSAGES_FRAGMENT_ACTION = "OPEN_MESSAGES_FRAGMENT_ACTION";
