@@ -63,7 +63,7 @@ public final class NetworkController {
 
     private NetworkController() {
         final RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://devopfpushapi.appspot.com/_ah/api/opfpush/v1") //todo change to prod
+                .setEndpoint("https://onepf-opfpush.appspot.com/_ah/api/opfpush/v1")
                 .setConverter(new GsonConverter(new GsonBuilder().create()))
                 .build();
         pushService = restAdapter.create(PushService.class);
