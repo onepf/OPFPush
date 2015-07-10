@@ -21,7 +21,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionName "0.3.0-SNAPSHOT"
+        versionName "0.3.0"
     }
 }
 
@@ -33,7 +33,7 @@ dependencies {
     //noinspection NewerVersionAvailable
     androidTestCompile 'org.robolectric:robolectric:2.4'
 
-    compile project(':opfpush')
+    compile 'org.onepf:opfpush:0.3.0@aar'
     
     provided 'com.amazon:amazon-device-messaging:1.0.1'
     provided 'com.android.support:support-annotations:19.1.0'

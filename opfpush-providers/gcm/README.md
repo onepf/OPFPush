@@ -4,7 +4,7 @@
 
 Download [the latest AAR][gcm-latest-aar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-gcm:0.2.3@aar'
+compile 'org.onepf:opfpush-gcm:0.3.0@aar'
 ```
     
 or Maven:
@@ -12,7 +12,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-gcm</artifactId>
-    <version>0.2.3</version>
+    <version>0.3.0</version>
     <type>aar</type>
 </dependency>
 ```
@@ -20,7 +20,7 @@ or Maven:
 You can also use JAR dependency.
 Download [the latest JAR][gcm-latest-jar] or grab via Gradle:
 ```groovy
-compile 'org.onepf:opfpush-gcm:0.2.3'
+compile 'org.onepf:opfpush-gcm:0.3.0'
 ```
 
 or Maven:
@@ -28,7 +28,7 @@ or Maven:
 <dependency>
     <groupId>org.onepf</groupId>
     <artifactId>opfpush-gcm</artifactId>
-    <version>0.2.3</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
@@ -98,5 +98,5 @@ builder.addProviders(new GCMProvider(context, GCM_SENDER_ID));
 ```
 
 [1]: https://developer.android.com/google/gcm/index.html
-[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-gcm-0.2.3.aar
-[gcm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.2.3/opfpush-gcm-0.2.3.jar
+[gcm-latest-aar]: https://github.com/onepf/OPFPush/releases/download/v0.3.0/opfpush-gcm-0.3.0.aar
+[gcm-latest-jar]: https://github.com/onepf/OPFPush/releases/download/v0.3.0/opfpush-gcm-0.3.0.jar
