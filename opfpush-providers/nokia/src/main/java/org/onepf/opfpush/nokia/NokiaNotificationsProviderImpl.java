@@ -27,6 +27,7 @@ import com.nokia.push.PushRegistrar;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 
@@ -52,6 +53,13 @@ class NokiaNotificationsProviderImpl extends BasePushProvider implements NokiaPu
     public NokiaNotificationsProviderImpl(@NonNull final Context context,
                                           @NonNull final String... sendersIds) {
         super(context, PROVIDER_NAME, NOKIA_STORE_APP_PACKAGE);
+        this.sendersIds = sendersIds;
+    }
+
+    public NokiaNotificationsProviderImpl(@NonNull final Context context,
+                                          @NonNull final NotificationMaker notificationMaker,
+                                          @NonNull final String... sendersIds) {
+        super(context, PROVIDER_NAME, NOKIA_STORE_APP_PACKAGE, notificationMaker);
         this.sendersIds = sendersIds;
     }
 

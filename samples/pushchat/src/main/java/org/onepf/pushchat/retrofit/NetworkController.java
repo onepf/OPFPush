@@ -26,10 +26,12 @@ import org.onepf.pushchat.controller.StateController;
 import org.onepf.pushchat.db.DatabaseHelper;
 import org.onepf.pushchat.db.DatabaseHelper.ContactsUuidsAsyncQueryHandler.QueryContactsUuidsCallback;
 import org.onepf.pushchat.model.request.RegistrationRequestBody;
+import org.onepf.pushchat.model.request.SubscribeOrUnsubscribeRequestBody;
 import org.onepf.pushchat.model.request.UnregistrationRequestBody;
 import org.onepf.pushchat.model.request.push.PushMessageRequestBody;
 import org.onepf.pushchat.model.response.ExistResponse;
 import org.onepf.pushchat.model.response.RegistrationResponse;
+import org.onepf.pushchat.model.response.TopicsResponse;
 import org.onepf.pushchat.model.response.UnregistrationResponse;
 import org.onepf.pushchat.model.response.push.PushMessageResponse;
 import org.onepf.pushchat.utils.Constants;
@@ -106,6 +108,23 @@ public final class NetworkController {
     public void exist(@NonNull final String uuid,
                       @NonNull final Callback<ExistResponse> callback) {
         pushService.exist(uuid, callback);
+    }
+
+    public void getTopics(@NonNull final Context context,
+                          @NonNull final Callback<TopicsResponse> callback) {
+        pushService.getTopics(getUuid(context), callback);
+    }
+
+    public void subscribe(@NonNull final Context context,
+                          @NonNull final String topic,
+                          @NonNull final Callback<Object> callback) {
+        pushService.subscribe(new SubscribeOrUnsubscribeRequestBody(topic, getUuid(context)), callback);
+    }
+
+    public void unsubscribe(@NonNull final Context context,
+                            @NonNull final String topic,
+                            @NonNull final Callback<Object> callback) {
+        pushService.unsubscribe(new SubscribeOrUnsubscribeRequestBody(topic, getUuid(context)), callback);
     }
 
     private String getUuid(@NonNull final Context context) {

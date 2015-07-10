@@ -31,6 +31,7 @@ import com.amazon.device.messaging.development.ADMManifest;
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 
@@ -52,15 +53,17 @@ import static org.onepf.opfpush.adm.ADMConstants.RECEIVE_MESSAGE_PERMISSION_SUFF
 class ADMProviderImpl extends BasePushProvider {
 
     @NonNull
-    private final ADM adm;
+    private final ADM adm = new ADM(getContext().getApplicationContext());
 
     @NonNull
-    private final PreferencesProvider preferencesProvider;
+    private final PreferencesProvider preferencesProvider =  PreferencesProvider.getInstance(getContext());
 
     public ADMProviderImpl(@NonNull final Context context) {
         super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE);
-        adm = new ADM(context.getApplicationContext());
-        preferencesProvider = PreferencesProvider.getInstance(getContext());
+    }
+
+    public ADMProviderImpl(@NonNull final Context context, @NonNull final NotificationMaker notificationMaker) {
+        super(context, PROVIDER_NAME, KINDLE_STORE_APP_PACKAGE, notificationMaker);
     }
 
     @Override

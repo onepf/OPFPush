@@ -30,6 +30,11 @@
 #appcompat
 -dontwarn android.view.accessibility.AccessibilityNodeInfo
 -dontwarn android.media.session.MediaSession
+-dontwarn android.support.v4.app.DialogFragment
+-dontwarn android.support.v4.app.FragmentTransaction
+-dontwarn android.support.v4.view.ViewCompat
+-dontwarn android.support.v4.widget.DrawerLayout
+-dontwarn android.support.v7.media.**
 
 #retrofit
 -keepattributes Signature

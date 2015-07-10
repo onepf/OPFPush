@@ -19,6 +19,8 @@ package org.onepf.opfpush;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -32,6 +34,7 @@ import org.onepf.opfpush.model.Message;
 import org.onepf.opfpush.model.PushError;
 import org.onepf.opfpush.model.State;
 import org.onepf.opfpush.model.UnrecoverablePushError;
+import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
@@ -277,6 +280,18 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         return settings.getState() == REGISTERING;
     }
 
+    @Override
+    public void onNeedRetryRegistration() {
+        OPFLog.logMethod();
+        OPFLog.d("Current provider : " + currentProvider);
+        settings.clear();
+        if (currentProvider != null) {
+            currentProvider.onRegistrationInvalid();
+            currentProvider = null;
+        }
+        register();
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -359,18 +374,6 @@ final class OPFPushHelperImpl extends OPFPushHelper {
         synchronized (registrationLock) {
             unregister(getProviderWithException(providerName));
         }
-    }
-
-    @Override
-    void onNeedRetryRegister() {
-        OPFLog.logMethod();
-        OPFLog.d("Current provider : " + currentProvider);
-        settings.clear();
-        if (currentProvider != null) {
-            currentProvider.onRegistrationInvalid();
-            currentProvider = null;
-        }
-        register();
     }
 
     @SuppressWarnings("PMD.OneDeclarationPerLine")
@@ -685,6 +688,8 @@ final class OPFPushHelperImpl extends OPFPushHelper {
     @SuppressWarnings("UnusedDeclaration")
     private final class ReceivedMessageHandlerImpl implements ReceivedMessageHandler {
 
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
         /**
          * A push provider calls this method when a new message is received.
          *
@@ -697,7 +702,21 @@ final class OPFPushHelperImpl extends OPFPushHelper {
             OPFLog.logMethod(providerName);
             if (currentProvider != null && providerName.equals(currentProvider.getName())) {
                 settings.saveState(REGISTERED);
-                eventListenerWrapper.onMessage(appContext, providerName, extras);
+
+                //noinspection InnerClassTooDeeplyNested
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //All operations with NotificationMaker should are performed in the main thread.
+                        //It saves users from having to make thread safe NotificationMaker.
+                        final NotificationMaker notificationMaker = currentProvider.getNotificationMaker();
+                        if (extras != null && notificationMaker.needShowNotification(extras)) {
+                            notificationMaker.showNotification(appContext, extras);
+                        } else {
+                            eventListenerWrapper.onMessage(appContext, providerName, extras);
+                        }
+                    }
+                });
             } else {
                 OPFLog.w("Ignore onMessage from provider " + providerName
                         + ". Current provider is " + currentProvider);

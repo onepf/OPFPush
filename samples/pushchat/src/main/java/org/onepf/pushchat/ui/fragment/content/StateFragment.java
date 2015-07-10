@@ -56,6 +56,7 @@ public class StateFragment extends BaseContentFragment {
 
     private Button registerButton;
 
+    @Nullable
     private BroadcastReceiver updateStateReceiver;
 
     @NonNull
@@ -77,7 +78,7 @@ public class StateFragment extends BaseContentFragment {
         registrationIdTextView = (TextView) view.findViewById(R.id.registration_id_text);
         registerButton = (Button) view.findViewById(R.id.register_button);
 
-        registerButton.setOnClickListener(onClickListener());
+        registerButton.setOnClickListener(onRegistrationClickListener());
 
         registerReceiver();
         initState();
@@ -85,6 +86,7 @@ public class StateFragment extends BaseContentFragment {
         return view;
     }
 
+    @SuppressWarnings("AssignmentToNull")
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -215,7 +217,7 @@ public class StateFragment extends BaseContentFragment {
         }
     }
 
-    private View.OnClickListener onClickListener() {
+    private View.OnClickListener onRegistrationClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {

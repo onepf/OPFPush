@@ -32,25 +32,19 @@ public final class GCMConstants {
      */
     public static final String PROVIDER_NAME = "Google Cloud Messaging";
 
-    static final String ACTION_REGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.REGISTRATION";
-    static final String ACTION_UNREGISTRATION_CALLBACK = BuildConfig.APPLICATION_ID + ".intent.UNREGISTRATION";
+    public static final String GCM_NOT_CURRENT_PROVIDER_ERROR = "GCM is not the current provider";
+    public static final String REGISTRATION_ID_NOT_OBTAINED_ERROR = "Registration token hasn't been obtained yet";
 
     static final String C2DM_ACTION_RECEIVE = "com.google.android.c2dm.intent.RECEIVE";
-
-    static final String EXTRA_ERROR_ID = "error_id";
-    static final String EXTRA_REGISTRATION_ID = "registration_id";
     static final String ERROR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+
     static final String ERROR_SERVICE_NOT_AVAILABLE = GoogleCloudMessaging.ERROR_SERVICE_NOT_AVAILABLE;
 
     static final String GOOGLE_PLAY_APP_PACKAGE = "com.android.vending";
-
-    static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    static final String ANDROID_RELEASE_4_0_4 = "4.0.4";
-
-    static final String PERMISSION_SEND = "com.google.android.c2dm.permission.SEND";
     static final String PERMISSION_RECEIVE = "com.google.android.c2dm.permission.RECEIVE";
     static final String PERMISSION_C2D_MESSAGE_SUFFIX = ".permission.C2D_MESSAGE";
     static final String GOOGLE_CLOUD_MESSAGING_CLASS_NAME = "com.google.android.gms.gcm.GoogleCloudMessaging";
+
     static final String MESSAGES_TO_SUFFIX = "@gcm.googleapis.com";
 
     static final String GOOGLE_SERVICES_FRAMEWORK_PACKAGE = "com.google.android.gsf";

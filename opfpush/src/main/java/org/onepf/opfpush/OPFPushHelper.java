@@ -120,6 +120,11 @@ public abstract class OPFPushHelper {
     public abstract boolean isRegistered();
 
     /**
+     * Is invoked if registration must be retried. (For example if registration id is expired).
+     */
+    public abstract void onNeedRetryRegistration();
+
+    /**
      * Returns {@code true} if the registration operation is being performed at the moment.
      *
      * @return {@code true} if the registration operation is being performed at the moment.
@@ -135,8 +140,6 @@ public abstract class OPFPushHelper {
     abstract void register(@NonNull final String providerName);
 
     abstract void unregister(@NonNull final String providerName);
-
-    abstract void onNeedRetryRegister();
 
     abstract void registerNextAvailableProvider(@Nullable final String prevProviderName);
 

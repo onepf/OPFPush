@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfpush.gcm;
+package org.onepf.pushchat.model.request;
 
-import android.support.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import android.support.annotation.NonNull;
 
 /**
- * @author Kirill Rozov
- * @since 24.09.14.
+ * @author Roman Savin
+ * @since 03.07.2015
  */
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({
-        GCMConstants.ACTION_REGISTRATION_CALLBACK,
-        GCMConstants.ACTION_UNREGISTRATION_CALLBACK
-})
-@interface GCMAction {
+//CHECKSTYLE:OFF
+public final class SubscribeOrUnsubscribeRequestBody {
+
+    @NonNull
+    public final String topic;
+
+    @NonNull
+    public final String uuid;
+
+    public SubscribeOrUnsubscribeRequestBody(@NonNull final String topic, @NonNull final String uuid) {
+        this.topic = topic;
+        this.uuid = uuid;
+    }
 }

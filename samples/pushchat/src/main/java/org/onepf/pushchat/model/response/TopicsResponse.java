@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle')
+package org.onepf.pushchat.model.response;
 
-android {
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 22
-        versionName "0.3.0"
+import android.support.annotation.Nullable;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
+/**
+ * @author Roman Savin
+ * @since 02.07.2015
+ */
+//CHECKSTYLE:OFF
+public final class TopicsResponse {
+
+    @SerializedName("topics")
+    @Nullable
+    public final List<String> topics;
+
+    public TopicsResponse(@Nullable final List<String> topics) {
+        this.topics = topics;
     }
-}
-
-dependencies {
-    compile 'org.onepf:opfpush:0.3.0@aar'
-    compile 'com.nokia:push:1.0'
-
-    provided 'com.android.support:support-annotations:19.1.0'
-    //noinspection NewerVersionAvailable
-    provided 'org.onepf:opfutils:0.1.22'
 }

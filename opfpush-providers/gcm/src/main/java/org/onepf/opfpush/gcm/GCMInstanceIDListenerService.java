@@ -16,30 +16,21 @@
 
 package org.onepf.opfpush.gcm;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.NonNull;
-
+import com.google.android.gms.iid.InstanceIDListenerService;
+import org.onepf.opfpush.OPFPush;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 
 /**
- * Forwards the Google Cloud Messaging (GCM) messages to {@link GCMService}.
+ * It performs reregistration of the GCMProvider in the implementation of the {@code onTokenRefresh()} method.
  *
  * @author Roman Savin
+ * @since 16.06.2015
  */
-public class GCMReceiver extends WakefulBroadcastReceiver {
+public class GCMInstanceIDListenerService extends InstanceIDListenerService {
 
     @Override
-    public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
-        OPFLog.logMethod(context, OPFUtils.toString(intent));
-
-        intent.setComponent(new ComponentName(context, GCMService.class));
-        startWakefulService(context, intent);
-        if (isOrderedBroadcast()) {
-            setResultCode(Activity.RESULT_OK);
-        }
+    public void onTokenRefresh() {
+        OPFLog.logMethod();
+        OPFPush.getHelper().onNeedRetryRegistration();
     }
 }
