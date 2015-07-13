@@ -51,7 +51,7 @@ dependencies {
     compile 'com.melnykov:floatingactionbutton:1.3.0'
 
     //opfpush
-    compile 'org.onepf:opfutils:0.1.22'
+    compile 'org.onepf:opfutils:0.1.23'
     compile 'org.onepf:opfpush:0.3.0@aar'
     compile 'org.onepf:opfpush-gcm:0.3.0@aar'
     compile 'org.onepf:opfpush-adm:0.3.0@aar'
