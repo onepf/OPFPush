@@ -67,7 +67,7 @@ If you use JAR dependency, you also must add to your application AndroidManifest
 
 <application>
     <service
-        android:name=".GCMService"
+        android:name="org.onepf.opfpush.gcm.GCMService"
         android:exported="false">
         <intent-filter>
              <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -75,7 +75,7 @@ If you use JAR dependency, you also must add to your application AndroidManifest
     </service>
     
     <service
-        android:name=".GCMInstanceIDListenerService"
+        android:name="org.onepf.opfpush.gcm.GCMInstanceIDListenerService"
         android:exported="false">
         <intent-filter>
             <action android:name="com.google.android.gms.iid.InstanceID" />
