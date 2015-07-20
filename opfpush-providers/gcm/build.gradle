@@ -23,6 +23,10 @@ android {
         targetSdkVersion 22
         versionName "0.3.0"
     }
+
+    lintOptions {
+        disable 'NewerVersionAvailable'
+    }
 }
 
 dependencies {

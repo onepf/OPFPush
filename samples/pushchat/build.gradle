@@ -41,7 +41,7 @@ android {
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'IconExpectedSize',
                 'IconDensities', 'AlwaysShowAction', 'RtlEnabled', 'Overdraw', 'UnusedIds', 'RtlHardcoded',
-                'GradleDynamicVersion'
+                'GradleDynamicVersion', "NewerVersionAvailable"
     }
 }
 
