@@ -27,11 +27,9 @@ android {
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    //noinspection NewerVersionAvailable
-    testCompile 'org.robolectric:robolectric:2.4'
+    testCompile 'org.robolectric:robolectric:3.0'
     androidTestCompile 'junit:junit:4.12'
-    //noinspection NewerVersionAvailable
-    androidTestCompile 'org.robolectric:robolectric:2.4'
+    androidTestCompile 'org.robolectric:robolectric:3.0'
 
     compile 'org.onepf:opfpush:0.3.0@aar'
     //noinspection NewerVersionAvailable

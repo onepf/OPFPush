@@ -19,9 +19,7 @@ package org.onepf.opfpush.adm;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-
 import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +27,8 @@ import org.junit.runner.RunWith;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
@@ -42,7 +40,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
  * @author antonpp
  * @since 02.03.2015
  */
-@Config(emulateSdk = JELLY_BEAN_MR2, manifest = Config.NONE)
+@Config(sdk = JELLY_BEAN_MR2, manifest = Config.NONE)
 @RunWith(RobolectricTestRunner.class)
 public class PreferencesProviderTest extends Assert {
 
@@ -61,7 +59,7 @@ public class PreferencesProviderTest extends Assert {
 
     @Before
     public void setup() {
-        ctx = Robolectric.application.getApplicationContext();
+        ctx = RuntimeEnvironment.application.getApplicationContext();
         preferencesProvider = PreferencesProvider.getInstance(ctx);
         preferences = new OPFPreferences(ctx, ADM_POSTFIX);
         preferences.put(KEY_APP_VERSION, OPFUtils.getAppVersion(ctx));
