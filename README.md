@@ -30,7 +30,7 @@ provides possibility to use the system push provider for a specific device.
    or grab it via Gradle:
    ```groovy
    compile 'org.onepf:opfpush:0.3.0@aar'
-   compile 'org.onepf:opfutils:0.1.22'
+   compile 'org.onepf:opfutils:0.1.23'
    ```
 
    or Maven:
@@ -44,7 +44,7 @@ provides possibility to use the system push provider for a specific device.
    <dependency>
        <groupId>org.onepf</groupId>
        <artifactId>opfutils</artifactId>
-       <version>0.1.22</version>
+       <version>0.1.23</version>
    </dependency>
    ```
 
@@ -203,7 +203,7 @@ Take a look at the usage of the OPFPush library in our [sample application][samp
 [amazon-device-messaging]: https://developer.amazon.com/appsandservices/apis/engage/device-messaging
 [nokia-notifications]: http://developer.nokia.com/resources/library/nokia-x/nokia-notifications
 [opfutils]: https://github.com/onepf/OPFUtils
-[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.22/opfutils-0.1.22.jar
+[opfutils-latest-jar]: https://github.com/onepf/OPFUtils/releases/download/v0.1.23/opfutils-0.1.23.jar
 [jar-dependency-using]: https://github.com/onepf/OPFPush/wiki/Using-of-JAR-dependencies
 [opfpush-receiver-section]: https://github.com/onepf/OPFPush/wiki/Using-of-OPFPushReceiver
 [custom-push-provider]: https://github.com/onepf/OPFPush/wiki/Create-custom-push-provider
