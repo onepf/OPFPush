@@ -24,10 +24,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
-
 import org.onepf.opfpush.BasePushProvider;
 import org.onepf.opfpush.listener.CheckManifestHandler;
 import org.onepf.opfpush.model.AvailabilityResult;
@@ -35,7 +33,6 @@ import org.onepf.opfpush.notification.NotificationMaker;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFLog;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_APP_REGISTRATION_EVENT;
 import static com.amazon.device.messaging.ADMConstants.LowLevel.ACTION_RECEIVE_ADM_MESSAGE;
 import static com.amazon.device.messaging.development.ADMManifest.PERMISSION_RECEIVE_MESSAGES;
@@ -87,7 +84,6 @@ class ADMProviderImpl extends BasePushProvider {
         final Context context = getContext();
         ADMManifest.checkManifestAuthoredProperly(context);
         CheckUtils.checkPermission(context, PERMISSION_RECEIVE_MESSAGES, checkManifestHandler);
-        CheckUtils.checkPermission(context, GET_ACCOUNTS, checkManifestHandler);
 
         final String admMessagePermission = context.getPackageName() + RECEIVE_MESSAGE_PERMISSION_SUFFIX;
         CheckUtils.checkPermission(context, admMessagePermission, checkManifestHandler);

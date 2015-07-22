@@ -31,7 +31,8 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.robolectric:robolectric:3.0'
 
-    compile 'org.onepf:opfpush:0.3.0@aar'
+    //compile 'org.onepf:opfpush:0.3.0@aar'
+    compile project(':opfpush')
     
     provided 'com.amazon:amazon-device-messaging:1.0.1'
     provided 'com.android.support:support-annotations:19.1.0'
