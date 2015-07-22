@@ -35,5 +35,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
 
     provided 'com.android.support:support-annotations:19.1.0'
-    provided 'org.onepf:opfutils:0.1.23'
+    provided 'org.onepf:opfutils:0.1.24'
 }
