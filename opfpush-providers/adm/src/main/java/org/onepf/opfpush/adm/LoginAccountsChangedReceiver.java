@@ -24,9 +24,11 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfpush.RetryBroadcastReceiver;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
+import static android.Manifest.permission.GET_ACCOUNTS;
 import static org.onepf.opfpush.OPFConstants.ACTION_RETRY_UNREGISTER;
 import static org.onepf.opfpush.OPFConstants.EXTRA_PROVIDER_NAME;
 import static org.onepf.opfpush.adm.ADMConstants.ACCOUNT_TYPE;
@@ -44,6 +46,10 @@ public class LoginAccountsChangedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(@NonNull final Context context, @NonNull final Intent intent) {
         OPFLog.logMethod(context, OPFUtils.toString(intent));
+        if (!OPFChecks.hasPermission(context, GET_ACCOUNTS)) {
+            OPFLog.w(GET_ACCOUNTS + " permission hasn't been declared");
+            return;
+        }
 
         final PreferencesProvider preferencesProvider = PreferencesProvider.getInstance(context);
         final Account[] amazonAccounts = AccountManager.get(context).getAccountsByType(ACCOUNT_TYPE);

@@ -29,9 +29,7 @@ import org.onepf.opfpush.pushprovider.PushProvider;
 import org.onepf.opfpush.utils.CheckUtils;
 import org.onepf.opfutils.OPFUtils;
 
-import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.INTERNET;
-import static android.Manifest.permission.RECEIVE_BOOT_COMPLETED;
 import static android.Manifest.permission.WAKE_LOCK;
 
 /**
@@ -111,9 +109,7 @@ public abstract class BasePushProvider implements PushProvider {
     @Override
     public void checkManifest(@Nullable final CheckManifestHandler checkManifestHandler) {
         CheckUtils.checkPermission(appContext, INTERNET, checkManifestHandler);
-        CheckUtils.checkPermission(appContext, RECEIVE_BOOT_COMPLETED, checkManifestHandler);
         CheckUtils.checkPermission(appContext, WAKE_LOCK, checkManifestHandler);
-        CheckUtils.checkPermission(appContext, ACCESS_NETWORK_STATE, checkManifestHandler);
 
         CheckUtils.checkReceiver(appContext, BootCompleteReceiver.class.getName(),
                 new Intent(Intent.ACTION_BOOT_COMPLETED), checkManifestHandler);
