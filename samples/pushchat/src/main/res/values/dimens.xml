@@ -7,6 +7,8 @@
     <dimen name="separator_margin">5dp</dimen>
     <dimen name="item_height">48dp</dimen>
 
+    <dimen name="toolbar_height">56dp</dimen>
+
     <!--Navigation drawer-->
     <dimen name="navigation_drawer_width">240dp</dimen>
 

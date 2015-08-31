@@ -53,3 +53,7 @@
 -keep class sun.misc.Unsafe { *; }
 #your package path where your gson models are stored
 -keep class org.onepf.pushchat.model.** { *; }
+
+#compileSdkVersion 23 problem https://code.google.com/p/android-developer-preview/issues/detail?id=3001
+-dontwarn android.support.**
+-dontwarn android.net.http.**

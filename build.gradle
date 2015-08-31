@@ -28,7 +28,7 @@ buildscript {
     dependencies {
         //noinspection GradleDependency
         classpath 'com.kageiit:url-cache-plugin:1.0.0'
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:1.3.0'
         classpath 'com.noveogroup.android:check:1.1.2'
         classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
     }
@@ -43,7 +43,7 @@ allprojects {
     }
 
     ext {
-        compileSdkVersion = 22
-        buildToolsVersion = "22.0.1"
+        compileSdkVersion = 23
+        buildToolsVersion = "23.0.0"
     }
 }

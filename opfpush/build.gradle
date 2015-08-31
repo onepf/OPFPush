@@ -31,13 +31,15 @@ apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/m
 android {
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionName "0.3.1"
     }
 
     lintOptions {
         disable 'NewerVersionAvailable'
     }
+
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
@@ -46,6 +48,6 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.robolectric:robolectric:3.0'
 
-    provided 'com.android.support:support-annotations:19.1.0'
-    provided 'org.onepf:opfutils:0.1.24'
+    provided 'com.android.support:support-annotations:23.0.0'
+    provided 'org.onepf:opfutils:0.1.25'
 }

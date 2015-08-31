@@ -20,7 +20,7 @@ apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/m
 android {
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionName "0.3.1"
     }
 
@@ -33,6 +33,6 @@ dependencies {
     compile 'org.onepf:opfpush:0.3.1@aar'
     compile 'com.nokia:push:1.0'
 
-    provided 'com.android.support:support-annotations:19.1.0'
-    provided 'org.onepf:opfutils:0.1.24'
+    provided 'com.android.support:support-annotations:23.0.0'
+    provided 'org.onepf:opfutils:0.1.25'
 }

@@ -9,7 +9,7 @@
         android:id="@+id/tool_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/abc_action_bar_default_height_material"
+        android:minHeight="@dimen/toolbar_height"
         android:background="?attr/colorPrimary"
         app:theme="@style/ToolbarTheme">
 
