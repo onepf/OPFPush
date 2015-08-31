@@ -168,7 +168,7 @@ To create a custom push provider see [the following section][custom-push-provide
 | :---------------------------------- | :---: | :---: | :-----------------: | :---------: |
 | Receive messages                    |   +   |   +   |          +          |      +      |
 | Multiple senders                    |   +   |   -   |          +          |      +      |
-| Notification payload support        |   +   |   -   |          -          |      -      |
+| Notification payload support        |   +   |   -   |          -          |      +      |
 | Asynchronous registration and unregistration |   -   |   +   |          +          |      +      |
 | Retry register on fail              |   -   |   +   |          +          |      +      |
 | Retry register on fail after reboot |   -   |   -   |          -          |      +      |
